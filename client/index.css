@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer base {
+	h1 {
+		@apply text-6xl;
+	}
+}
+@layer components {
+	.btt {
+		@apply text-green-700;
+	}
+}
