@@ -1,50 +1,38 @@
 import catchAsync from "../middelwares/catchAsync.js";
-import productModel from "../models/productModel.js";
+import ProductModel from "../models/ProductModel.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendRespons.js";
+import {
+	createDoc,
+	deleteAllDocs,
+	deleteDoc,
+	deleteDocByOwner,
+	getAllDocs,
+} from "./handelFactoryController.js";
 
 //  @desc   add new product
 // @Route  POST /api/v1/products
 // @access Private/Admin
-export const addProduct = catchAsync(async (req, res, next) => {
-	const { name, price, countInStock, brand, category, description, image } =
-		req.body;
-	// validation
-	if (!name || !price || !countInStock || !brand || !category)
-		return next(new appError("please provide all fields", 400));
-	// create new product
-	const product = await productModel.create({
-		user: req.user._id,
-		name,
-		price,
-		countInStock,
-		brand,
-		category,
-		description,
-		image,
-	});
-	// check if product created
-	if (!product) return next(new appError("failed to add product", 400));
-	// send response
-	sendResponse(res, 201, product);
-});
 
+export const addProduct = createDoc(ProductModel, "ProductModel", [
+	"name",
+	"price",
+	"countInStock",
+	"brand",
+	"category",
+	"description",
+	"image",
+]);
 // @desc   get all products
 // @Route  GET /api/v1/products
 // @access Public
-export const getAllProducts = catchAsync(async (req, res, next) => {
-	const products = await productModel.find({});
-	// check if products exist
-	if (!products) return next(new appError("products not found", 400));
-	// send response
-	sendResponse(res, 200, { results: products.length, products });
-});
+export const getAllProducts = getAllDocs(ProductModel);
 
 //  @desc   get single product
 //  @Route  GET /api/v1/products/:id
 //  @access Public
 export const getSingleProduct = catchAsync(async (req, res, next) => {
-	const product = await productModel.findById(req.params.id);
+	const product = await ProductModel.findById(req.params.id);
 	// check if product exist
 	if (!product) return next(new appError("product not found", 400));
 	// send response
@@ -53,14 +41,13 @@ export const getSingleProduct = catchAsync(async (req, res, next) => {
 
 //  @desc   delete product
 //  @Route  DELETE /api/v1/products/:id
-//  @access Private/Admin
-export const deleteProduct = catchAsync(async (req, res, next) => {
-	const product = await productModel.findByIdAndDelete(req.params.id);
-	// check if product deleted
-	if (!product) return next(new appError("product not delete", 400));
-	// send response
-	sendResponse(res, 200, product);
-});
+//  @access Private/superAdmin
+export const deleteProduct = deleteDoc(ProductModel);
+
+//  @desc   delete product
+
+//  @access Private/superAdmin
+export const deleteProductByOwner = deleteDocByOwner(ProductModel);
 
 //  @desc   update product
 //  @Route  PATCH /api/v1/products/:id
@@ -80,7 +67,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
 	)
 		return next(new appError("please provide all fields", 400));
 	// update product
-	const product = await productModel.findByIdAndUpdate(
+	const product = await ProductModel.findByIdAndUpdate(
 		req.params.id,
 		{
 			name,
@@ -101,11 +88,5 @@ export const updateProduct = catchAsync(async (req, res, next) => {
 
 //  @desc  delete all products
 //  @Route  DELETE /api/v1/products
-//  @access Private/Admin
-export const deleteAllProducts = catchAsync(async (req, res, next) => {
-	const products = await productModel.deleteMany({});
-	// check if products deleted
-	if (!products) return next(new appError("products not delete", 400));
-	// send response
-	sendResponse(res, 200, products);
-});
+//  @access Private/superAdmin
+export const deleteAllProducts = deleteAllDocs(ProductModel);
