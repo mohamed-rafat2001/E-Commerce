@@ -37,12 +37,11 @@ const productSchema = new mongoose.Schema(
 			required: [true, "Product price is required"],
 			trim: true,
 		},
-		numReviews: {
+		ratingAverage: {
 			type: Number,
 			default: 0,
 		},
-		reviews: [],
-		rating: {
+		ratingQuantity: {
 			type: Number,
 			default: 0,
 		},
@@ -52,6 +51,21 @@ const productSchema = new mongoose.Schema(
 			required: [true, "countInStock is required"],
 		},
 	},
+	{ toJSON: { virtuals: true }, toObject: { virtuals: true } },
 	{ timestamps: true }
 );
+//  mongoose indexs price
+productSchema.index({ price: 1 });
+
+// virtual populate
+productSchema.virtual("reviews", {
+	ref: "ProductReviewsModel",
+	localField: "_id",
+	foreignField: "productId",
+});
+//  mongoose query middlewares
+productSchema.pre("findOne", function (next) {
+	this.populate("reviews");
+	next();
+});
 export default mongoose.model("ProductModel", productSchema);

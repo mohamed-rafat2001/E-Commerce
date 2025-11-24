@@ -55,8 +55,11 @@ app.use(cookieParser());
 import authRouter from "./routers/authRouter.js";
 import productRouter from "./routers/productRouter.js";
 import globalError from "./controllers/globalErrorController.js";
+import reviewRouter from "./routers/reviewRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/reviews", reviewRouter);
+
 // globall error handler
 app.use(globalError);

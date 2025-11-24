@@ -1,7 +1,5 @@
-import { Model } from "mongoose";
 import catchAsync from "../middelwares/catchAsync.js";
 import appError from "../utils/appError.js";
-import objectFilter from "../utils/objectFilter.js";
 import sendResponse from "../utils/sendRespons.js";
 import validationBody from "../utils/validationBody.js";
 
@@ -12,28 +10,55 @@ export const createDoc = (Model, modelName, objectFields) =>
 		if (Object.keys(object).length == 0)
 			return next(new appError("please provide all fields", 400));
 		// create new product
+		let doc = Model;
 		if (modelName == "ProductModel") {
-			const doc = await Model.create({
+			doc = await doc.create({
 				user: req.user._id,
 				...object,
 			});
-			// check if product create
-			if (!doc) return next(new appError("doc not create", 400));
-			// send response
-			return sendResponse(res, 200, doc);
 		}
 		//create new review
 		else if (modelName == "ProductReviewsModel") {
-			const doc = await Model.create({
+			doc = await doc.create({
 				user: req.user._id,
 				productId: req.params.id,
 				...object,
 			});
-			// check if doc created
-			if (!doc) return next(new appError("doc not create", 400));
-			// send response
-			return sendResponse(res, 201, doc);
+		} else return next(new appError("doc not create", 400));
+		// check if product create
+		if (!doc) return next(new appError("doc not create", 400));
+		// send response
+		return sendResponse(res, 200, doc);
+	});
+
+// update doc
+export const updateDoc = (Model, modelName, objectFields) =>
+	catchAsync(async (req, res, next) => {
+		const object = validationBody(req.body, objectFields);
+		if (Object.keys(object).length == 0)
+			return next(new appError("please provide all fields", 400));
+
+		let doc = Model;
+		// update product
+		if (modelName == "ProductModel") {
+			doc = await doc.findOneAndUpdate(
+				{ _id: req.params.id, user: req.user._id },
+				{ ...object },
+				{ new: true, runValidators: true }
+			);
 		}
+		// update review
+		else if (modelName == "ProductReviewsModel") {
+			doc = await doc.findOneAndUpdate(
+				{ _id: req.params.id, user: req.user._id },
+				{ ...object },
+				{ new: true, runValidators: true }
+			);
+		} else return next(new appError("doc not update", 400));
+		// check if doc updated
+		if (!doc) return next(new appError("doc don't update", 400));
+		// send response
+		sendResponse(res, 200, doc);
 	});
 //  getAllDocs
 export const getAllDocs = (Model) =>
@@ -55,7 +80,7 @@ export const getSingDoc = (Model) =>
 		sendResponse(res, 200, doc);
 	});
 
-// delete review by owner
+// delete doc by owner
 export const deleteDocByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const doc = await Model.findOneAndDelete({

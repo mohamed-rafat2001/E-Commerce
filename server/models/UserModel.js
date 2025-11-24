@@ -5,9 +5,15 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 const userSchema = new mongoose.Schema(
 	{
-		name: {
+		firstName: {
 			type: String,
-			required: [true, "name is required"],
+			required: [true, "firstName is required"],
+			trim: true,
+			minlength: 3,
+		},
+		lastName: {
+			type: String,
+			required: [true, "lastName is required"],
 			trim: true,
 			minlength: 3,
 		},
@@ -18,20 +24,7 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			validate: [validator.isEmail, "please enter the valid email"],
 		},
-		phone: {
-			type: String,
-			required: [true, "phone number is required"],
-			trim: true,
-			validate: [validator.isMobilePhone, "please enter valid phone number"],
-		},
-		profileImg: {
-			type: String,
-		},
-		location: {
-			type: String,
-			required: [true, "location is required"],
-			trim: true,
-		},
+
 		password: {
 			type: String,
 			required: [true, "password is required"],
@@ -53,8 +46,8 @@ const userSchema = new mongoose.Schema(
 		passwordResetExpires: Date,
 		role: {
 			type: String,
-			enum: ["user", "admin"],
-			default: "admin",
+			enum: ["Customer", "Seller", "Admin", "SuperAdmin", "Employee"],
+			default: "Customer",
 		},
 	},
 	{ timestamps: true }

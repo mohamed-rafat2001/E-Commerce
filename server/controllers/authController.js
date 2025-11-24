@@ -1,20 +1,31 @@
 import catchAsync from "../middelwares/catchAsync.js";
 import UserModel from "../models/UserModel.js";
+import CustomerModel from "../models/CustomerModel.js";
 import appError from "../utils/appError.js";
 import { passwordResetCodeTemplate } from "../utils/emailTempletes.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendRespons.js";
+import SellerModel from "../models/SellerModel.js";
 
 export const signUp = catchAsync(async (req, res, next) => {
-	const { name, email, phone, password, confirmPassword, location } = req.body;
-	const user = await UserModel.create({
-		name,
+	const {
+		firstName,
+		lastName,
+		phoneNumber,
 		email,
-		phone,
 		password,
 		confirmPassword,
-		location,
+		role,
+	} = req.body;
+	const user = await UserModel.create({
+		firstName,
+		lastName,
+		email,
+		password,
+		phoneNumber,
+		confirmPassword,
+		role,
 	});
 
 	// check if user created
@@ -23,10 +34,23 @@ export const signUp = catchAsync(async (req, res, next) => {
 	// create token
 	const token = user.CreateToken();
 	user.password = undefined;
+
+	let Model;
+	if (role === "Customer") Model = CustomerModel;
+	if (role === "Seller") Model = SellerModel;
+
+	Model = await Model.create({
+		_id: user._id,
+		name: `${firstName} ${lastName}`,
+		phoneNumber,
+	});
+
+	// check if user created
+	if (!Model) return next(new appError(`${role} not created`, 400));
 	// send cookies
 	sendCookies(res, token);
 	// send response to client
-	sendResponse(res, 201, { user, token });
+	sendResponse(res, 201, { user });
 });
 export const login = catchAsync(async (req, res, next) => {
 	const { email, password } = req.body;
@@ -49,13 +73,28 @@ export const login = catchAsync(async (req, res, next) => {
 	sendCookies(res, token);
 	// send response
 	user.password = undefined;
-	sendResponse(res, 200, { user, token });
+	sendResponse(res, 200, { user });
 });
 
 // logOut function
 export const logOut = catchAsync(async (req, res, next) => {
 	sendCookies(res, "");
 	sendResponse(res, 200, {});
+});
+
+// getUser function
+export const getMe = catchAsync(async (req, res, next) => {
+	let Model;
+	let role = req.user.role;
+	// find the user depend on user role
+	if (role === "Customer") Model = CustomerModel;
+	if (role === "Seller") Model = SellerModel;
+
+	Model = await Model.findById(req.user._id);
+
+	if (!Model) return next(new appError("user not found", 400));
+
+	sendResponse(res, 200, { user });
 });
 
 // forgotPassword password
@@ -78,14 +117,14 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 		subject: "password reset token",
 		html: passwordResetCodeTemplate(
 			resetCode,
-			user.name,
+			`${user.firstName} ${user.lastName}`,
 			user.passwordResetExpires
 		),
 	});
 	// check if email is sent
 	if (!Email) return next(new appError("something went wrong", 400));
 	// send response to client
-	sendResponse(res, 200, {  });
+	sendResponse(res, 200, {});
 });
 
 export const resetPassword = catchAsync(async (req, res, next) => {
