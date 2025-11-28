@@ -8,7 +8,7 @@ import CustomerLayout from "./appLayoutes/CustomerLayout.jsx";
 import SellerLayout from "./appLayoutes/SellerLayout.jsx";
 import EmployeeLayout from "./appLayoutes/EmployeeLayout.jsx";
 import PageNotFound from "./PageNotFound.jsx";
-
+import CustomerDashboard from "../pages/customerPannel/CustomerDashboard.jsx";
 // create app routing
 const router = createBrowserRouter([
 	// Public Routes
@@ -48,7 +48,12 @@ const router = createBrowserRouter([
 			{
 				path: "/customer",
 				element: <CustomerLayout />,
-				children: [],
+				children: [
+					{
+						path: "dashboard",
+						element: <CustomerDashboard />,
+					},
+				],
 			},
 		],
 	},

@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
+import validator from "validator";
 const CustomerSchema = new mongoose.Schema(
 	{
-		Customer: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
-			required: true,
-			unique: true,
 			ref: "UserModel",
 		},
 		name: {
@@ -25,16 +24,13 @@ const CustomerSchema = new mongoose.Schema(
 			min: 0,
 		},
 		status: {
+			type: String,
 			enum: ["active", "suspended", "deleted"],
 			default: "active",
 		},
 	},
 	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-// Virtual to access user email when user is populated
-CustomerSchema.virtual("email").get(function () {
-	return this.populated("Customer") ? this.Customer?.email : undefined;
-});
 
 CustomerSchema.index({ status: 1 });
 export default mongoose.model("CustomerModel", CustomerSchema);

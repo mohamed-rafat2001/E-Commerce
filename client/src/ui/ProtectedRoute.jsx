@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useGetCurrentUser } from "../hooks/useAuth";
+import LoadingSpinner from "./LoadingSpinner";
 
 /**
  * ProtectedRoute Component
@@ -9,10 +10,10 @@ import { useGetCurrentUser } from "../hooks/useAuth";
  * @param {ReactNode} children - Components to render if authenticated
  * @param {string[]} allowedRoles - Optional array of allowed roles
  */
-function ProtectedRoute({  allowedRoles = [] }) {
+function ProtectedRoute({ allowedRoles = [] }) {
 	const { isAuthenticated, userRole, isLoading } = useGetCurrentUser();
 	const location = useLocation();
-
+	console.log(userRole);
 	// Keep track if the user has just become unauthenticated
 	const wasAuthenticated = useRef(isAuthenticated);
 	const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -27,19 +28,7 @@ function ProtectedRoute({  allowedRoles = [] }) {
 
 	// Show a loading indicator while user info is being fetched
 	if (isLoading) {
-		return (
-			<div
-				style={{
-					width: "100vw",
-					height: "100vh",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<span>Loading...</span>
-			</div>
-		);
+		return <LoadingSpinner />;
 	}
 
 	// If user is not authenticated (either initially or due to state change), redirect to login
@@ -53,7 +42,7 @@ function ProtectedRoute({  allowedRoles = [] }) {
 		return <Navigate to="/unauthorized" replace />;
 	}
 
-    return <Outlet />;
+	return <Outlet />;
 }
 
 export default ProtectedRoute;

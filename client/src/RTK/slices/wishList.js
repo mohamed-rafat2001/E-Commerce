@@ -19,10 +19,10 @@ const wishListSlice = createSlice({
 			return state;
 		},
 		// delete all items from wishList
-		clearWishList: (state, action) => {
-			state.items = [];
-			return state;
-		},
+        clearWishList: (state) => {
+            state.items = [];
+            return state;
+        },
 	},
 });
 export const { addToWishList, deleteFromWishList, clearWishList } =

@@ -1,4 +1,5 @@
+import { Outlet } from "react-router-dom";
 function SellerLayout() {
-	return <h1>Seller layout</h1>;
+	return <Outlet />;
 }
 export default SellerLayout;

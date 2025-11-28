@@ -3,13 +3,27 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "react-router-dom";
 import router from "./ui/appRouting.jsx";
 import queryClient from "./utils/queryClient.js";
+import { Toaster } from "react-hot-toast";
 
 function App() {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ReactQueryDevtools initialIsOpen={false} />
-			<RouterProvider router={router} />
-		</QueryClientProvider>
+		<div className=" bg-gray-100 ">
+			<QueryClientProvider client={queryClient}>
+				<ReactQueryDevtools initialIsOpen={false} />
+				<RouterProvider router={router} />
+				<Toaster
+					position="bottom-right"
+					toastOptions={{
+						duration: 3000,
+						style: {
+							padding: "10px 20px",
+						},
+					}}
+					containerStyle={{ bottom: 50, right: 30 }}
+					reverseOrder={true}
+				/>
+			</QueryClientProvider>
+		</div>
 	);
 }
 

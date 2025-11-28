@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
+import validator from "validator";
 const SellerSchema = new mongoose.Schema(
 	{
-		Seller: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
-			required: true,
-			unique: true,
 			ref: "UserModel",
 		},
 		name: {
@@ -42,7 +41,7 @@ const SellerSchema = new mongoose.Schema(
 		status: {
 			type: String,
 			enum: ["pending", "active", "suspended", "closed"],
-			default: "pending",
+			default: "active",
 		},
 		verificationStatus: {
 			type: String,
@@ -54,10 +53,7 @@ const SellerSchema = new mongoose.Schema(
 	},
 	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-// Virtual to access user email when user is populated
-SellerSchema.virtual("email").get(function () {
-	return this.populated("Seller") ? this.Seller?.email : undefined;
-});
+
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });
 SellerSchema.index({ companyName: 1 });

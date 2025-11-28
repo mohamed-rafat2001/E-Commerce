@@ -25,11 +25,11 @@ const cartSlice = createSlice({
 			return state;
 		},
 		// delete all items from cart
-		clearCart: (state, action) => {
-			state.items = [];
-			state.totalPrice = 0;
-			return state;
-		},
+        clearCart: (state) => {
+            state.items = [];
+            state.totalPrice = 0;
+            return state;
+        },
 	},
 });
 export const { addToCart, deleteFromCart, clearCart } = cartSlice.actions;

@@ -1,4 +1,5 @@
+import { Outlet } from "react-router-dom";
 function EmployeeLayout() {
-	return <h1>Employee layout</h1>;
+    return <Outlet />;
 }
 export default EmployeeLayout;

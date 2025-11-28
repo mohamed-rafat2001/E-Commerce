@@ -35,18 +35,24 @@ export const signUp = catchAsync(async (req, res, next) => {
 	const token = user.CreateToken();
 	user.password = undefined;
 
-	let Model;
-	if (role === "Customer") Model = CustomerModel;
-	if (role === "Seller") Model = SellerModel;
-
-	Model = await Model.create({
-		_id: user._id,
-		name: `${firstName} ${lastName}`,
-		phoneNumber,
-	});
+	let userModel;
+	if (role === "Customer") {
+		userModel = await CustomerModel.create({
+			userId: user._id,
+			name: `${firstName} ${lastName}`,
+			phoneNumber,
+		});
+	}
+	if (role === "Seller") {
+		userModel = await CustomerModel.create({
+			userId: user._id,
+			name: `${firstName} ${lastName}`,
+			phoneNumber,
+		});
+	}
 
 	// check if user created
-	if (!Model) return next(new appError(`${role} not created`, 400));
+	if (!userModel) return next(new appError(`${role} not created`, 400));
 	// send cookies
 	sendCookies(res, token);
 	// send response to client
@@ -84,15 +90,22 @@ export const logOut = catchAsync(async (req, res, next) => {
 
 // getUser function
 export const getMe = catchAsync(async (req, res, next) => {
-	let Model;
+	let user;
 	let role = req.user.role;
 	// find the user depend on user role
-	if (role === "Customer") Model = CustomerModel;
-	if (role === "Seller") Model = SellerModel;
-
-	Model = await Model.findById(req.user._id);
-
-	if (!Model) return next(new appError("user not found", 400));
+	if (role === "Customer") {
+		user = await CustomerModel.findOne({ userId: req.user._id }).populate(
+			"userId",
+			"firstName lastName email phoneNumber role"
+		);
+	}
+	if (role === "Seller") {
+		user = await SellerModel.findOne({ userId: req.user._id }).populate(
+			"userId",
+			"firstName lastName email phoneNumber role"
+		);
+	}
+	if (!user) return next(new appError("user not found", 400));
 
 	sendResponse(res, 200, { user });
 });

@@ -9,11 +9,12 @@ import {
 	LogoutFunc,
 	RegisterFunc,
 } from "../services/auth.js";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const useLogin = () => {
 	const queryClient = useQueryClient();
-
+	const navigate = useNavigate();
 	const {
 		mutate: login,
 		isLoading: isLoggingIn,
@@ -21,9 +22,27 @@ export const useLogin = () => {
 		data: loginData,
 	} = useMutation({
 		mutationFn: LoginFunc,
-		onSuccess: (data) => {
-			// Invalidate user queries
-			queryClient.setQueriesData(["user"], data);
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			navigate("/customer/dashboard");
+			toast.success(
+				<div>
+					<h1 className="text-green-500 font-bold text-sm">Login Successful</h1>
+					<p className="text-green-500 text-xs">
+						Welcome Back,you are now signed in
+					</p>
+				</div>
+			);
+		},
+		onError: () => {
+			toast.error(
+				<div>
+					<h1 className="text-red-500 font-bold text-sm">Login Failed</h1>
+					<p className="text-red-500 text-xs">
+						Invalid credentials, please try again.
+					</p>
+				</div>
+			);
 		},
 	});
 	return { login, isLoggingIn, loginError, loginData };
@@ -34,19 +53,39 @@ export const useLogin = () => {
  */
 export const useRegister = () => {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	const {
-		mutate: register,
+		mutate: registerUser,
 		isLoading: isRegistering,
 		error: registerError,
 		data: registerData,
 	} = useMutation({
 		mutationFn: RegisterFunc,
-		onSuccess: (data) => {
-			queryClient.setQueriesData(["user"], data);
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			navigate("/login");
+			toast.success(
+				<div>
+					<h1 className="text-green-500 font-bold text-sm">
+						Registration Successful
+					</h1>
+					<p className="text-green-500 text-xs">Welcome to our platform!</p>
+				</div>
+			);
+		},
+		onError: () => {
+			toast.error(
+				<div>
+					<h1 className="text-red-500 font-bold text-sm">
+						Registration Failed
+					</h1>
+					<p className="text-red-500 text-xs">Please try again.</p>
+				</div>
+			);
 		},
 	});
-	return { register, isRegistering, registerError, registerData };
+	return { registerUser, isRegistering, registerError, registerData };
 };
 
 /**
@@ -54,13 +93,13 @@ export const useRegister = () => {
  */
 export const useLogout = () => {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	return useMutation({
 		mutationFn: LogoutFunc,
 		onSuccess: () => {
-			// Clear React Query cache
 			queryClient.clear();
-			Navigate("/");
+			navigate("/");
 		},
 	});
 };
@@ -70,20 +109,22 @@ export const useLogout = () => {
  */
 export const useGetCurrentUser = () => {
 	const {
-		data: user,
+		data: response,
 		isLoading,
 		error,
 	} = useQuery({
 		queryKey: ["user"],
 		queryFn: getMeFunc,
-		retry: 1, // retry once on failure
-		staleTime: 5 * 60 * 1000, // 5 minutes
+		retry: Infinity,
+		staleTime: 5 * 60 * 1000,
 	});
+
+	const user = response?.data?.data?.user;
 
 	return {
 		isAuthenticated: !!user,
 		user,
-		userRole: user?.role,
+		userRole: user?.userId?.role,
 		isLoading,
 		error,
 	};
