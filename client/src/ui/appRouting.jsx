@@ -3,12 +3,13 @@ import HomePage from "../pages/HomePage.jsx";
 import LoginPage from "../pages/LoginPage.jsx";
 import RegisterPage from "../pages/RegisterPage.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
-import AdminLayout from "./appLayoutes/AdminLayout.jsx";
-import CustomerLayout from "./appLayoutes/CustomerLayout.jsx";
-import SellerLayout from "./appLayoutes/SellerLayout.jsx";
-import EmployeeLayout from "./appLayoutes/EmployeeLayout.jsx";
+import AppLayout from "./AppLayout.jsx";
 import PageNotFound from "./PageNotFound.jsx";
-import CustomerDashboard from "../pages/customerPannel/CustomerDashboard.jsx";
+import PersonalDetailsPage from "../pages/PersonalDetailsPage.jsx";
+import ShippingAdressesPage from "../pages/customerPannel/ShippingAdressesPage.jsx";
+import PaymentMethodsPage from "../pages/customerPannel/PaymentMethodsPage.jsx";
+import OrderHistoryPage from "../pages/customerPannel/OrderHistoryPage.jsx";
+import SettingsPage from "../pages/SettingsPage.jsx";
 // create app routing
 const router = createBrowserRouter([
 	// Public Routes
@@ -23,8 +24,19 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: "/admin",
-				element: <AdminLayout />,
-				children: [],
+				element: <AppLayout />,
+				children: [
+					{
+						index: true,
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{ path: "settings", element: <SettingsPage /> },
+				],
 			},
 		],
 	},
@@ -35,8 +47,19 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: "/seller",
-				element: <SellerLayout />,
-				children: [],
+				element: <AppLayout />,
+				children: [
+					{
+						index: true,
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{ path: "settings", element: <SettingsPage /> },
+				],
 			},
 		],
 	},
@@ -47,12 +70,30 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: "/customer",
-				element: <CustomerLayout />,
+				element: <AppLayout />,
 				children: [
 					{
-						path: "dashboard",
-						element: <CustomerDashboard />,
+						index: true,
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
 					},
+					{
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{
+						path: "shippingAddresses",
+						element: <ShippingAdressesPage />,
+					},
+					{
+						path: "paymentMethods",
+						element: <PaymentMethodsPage />,
+					},
+					{
+						path: "orderHistory",
+						element: <OrderHistoryPage />,
+					},
+					{ path: "settings", element: <SettingsPage /> },
 				],
 			},
 		],
@@ -64,8 +105,19 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: "/employee",
-				element: <EmployeeLayout />,
-				children: [],
+				element: <AppLayout />,
+				children: [
+					{
+						index: true,
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{
+						path: "personalDetails",
+						element: <PersonalDetailsPage />,
+					},
+					{ path: "settings", element: <SettingsPage /> },
+				],
 			},
 		],
 	},

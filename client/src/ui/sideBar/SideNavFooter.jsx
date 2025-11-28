@@ -1,17 +1,25 @@
 import { NavLink } from "react-router-dom";
+import settingsIcon from "../../assets/setting.png";
+import logoutIcon from "../../assets/user-logout.png";
+import { useLogout } from "../../hooks/useAuth";
 function SideNavFooter() {
+	const { logout } = useLogout();
+	const handleLogout = () => {
+		logout();
+	};
 	return (
 		<div className=" w-full border-t border-gray-200 m-auto">
-			<NavLink to="/" className="side-Nav-Links  mt-4">
-				<h1>Icon</h1>
-				<h1>Settings</h1>
+			<NavLink to="settings" className="side-Nav-Links  mt-4">
+				<img src={settingsIcon} alt="settings" />
+				<h1 className="hidden xl:block">Settings</h1>
 			</NavLink>
 			<NavLink
-				to="/"
-				className="flex items-center justify-start space-x-3 w-[80%] m-auto  rounded-md hover:shadow  p-2 text-red-500 hover:bg-blue-100 font-semibold text-md  mt-4"
+				to="/login"
+				className="side-Nav-Links  text-red-500  mt-4"
+				onClick={handleLogout}
 			>
-				<h1>Icon</h1>
-				<h1>Logout</h1>
+				<img src={logoutIcon} alt="logout" />
+				<h1 className="hidden xl:block">Logout</h1>
 			</NavLink>
 		</div>
 	);

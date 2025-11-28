@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import SideNavbar from "../sideBar/SideNavbar";
-function CustomerLayout() {
+import SideNavbar from "./sideBar/SideNavbar";
+const AppLayout = () => {
 	return (
-		<div>
+		<div className="container">
 			<div className="grid pt-10 space-x-10 pl-10 grid-cols-12">
 				<div className="col-span-3 relative ">
 					<SideNavbar />
@@ -13,5 +13,6 @@ function CustomerLayout() {
 			</div>
 		</div>
 	);
-}
-export default CustomerLayout;
+};
+
+export default AppLayout;

@@ -1,12 +1,12 @@
 import catchAsync from "../middelwares/catchAsync.js";
 import UserModel from "../models/UserModel.js";
 import CustomerModel from "../models/CustomerModel.js";
+import SellerModel from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
 import { passwordResetCodeTemplate } from "../utils/emailTempletes.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendRespons.js";
-import SellerModel from "../models/SellerModel.js";
 
 export const signUp = catchAsync(async (req, res, next) => {
 	const {
@@ -44,7 +44,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 		});
 	}
 	if (role === "Seller") {
-		userModel = await CustomerModel.create({
+		userModel = await SellerModel.create({
 			userId: user._id,
 			name: `${firstName} ${lastName}`,
 			phoneNumber,
@@ -105,6 +105,7 @@ export const getMe = catchAsync(async (req, res, next) => {
 			"firstName lastName email phoneNumber role"
 		);
 	}
+
 	if (!user) return next(new appError("user not found", 400));
 
 	sendResponse(res, 200, { user });

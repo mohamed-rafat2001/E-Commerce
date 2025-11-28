@@ -22,9 +22,21 @@ export const useLogin = () => {
 		data: loginData,
 	} = useMutation({
 		mutationFn: LoginFunc,
-		onSuccess: () => {
+		onSuccess: (data) => {
 			queryClient.invalidateQueries({ queryKey: ["user"] });
-			navigate("/customer/dashboard");
+			const userRole = data?.data?.data?.user?.role;
+			if (userRole === "Customer") {
+				navigate("/customer/personalDetails");
+			} else if (userRole === "Seller") {
+				navigate("/seller/personalDetails");
+			} else if (userRole === "Employee") {
+				navigate("/employee/personalDetails");
+			} else if (userRole === "Admin") {
+				navigate("/admin/personalDetails");
+			}
+			// } else {
+			// 	navigate("/");
+			// }
 			toast.success(
 				<div>
 					<h1 className="text-green-500 font-bold text-sm">Login Successful</h1>
@@ -95,13 +107,30 @@ export const useLogout = () => {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
-	return useMutation({
+	const { mutate: logout } = useMutation({
 		mutationFn: LogoutFunc,
 		onSuccess: () => {
 			queryClient.clear();
-			navigate("/");
+			navigate("/login");
+			toast.success(
+				<div>
+					<h1 className="text-green-500 font-bold text-sm">
+						Logout Successful
+					</h1>
+					<p className="text-green-500 text-xs">You have been signed out.</p>
+				</div>
+			);
+		},
+		onError: () => {
+			toast.error(
+				<div>
+					<h1 className="text-red-500 font-bold text-sm">Logout Failed</h1>
+					<p className="text-red-500 text-xs">Please try again.</p>
+				</div>
+			);
 		},
 	});
+	return { logout };
 };
 
 /**

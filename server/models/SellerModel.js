@@ -19,7 +19,7 @@ const SellerSchema = new mongoose.Schema(
 		},
 		companyName: {
 			type: String,
-			required: true,
+			required: false,
 			trim: true,
 		},
 		description: {

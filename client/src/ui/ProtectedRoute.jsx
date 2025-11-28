@@ -13,7 +13,6 @@ import LoadingSpinner from "./LoadingSpinner";
 function ProtectedRoute({ allowedRoles = [] }) {
 	const { isAuthenticated, userRole, isLoading } = useGetCurrentUser();
 	const location = useLocation();
-	console.log(userRole);
 	// Keep track if the user has just become unauthenticated
 	const wasAuthenticated = useRef(isAuthenticated);
 	const [shouldRedirect, setShouldRedirect] = useState(false);
