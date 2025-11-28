@@ -3,10 +3,18 @@ import userIcon from "../../assets/user.png";
 function AdminLinks() {
 	return (
 		<>
-			<NavLink to="personalDetails" className="side-Nav-Links  ">
-				<img src={userIcon} alt="user" />
-				<h1 className="hidden xl:block">Personal Details</h1>
-			</NavLink>
+			<motion.div
+				whileHover={{
+					scale: 1.1,
+					transition: { duration: 0.2, ease: "easeInOut" },
+				}}
+				className="w-full"
+			>
+				<NavLink to="personalDetails" className="side-Nav-Links  ">
+					<img src={userIcon} alt="user" />
+					<h1 className="hidden xl:block">Personal Details</h1>
+				</NavLink>
+			</motion.div>
 
 			<NavLink to="/" className="side-Nav-Links  mt-4">
 				<h1>Icon</h1>

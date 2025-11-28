@@ -4,6 +4,7 @@ import mainApi from "../api/mainApi";
 export const LoginFunc = async (Credentials) => {
 	try {
 		const user = await mainApi.post("authentications/login", Credentials);
+
 		return user;
 	} catch (e) {
 		console.log(e);
