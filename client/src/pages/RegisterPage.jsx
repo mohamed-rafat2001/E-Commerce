@@ -12,7 +12,6 @@ function RegisterPage() {
 		formState: { errors },
 	} = useForm();
 	function Submit(data) {
-		console.log(data);
 		registerUser(data);
 	}
 	return (

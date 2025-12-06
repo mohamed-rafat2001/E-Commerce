@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import userIcon from "../../assets/user.png";
 function EmployeeLinks() {
 	return (

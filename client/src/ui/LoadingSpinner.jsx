@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 function LoadingSpinner() {
 	return (
 		<div className="flex justify-center items-center space-x-1 h-screen w-screen ">

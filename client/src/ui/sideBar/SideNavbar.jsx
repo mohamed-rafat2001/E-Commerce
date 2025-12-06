@@ -10,7 +10,7 @@ function SideNavbar() {
 	const { userRole, user } = useGetCurrentUser();
 	return (
 		<div className=" container sticky top-5  py-5 shadow rounded-xl flex flex-col justify-center items-center  bg-white ">
-			<SideNaveHeader fullName={user?.name} role={user?.userId?.role} />
+			<SideNaveHeader fullName={user?.name} role={userRole} />
 			{userRole === "Customer" && <CustomerLinks />}
 			{userRole === "Seller" && <SellerLinks />}
 			{userRole === "Admin" && <AdminLinks />}

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import settingsIcon from "../../assets/setting.png";
 import logoutIcon from "../../assets/user-logout.png";
 import { useLogout } from "../../hooks/useAuth";
