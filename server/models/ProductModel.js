@@ -1,8 +1,9 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
+import { moneySchema } from "./commonSchemas.js";
 
 const productSchema = new mongoose.Schema(
 	{
-		user: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
@@ -11,6 +12,12 @@ const productSchema = new mongoose.Schema(
 			required: [true, "Product name is required"],
 			minLength: 3,
 			trim: true,
+		},
+		slug: {
+			type: String,
+			required: false,
+			trim: true,
+			lowercase: true,
 		},
 		description: {
 			type: String,
@@ -26,17 +33,11 @@ const productSchema = new mongoose.Schema(
 			trim: true,
 		},
 		category: {
-			type: String,
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "CategoryModel",
 			required: [true, "Product category is required"],
-			minLength: 2,
-			trim: true,
 		},
-		price: {
-			type: Number,
-			default: 0,
-			required: [true, "Product price is required"],
-			trim: true,
-		},
+		price: moneySchema,
 		ratingAverage: {
 			type: Number,
 			default: 0,
@@ -50,13 +51,19 @@ const productSchema = new mongoose.Schema(
 			default: 0,
 			required: [true, "countInStock is required"],
 		},
+		status: {
+			type: String,
+			enum: ["draft", "active", "inactive", "archived"],
+			default: "draft",
+		},
+		visibility: {
+			type: String,
+			enum: ["public", "private"],
+			default: "public",
+		},
 	},
-	{ toJSON: { virtuals: true }, toObject: { virtuals: true } },
-	{ timestamps: true }
+	{ toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
 );
-//  mongoose indexs price
-productSchema.index({ price: 1 });
-
 // virtual populate
 productSchema.virtual("reviews", {
 	ref: "ProductReviewsModel",
@@ -68,4 +75,9 @@ productSchema.pre("findOne", function (next) {
 	this.populate("reviews");
 	next();
 });
+//  mongoose indexs price
+productSchema.index({ price: 1 });
+productSchema.index({ slug: 1 }, { unique: true });
+productSchema.index({ userId: 1, status: 1 });
+
 export default mongoose.model("ProductModel", productSchema);

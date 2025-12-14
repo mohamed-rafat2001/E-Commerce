@@ -1,25 +1,27 @@
 import express from "express";
 const router = express.Router();
-import { Protect, restrictTo } from "../middelwares/authMiddelware.js";
+import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 import {
 	addProduct,
 	deleteAllProducts,
 	deleteProduct,
+	deleteProductByOwner,
 	getAllProducts,
 	getSingleProduct,
 	updateProduct,
 } from "../controllers/productController.js";
 
+router.get("/", getAllProducts);
+router.get("/:id", getSingleProduct);
 // add protect to all routes
 router.use(Protect);
 router
 	.route("/")
-	.post(restrictTo("admin"), addProduct)
-	.get(getAllProducts)
-	.delete(restrictTo("admin"), deleteAllProducts);
+	.post(restrictTo("Admin", "Seller", "SuperAdmin"), addProduct)
+	.delete(restrictTo("SuperAdmin"), deleteAllProducts);
 router
 	.route("/:id")
-	.get(getSingleProduct)
-	.delete(restrictTo("admin"), deleteProduct)
-	.patch(restrictTo("admin"), updateProduct);
+	.delete(restrictTo("Admin", "SuperAdmin", "Seller"), deleteProduct)
+	.patch(restrictTo("Admin", "SuperAdmin", "Seller"), updateProduct);
+router.delete("/seller/:id", restrictTo("Seller"), deleteProductByOwner);
 export default router;

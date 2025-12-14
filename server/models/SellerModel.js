@@ -1,32 +1,41 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import { addressSchema, moneySchema } from "./commonSchemas.js";
 const SellerSchema = new mongoose.Schema(
 	{
 		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
-		name: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		phoneNumber: {
-			type: String,
-			required: [true, "phone number is required"],
-			trim: true,
-			validate: [validator.isMobilePhone, "please enter valid phone number"],
-		},
-		companyName: {
+		brand: {
 			type: String,
 			required: false,
 			trim: true,
 		},
+		brandImg: String,
 		description: {
 			type: String,
 			trim: true,
 		},
-		addresses: String,
+		businessEmail: {
+			type: String,
+			required: [false, "email is required"],
+			unique: true,
+			trim: true,
+			validate: [validator.isEmail, "please enter the valid email"],
+		},
+		businessPhone: {
+			type: String,
+			required: [false, "phone number is required"],
+			trim: true,
+			validate: [validator.isMobilePhone, "please enter valid phone number"],
+		},
+		primaryCategory: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "CategoryModel",
+		},
+
+		addresses: [addressSchema],
 		ratingAverage: {
 			type: Number,
 			min: 0,
@@ -40,7 +49,7 @@ const SellerSchema = new mongoose.Schema(
 		},
 		status: {
 			type: String,
-			enum: ["pending", "active", "suspended", "closed"],
+			enum: ["active", "suspended", "deleted"],
 			default: "active",
 		},
 		verificationStatus: {
@@ -49,12 +58,12 @@ const SellerSchema = new mongoose.Schema(
 			default: "unverified",
 		},
 		defaultPayoutMethod: String,
-		balance: String,
+		balance: moneySchema,
 	},
 	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });
-SellerSchema.index({ companyName: 1 });
+SellerSchema.index({ brand: 1 });
 export default mongoose.model("SellerModel", SellerSchema);

@@ -1,23 +1,14 @@
 import mongoose from "mongoose";
-import validator from "validator";
+import { addressSchema } from "./commonSchemas.js";
+
 const CustomerSchema = new mongoose.Schema(
 	{
 		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
-		name: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		phoneNumber: {
-			type: String,
-			required: [true, "phone number is required"],
-			trim: true,
-			validate: [validator.isMobilePhone, "please enter valid phone number"],
-		},
-		addresses: String,
+
+		addresses: [addressSchema],
 		loyaltyPoints: {
 			type: Number,
 			default: 0,

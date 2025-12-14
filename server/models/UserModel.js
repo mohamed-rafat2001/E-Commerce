@@ -24,7 +24,13 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			validate: [validator.isEmail, "please enter the valid email"],
 		},
-
+		phoneNumber: {
+			type: String,
+			required: [true, "phone number is required"],
+			trim: true,
+			validate: [validator.isMobilePhone, "please enter valid phone number"],
+		},
+		profileImg: String,
 		password: {
 			type: String,
 			required: [true, "password is required"],
@@ -48,6 +54,11 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			enum: ["Customer", "Seller", "Admin", "SuperAdmin", "Employee"],
 			default: "Customer",
+		},
+		status: {
+			type: String,
+			enum: ["active", "suspended", "deleted"],
+			default: "active",
 		},
 	},
 	{ timestamps: true }
@@ -82,7 +93,7 @@ userSchema.methods.createPasswordResetCode = function () {
 	return code;
 };
 // check if password is correct
-userSchema.methods.credientals = async function (password, userPassword) {
+userSchema.methods.correctPassword = async function (password, userPassword) {
 	return await bcryptjs.compare(password, userPassword);
 };
 export default mongoose.model("UserModel", userSchema);

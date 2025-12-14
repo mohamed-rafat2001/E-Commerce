@@ -7,7 +7,7 @@ import {
 	getAllDocs,
 	getSingDoc,
 	updateDoc,
-} from "./handelFactoryController.js";
+} from "./handlerFactory.js";
 
 //  @desc   add new product
 // @Route  POST /api/v1/products
@@ -38,13 +38,13 @@ export const getSingleProduct = getSingDoc(ProductModel);
 export const deleteProduct = deleteDoc(ProductModel);
 
 //  @desc   delete product
-
-//  @access Private/superAdmin
+//  @Route DELETE /api/v1/products/seller/:id
+//  @access Private/Seller
 export const deleteProductByOwner = deleteDocByOwner(ProductModel);
 
 //  @desc   update product
 //  @Route  PATCH /api/v1/products/:id
-//  @access Private/Admin
+//  @access Private/Admin && seller
 export const updateProduct = updateDoc(ProductModel, "ProductModel", [
 	"name",
 	"price",

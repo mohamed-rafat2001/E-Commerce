@@ -1,12 +1,13 @@
-import catchAsync from "../middelwares/catchAsync.js";
+import catchAsync from "../middlewares/catchAsync.js";
 import UserModel from "../models/UserModel.js";
 import CustomerModel from "../models/CustomerModel.js";
 import SellerModel from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
-import { passwordResetCodeTemplate } from "../utils/emailTempletes.js";
+import { passwordResetCodeTemplate } from "../utils/emailTemplates.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
-import sendResponse from "../utils/sendRespons.js";
+import sendResponse from "../utils/sendResponse.js";
+import { updateDoc } from "./handlerFactory.js";
 
 export const signUp = catchAsync(async (req, res, next) => {
 	const {
@@ -36,20 +37,12 @@ export const signUp = catchAsync(async (req, res, next) => {
 	user.password = undefined;
 
 	let userModel;
-	if (role === "Customer") {
-		userModel = await CustomerModel.create({
-			userId: user._id,
-			name: `${firstName} ${lastName}`,
-			phoneNumber,
-		});
-	}
-	if (role === "Seller") {
-		userModel = await SellerModel.create({
-			userId: user._id,
-			name: `${firstName} ${lastName}`,
-			phoneNumber,
-		});
-	}
+	if (role === "Customer") userModel = CustomerModel;
+	if (role === "Seller") userModel = SellerModel;
+
+	userModel = await userModel.create({
+		userId: user._id,
+	});
 
 	// check if user created
 	if (!userModel) return next(new appError(`${role} not created`, 400));
@@ -66,7 +59,7 @@ export const login = catchAsync(async (req, res, next) => {
 
 	// find the user using email
 	const user = await UserModel.findOne({ email });
-	const isPasswordCorrect = await user.credientals(password, user.password);
+	const isPasswordCorrect = await user.correctPassword(password, user.password);
 
 	// check if password and email  is correct
 	if (!user || !isPasswordCorrect)
@@ -90,25 +83,50 @@ export const logOut = catchAsync(async (req, res, next) => {
 
 // getUser function
 export const getMe = catchAsync(async (req, res, next) => {
-	let user;
-	let role = req.user.role;
+	let userModel;
+	const role = req.user.role;
 	// find the user depend on user role
-	if (role === "Customer") {
-		user = await CustomerModel.findOne({ userId: req.user._id }).populate(
-			"userId",
-			"firstName lastName email phoneNumber role"
-		);
-	}
-	if (role === "Seller") {
-		user = await SellerModel.findOne({ userId: req.user._id }).populate(
-			"userId",
-			"firstName lastName email phoneNumber role"
-		);
-	}
+	if (role === "Customer") userModel = CustomerModel;
+	if (role === "Seller") userModel = SellerModel;
 
-	if (!user) return next(new appError("user not found", 400));
+	userModel = await userModel
+		.findOne({ userId: req.user._id })
+		.populate("userId", "firstName lastName email phoneNumber role");
 
-	sendResponse(res, 200, { user });
+	if (!userModel) return next(new appError("user not found", 400));
+
+	sendResponse(res, 200, { userModel });
+});
+
+// update personal details in user model
+export const updatePersonalDetails = updateDoc(UserModel, "UserModel", [
+	"firstName",
+	"lastName",
+	"phoneNumber",
+	"email",
+]);
+
+// delete me from UserModel and another models = change status from active to deleted
+export const deleteMe = catchAsync(async (req, res, next) => {
+	// find user in UserModel AND change the status
+	const user = await UserModel.findByIdAndUpdate(
+		req.user._id,
+		{ status: "deleted" },
+		{ runValidators: true, new: true }
+	);
+	let model;
+	const role = req.user.role;
+	if (role === "Customer") model = CustomerModel;
+	if (role === "Seller") model = SellerModel;
+
+	// change the status
+	model = await model.findByIdAndUpdate(
+		req.user._id,
+		{ status: "deleted" },
+		{ runValidators: true, new: true }
+	);
+	if (!user && !model) return next(new appError("user didn't deleted"));
+	sendResponse(res, 200, {});
 });
 
 // forgotPassword password
@@ -176,7 +194,7 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 		return next(new appError("please provide all fields", 400));
 
 	const user = await UserModel.findById(req.user._id).select("+password");
-	const isPasswordCorrect = await user.credientals(
+	const isPasswordCorrect = await user.correctPassword(
 		currentPassword,
 		user.password
 	);

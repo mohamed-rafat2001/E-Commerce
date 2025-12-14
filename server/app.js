@@ -3,9 +3,9 @@ import cors from "cors";
 import dbConnect from "./db/config.js";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-// import mongoSanitize from "express-mongo-sanitize";
+import mongoSanitize from "express-mongo-sanitize";
 
-// import hpp from "hpp";
+import hpp from "hpp";
 import cookieParser from "cookie-parser";
 // db connected
 dbConnect();
@@ -40,26 +40,32 @@ app.use(express.json({ limit: "10kb" }));
 // from cookie
 app.use(cookieParser());
 // Data sanitization against noSQL query injection
-// app.use(
-// 	mongoSanitize({
-// 		replaceWith: "_",
-// 		// Only sanitize the request body, not query or params
-// 		sanitize: ({ body }) => body,
-// 	})
-// );
+app.use(
+	mongoSanitize({
+		replaceWith: "_",
+		// Only sanitize the request body, not query or params
+		sanitize: ({ body }) => body,
+	})
+);
 
 // Prevent parameter pollution
-// app.use(hpp());
+app.use(hpp());
 
 // Routers
 import authRouter from "./routers/authRouter.js";
+import sellerRouter from "./routers/sellerRouter.js";
+import customerRouter from "./routers/customerRouter.js";
 import productRouter from "./routers/productRouter.js";
+import categoryRouter from "./routers/categoryRouter.js";
 import globalError from "./controllers/globalErrorController.js";
 import reviewRouter from "./routers/reviewRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
+app.use("/api/v1/sellers", sellerRouter);
+app.use("/api/v1/customers", customerRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/categories", categoryRouter);
 
-// globall error handler
+// global error handler
 app.use(globalError);

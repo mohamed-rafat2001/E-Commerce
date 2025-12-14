@@ -4,7 +4,7 @@ import {
 	updateDoc,
 	deleteDocByOwner,
 	getSingDoc,
-} from "./handelFactoryController.js";
+} from "./handlerFactory.js";
 
 //  @desc   add new review
 // @Route  POST /api/v1/reviews

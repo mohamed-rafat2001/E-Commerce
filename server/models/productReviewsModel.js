@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import ProductModel from "./ProductModel.js";
 const ReviewsSchema = new mongoose.Schema(
 	{
-		user: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
@@ -27,8 +27,8 @@ const ReviewsSchema = new mongoose.Schema(
 );
 ReviewsSchema.pre(/^find/, function (next) {
 	this.populate({
-		path: "user",
-		select: "name profileImg",
+		path: "userId",
+		select: "firstName lastName profileImg",
 	});
 	next();
 });
