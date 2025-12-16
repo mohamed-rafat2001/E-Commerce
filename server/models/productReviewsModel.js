@@ -26,10 +26,7 @@ const ReviewsSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 ReviewsSchema.pre(/^find/, function (next) {
-	this.populate({
-		path: "userId",
-		select: "firstName lastName profileImg",
-	});
+	this.populate("userId", "firstName lastName profileImg");
 	next();
 });
 //  calculate ratings and average ratings

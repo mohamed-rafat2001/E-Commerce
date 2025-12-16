@@ -35,11 +35,11 @@ export const signUp = catchAsync(async (req, res, next) => {
 	// create token
 	const token = user.CreateToken();
 	user.password = undefined;
-
+	let userRole = user.role;
 	let userModel;
-	if (role === "Customer") userModel = CustomerModel;
-	if (role === "Seller") userModel = SellerModel;
-
+	if (userRole === "Customer") userModel = CustomerModel;
+	else if (userRole === "Seller") userModel = SellerModel;
+	else return next(new appError("role not defined", 400));
 	userModel = await userModel.create({
 		userId: user._id,
 	});
@@ -59,10 +59,11 @@ export const login = catchAsync(async (req, res, next) => {
 
 	// find the user using email
 	const user = await UserModel.findOne({ email });
+	if (!user) return next(new appError("email or password is incorrect", 400));
 	const isPasswordCorrect = await user.correctPassword(password, user.password);
 
 	// check if password and email  is correct
-	if (!user || !isPasswordCorrect)
+	if (!isPasswordCorrect)
 		return next(new appError("email or password is incorrect", 400));
 
 	// create token
@@ -83,19 +84,19 @@ export const logOut = catchAsync(async (req, res, next) => {
 
 // getUser function
 export const getMe = catchAsync(async (req, res, next) => {
-	let userModel;
+	let user;
 	const role = req.user.role;
 	// find the user depend on user role
-	if (role === "Customer") userModel = CustomerModel;
-	if (role === "Seller") userModel = SellerModel;
+	if (role === "Customer") user = CustomerModel;
+	if (role === "Seller") user = SellerModel;
 
-	userModel = await userModel
+	user = await user
 		.findOne({ userId: req.user._id })
 		.populate("userId", "firstName lastName email phoneNumber role");
 
-	if (!userModel) return next(new appError("user not found", 400));
+	if (!user) return next(new appError("user not found", 400));
 
-	sendResponse(res, 200, { userModel });
+	sendResponse(res, 200, { user });
 });
 
 // update personal details in user model
@@ -126,6 +127,7 @@ export const deleteMe = catchAsync(async (req, res, next) => {
 		{ runValidators: true, new: true }
 	);
 	if (!user && !model) return next(new appError("user didn't deleted"));
+	sendCookies(res, "");
 	sendResponse(res, 200, {});
 });
 

@@ -63,7 +63,7 @@ export const moneySchema = new mongoose.Schema(
 		},
 		currency: {
 			type: String,
-			required: true,
+			required: false,
 			trim: true,
 			uppercase: true,
 			default: "USD",

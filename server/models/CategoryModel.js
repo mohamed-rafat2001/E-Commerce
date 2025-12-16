@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const categorySchema = new mongoose.Schema(
 	{
-		user: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema(
 		},
 		slug: {
 			type: String,
-			required: true,
+			required: false,
 			trim: true,
 			lowercase: true,
 		},
@@ -28,5 +28,5 @@ const categorySchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
-categorySchema.index({ slug: 1 }, { unique: true });
+// categorySchema.index({ slug: 1 }, { unique: true });
 export default mongoose.model("CategoryModel", categorySchema);

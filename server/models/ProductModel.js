@@ -62,7 +62,12 @@ const productSchema = new mongoose.Schema(
 			default: "public",
 		},
 	},
-	{ toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
+	{
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+		timestamps: true,
+		id: false,
+	}
 );
 // virtual populate
 productSchema.virtual("reviews", {
@@ -71,13 +76,14 @@ productSchema.virtual("reviews", {
 	foreignField: "productId",
 });
 //  mongoose query middlewares
-productSchema.pre("findOne", function (next) {
+productSchema.pre(/^find/, function (next) {
 	this.populate("reviews");
+	this.populate("category", "name description");
 	next();
 });
 //  mongoose indexs price
 productSchema.index({ price: 1 });
-productSchema.index({ slug: 1 }, { unique: true });
+// productSchema.index({ slug: 1 }, { unique: true });
 productSchema.index({ userId: 1, status: 1 });
 
 export default mongoose.model("ProductModel", productSchema);

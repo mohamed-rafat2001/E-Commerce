@@ -40,13 +40,11 @@ app.use(express.json({ limit: "10kb" }));
 // from cookie
 app.use(cookieParser());
 // Data sanitization against noSQL query injection
-app.use(
-	mongoSanitize({
-		replaceWith: "_",
-		// Only sanitize the request body, not query or params
-		sanitize: ({ body }) => body,
-	})
-);
+app.use((req, res, next) => {
+	req.body = mongoSanitize.sanitize(req.body);
+	req.params = mongoSanitize.sanitize(req.params);
+	next();
+});
 
 // Prevent parameter pollution
 app.use(hpp());
