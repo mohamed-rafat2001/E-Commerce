@@ -13,7 +13,7 @@ import {
 // @Route  POST /api/v1/products
 // @access Private/Admin
 
-export const addProduct = createDoc(ProductModel, "ProductModel", [
+export const addProduct = createDoc(ProductModel, [
 	"name",
 	"price",
 	"countInStock",
@@ -45,7 +45,7 @@ export const deleteProductByOwner = deleteDocByOwner(ProductModel);
 //  @desc   update product
 //  @Route  PATCH /api/v1/products/:id
 //  @access Private/Admin && seller
-export const updateProduct = updateDoc(ProductModel, "ProductModel", [
+export const updateProduct = updateDoc(ProductModel, [
 	"name",
 	"price",
 	"countInStock",

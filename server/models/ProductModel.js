@@ -40,10 +40,13 @@ const productSchema = new mongoose.Schema(
 		price: moneySchema,
 		ratingAverage: {
 			type: Number,
+			min: 0,
+			max: 5,
 			default: 0,
 		},
-		ratingQuantity: {
+		ratingCount: {
 			type: Number,
+			min: 0,
 			default: 0,
 		},
 		countInStock: {
@@ -71,9 +74,9 @@ const productSchema = new mongoose.Schema(
 );
 // virtual populate
 productSchema.virtual("reviews", {
-	ref: "ProductReviewsModel",
+	ref: "ReviewsModel",
 	localField: "_id",
-	foreignField: "productId",
+	foreignField: "itemId",
 });
 //  mongoose query middlewares
 productSchema.pre(/^find/, function (next) {

@@ -11,15 +11,12 @@ import {
 // @Route  POST /api/v1/categories
 // @access Private/Admin
 
-export const createCategory = createDoc(CategoryModel, "CategoryModel", [
-	"name",
-	"description",
-]);
+export const createCategory = createDoc(CategoryModel, ["name", "description"]);
 
 //  @desc   update category
 // @Route  PATCH /api/v1/categories/:id
 // @access Private/Admin
-export const updateCategory = updateDoc(CategoryModel, "CategoryModel", [
+export const updateCategory = updateDoc(CategoryModel, [
 	"name",
 	"description",
 	"isActive",

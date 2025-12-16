@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { Protect } from "../middlewares/authMiddleware.js";
 import {
 	addReview,
 	deleteReviewByOwner,
@@ -9,7 +9,7 @@ import {
 } from "../controllers/reviewController.js";
 
 //  add protect to all routes
-router.use(Protect, restrictTo("Customer"));
+router.use(Protect);
 
 //  routes
 router

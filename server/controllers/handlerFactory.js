@@ -1,48 +1,56 @@
-import { Model } from "mongoose";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
 
-export const createDoc = (Model, modelName, objectFields) =>
+export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
 		// validation
-		const object = validationBody(req.body, objectFields);
-		if (Object.keys(object).length == 0)
-			return next(new appError("please provide valid fields to update", 400));
+		let object;
+		if (Fields.length != 0) {
+			object = validationBody(req.body, Fields);
+			if (!object || Object.keys(object).length === 0)
+				return next(new appError("please provide valid fields to update", 400));
+		}
 
 		// create new doc
 		let doc = Model;
 
-		if (modelName === "ProductReviewsModel") {
+		if (Model.modelName === "ReviewsModel") {
 			doc = await doc.create({
 				userId: req.user._id,
-				productId: req.params.id,
+				itemId: req.params.id,
 				...object,
 			});
-		} else if (modelName === "WishListModel" || modelName === "OrderModel") {
-			doc = await doc.findOne({ userId: req.user._id });
-			if (!doc) {
+		} else if (
+			Model.modelName === "WishListModel" ||
+			Model.modelName === "OrderModel"
+		) {
+			const isDocExist = await Model.findOne({ userId: req.user._id });
+
+			if (!isDocExist) {
 				doc = await doc.create({
 					userId: req.user._id,
 					items: [req.params.id],
 				});
 			} else {
-				const itemExist = doc.items.find(
-					(item) => item.toString() === req.params.id
+				const itemExist = isDocExist.items.find(
+					(item) => item._id.toString() === req.params.id
 				);
+
 				if (!itemExist) {
 					doc = await doc.findByIdAndUpdate(
-						doc._id,
+						isDocExist._id,
 						{ $push: { items: req.params.id } },
 						{ new: true, runValidators: true }
 					);
+				} else {
+					doc = await doc.findByIdAndUpdate(
+						isDocExist._id,
+						{ $pull: { items: req.params.id } },
+						{ new: true, runValidators: true }
+					);
 				}
-				doc = await doc.findByIdAndUpdate(
-					doc._id,
-					{ $pull: { items: req.params.id } },
-					{ new: true, runValidators: true }
-				);
 			}
 		} else {
 			doc = await doc.create({
@@ -57,34 +65,36 @@ export const createDoc = (Model, modelName, objectFields) =>
 	});
 export const addItemToList = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const { quantity } = req.body;
+		if (!Model) return next(new appError("Model is not defined", 500));
+		const { quantity, itemId } = req.body;
 		let doc = Model;
-		doc = await doc.findOne({ userId: req.user._id });
-		if (!doc) {
+		const isDocExist = await Model.findOne({ userId: req.user._id });
+
+		if (!isDocExist) {
 			doc = await doc.create({
 				userId: req.user._id,
-				items: [{ item: req.params.id, quantity: quantity || 1 }],
+				items: [{ item: itemId, quantity: quantity || 1 }],
 			});
 		} else {
-			// Check if product already exists in cart
-			const itemExist = doc.items.find(
-				(item) => item.item.toString() === req.params.id
+			// Check if item already exists in model
+			const itemExist = isDocExist.items.find(
+				(item) => item.item?._id.toString() === itemId
 			);
 
 			if (itemExist) {
-				// Update quantity if product exists
+				// Update quantity if item exists
 				doc = await doc.findOneAndUpdate(
-					{ _id: doc._id, "items.item": req.params.id },
+					{ _id: isDocExist._id, "items.item": itemId },
 					{ $inc: { "items.$.quantity": quantity || 1 } },
 					{ new: true, runValidators: true }
 				);
 			} else {
-				// Push new item if product doesn't exist
+				// Push new item if item doesn't exist
 				doc = await doc.findByIdAndUpdate(
-					doc._id,
+					isDocExist._id,
 					{
 						$push: {
-							items: { item: req.params.id, quantity: quantity || 1 },
+							items: { item: itemId, quantity: quantity || 1 },
 						},
 					},
 					{ new: true, runValidators: true }
@@ -97,22 +107,27 @@ export const addItemToList = (Model) =>
 		return sendResponse(res, 200, doc);
 	});
 // update doc
-export const updateDoc = (Model, modelName, objectFields) =>
+export const updateDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
 		// validation
-		const object = validationBody(req.body, objectFields);
-		if (Object.keys(object).length == 0)
-			return next(new appError("please provide valid fields to update", 400));
-
+		let object;
+		if (Fields.length != 0) {
+			object = validationBody(req.body, Fields);
+			if (!object || Object.keys(object).length === 0)
+				return next(new appError("please provide valid fields to update", 400));
+		}
 		let doc = Model;
 		// update doc
-		if (modelName === "UserModel") {
+		if (Model.modelName === "UserModel") {
 			doc = await doc.findByIdAndUpdate(
 				req.user._id,
 				{ ...object },
 				{ new: true, runValidators: true }
 			);
-		} else if (modelName === "SellerModel" || modelName === "CustomerModel") {
+		} else if (
+			Model.modelName === "SellerModel" ||
+			Model.modelName === "CustomerModel"
+		) {
 			doc = await doc.findOneAndUpdate(
 				{ userId: req.user._id },
 				{ ...object },
@@ -179,7 +194,7 @@ export const deleteDocByOwner = (Model) =>
 		// check if doc deleted
 		if (!doc) return next(new appError("doc not delete", 400));
 		// send response
-		sendResponse(res, 200, doc);
+		sendResponse(res, 200, {});
 	});
 
 // get doc by owner
@@ -189,14 +204,20 @@ export const getDocByOwner = (Model) =>
 		// check if doc deleted
 		if (!doc) return next(new appError("doc not found", 400));
 		// send response
-		sendResponse(res, 200, {});
+		sendResponse(res, 200, doc);
 	});
 // delete items from doc list by owner
 export const deleteFromDocList = (Model) =>
 	catchAsync(async (req, res, next) => {
+		let updateQuery;
+		if (Model.modelName === "CartModel") {
+			updateQuery = { $pull: { items: { item: req.params.id } } };
+		} else {
+			updateQuery = { $pull: { items: req.params.id } };
+		}
 		const doc = await Model.findOneAndUpdate(
 			{ userId: req.user._id },
-			{ $pull: { items: req.params.id } },
+			updateQuery,
 			{ new: true, runValidators: true }
 		);
 		// check if doc deleted

@@ -20,7 +20,7 @@ const SellerSchema = new mongoose.Schema(
 		businessEmail: {
 			type: String,
 			required: [false, "email is required"],
-			unique: true,
+			unique: false,
 			trim: true,
 			validate: [validator.isEmail, "please enter the valid email"],
 		},
@@ -60,9 +60,25 @@ const SellerSchema = new mongoose.Schema(
 		defaultPayoutMethod: String,
 		balance: moneySchema,
 	},
-	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+	{
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+		timestamps: true,
+		id: false,
+	}
 );
+// virtual populate
+SellerSchema.virtual("reviews", {
+	ref: "ReviewsModel",
+	localField: "userId",
+	foreignField: "itemId",
+});
+//  mongoose query middlewares
+SellerSchema.pre(/^find/, function (next) {
+	this.populate("reviews");
 
+	next();
+});
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });
 SellerSchema.index({ brand: 1 });

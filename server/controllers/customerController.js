@@ -6,6 +6,6 @@ import { updateDoc } from "./handlerFactory.js";
 // @access Private/Customer
 export const addAddressestoCustomer = updateDoc(
 	CustomerModel,
-	"CustomerModel",
+
 	["addresses"]
 );

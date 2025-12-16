@@ -55,6 +55,8 @@ import sellerRouter from "./routers/sellerRouter.js";
 import customerRouter from "./routers/customerRouter.js";
 import productRouter from "./routers/productRouter.js";
 import categoryRouter from "./routers/categoryRouter.js";
+import cartRouter from "./routers/cartRouter.js";
+import wishListRouter from "./routers/wishListRouter.js";
 import globalError from "./controllers/globalErrorController.js";
 import reviewRouter from "./routers/reviewRouter.js";
 
@@ -62,6 +64,8 @@ app.use("/api/v1/authentications", authRouter);
 app.use("/api/v1/sellers", sellerRouter);
 app.use("/api/v1/customers", customerRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/wishlist", wishListRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/categories", categoryRouter);
 

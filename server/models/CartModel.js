@@ -12,13 +12,14 @@ const cartSchema = new mongoose.Schema(
 					ref: "ProductModel",
 				},
 				quantity: { type: Number, default: 1 },
+				_id: false,
 			},
 		],
 	},
 	{ timestamps: true }
 );
 cartSchema.pre("findOne", function (next) {
-	this.populate("items.product");
+	this.populate("items.item");
 	next();
 });
 export default mongoose.model("CartModel", cartSchema);

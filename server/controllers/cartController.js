@@ -1,4 +1,4 @@
-import CartModel from "../models/WishListModel.js";
+import CartModel from "../models/CartModel.js";
 import {
 	addItemToList,
 	deleteDocByOwner,
@@ -7,18 +7,21 @@ import {
 } from "./handlerFactory.js";
 
 //  @desc  create Cart and push products to it
-//  POST /api/v1/wishlist
+//  PATCH /api/v1/cart
 //  private/User
 export const addToCart = addItemToList(CartModel);
 
 //  @desc  delete Cart by owner "user"
-//  DELETE /api/v1/Cart/:id
+//  DELETE /api/v1/cart/:id
 //  private/User
 export const deleteCart = deleteDocByOwner(CartModel);
 
 //  @desc  delete items from wishlist by owner "user"
-//  DELETE /api/v1/Cart/:id
+//  PAtch /api/v1/cart/:id
 //  private/User
 export const deleteFromCart = deleteFromDocList(CartModel);
 
+//  @desc  show Cart
+//  GET /api/v1/cart
+//  private/User
 export const showCart = getDocByOwner(CartModel);
