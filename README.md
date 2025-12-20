@@ -87,9 +87,12 @@ npm run client
 - **User Authentication:** Secure login/register flow with JWT and HttpOnly cookies.
 - **Role-Based Access Control:** Separate portals/permissions for Customers, Sellers, and Admins.
 - **Product Management:** Create, read, update, delete products with image support.
-- **Order System:** Full order lifecycle (Create -> Pay -> Deliver) with status tracking.
-- **Shopping Cart & Wishlist:** Persistent cart and wishlist management.
-- **Reviews:** Product review and rating system.
+- **Order System:** Unified order lifecycle management (Processing, Shipped, Delivered, Cancelled) with Snapshot tracking via `OrderItems`.
+- **Dynamic Admin Dashboard:** Centralized SuperAdmin control panel for managing all system models with field-level security.
+- **Shopping Cart & Wishlist:** Persistent cart and wishlist management with real-time price aggregation.
+- **Reviews:** Product review and rating system with automatic average calculation.
 
 ## 📄 Documentation
-For detailed backend documentation, please refer to the [Server Documentation](./server/README.md).
+
+- **[Server Documentation](./server/README.md):** Detailed API endpoints, user flow diagrams, and backend architecture.
+- **[Client Documentation](./client/README.md):** Frontend project structure, role-based UI components, and state management details.
