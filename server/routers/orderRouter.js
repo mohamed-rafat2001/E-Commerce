@@ -4,8 +4,7 @@ import {
 	getAllOrders,
 	getMyOrders,
 	getOrderById,
-	updateOrderToDelivered,
-	updateOrderToPaid,
+	updateOrderStatus,
 } from "../controllers/orderController.js";
 import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -22,10 +21,6 @@ router.route("/myorders").get(getMyOrders);
 
 router.route("/:id").get(getOrderById);
 
-router.route("/:id/pay").patch(updateOrderToPaid);
-
-router
-	.route("/:id/deliver")
-	.patch(restrictTo("Admin", "SuperAdmin"), updateOrderToDelivered);
+router.route("/:id/status").patch(updateOrderStatus);
 
 export default router;

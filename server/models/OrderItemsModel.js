@@ -1,17 +1,19 @@
 import mongoose from "mongoose";
 import { moneySchema } from "./commonSchemas.js";
 
-const cartSchema = new mongoose.Schema(
+const orderItemsSchema = new mongoose.Schema(
 	{
-		userId: {
+		orderId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "UserModel",
+			ref: "OrderModel",
+			required: true,
 		},
 		items: [
 			{
 				item: {
 					type: mongoose.Schema.Types.ObjectId,
 					ref: "ProductModel",
+					required: true,
 				},
 				quantity: { type: Number, default: 1 },
 				price: moneySchema,
@@ -23,10 +25,9 @@ const cartSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-cartSchema.pre("save", async function (next) {
+orderItemsSchema.pre("save", async function (next) {
 	if (!this.isModified("items")) return next();
 
-	// Use populate to get product details directly
 	await this.populate("items.item");
 
 	let currency = "USD";
@@ -46,9 +47,5 @@ cartSchema.pre("save", async function (next) {
 
 	next();
 });
-cartSchema.pre("findOne", function (next) {
-	this.populate("items.item");
-	next();
-});
 
-export default mongoose.model("CartModel", cartSchema);
+export default mongoose.model("OrderItemsModel", orderItemsSchema);

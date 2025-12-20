@@ -6,24 +6,20 @@ const orderSchema = new mongoose.Schema(
 		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
+		},
+		sellerId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "UserModel",
 			required: true,
 		},
-		items: [
-			{
-				product: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "ProductModel",
-					required: true,
-				},
-				name: { type: String, required: true },
-				quantity: { type: Number, required: true },
-				image: { type: String },
-				price: moneySchema,
-			},
-		],
+		items: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "OrderItemsModel",
+		},
 		shippingAddress: addressSchema,
 		paymentMethod: {
 			type: String,
+			enum: ["card", "paypal", "bank_transfer", "cash_on_delivery", "wallet"],
 			required: true,
 		},
 		paymentResult: {
@@ -62,5 +58,30 @@ const orderSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
+
+orderSchema.pre("save", async function (next) {
+	if (!this.isModified("items")) return next();
+
+	await this.populate("items");
+
+	const itemsTotal = this.items?.totalPrice?.amount || 0;
+	const currency = this.items?.totalPrice?.currency || "USD";
+
+	this.itemsPrice = { amount: itemsTotal, currency };
+
+	// Update tax and shipping currency to match items
+	if (this.taxPrice) this.taxPrice.currency = currency;
+	if (this.shippingPrice) this.shippingPrice.currency = currency;
+
+	const tax = this.taxPrice?.amount || 0;
+	const shipping = this.shippingPrice?.amount || 0;
+
+	this.totalPrice = {
+		amount: itemsTotal + tax + shipping,
+		currency: currency,
+	};
+
+	next();
+});
 
 export default mongoose.model("OrderModel", orderSchema);

@@ -3,109 +3,105 @@ import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 
+import {
+	createDoc,
+	getAllDocs,
+	getAllDocsByOwner,
+	getDocByOwner,
+	getSingDoc,
+} from "./handlerFactory.js";
+
 // @desc    Create new order
 // @route   POST /api/v1/orders
 // @access  Private
-export const createOrder = catchAsync(async (req, res, next) => {
-	const {
-		items,
-		shippingAddress,
-		paymentMethod,
-		itemsPrice,
-		taxPrice,
-		shippingPrice,
-		totalPrice,
-	} = req.body;
-
-	if (items && items.length === 0) {
-		return next(new appError("No order items", 400));
-	} else {
-		const order = new OrderModel({
-			items,
-			userId: req.user._id,
-			shippingAddress,
-			paymentMethod,
-			itemsPrice,
-			taxPrice,
-			shippingPrice,
-			totalPrice,
-		});
-
-		const createdOrder = await order.save();
-		sendResponse(res, 201, createdOrder);
-	}
-});
+export const createOrder = createDoc(OrderModel, [
+	"items",
+	"shippingAddress",
+	"paymentMethod",
+	"taxPrice",
+	"shippingPrice",
+]);
 
 // @desc    Get order by ID
 // @route   GET /api/v1/orders/:id
 // @access  Private
-export const getOrderById = catchAsync(async (req, res, next) => {
-	const order = await OrderModel.findById(req.params.id).populate(
-		"userId",
-		"name email"
-	);
+export const getOrderById = getSingDoc(OrderModel);
 
-	if (order) {
-		sendResponse(res, 200, order);
-	} else {
-		return next(new appError("Order not found", 404));
-	}
-});
-
-// @desc    Update order to paid
-// @route   PUT /api/v1/orders/:id/pay
+// @desc    Update order status
+// @route   PATCH /api/v1/orders/:id/status
 // @access  Private
-export const updateOrderToPaid = catchAsync(async (req, res, next) => {
+export const updateOrderStatus = catchAsync(async (req, res, next) => {
+	const { status } = req.body;
 	const order = await OrderModel.findById(req.params.id);
 
-	if (order) {
-		order.isPaid = true;
-		order.paidAt = Date.now();
-		order.paymentResult = {
-			id: req.body.id,
-			status: req.body.status,
-			update_time: req.body.update_time,
-			email_address: req.body.email_address,
-		};
-		order.status = "Processing"; // Update status when paid
-
-		const updatedOrder = await order.save();
-		sendResponse(res, 200, updatedOrder);
-	} else {
+	if (!order) {
 		return next(new appError("Order not found", 404));
 	}
-});
 
-// @desc    Update order to delivered
-// @route   PUT /api/v1/orders/:id/deliver
-// @access  Private/Admin
-export const updateOrderToDelivered = catchAsync(async (req, res, next) => {
-	const order = await OrderModel.findById(req.params.id);
+	// Logic based on the requested status
+	switch (status) {
+		case "Processing": // Triggered after payment
+			order.isPaid = true;
+			order.paidAt = Date.now();
+			if (req.body.paymentResult) {
+				order.paymentResult = req.body.paymentResult;
+			}
+			order.status = "Processing";
+			break;
 
-	if (order) {
-		order.isDelivered = true;
-		order.deliveredAt = Date.now();
-		order.status = "Delivered";
+		case "Shipped":
+			if (!["Admin", "SuperAdmin"].includes(req.user.role)) {
+				return next(new appError("Not authorized to ship orders", 403));
+			}
+			order.status = "Shipped";
+			break;
 
-		const updatedOrder = await order.save();
-		sendResponse(res, 200, updatedOrder);
-	} else {
-		return next(new appError("Order not found", 404));
+		case "Delivered":
+			if (!["Admin", "SuperAdmin"].includes(req.user.role)) {
+				return next(new appError("Not authorized to deliver orders", 403));
+			}
+			order.isDelivered = true;
+			order.deliveredAt = Date.now();
+			order.status = "Delivered";
+			break;
+
+		case "Cancelled":
+			// Users can cancel their own orders if Pending/Processing
+			// Admins can cancel any order
+			const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
+			const isOwner = order.userId.toString() === req.user._id.toString();
+
+			if (!isAdmin && !isOwner) {
+				return next(new appError("Not authorized to cancel this order", 403));
+			}
+
+			if (!isAdmin && !["Pending", "Processing"].includes(order.status)) {
+				return next(
+					new appError(
+						`Cannot cancel order that is already ${order.status}`,
+						400
+					)
+				);
+			}
+
+			order.status = "Cancelled";
+			break;
+
+		default:
+			return next(new appError("Invalid status transition", 400));
 	}
+
+	const updatedOrder = await order.save();
+	sendResponse(res, 200, updatedOrder);
 });
 
 // @desc    Get logged in user orders
 // @route   GET /api/v1/orders/myorders
 // @access  Private
-export const getMyOrders = catchAsync(async (req, res, next) => {
-	const orders = await OrderModel.find({ userId: req.user._id });
-	sendResponse(res, 200, orders);
-});
+export const getMyOrders = getAllDocsByOwner(OrderModel);
 
+export const getMyOrder = getDocByOwner(OrderModel);
 // @desc    Get all orders
 // @route   GET /api/v1/orders
 // @access  Private/Admin
-export const getAllOrders = catchAsync(async (req, res, next) => {
-	const orders = await OrderModel.find({}).populate("userId", "id name");
-	sendResponse(res, 200, orders);
-});
+export const getAllOrders = getAllDocs(OrderModel);

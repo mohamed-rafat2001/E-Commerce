@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
+import OrderItemsModel from "../models/OrderItemsModel.js";
 
 export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
@@ -14,49 +16,79 @@ export const createDoc = (Model, Fields = []) =>
 		}
 
 		// create new doc
-		let doc = Model;
+		let doc;
 
-		if (Model.modelName === "ReviewsModel") {
-			doc = await doc.create({
-				userId: req.user._id,
-				itemId: req.params.id,
-				...object,
-			});
-		} else if (
-			Model.modelName === "WishListModel" ||
-			Model.modelName === "OrderModel"
-		) {
-			const isDocExist = await Model.findOne({ userId: req.user._id });
-
-			if (!isDocExist) {
-				doc = await doc.create({
+		switch (Model.modelName) {
+			case "ReviewsModel":
+				doc = await Model.create({
 					userId: req.user._id,
-					items: [req.params.id],
+					itemId: req.params.id,
+					...object,
 				});
-			} else {
-				const itemExist = isDocExist.items.find(
-					(item) => item._id.toString() === req.params.id
-				);
+				break;
 
-				if (!itemExist) {
-					doc = await doc.findByIdAndUpdate(
-						isDocExist._id,
-						{ $push: { items: req.params.id } },
-						{ new: true, runValidators: true }
-					);
+			case "WishListModel":
+				const isDocExist = await Model.findOne({ userId: req.user._id });
+
+				if (!isDocExist) {
+					doc = await Model.create({
+						userId: req.user._id,
+						items: [req.params.id],
+					});
 				} else {
-					doc = await doc.findByIdAndUpdate(
-						isDocExist._id,
-						{ $pull: { items: req.params.id } },
-						{ new: true, runValidators: true }
+					const itemExist = isDocExist.items.find(
+						(item) => item._id.toString() === req.params.id
 					);
+
+					if (!itemExist) {
+						doc = await Model.findByIdAndUpdate(
+							isDocExist._id,
+							{ $push: { items: req.params.id } },
+							{ new: true, runValidators: true }
+						);
+					} else {
+						doc = await Model.findByIdAndUpdate(
+							isDocExist._id,
+							{ $pull: { items: req.params.id } },
+							{ new: true, runValidators: true }
+						);
+					}
 				}
-			}
-		} else {
-			doc = await doc.create({
-				userId: req.user._id,
-				...object,
-			});
+				break;
+
+			case "OrderModel":
+				if (!req.body.items || req.body.items.length === 0) {
+					return next(new appError("No order items", 400));
+				}
+
+				const orderId = new mongoose.Types.ObjectId();
+
+				// Create a single OrderItems document containing all items
+				const orderItems = new OrderItemsModel({
+					orderId,
+					items: req.body.items.map((item) => ({
+						item: item.item,
+						quantity: item.quantity,
+					})),
+				});
+
+				const createdOrderItems = await orderItems.save();
+
+				doc = await Model.create({
+					_id: orderId,
+					items: createdOrderItems._id,
+					userId: req.user._id,
+					sellerId: req.body.items[0].sellerId,
+					...object,
+				});
+				break;
+
+			default:
+				doc = await Model.create({
+					userId: req.user._id,
+					...object,
+				});
+				break;
 		}
 		// check if doc created
 		if (!doc) return next(new appError("doc not create", 400));
@@ -116,29 +148,34 @@ export const updateDoc = (Model, Fields = []) =>
 			if (!object || Object.keys(object).length === 0)
 				return next(new appError("please provide valid fields to update", 400));
 		}
-		let doc = Model;
 		// update doc
-		if (Model.modelName === "UserModel") {
-			doc = await doc.findByIdAndUpdate(
-				req.user._id,
-				{ ...object },
-				{ new: true, runValidators: true }
-			);
-		} else if (
-			Model.modelName === "SellerModel" ||
-			Model.modelName === "CustomerModel"
-		) {
-			doc = await doc.findOneAndUpdate(
-				{ userId: req.user._id },
-				{ ...object },
-				{ new: true, runValidators: true }
-			);
-		} else {
-			doc = await doc.findOneAndUpdate(
-				{ _id: req.params.id, userId: req.user._id },
-				{ ...object },
-				{ new: true, runValidators: true }
-			);
+		let doc;
+
+		switch (Model.modelName) {
+			case "UserModel":
+				doc = await Model.findByIdAndUpdate(
+					req.user._id,
+					{ ...object },
+					{ new: true, runValidators: true }
+				);
+				break;
+
+			case "SellerModel":
+			case "CustomerModel":
+				doc = await Model.findOneAndUpdate(
+					{ userId: req.user._id },
+					{ ...object },
+					{ new: true, runValidators: true }
+				);
+				break;
+
+			default:
+				doc = await Model.findOneAndUpdate(
+					{ _id: req.params.id, userId: req.user._id },
+					{ ...object },
+					{ new: true, runValidators: true }
+				);
+				break;
 		}
 
 		// check if doc updated
@@ -206,15 +243,29 @@ export const getDocByOwner = (Model) =>
 		// send response
 		sendResponse(res, 200, doc);
 	});
+
+// get all docs by owner
+export const getAllDocsByOwner = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const doc = await Model.find({ userId: req.user._id });
+		// check if doc deleted
+		if (!doc) return next(new appError("doc not found", 400));
+		// send response
+		sendResponse(res, 200, doc);
+	});
 // delete items from doc list by owner
 export const deleteFromDocList = (Model) =>
 	catchAsync(async (req, res, next) => {
 		let updateQuery;
-		if (Model.modelName === "CartModel") {
-			updateQuery = { $pull: { items: { item: req.params.id } } };
-		} else {
-			updateQuery = { $pull: { items: req.params.id } };
+		switch (Model.modelName) {
+			case "CartModel":
+				updateQuery = { $pull: { items: { item: req.params.id } } };
+				break;
+			default:
+				updateQuery = { $pull: { items: req.params.id } };
+				break;
 		}
+
 		const doc = await Model.findOneAndUpdate(
 			{ userId: req.user._id },
 			updateQuery,
