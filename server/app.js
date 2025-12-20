@@ -60,8 +60,10 @@ import wishListRouter from "./routers/wishListRouter.js";
 import globalError from "./controllers/globalErrorController.js";
 import reviewRouter from "./routers/reviewRouter.js";
 import orderRouter from "./routers/orderRouter.js";
+import adminRouter from "./routers/adminRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/sellers", sellerRouter);
 app.use("/api/v1/customers", customerRouter);
 app.use("/api/v1/products", productRouter);

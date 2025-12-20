@@ -12,10 +12,7 @@ const router = express.Router();
 
 router.use(Protect);
 
-router
-	.route("/")
-	.post(createOrder)
-	.get(restrictTo("Admin", "SuperAdmin"), getAllOrders);
+router.route("/").post(createOrder).get(restrictTo("Admin"), getAllOrders);
 
 router.route("/myorders").get(getMyOrders);
 

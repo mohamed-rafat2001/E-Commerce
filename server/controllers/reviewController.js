@@ -2,8 +2,8 @@ import ReviewsModel from "../models/ReviewsModel.js";
 import {
 	createDoc,
 	updateDoc,
-	deleteDocByOwner,
 	getSingDoc,
+	deleteDoc,
 } from "./handlerFactory.js";
 
 //  @desc   add new review
@@ -27,5 +27,5 @@ export const getSingleReview = getSingDoc(ReviewsModel);
 
 //  @desc   delete single review by owner
 //  @Route  GET /api/v1/reviews/:id
-//  @access private/user
-export const deleteReviewByOwner = deleteDocByOwner(ReviewsModel);
+//  @access private/user || admin
+export const deleteReview = deleteDoc(ReviewsModel);

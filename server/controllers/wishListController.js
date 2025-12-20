@@ -1,20 +1,20 @@
 import WishListModel from "../models/WishListModel.js";
 import {
 	createDoc,
-	deleteDocByOwner,
+	deleteDoc,
 	deleteFromDocList,
 	getDocByOwner,
 } from "./handlerFactory.js";
 
 //  @desc  create wishlist and push products to it
 //  POST /api/v1/wishlist
-//  private/User
+//  private/User // admin
 export const addToWishList = createDoc(WishListModel);
 
 //  @desc  delete wishlist by owner "user"
 //  DELETE /api/v1/wishlist/:id
 //  private/User
-export const deleteWishList = deleteDocByOwner(WishListModel);
+export const deleteWishList = deleteDoc(WishListModel);
 
 //  @desc  delete items from wishlist by owner "user"
 //  PATCH /api/v1/wishlist/:id

@@ -3,7 +3,7 @@ const router = express.Router();
 import { Protect } from "../middlewares/authMiddleware.js";
 import {
 	addReview,
-	deleteReviewByOwner,
+	deleteReview,
 	getSingleReview,
 	updateReview,
 } from "../controllers/reviewController.js";
@@ -16,6 +16,6 @@ router
 	.route("/:id")
 	.post(addReview)
 	.patch(updateReview)
-	.delete(deleteReviewByOwner)
+	.delete(deleteReview)
 	.get(getSingleReview);
 export default router;

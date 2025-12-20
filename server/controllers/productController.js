@@ -34,13 +34,8 @@ export const getSingleProduct = getSingDoc(ProductModel);
 
 //  @desc   delete product
 //  @Route  DELETE /api/v1/products/:id
-//  @access Private/superAdmin
+//  @access Private/superAdmin || seller
 export const deleteProduct = deleteDoc(ProductModel);
-
-//  @desc   delete product
-//  @Route DELETE /api/v1/products/seller/:id
-//  @access Private/Seller
-export const deleteProductByOwner = deleteDocByOwner(ProductModel);
 
 //  @desc   update product
 //  @Route  PATCH /api/v1/products/:id
@@ -57,5 +52,5 @@ export const updateProduct = updateDoc(ProductModel, [
 
 //  @desc  delete all products
 //  @Route  DELETE /api/v1/products
-//  @access Private/superAdmin
+//  @access Private/superAdmin || seller
 export const deleteAllProducts = deleteAllDocs(ProductModel);

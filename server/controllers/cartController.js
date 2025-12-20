@@ -1,6 +1,7 @@
 import CartModel from "../models/CartModel.js";
 import {
 	addItemToList,
+	deleteDoc,
 	deleteDocByOwner,
 	deleteFromDocList,
 	getDocByOwner,
@@ -14,7 +15,7 @@ export const addToCart = addItemToList(CartModel);
 //  @desc  delete Cart by owner "user"
 //  DELETE /api/v1/cart/:id
 //  private/User
-export const deleteCart = deleteDocByOwner(CartModel);
+export const deleteCart = deleteDoc(CartModel);
 
 //  @desc  delete items from wishlist by owner "user"
 //  PAtch /api/v1/cart/:id

@@ -84,8 +84,9 @@ export const createDoc = (Model, Fields = []) =>
 				break;
 
 			default:
+				const userId = req.user._id;
 				doc = await Model.create({
-					userId: req.user._id,
+					userId,
 					...object,
 				});
 				break;
@@ -150,11 +151,14 @@ export const updateDoc = (Model, Fields = []) =>
 		}
 		// update doc
 		let doc;
+		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
 
 		switch (Model.modelName) {
 			case "UserModel":
+				// Admin can update any user by ID, users can only update themselves
+				const userId = isAdmin ? req.params.id || req.user._id : req.user._id;
 				doc = await Model.findByIdAndUpdate(
-					req.user._id,
+					userId,
 					{ ...object },
 					{ new: true, runValidators: true }
 				);
@@ -162,16 +166,24 @@ export const updateDoc = (Model, Fields = []) =>
 
 			case "SellerModel":
 			case "CustomerModel":
+				// Admin can update any seller/customer by userId, users only their own
+				const filter = isAdmin
+					? { _id: req.params.id }
+					: { userId: req.user._id };
 				doc = await Model.findOneAndUpdate(
-					{ userId: req.user._id },
+					filter,
 					{ ...object },
 					{ new: true, runValidators: true }
 				);
 				break;
 
 			default:
+				// Admin can update any doc by _id, users only their own
+				const defaultFilter = isAdmin
+					? { _id: req.params.id }
+					: { _id: req.params.id, userId: req.user._id };
 				doc = await Model.findOneAndUpdate(
-					{ _id: req.params.id, userId: req.user._id },
+					defaultFilter,
 					{ ...object },
 					{ new: true, runValidators: true }
 				);
@@ -204,7 +216,17 @@ export const getSingDoc = (Model) =>
 	});
 export const deleteDoc = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const doc = await Model.findByIdAndDelete(req.params.id);
+		let doc;
+		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
+
+		if (isAdmin) {
+			doc = await Model.findByIdAndDelete(req.params.id);
+		} else {
+			doc = await Model.findOneAndDelete({
+				_id: req.params.id,
+				userId: req.user._id,
+			});
+		}
 		// check if doc deleted
 		if (!doc) return next(new appError("doc not found", 400));
 		// send response
@@ -214,22 +236,18 @@ export const deleteDoc = (Model) =>
 // delete all docs in db
 export const deleteAllDocs = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const docs = await Model.deleteMany({});
-		// check if docs deleted
-		if (!docs) return next(new appError("docs not delete", 400));
-		// send response
-		sendResponse(res, 200, {});
-	});
+		let result;
+		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
 
-// delete doc by owner
-export const deleteDocByOwner = (Model) =>
-	catchAsync(async (req, res, next) => {
-		const doc = await Model.findOneAndDelete({
-			_id: req.params.id,
-			userId: req.user._id,
-		});
-		// check if doc deleted
-		if (!doc) return next(new appError("doc not delete", 400));
+		if (isAdmin) {
+			result = await Model.deleteMany({});
+		} else {
+			result = await Model.deleteMany({
+				userId: req.user._id,
+			});
+		}
+		// check if docs deleted
+		if (!result) return next(new appError("docs not deleted", 400));
 		// send response
 		sendResponse(res, 200, {});
 	});

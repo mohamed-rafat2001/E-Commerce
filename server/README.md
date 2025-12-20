@@ -52,10 +52,26 @@ sequenceDiagram
 
     %% Post-Order Flow
     Note over User, DB: 5. Post-Order Phase
-    User->>Order: PUT /orders/123/pay (Payment Result)
-    Order->>DB: Update Status -> Paid
-    Order-->>User: Payment Success
+    User->>Order: PATCH /orders/123/status (status: "Processing")
+    Order->>DB: Update Status -> Paid/Processing
+    Order-->>User: Status Updated
 ```
+
+### 🛠️ Dynamic Admin Dashboard (SuperAdmin Only)
+
+A powerful, dynamic administrative system has been implemented at `/api/v1/admin`. It allows for full CRUD operations across all models using a single set of generic routes, while enforcing strict field-level security.
+
+- **Dynamic Resolution**: Models are resolved from the URL (e.g., `/admin/users`, `/admin/products`).
+- **Security**: Restricted to `SuperAdmin` role only.
+- **Field Awareness**: Each model has a whitelist of `createFields` and `updateFields` to prevent unauthorized modification of internal data.
+
+#### Admin Endpoints:
+
+- `GET /admin/:model`: List all records for any model.
+- `GET /admin/:model/:id`: Get specific record.
+- `POST /admin/:model`: Create new record (respecting allowed fields).
+- `PATCH /admin/:model/:id`: Update record (respecting allowed fields).
+- `DELETE /admin/:model/:id`: Delete record.
 
 ### Detailed Step-by-Step Flow
 
@@ -89,10 +105,12 @@ sequenceDiagram
 
 #### 5. Payment & Delivery
 
-- **Action**: User completes payment via gateway (mock or real).
-- **Endpoint**: `PUT /api/v1/orders/:id/pay`
-- **Backend**: Updates `isPaid` to `true`, sets `paidAt` timestamp.
-- **Admin Action**: Admin ships item and calls `PUT /api/v1/orders/:id/deliver`.
+- **Action**: User completes payment or Admin updates status.
+- **Endpoint**: `PATCH /api/v1/orders/:id/status`
+- **Backend**:
+  - Updates `status` (Processing, Shipped, Delivered, Cancelled).
+  - Handles logical transitions (e.g., sets `isPaid` on `Processing`, `isDelivered` on `Delivered`).
+  - Enforces permissions (e.g., only Admin can ship/deliver, only owner can cancel).
 
 ---
 
@@ -152,8 +170,7 @@ The server follows the **MVC (Model-View-Controller)** pattern (without the View
 - `GET /`: Get all orders (Admin).
 - `GET /myorders`: Get logged-in user's orders.
 - `GET /:id`: Get order details.
-- `PUT /:id/pay`: Mark order as paid.
-- `PUT /:id/deliver`: Mark order as delivered (Admin).
+- `PATCH /:id/status`: Unified endpoint to manage order status (Processing, Shipped, Delivered, Cancelled).
 
 ### 🛒 Cart (`/cart`)
 

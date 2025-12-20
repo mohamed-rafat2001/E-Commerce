@@ -18,10 +18,9 @@ router.use(Protect);
 router
 	.route("/")
 	.post(restrictTo("Admin", "Seller", "SuperAdmin"), addProduct)
-	.delete(restrictTo("SuperAdmin", "Customer"), deleteAllProducts);
+	.delete(restrictTo("SuperAdmin", "Seller"), deleteAllProducts);
 router
 	.route("/:id")
 	.delete(restrictTo("Admin", "SuperAdmin", "Seller"), deleteProduct)
 	.patch(restrictTo("Admin", "SuperAdmin", "Seller"), updateProduct);
-router.delete("/seller/:id", restrictTo("Seller"), deleteProductByOwner);
 export default router;
