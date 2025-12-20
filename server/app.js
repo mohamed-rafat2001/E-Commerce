@@ -59,6 +59,7 @@ import cartRouter from "./routers/cartRouter.js";
 import wishListRouter from "./routers/wishListRouter.js";
 import globalError from "./controllers/globalErrorController.js";
 import reviewRouter from "./routers/reviewRouter.js";
+import orderRouter from "./routers/orderRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
 app.use("/api/v1/sellers", sellerRouter);
@@ -68,6 +69,7 @@ app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/wishlist", wishListRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/orders", orderRouter);
 
 // global error handler
 app.use(globalError);
