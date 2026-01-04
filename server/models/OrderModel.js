@@ -10,7 +10,6 @@ const orderSchema = new mongoose.Schema(
 		sellerId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
-			required: true,
 		},
 		items: {
 			type: mongoose.Schema.Types.ObjectId,

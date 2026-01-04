@@ -12,7 +12,7 @@ export const Protect = catchAsync(async (req, res, next) => {
 	) {
 		token = req.headers.authorization.split(" ")[1];
 	} else if (req.cookies.token) token = req.cookies.token;
-	if (!token) {
+	else  {
 		return next(new appError("no token", 404));
 	}
 

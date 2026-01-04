@@ -10,5 +10,5 @@ import {
 router.use(Protect, restrictTo("Seller"));
 router.patch("/addresses", addAddressestoSeller);
 router.patch("/", completeSellerDoc);
-router.patch("/payoutMethod", addPayoutMethodtoSeller);
+router.patch("/payoutMethods", addPayoutMethodtoSeller);
 export default router;

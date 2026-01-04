@@ -9,11 +9,11 @@ import {
 const router = express.Router();
 
 router.use(Protect);
-router.route("/").get(showWishList);
 router
 	.route("/:id")
 	.delete(deleteWishList)
 	.patch(deleteFromWishList)
-	.post(addToWishList);
+	.post(addToWishList)
+	.get(showWishList);
 
 export default router;

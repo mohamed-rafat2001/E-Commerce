@@ -15,11 +15,11 @@ import {
 // @route   POST /api/v1/orders
 // @access  Private
 export const createOrder = createDoc(OrderModel, [
-	"items",
-	"shippingAddress",
+	"cartId",
+	// "shippingAddress",
 	"paymentMethod",
-	"taxPrice",
-	"shippingPrice",
+	// "taxPrice",
+	// "shippingPrice",
 ]);
 
 // @desc    Get order by ID
@@ -100,7 +100,11 @@ export const updateOrderStatus = catchAsync(async (req, res, next) => {
 // @access  Private
 export const getMyOrders = getAllDocsByOwner(OrderModel);
 
+// @desc    Get logged in user orders
+// @route   GET /api/v1/orders/myorders/:id
+// @access  Private
 export const getMyOrder = getDocByOwner(OrderModel);
+
 // @desc    Get all orders
 // @route   GET /api/v1/orders
 // @access  Private/Admin

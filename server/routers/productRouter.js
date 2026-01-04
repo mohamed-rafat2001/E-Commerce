@@ -5,7 +5,6 @@ import {
 	addProduct,
 	deleteAllProducts,
 	deleteProduct,
-	deleteProductByOwner,
 	getAllProducts,
 	getSingleProduct,
 	updateProduct,

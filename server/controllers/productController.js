@@ -3,7 +3,6 @@ import {
 	createDoc,
 	deleteAllDocs,
 	deleteDoc,
-	deleteDocByOwner,
 	getAllDocs,
 	getSingDoc,
 	updateDoc,

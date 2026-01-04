@@ -1,6 +1,47 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import { addressSchema, moneySchema } from "./commonSchemas.js";
+
+const payoutMethodSchema = new mongoose.Schema(
+	{
+		type: {
+			type: String,
+			enum: ["bank_transfer", "paypal", "stripe", "cash"],
+			required: true,
+		},
+		accountHolderName: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		accountNumber: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		bankName: {
+			type: String,
+			trim: true,
+			required: true,
+		},
+		routingNumber: {
+			type: String,
+			trim: true,
+			required: true,
+		},
+		notes: {
+			type: String,
+			trim: true,
+		},
+		isDefault: {
+			type: Boolean,
+			default: false,
+		},
+	},
+	{ _id: false, timestamps: true }
+);
+
+
 const SellerSchema = new mongoose.Schema(
 	{
 		userId: {
@@ -57,7 +98,7 @@ const SellerSchema = new mongoose.Schema(
 			enum: ["unverified", "in_review", "verified", "rejected"],
 			default: "unverified",
 		},
-		defaultPayoutMethod: String,
+		payoutMethods: [payoutMethodSchema],
 		balance: moneySchema,
 	},
 	{
@@ -76,7 +117,7 @@ SellerSchema.virtual("reviews", {
 //  mongoose query middlewares
 SellerSchema.pre(/^find/, function (next) {
 	this.populate("reviews");
-
+	this.populate("primaryCategory","name description");
 	next();
 });
 SellerSchema.index({ status: 1 });

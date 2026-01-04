@@ -11,7 +11,7 @@ import {
 
 router.get("/", getAllCategories);
 
-router.use(Protect, restrictTo("Admin", "SuperAdmin"));
+router.use(Protect, restrictTo("Admin", "SuperAdmin","Seller"));
 router.route("/").post(createCategory).delete(deleteAllCategories);
 router.route("/:id").delete(deleteCategory).patch(updateCategory);
 export default router;

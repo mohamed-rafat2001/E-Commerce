@@ -2,7 +2,6 @@ import CartModel from "../models/CartModel.js";
 import {
 	addItemToList,
 	deleteDoc,
-	deleteDocByOwner,
 	deleteFromDocList,
 	getDocByOwner,
 } from "./handlerFactory.js";

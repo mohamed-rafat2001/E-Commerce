@@ -21,7 +21,7 @@ export const addAddressestoSeller = updateDoc(SellerModel, ["addresses"]);
 // @Route  PATCH /api/v1/seller/PayoutMethod
 // @access Private/Seller
 export const addPayoutMethodtoSeller = updateDoc(SellerModel, [
-	"defaultPayoutMethod",
+	"payoutMethods",
 ]);
 
 // add review to seller

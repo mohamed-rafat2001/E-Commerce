@@ -8,12 +8,12 @@ import {
 	deleteOne,
 	deleteAll,
 } from "../controllers/adminController.js";
-import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // All routes here are protected and restricted to SuperAdmin
-router.use(protect);
+router.use(Protect);
 router.use(restrictTo("SuperAdmin"));
 
 router.param("model", resolveModel);

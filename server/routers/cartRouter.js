@@ -9,6 +9,6 @@ import {
 const router = express.Router();
 
 router.use(Protect);
-router.route("/").get(showCart).patch(addToCart);
-router.route("/:id").delete(deleteCart).patch(deleteFromCart);
+router.route("/").patch(addToCart);
+router.route("/:id").delete(deleteCart).patch(deleteFromCart).get(showCart);
 export default router;

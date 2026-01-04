@@ -31,17 +31,24 @@ orderItemsSchema.pre("save", async function (next) {
 	await this.populate("items.item");
 
 	let currency = "USD";
-	const grandTotal = this.items.reduce((total, item) => {
-		if (item.item) {
+	let grandTotal = 0;
+
+	this.items.forEach((item) => {
+		if (item.item && item.item.price) {
+			const unitPrice = item.item.price.amount;
+			const itemSubtotal = unitPrice * item.quantity;
+
+			// Set the item price to the subtotal for that quantity
 			item.price = {
-				amount: item.item.price.amount,
+				amount: itemSubtotal,
 				currency: item.item.price.currency,
 			};
+
 			currency = item.item.price.currency;
-			return total + item.price.amount * item.quantity;
+			// Add this item's subtotal to the grand total
+			grandTotal += itemSubtotal;
 		}
-		return total;
-	}, 0);
+	});
 
 	this.totalPrice = { amount: grandTotal, currency };
 

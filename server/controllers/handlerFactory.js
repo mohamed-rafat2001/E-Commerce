@@ -4,6 +4,7 @@ import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
+import CartModel from "../models/CartModel.js";
 
 export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
@@ -28,45 +29,41 @@ export const createDoc = (Model, Fields = []) =>
 				break;
 
 			case "WishListModel":
-				const isDocExist = await Model.findOne({ userId: req.user._id });
+				doc = await Model.findOne({ userId: req.user._id });
 
-				if (!isDocExist) {
+				if (!doc) {
 					doc = await Model.create({
 						userId: req.user._id,
 						items: [req.params.id],
 					});
 				} else {
-					const itemExist = isDocExist.items.find(
-						(item) => item._id.toString() === req.params.id
+					const itemIndex = doc.items.findIndex(
+						(id) => id.toString() === req.params.id
 					);
 
-					if (!itemExist) {
-						doc = await Model.findByIdAndUpdate(
-							isDocExist._id,
-							{ $push: { items: req.params.id } },
-							{ new: true, runValidators: true }
-						);
+					if (itemIndex === -1) {
+						doc.items.push(req.params.id);
 					} else {
-						doc = await Model.findByIdAndUpdate(
-							isDocExist._id,
-							{ $pull: { items: req.params.id } },
-							{ new: true, runValidators: true }
-						);
+						doc.items.splice(itemIndex, 1);
 					}
+					await doc.save();
 				}
 				break;
 
 			case "OrderModel":
-				if (!req.body.items || req.body.items.length === 0) {
+				if (!req.body.cartId) {
 					return next(new appError("No order items", 400));
 				}
 
 				const orderId = new mongoose.Types.ObjectId();
-
+				const userCart = await CartModel.findOne({ userId: req.user._id });
+				if (!userCart) {
+					return next(new appError("No cart found", 400));
+				}
 				// Create a single OrderItems document containing all items
 				const orderItems = new OrderItemsModel({
 					orderId,
-					items: req.body.items.map((item) => ({
+					items: userCart.items.map((item) => ({
 						item: item.item,
 						quantity: item.quantity,
 					})),
@@ -78,7 +75,8 @@ export const createDoc = (Model, Fields = []) =>
 					_id: orderId,
 					items: createdOrderItems._id,
 					userId: req.user._id,
-					sellerId: req.body.items[0].sellerId,
+					sellerId: userCart.items[0].item.sellerId,
+					shippingAddress: req.user?.addresses?.[0],
 					...object,
 				});
 				break;
@@ -100,42 +98,38 @@ export const addItemToList = (Model) =>
 	catchAsync(async (req, res, next) => {
 		if (!Model) return next(new appError("Model is not defined", 500));
 		const { quantity, itemId } = req.body;
-		let doc = Model;
-		const isDocExist = await Model.findOne({ userId: req.user._id });
 
-		if (!isDocExist) {
-			doc = await doc.create({
+		let doc = await Model.findOne({ userId: req.user._id });
+
+		if (!doc) {
+			doc = await Model.create({
 				userId: req.user._id,
 				items: [{ item: itemId, quantity: quantity || 1 }],
 			});
 		} else {
 			// Check if item already exists in model
-			const itemExist = isDocExist.items.find(
-				(item) => item.item?._id.toString() === itemId
+			const itemExist = doc.items.find(
+				(item) =>
+					item.item?._id?.toString() === itemId ||
+					item.item?.toString() === itemId
 			);
 
 			if (itemExist) {
 				// Update quantity if item exists
-				doc = await doc.findOneAndUpdate(
-					{ _id: isDocExist._id, "items.item": itemId },
-					{ $inc: { "items.$.quantity": quantity || 1 } },
-					{ new: true, runValidators: true }
-				);
+				itemExist.quantity += Number(quantity) || 1;
 			} else {
 				// Push new item if item doesn't exist
-				doc = await doc.findByIdAndUpdate(
-					isDocExist._id,
-					{
-						$push: {
-							items: { item: itemId, quantity: quantity || 1 },
-						},
-					},
-					{ new: true, runValidators: true }
-				);
+				doc.items.push({ item: itemId, quantity: Number(quantity) || 1 });
 			}
+
+			// Explicitly mark as modified to trigger pre-save hooks
+			doc.markModified("items");
+			// Save the document to trigger pre-save hooks (like price calculation)
+			await doc.save();
 		}
+
 		// check if doc created
-		if (!doc) return next(new appError("doc not create", 400));
+		if (!doc) return next(new appError("doc not created", 400));
 		// send response
 		return sendResponse(res, 200, doc);
 	});
@@ -170,11 +164,26 @@ export const updateDoc = (Model, Fields = []) =>
 				const filter = isAdmin
 					? { _id: req.params.id }
 					: { userId: req.user._id };
-				doc = await Model.findOneAndUpdate(
-					filter,
-					{ ...object },
-					{ new: true, runValidators: true }
-				);
+				if (!filter) return next(new appError("doc not found", 400));
+				if (Fields.includes("addresses")) {
+					doc = await Model.findOneAndUpdate(
+						filter,
+						{ $push: { addresses: object.addresses } },
+						{ new: true, runValidators: true }
+					);
+				} else if (Fields.includes("payoutMethods")) {
+					doc = await Model.findOneAndUpdate(
+						filter,
+						{ $push: { payoutMethods: object.payoutMethods } },
+						{ new: true, runValidators: true }
+					);
+				} else {
+					doc = await Model.findOneAndUpdate(
+						filter,
+						{ ...object },
+						{ new: true, runValidators: true }
+					);
+				}
 				break;
 
 			default:
@@ -255,7 +264,10 @@ export const deleteAllDocs = (Model) =>
 // get doc by owner
 export const getDocByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const doc = await Model.findOne({ userId: req.user._id });
+		const doc = await Model.findOne({
+			_id: req.params.id,
+			userId: req.user._id,
+		});
 		// check if doc deleted
 		if (!doc) return next(new appError("doc not found", 400));
 		// send response
@@ -274,23 +286,27 @@ export const getAllDocsByOwner = (Model) =>
 // delete items from doc list by owner
 export const deleteFromDocList = (Model) =>
 	catchAsync(async (req, res, next) => {
-		let updateQuery;
+		const doc = await Model.findOne({ userId: req.user._id });
+		if (!doc) return next(new appError("document not found", 404));
+
 		switch (Model.modelName) {
 			case "CartModel":
-				updateQuery = { $pull: { items: { item: req.params.id } } };
+				// For CartModel, items is an array of objects { item: ID, quantity: N }
+				doc.items = doc.items.filter(
+					(item) =>
+						item.item?._id?.toString() !== req.params.id &&
+						item.item?.toString() !== req.params.id
+				);
 				break;
 			default:
-				updateQuery = { $pull: { items: req.params.id } };
+				// For WishListModel, items is an array of IDs
+				doc.items.pull(req.params.id);
 				break;
 		}
 
-		const doc = await Model.findOneAndUpdate(
-			{ userId: req.user._id },
-			updateQuery,
-			{ new: true, runValidators: true }
-		);
-		// check if doc deleted
-		if (!doc) return next(new appError("doc not delete", 400));
+		// Save the document to trigger pre-save hooks
+		await doc.save();
+
 		// send response
 		sendResponse(res, 200, doc);
 	});
