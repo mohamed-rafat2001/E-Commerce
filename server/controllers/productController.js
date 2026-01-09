@@ -1,16 +1,17 @@
 import ProductModel from "../models/ProductModel.js";
 import {
 	createDoc,
-	deleteAllDocs,
-	deleteDoc,
-	getAllDocs,
-	getSingDoc,
-	updateDoc,
+	deleteManyByOwner,
+	deleteOneByOwner,
+	getAll,
+	getAllByOwner,
+	getById,
+	updateByOwner,
 } from "./handlerFactory.js";
 
 //  @desc   add new product
 // @Route  POST /api/v1/products
-// @access Private/Admin
+// @access Private/seller
 
 export const addProduct = createDoc(ProductModel, [
 	"name",
@@ -24,22 +25,27 @@ export const addProduct = createDoc(ProductModel, [
 // @desc   get all products
 // @Route  GET /api/v1/products
 // @access Public
-export const getAllProducts = getAllDocs(ProductModel);
+export const getAllProducts = getAll(ProductModel);
+
+// @desc   get all products by owner seller || admin
+// @Route  GET /api/v1/products
+// @access private seller
+export const getProductsByOwner = getAllByOwner(ProductModel);
 
 //  @desc   get single product
 //  @Route  GET /api/v1/products/:id
 //  @access Public
-export const getSingleProduct = getSingDoc(ProductModel);
+export const getSingleProduct = getById(ProductModel);
 
 //  @desc   delete product
 //  @Route  DELETE /api/v1/products/:id
-//  @access Private/superAdmin || seller
-export const deleteProduct = deleteDoc(ProductModel);
+//  @access Private/ seller
+export const deleteProduct = deleteOneByOwner(ProductModel);
 
 //  @desc   update product
 //  @Route  PATCH /api/v1/products/:id
-//  @access Private/Admin && seller
-export const updateProduct = updateDoc(ProductModel, [
+//  @access Private/ seller
+export const updateProduct = updateByOwner(ProductModel, [
 	"name",
 	"price",
 	"countInStock",
@@ -51,5 +57,5 @@ export const updateProduct = updateDoc(ProductModel, [
 
 //  @desc  delete all products
 //  @Route  DELETE /api/v1/products
-//  @access Private/superAdmin || seller
-export const deleteAllProducts = deleteAllDocs(ProductModel);
+//  @access Private/Admin || seller
+export const deleteAllProducts = deleteManyByOwner(ProductModel);

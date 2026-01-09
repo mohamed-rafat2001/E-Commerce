@@ -2,20 +2,18 @@ import OrderModel from "../models/OrderModel.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
-
 import {
 	createDoc,
-	getAllDocs,
-	getAllDocsByOwner,
-	getDocByOwner,
-	getSingDoc,
+	getAllByOwner,
+	getById,
+	getOneByOwner,
 } from "./handlerFactory.js";
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
 // @access  Private
 export const createOrder = createDoc(OrderModel, [
-	"cartId",
+	"items",
 	// "shippingAddress",
 	"paymentMethod",
 	// "taxPrice",
@@ -25,7 +23,7 @@ export const createOrder = createDoc(OrderModel, [
 // @desc    Get order by ID
 // @route   GET /api/v1/orders/:id
 // @access  Private
-export const getOrderById = getSingDoc(OrderModel);
+export const getOrderById = getById(OrderModel);
 
 // @desc    Update order status
 // @route   PATCH /api/v1/orders/:id/status
@@ -98,14 +96,9 @@ export const updateOrderStatus = catchAsync(async (req, res, next) => {
 // @desc    Get logged in user orders
 // @route   GET /api/v1/orders/myorders
 // @access  Private
-export const getMyOrders = getAllDocsByOwner(OrderModel);
+export const getMyOrders = getAllByOwner(OrderModel);
 
 // @desc    Get logged in user orders
 // @route   GET /api/v1/orders/myorders/:id
 // @access  Private
-export const getMyOrder = getDocByOwner(OrderModel);
-
-// @desc    Get all orders
-// @route   GET /api/v1/orders
-// @access  Private/Admin
-export const getAllOrders = getAllDocs(OrderModel);
+export const getMyOrder = getOneByOwner(OrderModel);

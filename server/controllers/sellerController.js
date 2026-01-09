@@ -1,10 +1,10 @@
 import SellerModel from "../models/SellerModel.js";
-import { updateDoc } from "./handlerFactory.js";
+import { updateByOwner } from "./handlerFactory.js";
 
 //  @desc  complete seller's doc
 // @Route  PATCH /api/v1/seller/
 // @access Private/Seller
-export const completeSellerDoc = updateDoc(SellerModel, [
+export const completeSellerDoc = updateByOwner(SellerModel, [
 	"brand",
 	"brandImg",
 	"description",
@@ -16,11 +16,11 @@ export const completeSellerDoc = updateDoc(SellerModel, [
 //  @desc  add addresses to seller
 // @Route  PATCH /api/v1/seller/addresses
 // @access Private/Seller
-export const addAddressestoSeller = updateDoc(SellerModel, ["addresses"]);
+export const addAddressestoSeller = updateByOwner(SellerModel, ["addresses"]);
 //  @desc  add PayoutMethod to seller
 // @Route  PATCH /api/v1/seller/PayoutMethod
 // @access Private/Seller
-export const addPayoutMethodtoSeller = updateDoc(SellerModel, [
+export const addPayoutMethodtoSeller = updateByOwner(SellerModel, [
 	"payoutMethods",
 ]);
 

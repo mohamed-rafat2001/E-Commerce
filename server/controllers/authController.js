@@ -7,7 +7,7 @@ import { passwordResetCodeTemplate } from "../utils/emailTemplates.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendResponse.js";
-import { updateDoc } from "./handlerFactory.js";
+import { updateByOwner } from "./handlerFactory.js";
 
 export const signUp = catchAsync(async (req, res, next) => {
 	const {
@@ -100,7 +100,7 @@ export const getMe = catchAsync(async (req, res, next) => {
 });
 
 // update personal details in user model
-export const updatePersonalDetails = updateDoc(UserModel, "UserModel", [
+export const updatePersonalDetails = updateByOwner(UserModel, [
 	"firstName",
 	"lastName",
 	"phoneNumber",

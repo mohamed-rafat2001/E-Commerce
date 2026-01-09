@@ -19,9 +19,23 @@ const cartSchema = new mongoose.Schema(
 			},
 		],
 		totalPrice: moneySchema,
+		active: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	{ timestamps: true }
 );
+
+cartSchema.pre("findOne", function (next) {
+	this.populate("items.item");
+	this.find({
+		active: {
+			$ne: false,
+		},
+	});
+	next();
+});
 
 cartSchema.pre("save", async function (next) {
 	if (!this.isModified("items")) return next();
@@ -54,10 +68,6 @@ cartSchema.pre("save", async function (next) {
 		currency: currency,
 	};
 
-	next();
-});
-cartSchema.pre("findOne", function (next) {
-	this.populate("items.item");
 	next();
 });
 

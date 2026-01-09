@@ -1,15 +1,19 @@
 import { useForm } from "react-hook-form";
-import { useGetCurrentUser } from "../../hooks/useAuth";
+import useCurrentUser from "../../../hooks/useCurrentUser.js";
+import useUpdateUser from "../hooks/useUpdateUser.js";
 
 const PersonalDetails = ({ update }) => {
-	const { user } = useGetCurrentUser();
+	const { user } = useCurrentUser();
+	const { updateDetails } = useUpdateUser();
 	const {
 		handleSubmit,
 		register,
 
 		formState: { errors },
 	} = useForm();
-	function Submit() {}
+	function Submit(data) {
+		updateDetails(data);
+	}
 	return (
 		<div className="px-5">
 			<form onSubmit={handleSubmit(Submit)}>
@@ -107,7 +111,7 @@ const PersonalDetails = ({ update }) => {
 							type="text"
 							id="phoneNumber"
 							disabled={update}
-							defaultValue={user?.phoneNumber}
+							defaultValue={user?.userId?.phoneNumber}
 							className=" disabled:bg-blue-100  appearance-none bg-white border placeholder:text-sm border-gray-300  rounded-xl w-full  px-3 text-gray-700 leading-10 focus:outline-none "
 							{...register("phoneNumber", {
 								required: "Phone Number is required",

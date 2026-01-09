@@ -3,6 +3,7 @@ import validator from "validator";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
+
 const userSchema = new mongoose.Schema(
 	{
 		firstName: {
@@ -52,7 +53,7 @@ const userSchema = new mongoose.Schema(
 		passwordResetExpires: Date,
 		role: {
 			type: String,
-			enum: ["Customer", "Seller", "Admin", "SuperAdmin", "Employee"],
+			enum: ["Customer", "Seller", "Admin", "SuperAdmin"],
 			default: "Customer",
 		},
 		status: {

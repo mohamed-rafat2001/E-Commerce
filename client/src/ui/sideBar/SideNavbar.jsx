@@ -1,5 +1,5 @@
 import SideNavFooter from "./SideNavFooter";
-import { useGetCurrentUser } from "../../hooks/useAuth";
+import useCurrentUser from "../../hooks/useCurrentUser.js";
 import CustomerLinks from "./CustomerLinks";
 import SideNaveHeader from "./SideNavHeader";
 import SellerLinks from "./SellerLinks";
@@ -7,10 +7,13 @@ import AdminLinks from "./AdminLinks";
 import EmployeeLinks from "./EmployeeLinks";
 
 function SideNavbar() {
-	const { userRole, user } = useGetCurrentUser();
+	const { userRole, user } = useCurrentUser();
 	return (
 		<div className=" container sticky top-5  py-5 shadow rounded-xl flex flex-col justify-center items-center  bg-white ">
-			<SideNaveHeader fullName={user?.name} role={userRole} />
+			<SideNaveHeader
+				fullName={user?.userId.firstName + " " + user?.userId.lastName}
+				role={userRole}
+			/>
 			{userRole === "Customer" && <CustomerLinks />}
 			{userRole === "Seller" && <SellerLinks />}
 			{userRole === "Admin" && <AdminLinks />}

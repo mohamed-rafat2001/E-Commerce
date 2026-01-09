@@ -24,12 +24,6 @@ mainApi.interceptors.response.use(
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			originalRequest._retry = true;
 
-			// Clear auth state (cookie is cleared by backend)
-			// Dispatch logout action if store is available
-			// if (window.store) {
-			// 	window.store.dispatch({ type: "auth/logout" });
-			// }
-
 			// Redirect to login
 			window.location.href = "/login";
 		}

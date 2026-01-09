@@ -8,6 +8,11 @@ const orderItemsSchema = new mongoose.Schema(
 			ref: "OrderModel",
 			required: true,
 		},
+		sellerId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "SellerModel",
+			required: true,
+		},
 		items: [
 			{
 				item: {

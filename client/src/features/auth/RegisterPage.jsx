@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useRegister } from "../hooks/useAuth";
+import useRegister from "./hooks/useRegister.jsx";
 import { isStrongPassword } from "validator";
 import isEmail from "validator/lib/isEmail";
+
 function RegisterPage() {
 	const { registerUser, isRegistering } = useRegister();
 	const {

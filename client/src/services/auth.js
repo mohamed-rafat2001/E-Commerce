@@ -1,36 +1,34 @@
-import mainApi from "../api/mainApi";
+import { addFunc, deleteFunc, getFunc, updateFunc } from "./handlerFactory.js";
 
 // login func
-export const LoginFunc = async (Credentials) => {
-	try {
-		const user = await mainApi.post("authentications/login", Credentials);
-
-		return user;
-	} catch (e) {
-		console.log(e);
-	}
-};
+export const LoginFunc = (Credentials) =>
+	addFunc("authentications/login", Credentials);
 
 // register func
-export const RegisterFunc = async (Credentials) => {
-	try {
-		const user = await mainApi.post("authentications/signUp", Credentials);
-		return user;
-	} catch (e) {
-		console.log(e);
-	}
-};
+export const RegisterFunc = (Credentials) =>
+	addFunc("authentications/signUp", Credentials);
 
 // logout func
-export const LogoutFunc = async () => {
-	const user = await mainApi.get("authentications/logOut");
-	return user;
-};
-export const getMeFunc = async () => {
-	try {
-		const user = await mainApi.get("authentications/me");
-		return user;
-	} catch (e) {
-		console.log(e);
-	}
-};
+export const LogoutFunc = () => getFunc("authentications/logOut");
+
+// get user data
+export const getMeFunc = () => getFunc("authentications/me");
+
+// update personal details func
+export const updatePersonalDetails = (data) =>
+	updateFunc("authentications/me", data);
+
+// delete me func
+export const deleteMe = () => deleteFunc("authentications/me");
+
+// forgot password func
+export const forgotPassword = (email) =>
+	addFunc("authentications/forgotPassword", email);
+
+// reset password func
+export const resetPassword = (passwords) =>
+	updateFunc("authentications/resetPassword", passwords);
+
+// update password
+export const updatePassword = (passwords) =>
+	updateFunc("authentications/updatePassword", passwords);

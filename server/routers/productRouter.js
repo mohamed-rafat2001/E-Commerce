@@ -6,20 +6,16 @@ import {
 	deleteAllProducts,
 	deleteProduct,
 	getAllProducts,
+	getProductsByOwner,
 	getSingleProduct,
 	updateProduct,
 } from "../controllers/productController.js";
 
 router.get("/", getAllProducts);
 router.get("/:id", getSingleProduct);
+router.get("/myproducts", getProductsByOwner);
 // add protect to all routes
-router.use(Protect);
-router
-	.route("/")
-	.post(restrictTo("Admin", "Seller", "SuperAdmin"), addProduct)
-	.delete(restrictTo("SuperAdmin", "Seller"), deleteAllProducts);
-router
-	.route("/:id")
-	.delete(restrictTo("Admin", "SuperAdmin", "Seller"), deleteProduct)
-	.patch(restrictTo("Admin", "SuperAdmin", "Seller"), updateProduct);
+router.use(Protect, restrictTo("Seller"));
+router.route("/").post(addProduct).delete(deleteAllProducts);
+router.route("/:id").delete(deleteProduct).patch(updateProduct);
 export default router;

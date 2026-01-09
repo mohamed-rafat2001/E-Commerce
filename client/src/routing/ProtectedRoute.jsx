@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { useGetCurrentUser } from "../hooks/useAuth";
-import LoadingSpinner from "./LoadingSpinner";
+import useCurrentUser from "../hooks/useCurrentUser.js";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 /**
  * ProtectedRoute Component
@@ -11,7 +11,7 @@ import LoadingSpinner from "./LoadingSpinner";
  * @param {string[]} allowedRoles - Optional array of allowed roles
  */
 function ProtectedRoute({ allowedRoles = [] }) {
-	const { isAuthenticated, userRole, isLoading } = useGetCurrentUser();
+	const { isAuthenticated, userRole, isLoading } = useCurrentUser();
 	const location = useLocation();
 	// Keep track if the user has just become unauthenticated
 	const wasAuthenticated = useRef(isAuthenticated);

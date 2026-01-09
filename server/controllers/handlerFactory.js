@@ -4,7 +4,6 @@ import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
-import CartModel from "../models/CartModel.js";
 
 export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
@@ -13,7 +12,9 @@ export const createDoc = (Model, Fields = []) =>
 		if (Fields.length != 0) {
 			object = validationBody(req.body, Fields);
 			if (!object || Object.keys(object).length === 0)
-				return next(new appError("please provide valid fields to update", 400));
+				return next(
+					new appError("please provide  val id fiel ds to update", 400)
+				);
 		}
 
 		// create new doc
@@ -28,54 +29,40 @@ export const createDoc = (Model, Fields = []) =>
 				});
 				break;
 
-			case "WishListModel":
-				doc = await Model.findOne({ userId: req.user._id });
-
-				if (!doc) {
-					doc = await Model.create({
-						userId: req.user._id,
-						items: [req.params.id],
-					});
-				} else {
-					const itemIndex = doc.items.findIndex(
-						(id) => id.toString() === req.params.id
-					);
-
-					if (itemIndex === -1) {
-						doc.items.push(req.params.id);
-					} else {
-						doc.items.splice(itemIndex, 1);
-					}
-					await doc.save();
-				}
-				break;
-
 			case "OrderModel":
-				if (!req.body.cartId) {
+				if (!object.items) {
 					return next(new appError("No order items", 400));
 				}
 
 				const orderId = new mongoose.Types.ObjectId();
-				const userCart = await CartModel.findOne({ userId: req.user._id });
-				if (!userCart) {
-					return next(new appError("No cart found", 400));
-				}
-				// Create a single OrderItems document containing all items
-				const orderItems = new OrderItemsModel({
-					orderId,
-					items: userCart.items.map((item) => ({
-						item: item.item,
-						quantity: item.quantity,
-					})),
+				const allSellers = [];
+				// Create a single OrderItems document containing all items for same seller
+				items.forEach((item) => {
+					if (!allSellers.includes(item.item.userId))
+						allSellers.push(item.item.userId);
 				});
-
-				const createdOrderItems = await orderItems.save();
+				const allOrderItems = [];
+				allSellers.forEach(async (id) => {
+					let itemsForSameSeller = items.filter(
+						(item) => item.item.userId.toString() == id
+					);
+					const orderItems = new OrderItemsModel({
+						orderId,
+						sellerId: id,
+						items: itemsForSameSeller.map((item) => ({
+							item: item.item,
+							quantity: item.quantity,
+						})),
+					});
+					const createdOrderItems = await orderItems.save();
+					allOrderItems.push(createdOrderItems);
+				});
 
 				doc = await Model.create({
 					_id: orderId,
-					items: createdOrderItems._id,
+					items: allOrderItems.map((item) => item),
 					userId: req.user._id,
-					sellerId: userCart.items[0].item.sellerId,
+					sellerIds: allSellers,
 					shippingAddress: req.user?.addresses?.[0],
 					...object,
 				});
@@ -94,47 +81,8 @@ export const createDoc = (Model, Fields = []) =>
 		// send response
 		return sendResponse(res, 200, doc);
 	});
-export const addItemToList = (Model) =>
-	catchAsync(async (req, res, next) => {
-		if (!Model) return next(new appError("Model is not defined", 500));
-		const { quantity, itemId } = req.body;
-
-		let doc = await Model.findOne({ userId: req.user._id });
-
-		if (!doc) {
-			doc = await Model.create({
-				userId: req.user._id,
-				items: [{ item: itemId, quantity: quantity || 1 }],
-			});
-		} else {
-			// Check if item already exists in model
-			const itemExist = doc.items.find(
-				(item) =>
-					item.item?._id?.toString() === itemId ||
-					item.item?.toString() === itemId
-			);
-
-			if (itemExist) {
-				// Update quantity if item exists
-				itemExist.quantity += Number(quantity) || 1;
-			} else {
-				// Push new item if item doesn't exist
-				doc.items.push({ item: itemId, quantity: Number(quantity) || 1 });
-			}
-
-			// Explicitly mark as modified to trigger pre-save hooks
-			doc.markModified("items");
-			// Save the document to trigger pre-save hooks (like price calculation)
-			await doc.save();
-		}
-
-		// check if doc created
-		if (!doc) return next(new appError("doc not created", 400));
-		// send response
-		return sendResponse(res, 200, doc);
-	});
-// update doc
-export const updateDoc = (Model, Fields = []) =>
+// update doc by owner
+export const updateByOwner = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
 		// validation
 		let object;
@@ -145,12 +93,9 @@ export const updateDoc = (Model, Fields = []) =>
 		}
 		// update doc
 		let doc;
-		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
-
+		const userId = req.user._id;
 		switch (Model.modelName) {
 			case "UserModel":
-				// Admin can update any user by ID, users can only update themselves
-				const userId = isAdmin ? req.params.id || req.user._id : req.user._id;
 				doc = await Model.findByIdAndUpdate(
 					userId,
 					{ ...object },
@@ -160,26 +105,21 @@ export const updateDoc = (Model, Fields = []) =>
 
 			case "SellerModel":
 			case "CustomerModel":
-				// Admin can update any seller/customer by userId, users only their own
-				const filter = isAdmin
-					? { _id: req.params.id }
-					: { userId: req.user._id };
-				if (!filter) return next(new appError("doc not found", 400));
 				if (Fields.includes("addresses")) {
 					doc = await Model.findOneAndUpdate(
-						filter,
+						userId,
 						{ $push: { addresses: object.addresses } },
 						{ new: true, runValidators: true }
 					);
 				} else if (Fields.includes("payoutMethods")) {
 					doc = await Model.findOneAndUpdate(
-						filter,
+						userId,
 						{ $push: { payoutMethods: object.payoutMethods } },
 						{ new: true, runValidators: true }
 					);
 				} else {
 					doc = await Model.findOneAndUpdate(
-						filter,
+						userId,
 						{ ...object },
 						{ new: true, runValidators: true }
 					);
@@ -187,12 +127,8 @@ export const updateDoc = (Model, Fields = []) =>
 				break;
 
 			default:
-				// Admin can update any doc by _id, users only their own
-				const defaultFilter = isAdmin
-					? { _id: req.params.id }
-					: { _id: req.params.id, userId: req.user._id };
 				doc = await Model.findOneAndUpdate(
-					defaultFilter,
+					{ _id: req.params.id, userId },
 					{ ...object },
 					{ new: true, runValidators: true }
 				);
@@ -204,85 +140,7 @@ export const updateDoc = (Model, Fields = []) =>
 		// send response
 		sendResponse(res, 200, doc);
 	});
-//  getAllDocs
-export const getAllDocs = (Model) =>
-	catchAsync(async (req, res, next) => {
-		const docs = await Model.find({});
-		// check if docs exist
-		if (!docs) return next(new appError("docs not found", 400));
-		// send response
-		sendResponse(res, 200, { results: docs.length, docs });
-	});
 
-//  getSingleDoc
-export const getSingDoc = (Model) =>
-	catchAsync(async (req, res, next) => {
-		const doc = await Model.findById(req.params.id);
-		// check if doc exist
-		if (!doc) return next(new appError("doc not found", 400));
-		// send response
-		sendResponse(res, 200, doc);
-	});
-export const deleteDoc = (Model) =>
-	catchAsync(async (req, res, next) => {
-		let doc;
-		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
-
-		if (isAdmin) {
-			doc = await Model.findByIdAndDelete(req.params.id);
-		} else {
-			doc = await Model.findOneAndDelete({
-				_id: req.params.id,
-				userId: req.user._id,
-			});
-		}
-		// check if doc deleted
-		if (!doc) return next(new appError("doc not found", 400));
-		// send response
-		sendResponse(res, 200, {});
-	});
-
-// delete all docs in db
-export const deleteAllDocs = (Model) =>
-	catchAsync(async (req, res, next) => {
-		let result;
-		const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
-
-		if (isAdmin) {
-			result = await Model.deleteMany({});
-		} else {
-			result = await Model.deleteMany({
-				userId: req.user._id,
-			});
-		}
-		// check if docs deleted
-		if (!result) return next(new appError("docs not deleted", 400));
-		// send response
-		sendResponse(res, 200, {});
-	});
-
-// get doc by owner
-export const getDocByOwner = (Model) =>
-	catchAsync(async (req, res, next) => {
-		const doc = await Model.findOne({
-			_id: req.params.id,
-			userId: req.user._id,
-		});
-		// check if doc deleted
-		if (!doc) return next(new appError("doc not found", 400));
-		// send response
-		sendResponse(res, 200, doc);
-	});
-
-// get all docs by owner
-export const getAllDocsByOwner = (Model) =>
-	catchAsync(async (req, res, next) => {
-		const doc = await Model.find({ userId: req.user._id });
-		// check if doc deleted
-		if (!doc) return next(new appError("doc not found", 400));
-		// send response
-		sendResponse(res, 200, doc);
-	});
 // delete items from doc list by owner
 export const deleteFromDocList = (Model) =>
 	catchAsync(async (req, res, next) => {
@@ -308,5 +166,145 @@ export const deleteFromDocList = (Model) =>
 		await doc.save();
 
 		// send response
+		sendResponse(res, 200, doc);
+	});
+
+// delete one doc by owner
+export const deleteOneByOwner = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const userId = req.user._id;
+		const doc = await Model.findOneAndDelete({
+			_id: req.params.id,
+			userId,
+		});
+
+		if (!doc) return next(new appError("doc not deleted", 400));
+
+		sendResponse(res, 200, {});
+	});
+// delete many docs by owner
+export const deleteManyByOwner = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const userId = req.user._id;
+		const docs = await Model.deleteMany({
+			userId,
+		});
+
+		if (!docs) return next(new appError("docs not deleted", 400));
+
+		sendResponse(res, 200, {});
+	});
+// get one doc by owner
+export const getOneByOwner = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const userId = req.user._id;
+		let doc;
+
+		if (Model.modelName === "OrderItemsModel") {
+			doc = await Model.findOne({
+				_id: req.params.id,
+				sellerId: userId,
+			});
+		}
+		if (Model.modelName === "CartModel") {
+			doc = await Model.findOne({
+				_id: req.params.id,
+				userId,
+				active: true,
+			});
+		}
+
+		doc = await Model.findOne({
+			_id: req.params.id,
+			userId,
+		});
+
+		if (!doc) return next(new appError("doc not Found", 400));
+
+		sendResponse(res, 200, doc);
+	});
+// get all docs by owner
+export const getAllByOwner = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const userId = req.user._id;
+		let docs;
+
+		if (Model.modelName === "OrderItemsModel") {
+			docs = await Model.find({
+				sellerId: userId,
+			});
+		}
+
+		docs = await Model.find({
+			userId,
+		});
+
+		if (!docs) return next(new appError("docs not Found", 400));
+
+		sendResponse(res, 200, docs);
+	});
+
+// get doc by id
+export const getById = (Model) =>
+	catchAsync(async (req, res, next) => {
+		//do id
+		const _id = req.params.id;
+		const doc = await Model.findById(_id);
+
+		if (!doc) return next(new appError("doc not Found", 400));
+
+		sendResponse(res, 200, doc);
+	});
+
+// get all docs
+export const getAll = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const docs = await Model.find({});
+
+		if (!docs) return next(new appError("docs not Found", 400));
+
+		sendResponse(res, 200, docs);
+	});
+
+//delete all docs
+export const deleteAll = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const docs = await Model.deleteMany();
+
+		if (!docs) return next(new appError("docs not deleted", 400));
+
+		sendResponse(res, 200, {});
+	});
+
+//delete by id
+export const deleteById = (Model) =>
+	catchAsync(async (req, res, next) => {
+		const _id = req.params.id;
+		const docs = await Model.findByIdAndDelete(_id);
+
+		if (!docs) return next(new appError("doc not deleted", 400));
+
+		sendResponse(res, 200, {});
+	});
+// update doc by id
+export const updateById = (Model, Fields = []) =>
+	catchAsync(async (req, res, next) => {
+		// validation body
+		let object;
+
+		if (Fields.length != 0) {
+			object = validationBody(req.body, Fields);
+			if (!object || Object.keys(object).length === 0)
+				return next(new appError("please provide valid fields to update", 400));
+		}
+		//do id
+		const _id = req.params.id;
+		const doc = await Model.findByIdAndUpdate(_id, object, {
+			runValidators: true,
+			new: true,
+		});
+
+		if (!doc) return next(new appError("doc not updated", 400));
+
 		sendResponse(res, 200, doc);
 	});

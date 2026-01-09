@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import SideNavbar from "./sideBar/SideNavbar";
+import SideNavbar from "../ui/sideBar/SideNavbar";
 const AppLayout = () => {
 	return (
 		<div className="container">

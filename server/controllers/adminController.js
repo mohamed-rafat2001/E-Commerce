@@ -11,12 +11,12 @@ import OrderItemsModel from "../models/OrderItemsModel.js";
 import appError from "../utils/appError.js";
 
 import {
-	getAllDocs,
-	getSingDoc,
+	getAll,
+	getById,
+	updateById,
+	deleteById,
+	deleteAll,
 	createDoc,
-	updateDoc,
-	deleteDoc,
-	deleteAllDocs,
 } from "./handlerFactory.js";
 
 const models = {
@@ -147,13 +147,13 @@ export const resolveModel = (req, res, next) => {
 	next();
 };
 
-export const getAll = (req, res, next) => getAllDocs(req.Model)(req, res, next);
-export const getOne = (req, res, next) => getSingDoc(req.Model)(req, res, next);
+export const getAll = (req, res, next) => getAll(req.Model)(req, res, next);
+export const getOne = (req, res, next) => getById(req.Model)(req, res, next);
 export const createOne = (req, res, next) =>
 	createDoc(req.Model, req.createFields)(req, res, next);
 export const updateOne = (req, res, next) =>
-	updateDoc(req.Model, req.updateFields)(req, res, next);
+	updateById(req.Model, req.updateFields)(req, res, next);
 export const deleteOne = (req, res, next) =>
-	deleteDoc(req.Model)(req, res, next);
+	deleteById(req.Model)(req, res, next);
 export const deleteAll = (req, res, next) =>
-	deleteAllDocs(req.Model)(req, res, next);
+	deleteAll(req.Model)(req, res, next);

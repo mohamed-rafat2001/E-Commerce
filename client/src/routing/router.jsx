@@ -1,15 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
-import HomePage from "../pages/HomePage.jsx";
-import LoginPage from "../pages/LoginPage.jsx";
-import RegisterPage from "../pages/RegisterPage.jsx";
-import ProtectedRoute from "./ProtectedRoute.jsx";
-import AppLayout from "./AppLayout.jsx";
-import PageNotFound from "./PageNotFound.jsx";
-import PersonalDetailsPage from "../pages/PersonalDetailsPage.jsx";
-import ShippingAdressesPage from "../pages/customerPannel/ShippingAdressesPage.jsx";
-import PaymentMethodsPage from "../pages/customerPannel/PaymentMethodsPage.jsx";
-import OrderHistoryPage from "../pages/customerPannel/OrderHistoryPage.jsx";
-import SettingsPage from "../pages/SettingsPage.jsx";
+import AppLayout from "../layouts/AppLayout.jsx";
+import ProtectedRoute from "../routing/ProtectedRoute.jsx";
+
+import HomePage from "../features/home/HomePage.jsx";
+import LoginPage from "../features/auth/LoginPage.jsx";
+import RegisterPage from "../features/auth/RegisterPage.jsx";
+import PersonalDetailsPage from "../features/user/PersonalDetailsPage.jsx";
+import ShippingAdressesPage from "../features/customerPanel/shippingAddress/ShippingAdressesPage.jsx";
+import PaymentMethodsPage from "../features/customerPanel/paymentMethod/PaymentMethodsPage.jsx";
+import OrderHistoryPage from "../features/customerPanel/orderHistory/OrderHistoryPage.jsx";
+import SettingsPage from "../features/settings/SettingsPage.jsx";
+import PageNotFound from "../ui/PageNotFound.jsx";
 // create app routing
 const router = createBrowserRouter([
 	// Public Routes

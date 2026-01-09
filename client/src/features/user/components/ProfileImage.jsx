@@ -1,9 +1,8 @@
-import defaultimage from "../../assets/WhatsApp Image 2025-12-06 at 03.47.26_4f0abdad.jpg";
+import defaultimage from "../../../assets/WhatsApp Image 2025-12-06 at 03.47.26_4f0abdad.jpg";
 import { motion } from "framer-motion";
-import { useGetCurrentUser } from "../../hooks/useAuth";
+import useCurrentUser from "../../../hooks/useCurrentUser.js";
 const ProfileImage = () => {
-	const { userRole, user } = useGetCurrentUser();
-	console.log(user);
+	const { userRole, user } = useCurrentUser();
 	return (
 		<div className="flex justify-between items-center">
 			<div className="w-10/12 flex space-x-5  ">
@@ -14,7 +13,9 @@ const ProfileImage = () => {
                     object-cover object-center cursor-pointer "
 				/>
 				<div className="mt-3">
-					<h1 className="text-blue-500 font-semibold text-lg">{user?.name}</h1>
+					<h1 className="text-blue-500 font-semibold text-lg">
+						{user?.userId.firstName} {user?.userId.lastName}
+					</h1>
 					<p className="text-gray-500  text-sm ">{userRole}</p>
 				</div>
 			</div>

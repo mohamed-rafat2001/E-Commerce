@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useLogin } from "../hooks/useAuth";
+import useLogin from "./hooks/useLogin.jsx";
 
 function LoginPage() {
 	const { login, isLoggingIn } = useLogin();

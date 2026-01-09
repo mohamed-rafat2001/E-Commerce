@@ -7,14 +7,13 @@ const orderSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
-		sellerId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "UserModel",
-		},
-		items: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "OrderItemsModel",
-		},
+		sellerIds: [],
+		items: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "OrderItemsModel",
+			},
+		],
 		shippingAddress: addressSchema,
 		paymentMethod: {
 			type: String,
