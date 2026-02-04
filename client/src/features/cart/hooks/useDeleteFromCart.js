@@ -1,5 +1,5 @@
-import { deleteFromCart } from "../../../services/cart.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { deleteFromCart } from "../services/cart.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useDeleteFromCart() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		deleteFromCart,

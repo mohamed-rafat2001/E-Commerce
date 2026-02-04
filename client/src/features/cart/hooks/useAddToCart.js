@@ -1,5 +1,5 @@
-import { addToCart } from "../../../services/cart.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { addToCart } from "../services/cart.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useAddToCart() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		addToCart,

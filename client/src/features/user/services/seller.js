@@ -1,4 +1,4 @@
-import { updateFunc } from "./handlerFactory";
+import { updateFunc } from "../../../shared/services/handlerFactory.js";
 
 // add addresses to seller
 export const addAdressesToSeller = (addresses) =>

@@ -1,5 +1,5 @@
-import { updateCategory } from "../../../services/category.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { updateCategory } from "../services/category.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useUpdateCategory() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		updateCategory,

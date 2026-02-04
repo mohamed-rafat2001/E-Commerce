@@ -1,5 +1,5 @@
-import { deleteProducts } from "../../../services/product.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { deleteProducts } from "../services/product.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useDeleteAllProduct() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		deleteProducts,

@@ -1,5 +1,5 @@
-import { deleteWishlist } from "../../../services/wishList.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { deleteWishlist } from "../services/wishList.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useDeleteWishlist() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		deleteWishlist,

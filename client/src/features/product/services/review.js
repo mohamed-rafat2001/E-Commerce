@@ -1,4 +1,4 @@
-import { addFunc, deleteFunc, getFunc, updateFunc } from "./handlerFactory.js";
+import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/services/handlerFactory.js";
 
 // add category
 export const addReview = (review, id) => addFunc(`reviews/${id}`, review);

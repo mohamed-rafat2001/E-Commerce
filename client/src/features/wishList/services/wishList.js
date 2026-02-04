@@ -1,4 +1,4 @@
-import { addFunc, deleteFunc, getFunc, updateFunc } from "./handlerFactory.js";
+import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/services/handlerFactory.js";
 
 // add product to wishlist
 export const addToWishlist = (id) => addFunc(`wishlist/${id}`);

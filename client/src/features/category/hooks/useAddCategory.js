@@ -1,5 +1,5 @@
-import { addCategory } from "../../../services/category.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { addCategory } from "../services/category.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useAddCategory() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		addCategory,

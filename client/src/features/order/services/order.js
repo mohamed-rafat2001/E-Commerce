@@ -1,4 +1,4 @@
-import { addFunc, getFunc, updateFunc } from "./handlerFactory.js";
+import { addFunc, getFunc, updateFunc } from "../../../shared/services/handlerFactory.js";
 
 // add order
 export const addOrder = (order) => addFunc("orders", order);

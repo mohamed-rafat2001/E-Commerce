@@ -1,5 +1,5 @@
-import { addToWishlist } from "../../../services/wishList.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { addToWishlist } from "../services/wishList.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useAddToWishlist() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		addToWishlist,

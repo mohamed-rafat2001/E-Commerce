@@ -1,5 +1,5 @@
-import { updateProduct } from "../../../services/product.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { updateProduct } from "../services/product.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useUpdateProduct() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		updateProduct,

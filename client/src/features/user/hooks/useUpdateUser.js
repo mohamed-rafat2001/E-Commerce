@@ -1,6 +1,5 @@
-import { updatePersonalDetails } from "../../../services/auth.js";
-
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { updatePersonalDetails } from "../../auth/services/auth.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 /**
  * Update user hook
  */

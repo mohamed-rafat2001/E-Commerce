@@ -1,5 +1,5 @@
-import { deleteCategory } from "../../../services/category.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { deleteCategory } from "../services/category.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 export default function useDeleteCategory() {
 	const { error, data, mutate, isLoading } = useMutationFactory(
 		deleteCategory,
