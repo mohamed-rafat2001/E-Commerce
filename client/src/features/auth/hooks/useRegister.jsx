@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { RegisterFunc } from "../../../services/auth.js";
+import { RegisterFunc } from "../services/auth.js";
 import toast from "react-hot-toast";
 import { ToastSuccess, ToastError } from "../../../shared/ui/index.js";
 

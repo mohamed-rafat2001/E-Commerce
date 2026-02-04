@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMeFunc } from "../services/auth.js";
+import { getMeFunc } from "../../auth/services/auth.js";
 
 /**
  * Get current user query

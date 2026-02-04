@@ -1,5 +1,5 @@
-import { updatePassword } from "../../../services/auth.js";
-import useMutationFactory from "../../../hooks/useMutationFactory.jsx";
+import { updatePassword } from "../../auth/services/auth.js";
+import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 
 /**
  * Update password mutation hook

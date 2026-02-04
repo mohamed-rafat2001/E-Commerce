@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { LogoutFunc } from "../../../services/auth.js";
+import { LogoutFunc } from "../services/auth.js";
 import toast from "react-hot-toast";
 import { ToastSuccess, ToastError } from "../../../shared/ui/index.js";
 

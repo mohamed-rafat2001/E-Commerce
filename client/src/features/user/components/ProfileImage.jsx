@@ -1,6 +1,6 @@
 import defaultimage from "../../../assets/WhatsApp Image 2025-12-06 at 03.47.26_4f0abdad.jpg";
 import { motion } from "framer-motion";
-import useCurrentUser from "../../../hooks/useCurrentUser.js";
+import useCurrentUser from "../hooks/useCurrentUser.js";
 const ProfileImage = () => {
 	const { userRole, user } = useCurrentUser();
 	return (
