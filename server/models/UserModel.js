@@ -31,7 +31,10 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			validate: [validator.isMobilePhone, "please enter valid phone number"],
 		},
-		profileImg: String,
+		profileImg: {
+				public_id: String,
+				secure_url: String,
+			},
 		password: {
 			type: String,
 			required: [true, "password is required"],

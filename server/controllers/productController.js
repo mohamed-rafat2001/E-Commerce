@@ -20,7 +20,8 @@ export const addProduct = createDoc(ProductModel, [
 	"brand",
 	"category",
 	"description",
-	"image",
+	"coverImage",
+	"images",
 ]);
 // @desc   get all products
 // @Route  GET /api/v1/products
@@ -52,7 +53,8 @@ export const updateProduct = updateByOwner(ProductModel, [
 	"brand",
 	"category",
 	"description",
-	"image",
+	"coverImage",
+	"images",
 ]);
 
 //  @desc  delete all products

@@ -1,14 +1,12 @@
 import express from "express";
 import cors from "cors";
-import dbConnect from "./db/config.js";
+import hpp from "hpp";
+import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 
-import hpp from "hpp";
-import cookieParser from "cookie-parser";
-// db connected
-dbConnect();
+// db connection moved to server.js
 export const app = express();
 
 app.use(
@@ -48,6 +46,11 @@ app.use((req, res, next) => {
 
 // Prevent parameter pollution
 app.use(hpp());
+
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routers
 import authRouter from "./routers/authRouter.js";

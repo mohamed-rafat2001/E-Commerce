@@ -11,12 +11,12 @@ import OrderItemsModel from "../models/OrderItemsModel.js";
 import appError from "../utils/appError.js";
 
 import {
-	getAll,
-	getById,
-	updateById,
-	deleteById,
-	deleteAll,
-	createDoc,
+	getAll as fetchAll,
+	getById as fetchById,
+	updateById as modifyById,
+	deleteById as removeById,
+	deleteAll as removeAll,
+	createDoc as createOneDoc,
 } from "./handlerFactory.js";
 
 const models = {
@@ -147,13 +147,13 @@ export const resolveModel = (req, res, next) => {
 	next();
 };
 
-export const getAll = (req, res, next) => getAll(req.Model)(req, res, next);
-export const getOne = (req, res, next) => getById(req.Model)(req, res, next);
+export const getAll = (req, res, next) => fetchAll(req.Model)(req, res, next);
+export const getOne = (req, res, next) => fetchById(req.Model)(req, res, next);
 export const createOne = (req, res, next) =>
-	createDoc(req.Model, req.createFields)(req, res, next);
+	createOneDoc(req.Model, req.createFields)(req, res, next);
 export const updateOne = (req, res, next) =>
-	updateById(req.Model, req.updateFields)(req, res, next);
+	modifyById(req.Model, req.updateFields)(req, res, next);
 export const deleteOne = (req, res, next) =>
-	deleteById(req.Model)(req, res, next);
+	removeById(req.Model)(req, res, next);
 export const deleteAll = (req, res, next) =>
-	deleteAll(req.Model)(req, res, next);
+	removeAll(req.Model)(req, res, next);

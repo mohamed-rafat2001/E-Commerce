@@ -4,6 +4,7 @@ import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
+import ProductModel from "../models/ProductModel.js";
 
 export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
@@ -30,41 +31,64 @@ export const createDoc = (Model, Fields = []) =>
 				break;
 
 			case "OrderModel":
-				if (!object.items) {
-					return next(new appError("No order items", 400));
+				if (!object.items || object.items.length === 0) {
+					return next(new appError("No order items provided", 400));
 				}
 
-				const orderId = new mongoose.Types.ObjectId();
-				const allSellers = [];
-				// Create a single OrderItems document containing all items for same seller
-				items.forEach((item) => {
-					if (!allSellers.includes(item.item.userId))
-						allSellers.push(item.item.userId);
-				});
-				const allOrderItems = [];
-				allSellers.forEach(async (id) => {
-					let itemsForSameSeller = items.filter(
-						(item) => item.item.userId.toString() == id
-					);
-					const orderItems = new OrderItemsModel({
-						orderId,
-						sellerId: id,
-						items: itemsForSameSeller.map((item) => ({
-							item: item.item,
-							quantity: item.quantity,
-						})),
-					});
-					const createdOrderItems = await orderItems.save();
-					allOrderItems.push(createdOrderItems);
-				});
+				// Fetch products to verify IDs and get seller info
+				const productIds = object.items.map((item) => item.item);
+				const products = await ProductModel.find({ _id: { $in: productIds } });
 
+				if (products.length !== object.items.length) {
+					return next(new appError("Some products were not found", 404));
+				}
+
+				const productMap = products.reduce((acc, p) => {
+					acc[p._id.toString()] = p;
+					return acc;
+				}, {});
+
+				const orderId = new mongoose.Types.ObjectId();
+
+				// Group items by seller using a hash map for O(N) efficiency
+				const itemsBySeller = object.items.reduce((acc, entry) => {
+					const product = productMap[entry.item.toString()];
+					const sellerId = product?.userId?.toString();
+
+					if (sellerId) {
+						if (!acc[sellerId]) acc[sellerId] = [];
+						acc[sellerId].push({
+							item: entry.item,
+							quantity: entry.quantity,
+						});
+					}
+					return acc;
+				}, {});
+
+				const sellerIds = Object.keys(itemsBySeller);
+				if (sellerIds.length === 0) {
+					return next(new appError("Invalid items data: Sellers not found", 400));
+				}
+
+				// Create an OrderItems document for each seller in parallel
+				const orderItemsDocs = await Promise.all(
+					sellerIds.map(async (sellerId) => {
+						return await OrderItemsModel.create({
+							orderId,
+							sellerId,
+							items: itemsBySeller[sellerId],
+						});
+					})
+				);
+
+				// Create the main Order document
 				doc = await Model.create({
-					_id: orderId,
-					items: allOrderItems.map((item) => item),
-					userId: req.user._id,
-					sellerIds: allSellers,
-					shippingAddress: req.user?.addresses?.[0],
 					...object,
+					_id: orderId,
+					items: orderItemsDocs.map((d) => d._id),
+					userId: req.user._id,
+					sellerIds,
+					shippingAddress: object.shippingAddress || req.user?.addresses?.[0],
 				});
 				break;
 
@@ -79,7 +103,7 @@ export const createDoc = (Model, Fields = []) =>
 		// check if doc created
 		if (!doc) return next(new appError("doc not create", 400));
 		// send response
-		return sendResponse(res, 200, doc);
+		return sendResponse(res, 201, doc);
 	});
 // update doc by owner
 export const updateByOwner = (Model, Fields = []) =>
@@ -107,19 +131,19 @@ export const updateByOwner = (Model, Fields = []) =>
 			case "CustomerModel":
 				if (Fields.includes("addresses")) {
 					doc = await Model.findOneAndUpdate(
-						userId,
+						{ userId },
 						{ $push: { addresses: object.addresses } },
 						{ new: true, runValidators: true }
 					);
 				} else if (Fields.includes("payoutMethods")) {
 					doc = await Model.findOneAndUpdate(
-						userId,
+						{ userId },
 						{ $push: { payoutMethods: object.payoutMethods } },
 						{ new: true, runValidators: true }
 					);
 				} else {
 					doc = await Model.findOneAndUpdate(
-						userId,
+						{ userId },
 						{ ...object },
 						{ new: true, runValidators: true }
 					);
@@ -308,3 +332,6 @@ export const updateById = (Model, Fields = []) =>
 
 		sendResponse(res, 200, doc);
 	});
+
+export const updateDoc = updateById;
+export const deleteOne = deleteById;

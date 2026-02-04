@@ -62,8 +62,12 @@ orderSchema.pre("save", async function (next) {
 
 	await this.populate("items");
 
-	const itemsTotal = this.items?.totalPrice?.amount || 0;
-	const currency = this.items?.totalPrice?.currency || "USD";
+	// Calculate total amount from all valid OrderItems
+	const itemsTotal = this.items.reduce((sum, item) => {
+		return sum + (item.totalPrice?.amount || 0);
+	}, 0);
+	
+	const currency = this.items?.[0]?.totalPrice?.currency || "USD";
 
 	this.itemsPrice = { amount: itemsTotal, currency };
 

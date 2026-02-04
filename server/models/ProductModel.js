@@ -25,7 +25,16 @@ const productSchema = new mongoose.Schema(
 			minLength: 3,
 			trim: true,
 		},
-		image: String,
+		coverImage: {
+				public_id: String,
+				secure_url: String,
+			},
+		images: [
+			{
+				public_id: String,
+				secure_url: String,
+			},
+		],
 		brand: {
 			type: String,
 			required: [true, "Product Brand is required"],

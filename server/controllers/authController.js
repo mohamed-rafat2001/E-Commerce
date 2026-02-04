@@ -49,7 +49,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 	// send cookies
 	sendCookies(res, token);
 	// send response to client
-	sendResponse(res, 201, { user });
+	sendResponse(res, 201, { user, token });
 });
 export const login = catchAsync(async (req, res, next) => {
 	const { email, password } = req.body;
@@ -73,7 +73,7 @@ export const login = catchAsync(async (req, res, next) => {
 	sendCookies(res, token);
 	// send response
 	user.password = undefined;
-	sendResponse(res, 200, { user });
+	sendResponse(res, 200, { user, token });
 });
 
 // logOut function
@@ -105,6 +105,7 @@ export const updatePersonalDetails = updateByOwner(UserModel, [
 	"lastName",
 	"phoneNumber",
 	"email",
+	"profileImg",
 ]);
 
 // delete me from UserModel and another models = change status from active to deleted

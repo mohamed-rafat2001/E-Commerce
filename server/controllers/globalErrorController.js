@@ -52,6 +52,10 @@ export default function globalError(error, req, res, next) {
 	error.status = error.status || "error";
 	error.statusCode = error.statusCode || 500;
 
+    if (process.env.NODE_ENV === "test") {
+        console.error("TEST ERROR:", error.message, error.stack);
+    }
+
 	if (process.env.NODE_MODE === "DEV") {
 		sendErrorDev(error, res);
 	} else if (process.env.NODE_MODE === "PROD") {

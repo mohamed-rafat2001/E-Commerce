@@ -14,10 +14,10 @@ import {
 // @access  Private
 export const createOrder = createDoc(OrderModel, [
 	"items",
-	// "shippingAddress",
+	"shippingAddress",
 	"paymentMethod",
-	// "taxPrice",
-	// "shippingPrice",
+	"taxPrice",
+	"shippingPrice",
 ]);
 
 // @desc    Get order by ID

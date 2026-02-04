@@ -20,7 +20,10 @@ const categorySchema = new mongoose.Schema(
 			type: String,
 			trim: true,
 		},
-		image: String,
+		coverImage: {
+				public_id: String,
+				secure_url: String,
+			},
 		isActive: {
 			type: Boolean,
 			default: true,

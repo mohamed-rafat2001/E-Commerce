@@ -38,7 +38,7 @@ ReviewsSchema.pre(/^find/, function (next) {
 ReviewsSchema.statics.calculateRatings = async function (itemId) {
 	const stats = await this.aggregate([
 		{
-			$match: { itemId },
+			$match: { itemId: new mongoose.Types.ObjectId(itemId) },
 		},
 		{
 			$group: {

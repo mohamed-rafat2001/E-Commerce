@@ -2,8 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { RegisterFunc } from "../../../services/auth.js";
 import toast from "react-hot-toast";
-import ToastError from "../../../ui/ToastError.jsx";
-import ToastSuccess from "../../../ui/ToastSuccess.jsx";
+import { ToastSuccess, ToastError } from "../../../shared/ui/index.js";
 
 export default function useRegister() {
 	const queryClient = useQueryClient();

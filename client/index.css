@@ -1,9 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @layer base {
+	* {
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-gray-50 text-gray-900 antialiased;
+		min-height: 100vh;
+	}
+
+	/* Custom scrollbar */
+	::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+		@apply bg-gray-100 rounded-full;
+	}
+
+	::-webkit-scrollbar-thumb {
+		@apply bg-gray-300 rounded-full;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		@apply bg-gray-400;
+	}
+
+	/* Selection styling */
+	::selection {
+		@apply bg-indigo-500 text-white;
+	}
 }
+
 @layer components {
+	/* Sidebar navigation links */
 	.side-Nav-Links {
-		@apply flex items-center justify-center xl:justify-start space-x-2 w-[80%] m-auto rounded-md hover:shadow hover:text-blue-500 p-2 text-gray-700 hover:bg-blue-100 font-semibold text-base;
+		@apply flex items-center justify-center xl:justify-start 
+			   gap-3 w-full rounded-xl hover:shadow-md 
+			   hover:text-indigo-600 p-3 text-gray-600 
+			   hover:bg-indigo-50/80 font-medium text-sm
+			   transition-all duration-200;
+	}
+
+	.side-Nav-Links.active {
+		@apply bg-gradient-to-r from-indigo-500 to-purple-600 
+			   text-white shadow-lg;
+	}
+
+	/* Glassmorphism card */
+	.glass-card {
+		@apply bg-white/80 backdrop-blur-xl 
+			   border border-white/20 shadow-xl rounded-2xl;
+	}
+
+	/* Premium button */
+	.btn-premium {
+		@apply relative overflow-hidden px-6 py-3 
+			   font-semibold rounded-xl shadow-lg 
+			   transition-all duration-300
+			   hover:shadow-xl hover:scale-[1.02]
+			   active:scale-[0.98];
+	}
+
+	.btn-premium::before {
+		content: '';
+		@apply absolute inset-0 bg-gradient-to-r 
+			   from-white/20 to-transparent 
+			   opacity-0 transition-opacity duration-300;
+	}
+
+	.btn-premium:hover::before {
+		@apply opacity-100;
+	}
+
+	/* Gradient text */
+	.gradient-text {
+		@apply bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 
+			   bg-clip-text text-transparent;
+	}
+
+	/* Animated gradient background */
+	.animated-gradient {
+		background: linear-gradient(-45deg, #667eea, #764ba2, #11998e, #38ef7d);
+		background-size: 400% 400%;
+		animation: gradient 15s ease infinite;
+	}
+
+	@keyframes gradient {
+		0% {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 100% 50%;
+		}
+		100% {
+			background-position: 0% 50%;
+		}
+	}
+
+	/* Floating animation */
+	.float-animation {
+		animation: float 6s ease-in-out infinite;
+	}
+
+	@keyframes float {
+		0%, 100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-10px);
+		}
+	}
+
+	/* Shimmer loading effect */
+	.shimmer {
+		@apply relative overflow-hidden bg-gray-200;
+	}
+
+	.shimmer::after {
+		content: '';
+		@apply absolute inset-0;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.5),
+			transparent
+		);
+		animation: shimmer 1.5s infinite;
+	}
+
+	@keyframes shimmer {
+		0% {
+			transform: translateX(-100%);
+		}
+		100% {
+			transform: translateX(100%);
+		}
+	}
+
+	/* Pulse glow effect */
+	.pulse-glow {
+		animation: pulse-glow 2s ease-in-out infinite;
+	}
+
+	@keyframes pulse-glow {
+		0%, 100% {
+			box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
+		}
+		50% {
+			box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+		}
+	}
+
+	/* Card hover lift */
+	.card-hover {
+		@apply transition-all duration-300;
+	}
+
+	.card-hover:hover {
+		@apply -translate-y-1 shadow-xl;
+	}
+
+	/* Input focus ring */
+	.input-focus {
+		@apply transition-all duration-200 
+			   focus:ring-2 focus:ring-indigo-500/50 
+			   focus:border-indigo-500;
+	}
+
+	/* Status indicators */
+	.status-online {
+		@apply w-2.5 h-2.5 bg-emerald-500 rounded-full 
+			   ring-2 ring-white shadow-sm;
+	}
+
+	.status-offline {
+		@apply w-2.5 h-2.5 bg-gray-400 rounded-full 
+			   ring-2 ring-white shadow-sm;
+	}
+
+	.status-busy {
+		@apply w-2.5 h-2.5 bg-red-500 rounded-full 
+			   ring-2 ring-white shadow-sm;
+	}
+}
+
+@layer utilities {
+	/* Hide scrollbar but keep functionality */
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	/* Line clamp utilities */
+	.line-clamp-1 {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 1;
+	}
+
+	.line-clamp-2 {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+
+	.line-clamp-3 {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
 	}
 }

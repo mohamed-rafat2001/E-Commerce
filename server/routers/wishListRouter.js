@@ -8,7 +8,79 @@ import {
 } from "../controllers/wishListController.js";
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Wishlist
+ *   description: Personal wishlist management API
+ */
+
 router.use(Protect);
+
+/**
+ * @swagger
+ * /api/v1/wishlist/{id}:
+ *   post:
+ *     summary: Add an item to wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the product to add
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Item added to wishlist
+ *   get:
+ *     summary: Get user's wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the wishlist
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Wishlist details retrieved
+ *   patch:
+ *     summary: Remove an item from wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the product to remove
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Item removed from wishlist
+ *   delete:
+ *     summary: Delete whole wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the wishlist to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Wishlist deleted
+ */
 router
 	.route("/:id")
 	.delete(deleteWishList)

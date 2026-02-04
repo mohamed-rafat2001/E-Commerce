@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import useCurrentUser from "../hooks/useCurrentUser.js";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 
 /**
  * ProtectedRoute Component
