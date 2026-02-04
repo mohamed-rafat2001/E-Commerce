@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import useCurrentUser from "../../../hooks/useCurrentUser.js";
+import useCurrentUser from "../hooks/useCurrentUser.js";
 import useUpdateUser from "../hooks/useUpdateUser.js";
 
 const PersonalDetails = ({ update }) => {

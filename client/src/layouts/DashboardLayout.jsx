@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sidebar } from '../shared/widgets/Sidebar/index.js';
-import useCurrentUser from '../hooks/useCurrentUser.js';
+import useCurrentUser from '../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../shared/constants/theme.js';
 
 const DashboardLayout = () => {

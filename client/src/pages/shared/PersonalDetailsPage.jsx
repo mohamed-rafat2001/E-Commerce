@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, Button, Input, Avatar, Badge } from '../../shared/ui/index.js';
-import useCurrentUser from '../../hooks/useCurrentUser.js';
+import useCurrentUser from '../../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../../shared/constants/theme.js';
 import { UserIcon } from '../../shared/constants/icons.jsx';
 

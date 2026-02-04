@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import useCurrentUser from '../../../hooks/useCurrentUser.js';
+import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from "../../constants/theme.js";
 import { Avatar, Badge } from '../../ui/index.js';
 import {

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Card, Button, Badge } from '../../shared/ui/index.js';
 import { SettingsIcon } from '../../shared/constants/icons.jsx';
-import useCurrentUser from '../../hooks/useCurrentUser.js';
+import useCurrentUser from '../../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../../shared/constants/theme.js';
 
 const settingsSections = [

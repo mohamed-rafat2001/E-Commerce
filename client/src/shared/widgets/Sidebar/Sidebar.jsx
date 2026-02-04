@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import useCurrentUser from '../../../hooks/useCurrentUser.js';
+import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import useLogout from '../../../features/auth/hooks/useLogout.jsx';
 import { Avatar, Badge } from '../../ui/index.js';
 import { roleThemes } from '../../constants/theme.js';

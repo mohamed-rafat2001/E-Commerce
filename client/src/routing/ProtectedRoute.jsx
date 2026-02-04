@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import useCurrentUser from "../hooks/useCurrentUser.js";
+import useCurrentUser from "../features/user/hooks/useCurrentUser.js";
 import LoadingSpinner from "../shared/ui/LoadingSpinner";
 
 /**
