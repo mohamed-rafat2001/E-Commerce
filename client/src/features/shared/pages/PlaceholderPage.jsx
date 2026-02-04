@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card } from '../../shared/ui/index.js';
+import { Card } from '../../../shared/ui/index.js';
 import { useLocation } from 'react-router-dom';
 
 const PlaceholderPage = ({ title }) => {

@@ -18,7 +18,14 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		confirmPassword,
 		role,
+		// Seller fields
+		brand,
+		description,
+		businessEmail,
+		businessPhone,
+		primaryCategory,
 	} = req.body;
+
 	const user = await UserModel.create({
 		firstName,
 		lastName,
@@ -26,7 +33,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		phoneNumber,
 		confirmPassword,
-		role,
+		role: role === "Customer" ? "Customer" : "Seller",
 	});
 
 	// check if user created
@@ -37,15 +44,27 @@ export const signUp = catchAsync(async (req, res, next) => {
 	user.password = undefined;
 	let userRole = user.role;
 	let userModel;
-	if (userRole === "Customer") userModel = CustomerModel;
-	else if (userRole === "Seller") userModel = SellerModel;
-	else return next(new appError("role not defined", 400));
-	userModel = await userModel.create({
-		userId: user._id,
-	});
 
-	// check if user created
+	if (userRole === "Customer") {
+		userModel = await CustomerModel.create({
+			userId: user._id,
+		});
+	} else if (userRole === "Seller") {
+		userModel = await SellerModel.create({
+			userId: user._id,
+			brand,
+			description,
+			businessEmail,
+			businessPhone,
+			primaryCategory,
+		});
+	} else {
+		return next(new appError("role not defined", 400));
+	}
+
+	// check if user model created
 	if (!userModel) return next(new appError(`${role} not created`, 400));
+
 	// send cookies
 	sendCookies(res, token);
 	// send response to client

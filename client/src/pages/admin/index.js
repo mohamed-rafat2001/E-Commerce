@@ -1,2 +1,2 @@
 // Admin pages barrel export
-export { default as AdminDashboardPage } from './DashboardPage.jsx';
+export { default as AdminDashboardPage } from '../../features/admin/pages/DashboardPage.jsx';

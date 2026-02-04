@@ -1,4 +1,4 @@
 // Shared pages barrel export
-export { default as PersonalDetailsPage } from './PersonalDetailsPage.jsx';
-export { default as SettingsPage } from './SettingsPage.jsx';
-export { default as PlaceholderPage } from './PlaceholderPage.jsx';
+export { default as PersonalDetailsPage } from '../../features/user/PersonalDetailsPage.jsx';
+export { default as SettingsPage } from '../../features/settings/SettingsPage.jsx';
+export { default as PlaceholderPage } from '../../features/shared/pages/PlaceholderPage.jsx';

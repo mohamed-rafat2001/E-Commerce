@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ToastSuccess, ToastError } from "../shared/ui/index.js";
+import { ToastSuccess, ToastError } from "../ui/index.js";
 import toast from "react-hot-toast";
 export default function useMutationFactory(serviceFunc, keyName, err, success) {
 	const queryClient = useQueryClient();

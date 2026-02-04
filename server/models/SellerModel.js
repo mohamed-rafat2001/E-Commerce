@@ -50,24 +50,28 @@ const SellerSchema = new mongoose.Schema(
 		},
 		brand: {
 			type: String,
-			required: false,
+			required: true,
 			trim: true,
 		},
-		brandImg: String,
+		brandImg: {
+				public_id: String,
+				secure_url: String,
+			},
 		description: {
 			type: String,
 			trim: true,
+			required: [true, "description is required"],
 		},
 		businessEmail: {
 			type: String,
-			required: [false, "email is required"],
-			unique: false,
+			required: [true, "email is required"],
+			unique: true,
 			trim: true,
 			validate: [validator.isEmail, "please enter the valid email"],
 		},
 		businessPhone: {
 			type: String,
-			required: [false, "phone number is required"],
+			required: [true, "phone number is required"],
 			trim: true,
 			validate: [validator.isMobilePhone, "please enter valid phone number"],
 		},

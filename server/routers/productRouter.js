@@ -68,7 +68,7 @@ router.use(Protect, restrictTo("Seller"));
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required: [name, price[amount], category, description]
+ *             required: ["name", "price[amount]", "category", "description"]
  *             properties:
  *               name:
  *                 type: string

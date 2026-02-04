@@ -10,18 +10,20 @@ import LoginPage from "../features/auth/LoginPage.jsx";
 import RegisterPage from "../features/auth/RegisterPage.jsx";
 
 // Pages - Dashboard (Role-specific)
-import { AdminDashboardPage } from "../pages/admin/index.js";
-import { SellerDashboardPage } from "../pages/seller/index.js";
+import { AdminDashboardPage } from "../features/admin/pages/index.js";
+import { SellerDashboardPage } from "../features/seller/pages/index.js";
 import { 
 	CustomerDashboardPage, 
 	ShippingAddressesPage, 
 	PaymentMethodsPage, 
 	OrderHistoryPage 
-} from "../pages/customer/index.js";
-import { EmployeeDashboardPage } from "../pages/employee/index.js";
+} from "../features/customer/pages/index.js";
+import { EmployeeDashboardPage } from "../features/employee/pages/index.js";
 
 // Pages - Shared
-import { PersonalDetailsPage, SettingsPage, PlaceholderPage } from "../pages/shared/index.js";
+import PersonalDetailsPage from "../features/user/PersonalDetailsPage.jsx";
+import SettingsPage from "../features/settings/SettingsPage.jsx";
+import { PlaceholderPage } from "../features/shared/pages/index.js";
 
 // UI Components
 import PageNotFound from "../shared/ui/PageNotFound.jsx";

@@ -1,2 +1,2 @@
 // Seller pages barrel export
-export { default as SellerDashboardPage } from './DashboardPage.jsx';
+export { default as SellerDashboardPage } from '../../features/seller/pages/DashboardPage.jsx';
