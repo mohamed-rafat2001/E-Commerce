@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Badge } from '../../../shared/ui/index.js';
-import { useMutationFactory } from '../../../shared/hooks/useMutationFactory.jsx';
+import useMutationFactory from '../../../shared/hooks/useMutationFactory.jsx';
 import { setDefaultPaymentMethodFunc, deletePaymentMethodFunc } from '../services/customerService.js';
 
 const PaymentCard = ({ card, index }) => {
