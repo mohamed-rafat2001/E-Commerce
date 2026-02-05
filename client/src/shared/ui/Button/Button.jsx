@@ -2,13 +2,13 @@ import { motion } from 'framer-motion';
 
 const variants = {
 	primary:
-		'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg hover:shadow-xl',
+		'bg-linear-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg hover:shadow-xl',
 	secondary:
 		'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm',
 	success:
-		'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl',
+		'bg-linear-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl',
 	danger:
-		'bg-gradient-to-r from-rose-500 to-red-600 text-white hover:from-rose-600 hover:to-red-700 shadow-lg hover:shadow-xl',
+		'bg-linear-to-r from-rose-500 to-red-600 text-white hover:from-rose-600 hover:to-red-700 shadow-lg hover:shadow-xl',
 	ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900',
 	outline:
 		'bg-transparent border-2 border-indigo-500 text-indigo-600 hover:bg-indigo-50',

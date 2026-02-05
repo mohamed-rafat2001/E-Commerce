@@ -12,7 +12,7 @@ const AuthBanner = ({ image, title, subtitle, accentColor = "blue" }) => {
 		<div className="hidden lg:flex w-1/2 h-full items-center justify-center">
 			<div className="relative w-full h-full overflow-hidden">
 				<div className={`absolute inset-0 ${accentColor === 'blue' ? 'bg-blue-900/20' : 'bg-indigo-900/20'} z-10 mix-blend-multiply`}></div>
-				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+				<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10"></div>
 				<img 
 					src={image} 
 					alt="Auth Banner" 

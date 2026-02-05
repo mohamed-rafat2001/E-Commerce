@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useRegister from "./hooks/useRegister.jsx";
+import useRegister from "../hooks/useRegister.jsx";
 import { motion, AnimatePresence } from "framer-motion";
-import AuthBanner from "./components/AuthBanner.jsx";
-import RegisterStepOne from "./components/RegisterStepOne.jsx";
-import RegisterStepTwo from "./components/RegisterStepTwo.jsx";
-import RegisterStepThreeSeller from "./components/RegisterStepThreeSeller.jsx";
-import RegisterStepThreeCustomer from "./components/RegisterStepThreeCustomer.jsx";
+import AuthBanner from "../components/AuthBanner.jsx";
+import RegisterStepOne from "../components/RegisterStepOne.jsx";
+import RegisterStepTwo from "../components/RegisterStepTwo.jsx";
+import RegisterStepThreeSeller from "../components/RegisterStepThreeSeller.jsx";
+import RegisterStepThreeCustomer from "../components/RegisterStepThreeCustomer.jsx";
 
 function RegisterPage() {
 	const { registerUser, isRegistering } = useRegister();

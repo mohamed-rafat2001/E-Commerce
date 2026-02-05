@@ -11,7 +11,7 @@ const PaymentCard = ({ card, index }) => {
 			{/* Credit Card Visual */}
 			<div className="relative group perspective-1000">
 				<div className={`relative h-56 rounded-2xl p-6 text-white shadow-xl overflow-hidden
-					bg-gradient-to-br ${card.gradient} transition-transform duration-500 group-hover:scale-[1.02]`}>
+					bg-linear-to-br ${card.gradient} transition-transform duration-500 group-hover:scale-[1.02]`}>
 					
 					{/* Decorative Circles */}
 					<div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-10 -translate-y-10 blur-xl" />

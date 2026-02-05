@@ -32,7 +32,7 @@ const QuickActions = () => {
 							transition={{ delay: 0.6 + index * 0.05 }}
 						>
 							<span
-								className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} 
+								className={`w-10 h-10 rounded-lg bg-linear-to-br ${action.color} 
 									flex items-center justify-center text-xl shadow-sm`}
 							>
 								{action.icon}

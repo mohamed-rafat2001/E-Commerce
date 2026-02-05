@@ -5,9 +5,8 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
 
 // Pages - Public
-import HomePage from "../features/home/HomePage.jsx";
-import LoginPage from "../features/auth/LoginPage.jsx";
-import RegisterPage from "../features/auth/RegisterPage.jsx";
+import { HomePage } from "../features/home/pages/index.js";
+import { LoginPage, RegisterPage } from "../features/auth/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
 import { AdminDashboardPage } from "../features/admin/pages/index.js";
@@ -21,8 +20,8 @@ import {
 import { EmployeeDashboardPage } from "../features/employee/pages/index.js";
 
 // Pages - Shared
-import PersonalDetailsPage from "../features/user/PersonalDetailsPage.jsx";
-import SettingsPage from "../features/settings/SettingsPage.jsx";
+import { PersonalDetailsPage } from "../features/user/pages/index.js";
+import { SettingsPage } from "../features/settings/pages/index.js";
 import { PlaceholderPage } from "../features/shared/pages/index.js";
 
 // UI Components

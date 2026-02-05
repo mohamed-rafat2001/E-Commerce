@@ -19,7 +19,7 @@ const DashboardHeader = ({ title, subtitle }) => {
 			<Badge
 				variant="gradient"
 				size="lg"
-				className="!bg-gradient-to-r !from-pink-500 !to-amber-400"
+				className="bg-linear-to-r! from-pink-500! to-amber-400!"
 			>
 				Employee Portal
 			</Badge>

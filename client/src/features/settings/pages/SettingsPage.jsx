@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Card, Button, Badge } from '../../shared/ui/index.js';
-import { SettingsIcon } from '../../shared/constants/icons.jsx';
-import useCurrentUser from '../user/hooks/useCurrentUser.js';
-import { roleThemes } from '../../shared/constants/theme.js';
+import { Card, Button, Badge } from '../../../shared/ui/index.js';
+import { SettingsIcon } from '../../../shared/constants/icons.jsx';
+import useCurrentUser from '../../user/hooks/useCurrentUser.js';
+import { roleThemes } from '../../../shared/constants/theme.js';
 
 const settingsSections = [
 	{
@@ -108,7 +108,7 @@ const SettingsPage = () => {
 					</p>
 				</div>
 				<div
-					className={`p-3 rounded-2xl bg-gradient-to-br ${roleTheme.color} text-white shadow-lg`}
+					className={`p-3 rounded-2xl bg-linear-to-br ${roleTheme.color} text-white shadow-lg`}
 				>
 					<SettingsIcon className="w-6 h-6" />
 				</div>

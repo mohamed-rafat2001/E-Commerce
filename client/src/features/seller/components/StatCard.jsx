@@ -12,7 +12,7 @@ const StatCard = ({ stat, index }) => {
 		>
 			<Card variant="elevated" className="relative overflow-hidden group">
 				<div
-					className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+					className={`absolute inset-0 bg-linear-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
 				/>
 
 				<div className="flex items-start justify-between">
@@ -30,7 +30,7 @@ const StatCard = ({ stat, index }) => {
 						</div>
 					</div>
 					<div
-						className={`p-3 rounded-xl bg-gradient-to-br ${stat.gradient} text-white shadow-lg`}
+						className={`p-3 rounded-xl bg-linear-to-br ${stat.gradient} text-white shadow-lg`}
 					>
 						<Icon className="w-6 h-6" />
 					</div>

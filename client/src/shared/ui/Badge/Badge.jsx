@@ -8,7 +8,7 @@ const variants = {
 	danger: 'bg-red-100 text-red-700',
 	info: 'bg-sky-100 text-sky-700',
 	gradient:
-		'bg-gradient-to-r from-indigo-500 to-purple-600 text-white',
+		'bg-linear-to-r from-indigo-500 to-purple-600 text-white',
 };
 
 const sizes = {

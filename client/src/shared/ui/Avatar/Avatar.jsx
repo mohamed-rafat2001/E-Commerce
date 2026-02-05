@@ -42,7 +42,7 @@ const Avatar = ({
 	};
 
 	const baseClasses =
-		'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold';
+		'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-linear-to-br from-indigo-500 to-purple-600 text-white font-semibold';
 
 	const ringClasses = ring ? `ring-4 ${ringColor} ring-offset-2` : '';
 	const clickableClasses = onClick ? 'cursor-pointer' : 'cursor-default';

@@ -16,7 +16,7 @@ const DashboardHeader = ({ title, subtitle }) => {
 				</p>
 			</div>
 			<motion.button
-				className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white 
+				className="px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white 
 					font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
 				whileHover={{ scale: 1.02 }}
 				whileTap={{ scale: 0.98 }}

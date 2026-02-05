@@ -6,7 +6,7 @@ const variants = {
 	glass:
 		'bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl',
 	gradient:
-		'bg-gradient-to-br from-white to-gray-50 border border-gray-100',
+		'bg-linear-to-br from-white to-gray-50 border border-gray-100',
 	dark: 'bg-slate-800 text-white border border-slate-700',
 };
 

@@ -1,4 +1,4 @@
-# Hi there! I'm Mohamed Rafat 👋
+# Hi there! I'm Mohamed Rafat Full Stack Web & Mobile & OutSystems Developer 👋
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=0078D4&center=true&vCenter=true&width=435&lines=Full+Stack+Developer;MERN+Stack+Specialist;Passionate+Problem+Solver;Turning+Coffee+into+Code" alt="Typing SVG" />

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { Card, Button, Input, Avatar, Badge, Modal, Dropdown } from '../../shared/ui/index.js';
-import useCurrentUser from './hooks/useCurrentUser.js';
-import useUpdateUser from './hooks/useUpdateUser.js';
-import useUpdateAvatar from './hooks/useUpdateAvatar.jsx';
-import { roleThemes } from '../../shared/constants/theme.js';
-import { UserIcon } from '../../shared/constants/icons.jsx';
+import { Card, Button, Input, Avatar, Badge, Modal, Dropdown } from '../../../shared/ui/index.js';
+import useCurrentUser from '../hooks/useCurrentUser.js';
+import useUpdateUser from '../hooks/useUpdateUser.js';
+import useUpdateAvatar from '../hooks/useUpdateAvatar.jsx';
+import { roleThemes } from '../../../shared/constants/theme.js';
+import { UserIcon } from '../../../shared/constants/icons.jsx';
 
 const PersonalDetailsPage = () => {
 	const { user, userRole } = useCurrentUser();

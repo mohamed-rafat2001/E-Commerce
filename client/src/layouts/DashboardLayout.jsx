@@ -9,7 +9,7 @@ const DashboardLayout = () => {
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50">
+		<div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
 			{/* Decorative background elements */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">
 				{/* Gradient orbs */}

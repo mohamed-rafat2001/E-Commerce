@@ -5,14 +5,14 @@ import { HomeIcon } from '../constants/icons.jsx';
 
 const PageNotFound = () => {
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 
+		<div className="min-h-screen bg-linear-to-br from-gray-50 via-indigo-50 to-purple-50 
 			flex items-center justify-center p-4">
 			{/* Decorative background elements */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">
 				<div className="absolute -top-40 -right-40 w-80 h-80 rounded-full 
-					bg-gradient-to-br from-indigo-400 to-purple-500 opacity-20 blur-3xl" />
+					bg-linear-to-br from-indigo-400 to-purple-500 opacity-20 blur-3xl" />
 				<div className="absolute bottom-20 -left-20 w-60 h-60 rounded-full 
-					bg-gradient-to-br from-cyan-400 to-blue-500 opacity-15 blur-3xl" />
+					bg-linear-to-br from-cyan-400 to-blue-500 opacity-15 blur-3xl" />
 			</div>
 
 			<motion.div
@@ -29,7 +29,7 @@ const PageNotFound = () => {
 					transition={{ type: 'spring', delay: 0.2 }}
 				>
 					<h1 className="text-[150px] sm:text-[200px] font-black leading-none
-						bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 
+						bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 
 						bg-clip-text text-transparent">
 						404
 					</h1>

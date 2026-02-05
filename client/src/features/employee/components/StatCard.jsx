@@ -12,7 +12,7 @@ const StatCard = ({ stat, index }) => {
 		>
 			<Card variant="elevated" className="flex items-center gap-4">
 				<div
-					className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}
+					className={`p-3 rounded-xl bg-linear-to-br ${stat.color} text-white shadow-lg`}
 				>
 					<Icon className="w-6 h-6" />
 				</div>

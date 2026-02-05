@@ -4,7 +4,7 @@ import { ShippingIcon } from '../../../shared/constants/icons.jsx';
 const AddressCard = ({ addr, onSetDefault, onDelete, onEdit, isSettingDefault, isDeleting }) => {
 	return (
 		<Card variant="elevated" className={`relative h-full transition-all duration-300 ${addr.isDefault ? 'ring-2 ring-indigo-500 shadow-lg' : 'hover:shadow-md'}`}>
-			<Card.Header className="!pb-2 !border-b-0">
+			<Card.Header className="pb-2! border-b-0!">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
 						<div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">

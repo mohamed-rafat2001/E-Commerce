@@ -69,7 +69,7 @@ const SkeletonLoader = ({
 }) => {
 	return (
 		<div
-			className={`${height} ${width} ${rounded} bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse ${className}`}
+			className={`${height} ${width} ${rounded} bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse ${className}`}
 		/>
 	);
 };

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Button, Card, Badge } from '../../shared/ui/index.js';
-import { Header } from '../../shared/widgets/Header/index.js';
+import { Button, Card, Badge } from '../../../shared/ui/index.js';
+import { Header } from '../../../shared/widgets/Header/index.js';
 
 const featuredProducts = [
 	{ id: 1, name: 'Wireless Headphones', price: '$299', image: '🎧', category: 'Electronics', rating: 4.8 },
@@ -21,7 +21,7 @@ const categories = [
 
 const HomePage = () => {
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+		<div className="min-h-screen bg-linear-to-b from-gray-50 to-white">
 			{/* Header */}
 			<Header />
 
@@ -30,9 +30,9 @@ const HomePage = () => {
 				{/* Background decorations */}
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute top-20 right-0 w-96 h-96 rounded-full 
-						bg-gradient-to-br from-indigo-400/20 to-purple-500/20 blur-3xl" />
+						bg-linear-to-br from-indigo-400/20 to-purple-500/20 blur-3xl" />
 					<div className="absolute bottom-0 left-0 w-80 h-80 rounded-full 
-						bg-gradient-to-br from-cyan-400/20 to-blue-500/20 blur-3xl" />
+						bg-linear-to-br from-cyan-400/20 to-blue-500/20 blur-3xl" />
 				</div>
 
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10">
@@ -47,7 +47,7 @@ const HomePage = () => {
 							</Badge>
 							<h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
 								Discover Amazing
-								<span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 
+								<span className="block bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 
 									bg-clip-text text-transparent">
 									Products Online
 								</span>
@@ -226,7 +226,7 @@ const HomePage = () => {
 									<Button
 										variant="secondary"
 										size="lg"
-										className="!bg-white !text-indigo-600 hover:!bg-gray-100"
+										className="bg-white! text-indigo-600! hover:bg-gray-100!"
 									>
 										Become a Seller
 									</Button>
@@ -235,7 +235,7 @@ const HomePage = () => {
 									<Button
 										variant="ghost"
 										size="lg"
-										className="!text-white border border-white/30 hover:!bg-white/10"
+										className="text-white! border border-white/30 hover:bg-white/10!"
 									>
 										Sign In
 									</Button>
@@ -252,7 +252,7 @@ const HomePage = () => {
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-8">
 						<div className="col-span-2 md:col-span-1">
 							<div className="flex items-center gap-2 mb-4">
-								<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 
+								<div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 
 									flex items-center justify-center font-bold text-xl">
 									E
 								</div>

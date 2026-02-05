@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useLogin from "./hooks/useLogin.jsx";
+import useLogin from "../hooks/useLogin.jsx";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { 
@@ -10,7 +10,7 @@ import {
 	EyeOffIcon, 
 	GoogleIcon, 
 	FacebookIcon 
-} from "../../shared/constants/icons.jsx";
+} from "../../../shared/constants/icons.jsx";
 
 function LoginPage() {
 	const { login, isLoggingIn } = useLogin();
@@ -31,7 +31,7 @@ function LoginPage() {
 			<div className="hidden lg:flex w-1/2 h-full items-center justify-center">
 				<div className="relative w-full h-full overflow-hidden">
 					<div className="absolute inset-0 bg-blue-900/20 z-10 mix-blend-multiply"></div>
-					<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+					<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10"></div>
 					<img 
 						src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop" 
 						alt="E-commerce shopping" 
@@ -62,7 +62,7 @@ function LoginPage() {
 					initial={{ opacity: 0, x: 20 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.5 }}
-					className="max-w-md w-full bg-white shadow-[0_24px_60px_rgba(15,_23,_42,_0.35)] rounded-[2rem] p-8 space-y-5 ring-1 ring-gray-100/50"
+					className="max-w-md w-full bg-white shadow-[0_24px_60px_rgba(15,23,42,0.35)] rounded-4xl p-8 space-y-5 ring-1 ring-gray-100/50"
 				>
 					<div className="text-center">
 						<h2 className="text-2xl font-bold text-gray-900 tracking-tight">
