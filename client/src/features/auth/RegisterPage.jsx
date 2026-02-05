@@ -92,7 +92,7 @@ function RegisterPage() {
 					initial={{ opacity: 0, x: -20 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.5 }}
-					className="max-w-md w-full bg-white shadow-[0_24px_60px_rgba(15,_23,_42,_0.35)] rounded-[2rem] p-8 space-y-5 ring-1 ring-gray-100/50 relative overflow-hidden"
+					className="max-w-md w-full bg-white shadow-[0_24px_60px_rgba(15,23,42,0.35)] rounded-4xl p-8 space-y-5 ring-1 ring-gray-100/50 relative overflow-hidden"
 				>
 					{/* Progress Bar */}
 					<div className="absolute top-0 left-0 w-full h-1 bg-gray-100">

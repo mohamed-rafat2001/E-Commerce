@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
@@ -20,7 +20,8 @@ import {
 	ChevronRightIcon,
 	MenuIcon,
 	CloseIcon,
-	StoreIcon
+	StoreIcon,
+	HeartIcon
 } from '../../constants/icons.jsx';
 
 // Navigation link configurations for each role
@@ -132,6 +133,12 @@ const roleNavigationConfig = {
 			icon: StoreIcon,
 			description: 'Items in your cart',
 		},
+		{
+			label: 'Wishlist',
+			path: 'wishlist',
+			icon: HeartIcon,
+			description: 'Your saved items',
+		},
 	],
 	Employee: [
 		{
@@ -162,7 +169,7 @@ const roleNavigationConfig = {
 };
 
 // Single navigation link component
-const NavItem = ({ item, isActive, index, roleTheme }) => {
+const NavItem = ({ item, index, roleTheme }) => {
 	const Icon = item.icon;
 
 	return (
@@ -201,7 +208,7 @@ const NavItem = ({ item, isActive, index, roleTheme }) => {
 
 						{/* Icon */}
 						<span
-							className={`relative z-10 flex-shrink-0 ${
+							className={`relative z-10 shrink-0 ${
 								linkActive
 									? 'text-white'
 									: 'text-gray-400 group-hover:text-gray-600'
@@ -246,7 +253,8 @@ const NavItem = ({ item, isActive, index, roleTheme }) => {
 };
 
 // Header section with user info
-const SidebarHeader = ({ user, roleTheme, userRole }) => {
+const SidebarHeader = ({ user, userRole }) => {
+	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 	const fullName = user?.userId
 		? `${user.userId.firstName} ${user.userId.lastName}`
 		: 'User';
@@ -271,7 +279,7 @@ const SidebarHeader = ({ user, roleTheme, userRole }) => {
 					status="online"
 					ring
 					ringColor="ring-white/50"
-					className="flex-shrink-0"
+					className="shrink-0"
 				/>
 				<div className="flex-1 min-w-0 hidden xl:block">
 					<h3 className="font-bold text-gray-800 truncate">{fullName}</h3>
@@ -289,7 +297,7 @@ const SidebarHeader = ({ user, roleTheme, userRole }) => {
 };
 
 // Footer section with settings and logout
-const SidebarFooter = ({ roleTheme }) => {
+const SidebarFooter = () => {
 	const { logout } = useLogout();
 
 	const handleLogout = () => {
@@ -336,7 +344,6 @@ const SidebarFooter = ({ roleTheme }) => {
 // Main Sidebar component
 const Sidebar = () => {
 	const { userRole, user } = useCurrentUser();
-	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isMobileOpen, setIsMobileOpen] = useState(false);
 
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
@@ -381,14 +388,14 @@ const Sidebar = () => {
 					transition-all duration-300
 
 					${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-					${isCollapsed ? 'w-20' : 'w-80 md:w-72 lg:w-80'}
+					w-80 md:w-72 lg:w-80
 				`}
 				style={{
 					borderRadius: '0 24px 24px 0',
 				}}
 			>
 				{/* Header */}
-				<SidebarHeader user={user} roleTheme={roleTheme} userRole={userRole} />
+				<SidebarHeader user={user} userRole={userRole} />
 
 				{/* Navigation */}
 				<nav className="flex-1 overflow-y-auto p-4 space-y-1">
@@ -402,4 +409,11 @@ const Sidebar = () => {
 					))}
 				</nav>
 
-				{/* Footer */
+				{/* Footer */}
+				<SidebarFooter />
+			</motion.aside>
+		</>
+	);
+};
+
+export default Sidebar;

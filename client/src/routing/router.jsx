@@ -127,6 +127,14 @@ const router = createBrowserRouter([
 						path: "orderHistory",
 						element: <OrderHistoryPage />,
 					},
+					{ 
+						path: "cart", 
+						element: <PlaceholderPage title="My Cart" /> 
+					},
+					{ 
+						path: "wishlist", 
+						element: <PlaceholderPage title="Wishlist" /> 
+					},
 					{ path: "settings", element: <SettingsPage /> },
 				],
 			},

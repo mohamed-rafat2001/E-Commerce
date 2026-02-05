@@ -215,7 +215,7 @@ const RegisterStepThreeCustomer = ({
 				<button
 					type="submit"
 					disabled={isRegistering}
-					className="flex-[2] flex items-center justify-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+					className="flex-2 flex items-center justify-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
 				>
 					{isRegistering ? (
 						<>

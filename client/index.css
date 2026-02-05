@@ -54,7 +54,7 @@
 	}
 
 	.side-Nav-Links.active {
-		@apply bg-gradient-to-r from-indigo-500 to-purple-600 
+		@apply bg-linear-to-r from-indigo-500 to-purple-600 
 			   text-white shadow-lg;
 	}
 
@@ -75,7 +75,7 @@
 
 	.btn-premium::before {
 		content: '';
-		@apply absolute inset-0 bg-gradient-to-r 
+		@apply absolute inset-0 bg-linear-to-r 
 			   from-white/20 to-transparent 
 			   opacity-0 transition-opacity duration-300;
 	}
@@ -86,7 +86,7 @@
 
 	/* Gradient text */
 	.gradient-text {
-		@apply bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 
+		@apply bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 
 			   bg-clip-text text-transparent;
 	}
 
