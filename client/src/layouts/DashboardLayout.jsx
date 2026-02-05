@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sidebar } from '../shared/widgets/Sidebar/index.js';
+import { Header } from '../shared/widgets/Header/index.js';
 import useCurrentUser from '../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../shared/constants/theme.js';
 
@@ -46,7 +47,10 @@ const DashboardLayout = () => {
 
 				{/* Main content area */}
 				<main className="flex-1 min-h-screen md:ml-0">
-					<div className="p-4 sm:p-6 lg:p-8 pt-20 md:pt-8">
+					{/* Header */}
+					<Header />
+
+					<div className="p-4 sm:p-6 lg:p-8">
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
