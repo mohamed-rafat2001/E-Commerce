@@ -218,7 +218,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 						</span>
 
 						{/* Label and description */}
-						<div className="relative z-10 flex-1 min-w-0 hidden xl:block">
+						<div className="relative z-10 flex-1 min-w-0">
 							<span
 								className={`block font-medium truncate ${
 									linkActive ? 'text-white' : 'text-gray-700'
@@ -239,7 +239,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 
 						{/* Chevron */}
 						<ChevronRightIcon
-							className={`relative z-10 w-4 h-4 hidden xl:block transition-transform duration-200 ${
+							className={`relative z-10 w-4 h-4 transition-transform duration-200 ${
 								linkActive
 									? 'text-white/80 translate-x-1'
 									: 'text-gray-300 group-hover:text-gray-400 group-hover:translate-x-1'
@@ -281,7 +281,7 @@ const SidebarHeader = ({ user, userRole }) => {
 					ringColor="ring-white/50"
 					className="shrink-0"
 				/>
-				<div className="flex-1 min-w-0 hidden xl:block">
+				<div className="flex-1 min-w-0">
 					<h3 className="font-bold text-gray-800 truncate">{fullName}</h3>
 					<Badge
 						variant="gradient"
@@ -324,7 +324,7 @@ const SidebarFooter = () => {
 				`}
 			>
 				<SettingsIcon className="w-5 h-5" />
-				<span className="font-medium hidden xl:block">Settings</span>
+				<span className="font-medium">Settings</span>
 			</NavLink>
 
 			<motion.button
@@ -335,7 +335,7 @@ const SidebarFooter = () => {
 				whileTap={{ scale: 0.98 }}
 			>
 				<LogoutIcon className="w-5 h-5" />
-				<span className="font-medium hidden xl:block">Logout</span>
+				<span className="font-medium">Logout</span>
 			</motion.button>
 		</motion.div>
 	);
