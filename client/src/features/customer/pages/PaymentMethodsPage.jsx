@@ -1,10 +1,10 @@
 import PaymentMethodsHeader from '../components/PaymentMethodsHeader.jsx';
 import PaymentCard from '../components/PaymentCard.jsx';
-import { useCustomerProfile } from '../hooks/useCustomerProfile.js';
+import useCustomerProfile from '../hooks/useCustomerProfile.js';
 import { LoadingSpinner } from '../../../shared/ui/index.js';
 
 const PaymentMethodsPage = () => {
-	const { data: customer, isLoading } = useCustomerProfile();
+	const { customer, isLoading } = useCustomerProfile();
 
 	if (isLoading) return <LoadingSpinner />;
 
