@@ -7,7 +7,6 @@ import { roleThemes } from "../../constants/theme.js";
 import { Avatar, Badge, Modal, Button } from '../../ui/index.js';
 import {
 	NotificationIcon,
-	HomeIcon,
 	StoreIcon,
 	HeartIcon,
 	DashboardIcon,
@@ -106,16 +105,6 @@ const Header = ({ isPanel = false }) => {
 						<div className={`flex items-center gap-2 sm:gap-4 ${isPanel ? 'ml-auto' : ''}`}>
 							{/* Quick action buttons */}
 							<div className="flex items-center gap-1">
-								{!isPanel && (
-									<motion.button
-										className="p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-											hover:bg-gray-100 transition-all duration-200"
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-									>
-										<HomeIcon className="w-5 h-5" />
-									</motion.button>
-								)}
 								<motion.button
 									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
 										hover:bg-gray-100 transition-all duration-200"

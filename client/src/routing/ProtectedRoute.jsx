@@ -1,5 +1,4 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
 import useCurrentUser from "../features/user/hooks/useCurrentUser.js";
 import LoadingSpinner from "../shared/ui/LoadingSpinner";
 
@@ -13,32 +12,21 @@ import LoadingSpinner from "../shared/ui/LoadingSpinner";
 function ProtectedRoute({ allowedRoles = [] }) {
 	const { isAuthenticated, userRole, isLoading } = useCurrentUser();
 	const location = useLocation();
-	// Keep track if the user has just become unauthenticated
-	const wasAuthenticated = useRef(isAuthenticated);
-	const [shouldRedirect, setShouldRedirect] = useState(false);
-
-	// Watch for changes to isAuthenticated after mount
-	useEffect(() => {
-		if (wasAuthenticated.current && !isAuthenticated) {
-			setShouldRedirect(true);
-		}
-		wasAuthenticated.current = isAuthenticated;
-	}, [isAuthenticated]);
 
 	// Show a loading indicator while user info is being fetched
 	if (isLoading) {
 		return <LoadingSpinner />;
 	}
 
-	// If user is not authenticated (either initially or due to state change), redirect to login
-	if (!isAuthenticated || shouldRedirect) {
+	// If user is not authenticated, redirect to login
+	if (!isAuthenticated) {
 		return <Navigate to="/login" state={{ from: location }} replace />;
 	}
 
 	// Check role-based access
 	if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
-		// Redirect based on role or show unauthorized
-		return <Navigate to="/unauthorized" replace />;
+		// Redirect to home or unauthorized page
+		return <Navigate to="/" replace />;
 	}
 
 	return <Outlet />;

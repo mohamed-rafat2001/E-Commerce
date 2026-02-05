@@ -18,16 +18,8 @@ mainApi.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
-		const originalRequest = error.config;
-
-		// If 401 and not already retried
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			originalRequest._retry = true;
-
-			// Redirect to login
-			window.location.href = "/login";
-		}
-
+		// Just reject the error and let the application logic handle redirects
+		// to avoid infinite loops or conflicting redirect behavior
 		return Promise.reject(error);
 	}
 );

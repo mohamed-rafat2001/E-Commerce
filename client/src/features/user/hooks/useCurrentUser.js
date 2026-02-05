@@ -12,17 +12,27 @@ export default function useCurrentUser() {
 	} = useQuery({
 		queryKey: ["user"],
 		queryFn: getMeFunc,
-		retry: Infinity,
+		retry: (failureCount, error) => {
+			// Immediately stop retrying for auth errors (401, 403)
+			if (error.response?.status === 401 || error.response?.status === 403) return false;
+			// For other errors, retry only once to speed up failure detection
+			return failureCount < 1;
+		},
 		staleTime: 5 * 60 * 1000,
+		// Ensure error state is caught immediately
+		throwOnError: false,
 	});
 
 	const user = response?.data?.data?.user;
 
+	// If there is an error (like 401), we are not authenticated
+	const isError = !!error;
+
 	return {
-		isAuthenticated: !!user,
+		isAuthenticated: !!user && !isError,
 		user,
 		userRole: user?.userId?.role,
-		isLoading,
+		isLoading: isLoading && !isError,
 		error,
 	};
 }
