@@ -1,4 +1,8 @@
-# Hi there! I'm Mohamed Rafat Full Stack Web & Mobile & OutSystems Developer 👋
+<div align="center">
+  <img src="https://raw.githubusercontent.com/ABSphreak/ABSphreak/master/gifs/Hi.gif" width="30px">
+  <h1>Hi there! I'm Mohamed Rafat</h1>
+  <h3>Full Stack Web & Mobile Developer | OutSystems Specialist</h3>
+</div>
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=0078D4&center=true&vCenter=true&width=435&lines=Full+Stack+Developer;MERN+Stack+Specialist;Passionate+Problem+Solver;Turning+Coffee+into+Code" alt="Typing SVG" />
