@@ -5,7 +5,7 @@ import AddressCard from '../components/AddressCard.jsx';
 import AddressForm from '../components/AddressForm.jsx';
 import useCustomerProfile from '../hooks/useCustomerProfile.js';
 import useCustomerAddresses from '../hooks/useCustomerAddresses.js';
-import { Modal, LoadingSpinner } from '../../../shared/ui/index.js';
+import { Modal, LoadingSpinner, Button } from '../../../shared/ui/index.js';
 
 const ShippingAddressesPage = () => {
 	const { addresses, isLoading: isFetching } = useCustomerProfile();
@@ -22,6 +22,7 @@ const ShippingAddressesPage = () => {
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingAddress, setEditingAddress] = useState(null);
+	const [addressToDelete, setAddressToDelete] = useState(null);
 
 	const handleAddClick = () => {
 		setEditingAddress(null);
@@ -54,8 +55,14 @@ const ShippingAddressesPage = () => {
 
 
 	const handleDelete = (id) => {
-		if (window.confirm('Are you sure you want to delete this address?')) {
-			deleteAddress(id);
+		setAddressToDelete(id);
+	};
+
+	const confirmDelete = () => {
+		if (addressToDelete) {
+			deleteAddress(addressToDelete, {
+				onSuccess: () => setAddressToDelete(null)
+			});
 		}
 	};
 
@@ -105,11 +112,10 @@ const ShippingAddressesPage = () => {
 			)}
 
 			{/* Add/Edit Modal */}
-			<Modal
-				isOpen={isModalOpen}
+			<Modal 
+				isOpen={isModalOpen} 
 				onClose={() => setIsModalOpen(false)}
 				title={editingAddress ? 'Edit Address' : 'Add New Address'}
-				size="md"
 			>
 				<AddressForm 
 					initialData={editingAddress}
@@ -117,6 +123,42 @@ const ShippingAddressesPage = () => {
 					isLoading={isAdding || isUpdating}
 					onCancel={() => setIsModalOpen(false)}
 				/>
+			</Modal>
+
+			<Modal
+				isOpen={!!addressToDelete}
+				onClose={() => setAddressToDelete(null)}
+				title="Confirm Deletion"
+				size="sm"
+			>
+				<div className="space-y-6">
+					<div className="flex flex-col items-center text-center space-y-3">
+						<div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 text-3xl">
+							🗑️
+						</div>
+						<h4 className="text-xl font-bold text-gray-900">Are you sure?</h4>
+						<p className="text-gray-500">
+							This action cannot be undone. This address will be permanently removed from your profile.
+						</p>
+					</div>
+					<div className="flex gap-3">
+						<Button 
+							variant="ghost" 
+							className="flex-1" 
+							onClick={() => setAddressToDelete(null)}
+						>
+							Cancel
+						</Button>
+						<Button 
+							variant="primary" 
+							className="flex-1 bg-red-600 hover:bg-red-700 border-red-600"
+							onClick={confirmDelete}
+							isLoading={isDeleting}
+						>
+							Delete
+						</Button>
+					</div>
+				</div>
 			</Modal>
 		</div>
 	);

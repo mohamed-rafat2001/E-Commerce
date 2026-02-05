@@ -10,6 +10,7 @@ import {
 	addPaymentMethod,
 	deletePaymentMethod,
 	setDefaultPaymentMethod,
+	updatePaymentMethod,
 } from "../controllers/customerController.js";
 
 /**
@@ -181,6 +182,37 @@ router.patch("/payment-methods", addPaymentMethod);
  *         description: Payment method deleted successfully
  */
 router.delete("/payment-methods/:paymentMethodId", deletePaymentMethod);
+
+/**
+ * @swagger
+ * /api/v1/customers/payment-methods/{paymentMethodId}:
+ *   patch:
+ *     summary: Update payment method
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: paymentMethodId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type: { type: string, enum: [Visa, Mastercard, PayPal, Apple Pay, Google Pay] }
+ *               last4: { type: string }
+ *               expiry: { type: string }
+ *               holder: { type: string }
+ *               isDefault: { type: boolean }
+ *               providerId: { type: string }
+ *     responses:
+ *       200:
+ *         description: Payment method updated successfully
+ */
+router.patch("/payment-methods/:paymentMethodId", updatePaymentMethod);
 
 /**
  * @swagger

@@ -99,6 +99,28 @@ export const setDefaultPaymentMethod = catchAsync(async (req, res, next) => {
 	sendResponse(res, 200, customer);
 });
 
+// @desc Update payment method
+// @Route PATCH /api/v1/customers/payment-methods/:paymentMethodId
+// @access Private/Customer
+export const updatePaymentMethod = catchAsync(async (req, res, next) => {
+	const customer = await CustomerModel.findOne({ userId: req.user._id });
+	if (!customer) return next(new appError("Customer not found", 404));
+
+	const paymentIndex = customer.paymentMethods.findIndex(
+		(pm) => pm._id.toString() === req.params.paymentMethodId
+	);
+
+	if (paymentIndex === -1) return next(new appError("Payment method not found", 404));
+
+	customer.paymentMethods[paymentIndex] = {
+		...customer.paymentMethods[paymentIndex].toObject(),
+		...req.body,
+	};
+
+	await customer.save();
+	sendResponse(res, 200, customer);
+});
+
 // @desc Update address
 // @Route PATCH /api/v1/customers/addresses/:addressId
 // @access Private/Customer

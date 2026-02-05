@@ -23,3 +23,7 @@ export const deletePaymentMethodFunc = (paymentMethodId) => deleteFunc(`customer
 
 // Set default payment method
 export const setDefaultPaymentMethodFunc = (paymentMethodId) => updateFunc(`customers/payment-methods/${paymentMethodId}/default`);
+
+// Update payment method
+export const updatePaymentMethodFunc = ({ paymentMethodId, paymentMethodData }) => 
+    updateFunc(`customers/payment-methods/${paymentMethodId}`, paymentMethodData);

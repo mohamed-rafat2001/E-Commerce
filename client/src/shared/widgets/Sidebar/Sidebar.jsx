@@ -181,7 +181,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 			<NavLink
 				to={item.path}
 				className={({ isActive: linkActive }) => `
-					group relative flex items-center gap-3 px-4 py-3 rounded-xl 
+					group relative flex items-start gap-3 px-4 py-3 rounded-xl 
 					transition-all duration-300 overflow-hidden
 					${
 						linkActive
@@ -208,7 +208,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 
 						{/* Icon */}
 						<span
-							className={`relative z-10 shrink-0 ${
+							className={`relative z-10 shrink-0 mt-1 ${
 								linkActive
 									? 'text-white'
 									: 'text-gray-400 group-hover:text-gray-600'
@@ -239,7 +239,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 
 						{/* Chevron */}
 						<ChevronRightIcon
-							className={`relative z-10 w-4 h-4 transition-transform duration-200 ${
+							className={`relative z-10 w-4 h-4 mt-1 transition-transform duration-200 ${
 								linkActive
 									? 'text-white/80 translate-x-1'
 									: 'text-gray-300 group-hover:text-gray-400 group-hover:translate-x-1'
