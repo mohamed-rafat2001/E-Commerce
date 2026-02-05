@@ -56,19 +56,21 @@ const Header = ({ isPanel = false }) => {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between h-16">
 						{/* Logo & Brand */}
-						<Link to="/" className="flex items-center gap-3 group">
-							<motion.div
-								className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
-								style={{ background: roleTheme.gradient }}
-								whileHover={{ scale: 1.05, rotate: 5 }}
-								whileTap={{ scale: 0.95 }}
-							>
-								E
-							</motion.div>
-							<span className="text-xl font-bold text-gray-800 hidden sm:block group-hover:text-indigo-600 transition-colors">
-								E-Commerce
-							</span>
-						</Link>
+						{!isPanel && (
+							<Link to="/" className="flex items-center gap-3 group">
+								<motion.div
+									className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
+									style={{ background: roleTheme.gradient }}
+									whileHover={{ scale: 1.05, rotate: 5 }}
+									whileTap={{ scale: 0.95 }}
+								>
+									E
+								</motion.div>
+								<span className="text-xl font-bold text-gray-800 hidden sm:block group-hover:text-indigo-600 transition-colors">
+									E-Commerce
+								</span>
+							</Link>
+						)}
 
 						{/* Search Bar (hidden on mobile and in panel) */}
 						{!isPanel && (
@@ -100,7 +102,7 @@ const Header = ({ isPanel = false }) => {
 						)}
 
 						{/* Right side actions */}
-						<div className="flex items-center gap-2 sm:gap-4">
+						<div className={`flex items-center gap-2 sm:gap-4 ${isPanel ? 'ml-auto' : ''}`}>
 							{/* Quick action buttons */}
 							<div className="flex items-center gap-1">
 								{!isPanel && (
@@ -167,7 +169,6 @@ const Header = ({ isPanel = false }) => {
 												src={user?.userId?.profileImg?.secure_url}
 												name={fullName} 
 												size="md" 
-												status="online"
 												ring
 												ringColor="ring-indigo-500/20"
 											/>
