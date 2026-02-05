@@ -20,14 +20,20 @@ export const addAddressestoCustomer = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
 	if (!customer) return next(new appError("Customer not found", 404));
 
-	// Expecting { addresses: { ...addressData } } from body to match factory behavior
 	if (!req.body.addresses) {
 		return next(new appError("Please provide address data", 400));
 	}
 
-	customer.addresses.push(req.body.addresses);
-	await customer.save();
+	const newAddress = { ...req.body.addresses };
+	delete newAddress._id;
 
+	if (customer.addresses.length === 0 || newAddress.isDefault) {
+		customer.addresses.forEach((addr) => (addr.isDefault = false));
+		newAddress.isDefault = true;
+	}
+
+	customer.addresses.push(newAddress);
+	await customer.save();
 	sendResponse(res, 201, customer);
 });
 
@@ -57,15 +63,16 @@ export const addPaymentMethod = catchAsync(async (req, res, next) => {
 		return next(new appError("Please provide payment method data", 400));
 	}
 
-	// If this is the first payment method or requested as default, unset other defaults
-	if (customer.paymentMethods.length === 0 || req.body.paymentMethod.isDefault) {
+	const newPM = { ...req.body.paymentMethod };
+	delete newPM._id;
+
+	if (customer.paymentMethods.length === 0 || newPM.isDefault) {
 		customer.paymentMethods.forEach((pm) => (pm.isDefault = false));
-		req.body.paymentMethod.isDefault = true;
+		newPM.isDefault = true;
 	}
 
-	customer.paymentMethods.push(req.body.paymentMethod);
+	customer.paymentMethods.push(newPM);
 	await customer.save();
-
 	sendResponse(res, 201, customer);
 });
 
@@ -106,16 +113,17 @@ export const updatePaymentMethod = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
 	if (!customer) return next(new appError("Customer not found", 404));
 
-	const paymentIndex = customer.paymentMethods.findIndex(
-		(pm) => pm._id.toString() === req.params.paymentMethodId
-	);
+	const pm = customer.paymentMethods.id(req.params.paymentMethodId);
+	if (!pm) return next(new appError("Payment method not found", 404));
 
-	if (paymentIndex === -1) return next(new appError("Payment method not found", 404));
+	// If setting as default, unset others
+	if (req.body.isDefault) {
+		customer.paymentMethods.forEach((p) => (p.isDefault = false));
+	}
 
-	customer.paymentMethods[paymentIndex] = {
-		...customer.paymentMethods[paymentIndex].toObject(),
-		...req.body,
-	};
+	const updateData = { ...req.body };
+	delete updateData._id;
+	pm.set(updateData);
 
 	await customer.save();
 	sendResponse(res, 200, customer);
@@ -128,16 +136,17 @@ export const updateAddress = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
 	if (!customer) return next(new appError("Customer not found", 404));
 
-	const addressIndex = customer.addresses.findIndex(
-		(addr) => addr._id.toString() === req.params.addressId
-	);
+	const address = customer.addresses.id(req.params.addressId);
+	if (!address) return next(new appError("Address not found", 404));
 
-	if (addressIndex === -1) return next(new appError("Address not found", 404));
+	// If setting as default, unset others
+	if (req.body.isDefault) {
+		customer.addresses.forEach((addr) => (addr.isDefault = false));
+	}
 
-	customer.addresses[addressIndex] = {
-		...customer.addresses[addressIndex].toObject(),
-		...req.body,
-	};
+	const updateData = { ...req.body };
+	delete updateData._id;
+	address.set(updateData);
 
 	await customer.save();
 	sendResponse(res, 200, customer);

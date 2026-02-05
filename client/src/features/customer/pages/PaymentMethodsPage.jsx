@@ -16,7 +16,7 @@ const PaymentMethodsPage = () => {
 
 	const { mutate: deletePM, isPending: isDeleting } = useMutationFactory(
 		deletePaymentMethodFunc,
-		['customerProfile'],
+		'customerProfile',
 		'Payment method removed successfully'
 	);
 

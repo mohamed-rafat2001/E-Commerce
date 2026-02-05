@@ -36,14 +36,14 @@ const PaymentMethodForm = ({ isOpen, onClose, initialData }) => {
 
 	const { mutate: addPayment, isPending: isAdding } = useMutationFactory(
 		addPaymentMethodFunc,
-		['customerProfile'],
+		'customerProfile',
 		'Failed to add payment method',
 		'Payment method added successfully'
 	);
 
 	const { mutate: updatePayment, isPending: isUpdating } = useMutationFactory(
 		updatePaymentMethodFunc,
-		['customerProfile'],
+		'customerProfile',
 		'Failed to update payment method',
 		'Payment method updated successfully'
 	);

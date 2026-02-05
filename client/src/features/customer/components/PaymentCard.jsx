@@ -6,7 +6,7 @@ import { setDefaultPaymentMethodFunc } from '../services/customerService.js';
 const PaymentCard = ({ card, index, onEdit, onDelete }) => {
 	const { mutate: setDefault, isPending: isSettingDefault } = useMutationFactory(
 		setDefaultPaymentMethodFunc,
-		['customerProfile'],
+		'customerProfile',
 		'Payment method set as default'
 	);
 
