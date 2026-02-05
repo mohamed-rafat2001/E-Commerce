@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Badge } from '../../../shared/ui/index.js';
 import { useMutationFactory } from '../../../shared/hooks/useMutationFactory.jsx';
 import { setDefaultPaymentMethodFunc, deletePaymentMethodFunc } from '../services/customerService.js';
-import { queryClient } from '../../../shared/utils/queryClient.js';
 
 const PaymentCard = ({ card, index }) => {
 	const { mutate: setDefault, isPending: isSettingDefault } = useMutationFactory(

@@ -104,8 +104,6 @@ productSchema.pre("save", function (next) {
 
 //  mongoose indexs price
 productSchema.index({ price: 1 });
-// productSchema.index({ slug: 1 }, { unique: true });
-productSchema.index({ slug: 1 });
 productSchema.index({ userId: 1, status: 1 });
 
 export default mongoose.model("ProductModel", productSchema);
