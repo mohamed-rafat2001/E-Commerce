@@ -51,7 +51,7 @@ export const addressSchema = new mongoose.Schema(
 			default: false,
 		},
 	},
-	{ _id: false }
+	{ _id: true }
 );
 
 export const moneySchema = new mongoose.Schema(

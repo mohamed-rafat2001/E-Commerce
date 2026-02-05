@@ -214,10 +214,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 									: 'text-gray-400 group-hover:text-gray-600'
 							}`}
 						>
-							<Icon 
-								className="w-5 h-5" 
-								filled={linkActive}
-							/>
+							<Icon className="w-5 h-5" />
 						</span>
 
 						{/* Label and description */}

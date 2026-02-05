@@ -129,25 +129,11 @@ export const updateByOwner = (Model, Fields = []) =>
 
 			case "SellerModel":
 			case "CustomerModel":
-				if (Fields.includes("addresses")) {
-					doc = await Model.findOneAndUpdate(
-						{ userId },
-						{ $push: { addresses: object.addresses } },
-						{ new: true, runValidators: true }
-					);
-				} else if (Fields.includes("payoutMethods")) {
-					doc = await Model.findOneAndUpdate(
-						{ userId },
-						{ $push: { payoutMethods: object.payoutMethods } },
-						{ new: true, runValidators: true }
-					);
-				} else {
-					doc = await Model.findOneAndUpdate(
-						{ userId },
-						{ ...object },
-						{ new: true, runValidators: true }
-					);
-				}
+				doc = await Model.findOneAndUpdate(
+					{ userId },
+					{ ...object },
+					{ new: true, runValidators: true }
+				);
 				break;
 
 			default:
