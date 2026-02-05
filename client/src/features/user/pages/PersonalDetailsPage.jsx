@@ -20,6 +20,7 @@ const PersonalDetailsPage = () => {
 	
 	const [isEditing, setIsEditing] = useState(false);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [previewUrl, setPreviewUrl] = useState(null);
@@ -86,6 +87,14 @@ const PersonalDetailsPage = () => {
 				}
 			});
 		}
+	};
+
+	const handleDeleteAvatar = () => {
+		deleteAvatar(null, {
+			onSuccess: () => {
+				setIsDeleteModalOpen(false);
+			}
+		});
 	};
 
 	const memberSince = user?.createdAt 
@@ -161,11 +170,8 @@ const PersonalDetailsPage = () => {
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 											</svg>
 										}
-										onClick={() => {
-											if (window.confirm('Are you sure you want to remove your profile image?')) {
-												deleteAvatar();
-											}
-										}}
+										onClick={() => setIsDeleteModalOpen(true)}
+										disabled={!user?.userId?.profileImg?.secure_url}
 									>
 										Delete Image
 									</Dropdown.Item>
@@ -299,6 +305,45 @@ const PersonalDetailsPage = () => {
 							disabled={!selectedFile}
 						>
 							Upload Image
+						</Button>
+					</div>
+				</div>
+			</Modal>
+
+			{/* Delete Image Confirmation Modal */}
+			<Modal
+				isOpen={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				title="Delete Profile Image"
+				size="sm"
+			>
+				<div className="space-y-6">
+					<div className="flex flex-col items-center justify-center text-center">
+						<div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-4 text-red-500">
+							<svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+							</svg>
+						</div>
+						<h3 className="text-xl font-bold text-gray-900">Are you sure?</h3>
+						<p className="text-gray-500 mt-2">
+							Do you really want to delete your profile image? This action cannot be undone.
+						</p>
+					</div>
+
+					<div className="flex gap-3">
+						<Button 
+							variant="ghost" 
+							className="flex-1"
+							onClick={() => setIsDeleteModalOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button 
+							variant="danger" 
+							className="flex-1"
+							onClick={handleDeleteAvatar}
+						>
+							Delete
 						</Button>
 					</div>
 				</div>

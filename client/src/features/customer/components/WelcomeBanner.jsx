@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../shared/ui/index.js';
 
 const WelcomeBanner = ({ title, subtitle }) => {
+	const navigate = useNavigate();
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: -20 }}
@@ -21,13 +24,18 @@ const WelcomeBanner = ({ title, subtitle }) => {
 					{subtitle}
 				</p>
 				<div className="flex flex-wrap gap-4 mt-6">
-					<Button variant="secondary" size="md">
+					<Button 
+						variant="secondary" 
+						size="md"
+						onClick={() => navigate('/')}
+					>
 						Start Shopping
 					</Button>
 					<Button
 						variant="ghost"
 						size="md"
 						className="text-white border border-white/30 hover:bg-white/10"
+						onClick={() => navigate('../orderHistory')}
 					>
 						View Deals
 					</Button>

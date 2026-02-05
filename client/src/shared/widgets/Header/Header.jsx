@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import useLogout from '../../../features/auth/hooks/useLogout.jsx';
 import { roleThemes } from "../../constants/theme.js";
-import { Avatar, Badge } from '../../ui/index.js';
+import { Avatar, Badge, Modal, Button } from '../../ui/index.js';
 import {
 	NotificationIcon,
 	HomeIcon,
@@ -20,6 +20,7 @@ const Header = ({ isPanel = false }) => {
 	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
 	const { logout } = useLogout();
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const dropdownRef = useRef(null);
 
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
@@ -220,7 +221,10 @@ const Header = ({ isPanel = false }) => {
 													</Link>
 
 													<button
-														onClick={handleLogout}
+														onClick={() => {
+															setIsDropdownOpen(false);
+															setIsLogoutModalOpen(true);
+														}}
 														className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors group"
 													>
 														<div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
@@ -256,6 +260,43 @@ const Header = ({ isPanel = false }) => {
 					</div>
 				</div>
 			</div>
+
+			{/* Logout Confirmation Modal */}
+			<Modal
+				isOpen={isLogoutModalOpen}
+				onClose={() => setIsLogoutModalOpen(false)}
+				title="Confirm Logout"
+				size="sm"
+			>
+				<div className="space-y-6">
+					<div className="flex flex-col items-center justify-center text-center">
+						<div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-4 text-red-500">
+							<LogoutIcon className="w-8 h-8" />
+						</div>
+						<h3 className="text-xl font-bold text-gray-900">Sign Out</h3>
+						<p className="text-gray-500 mt-2">
+							Are you sure you want to log out of your account?
+						</p>
+					</div>
+
+					<div className="flex gap-3">
+						<Button 
+							variant="ghost" 
+							className="flex-1"
+							onClick={() => setIsLogoutModalOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button 
+							variant="danger" 
+							className="flex-1"
+							onClick={handleLogout}
+						>
+							Logout
+						</Button>
+					</div>
+				</div>
+			</Modal>
 		</motion.header>
 	);
 };
