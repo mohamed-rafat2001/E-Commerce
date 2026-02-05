@@ -48,7 +48,7 @@ const DashboardLayout = () => {
 				{/* Main content area */}
 				<main className="flex-1 min-h-screen md:ml-0">
 					{/* Header */}
-					<Header />
+					<Header isPanel={true} />
 
 					<div className="p-4 sm:p-6 lg:p-8">
 						<motion.div

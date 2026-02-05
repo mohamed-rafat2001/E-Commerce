@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
@@ -262,28 +262,30 @@ const SidebarBrand = ({ userRole }) => {
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	return (
-		<motion.div
-			className="p-6 border-b border-gray-100 flex items-center gap-3 group cursor-pointer"
-			initial={{ opacity: 0, y: -20 }}
-			animate={{ opacity: 1, y: 0 }}
-		>
+		<Link to="/">
 			<motion.div
-				className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
-				style={{ background: roleTheme.gradient }}
-				whileHover={{ scale: 1.05, rotate: 5 }}
-				whileTap={{ scale: 0.95 }}
+				className="p-6 border-b border-gray-100 flex items-center gap-3 group cursor-pointer"
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
 			>
-				E
+				<motion.div
+					className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
+					style={{ background: roleTheme.gradient }}
+					whileHover={{ scale: 1.05, rotate: 5 }}
+					whileTap={{ scale: 0.95 }}
+				>
+					E
+				</motion.div>
+				<div className="flex flex-col">
+					<span className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors tracking-tight">
+						E-Commerce
+					</span>
+					<span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
+						{userRole} Portal
+					</span>
+				</div>
 			</motion.div>
-			<div className="flex flex-col">
-				<span className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors tracking-tight">
-					E-Commerce
-				</span>
-				<span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-					{userRole} Portal
-				</span>
-			</div>
-		</motion.div>
+		</Link>
 	);
 };
 

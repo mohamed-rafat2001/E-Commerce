@@ -16,7 +16,7 @@ import {
 	SettingsIcon
 } from '../../constants/icons.jsx';
 
-const Header = () => {
+const Header = ({ isPanel = false }) => {
 	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
 	const { logout } = useLogout();
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -46,13 +46,13 @@ const Header = () => {
 
 	return (
 		<motion.header
-			className="sticky top-0 z-30 w-full"
+			className={`sticky top-0 z-30 w-full ${isPanel ? 'bg-transparent' : ''}`}
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
 			transition={{ type: 'spring', stiffness: 260, damping: 20 }}
 		>
 			{/* Glassmorphism header */}
-			<div className="bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
+			<div className={`${isPanel ? 'bg-white/40' : 'bg-white/80'} backdrop-blur-xl border-b border-gray-100/50 shadow-sm`}>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between h-16">
 						{/* Logo & Brand */}
@@ -70,45 +70,49 @@ const Header = () => {
 							</span>
 						</Link>
 
-						{/* Search Bar (hidden on mobile) */}
-						<div className="hidden md:flex flex-1 max-w-md mx-8">
-							<div className="relative w-full">
-								<input
-									type="text"
-									placeholder="Search products, orders..."
-									className="w-full pl-4 pr-10 py-2.5 bg-gray-100/80 border-0 rounded-xl
-										text-gray-700 placeholder:text-gray-400
-										focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-white
-										transition-all duration-300"
-								/>
-								<svg
-									className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						{/* Search Bar (hidden on mobile and in panel) */}
+						{!isPanel && (
+							<div className="hidden md:flex flex-1 max-w-md mx-8">
+								<div className="relative w-full">
+									<input
+										type="text"
+										placeholder="Search products, orders..."
+										className="w-full pl-4 pr-10 py-2.5 bg-gray-100/80 border-0 rounded-xl
+											text-gray-700 placeholder:text-gray-400
+											focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-white
+											transition-all duration-300"
 									/>
-								</svg>
+									<svg
+										className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+										/>
+									</svg>
+								</div>
 							</div>
-						</div>
+						)}
 
 						{/* Right side actions */}
 						<div className="flex items-center gap-2 sm:gap-4">
 							{/* Quick action buttons */}
 							<div className="flex items-center gap-1">
-								<motion.button
-									className="p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-										hover:bg-gray-100 transition-all duration-200"
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-								>
-									<HomeIcon className="w-5 h-5" />
-								</motion.button>
+								{!isPanel && (
+									<motion.button
+										className="p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
+											hover:bg-gray-100 transition-all duration-200"
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+									>
+										<HomeIcon className="w-5 h-5" />
+									</motion.button>
+								)}
 								<motion.button
 									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
 										hover:bg-gray-100 transition-all duration-200"
