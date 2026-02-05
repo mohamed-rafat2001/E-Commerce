@@ -2,16 +2,12 @@ import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
-import useLogout from '../../../features/auth/hooks/useLogout.jsx';
-import { Avatar, Badge } from '../../ui/index.js';
 import { roleThemes } from '../../constants/theme.js';
 import {
 	UserIcon,
 	ShippingIcon,
 	PaymentIcon,
 	OrderIcon,
-	SettingsIcon,
-	LogoutIcon,
 	DashboardIcon,
 	ProductIcon,
 	UsersIcon,
@@ -104,6 +100,12 @@ const roleNavigationConfig = {
 	],
 	Customer: [
 		{
+			label: 'Dashboard',
+			path: 'dashboard',
+			icon: DashboardIcon,
+			description: 'Overview & statistics',
+		},
+		{
 			label: 'Personal Details',
 			path: 'personalDetails',
 			icon: UserIcon,
@@ -186,11 +188,14 @@ const NavItem = ({ item, index, roleTheme }) => {
 					${
 						linkActive
 							? 'text-white shadow-lg'
-							: 'text-gray-600 hover:bg-gray-100/80'
+							: 'text-gray-600 hover:bg-gray-100/80 hover:text-indigo-600'
 					}
 				`}
 				style={({ isActive: linkActive }) =>
-					linkActive ? { background: roleTheme.gradient } : {}
+					linkActive ? { 
+						background: roleTheme.gradient,
+						boxShadow: `0 10px 15px -3px ${roleTheme.primaryColor}40`
+					} : {}
 				}
 			>
 				{({ isActive: linkActive }) => (
@@ -252,98 +257,39 @@ const NavItem = ({ item, index, roleTheme }) => {
 	);
 };
 
-// Header section with user info
-const SidebarHeader = ({ user, userRole }) => {
+// Brand section
+const SidebarBrand = ({ userRole }) => {
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
-	const fullName = user?.userId
-		? `${user.userId.firstName} ${user.userId.lastName}`
-		: 'User';
 
 	return (
 		<motion.div
-			className="p-5 border-b border-gray-100"
+			className="p-6 border-b border-gray-100 flex items-center gap-3 group cursor-pointer"
 			initial={{ opacity: 0, y: -20 }}
 			animate={{ opacity: 1, y: 0 }}
 		>
-			{/* Gradient header bar */}
-			<div
-				className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+			<motion.div
+				className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
 				style={{ background: roleTheme.gradient }}
-			/>
-
-			<div className="flex items-center gap-4">
-				<Avatar
-					src={user?.userId?.profileImg?.secure_url}
-					name={fullName}
-					size="lg"
-					status="online"
-					ring
-					ringColor="ring-white/50"
-					className="shrink-0"
-				/>
-				<div className="flex-1 min-w-0">
-					<h3 className="font-bold text-gray-800 truncate">{fullName}</h3>
-					<Badge
-						variant="gradient"
-						size="sm"
-						icon={<span className="text-xs">{roleTheme.icon}</span>}
-					>
-						{userRole}
-					</Badge>
-				</div>
+				whileHover={{ scale: 1.05, rotate: 5 }}
+				whileTap={{ scale: 0.95 }}
+			>
+				E
+			</motion.div>
+			<div className="flex flex-col">
+				<span className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors tracking-tight">
+					E-Commerce
+				</span>
+				<span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
+					{userRole} Portal
+				</span>
 			</div>
-		</motion.div>
-	);
-};
-
-// Footer section with settings and logout
-const SidebarFooter = () => {
-	const { logout } = useLogout();
-
-	const handleLogout = () => {
-		logout();
-	};
-
-	return (
-		<motion.div
-			className="p-4 border-t border-gray-100 mt-auto"
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ delay: 0.3 }}
-		>
-			<NavLink
-				to="settings"
-				className={({ isActive }) => `
-					group flex items-center gap-3 px-4 py-3 rounded-xl mb-2
-					transition-all duration-300
-					${
-						isActive
-							? 'bg-gray-100 text-gray-800'
-							: 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-					}
-				`}
-			>
-				<SettingsIcon className="w-5 h-5" />
-				<span className="font-medium">Settings</span>
-			</NavLink>
-
-			<motion.button
-				onClick={handleLogout}
-				className="w-full flex items-center gap-3 px-4 py-3 rounded-xl
-					text-red-500 hover:bg-red-50 transition-all duration-300"
-				whileHover={{ scale: 1.02 }}
-				whileTap={{ scale: 0.98 }}
-			>
-				<LogoutIcon className="w-5 h-5" />
-				<span className="font-medium">Logout</span>
-			</motion.button>
 		</motion.div>
 	);
 };
 
 // Main Sidebar component
 const Sidebar = () => {
-	const { userRole, user } = useCurrentUser();
+	const { userRole } = useCurrentUser();
 	const [isMobileOpen, setIsMobileOpen] = useState(false);
 
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
@@ -394,8 +340,8 @@ const Sidebar = () => {
 					borderRadius: '0 24px 24px 0',
 				}}
 			>
-				{/* Header */}
-				<SidebarHeader user={user} userRole={userRole} />
+				{/* Brand */}
+				<SidebarBrand userRole={userRole} />
 
 				{/* Navigation */}
 				<nav className="flex-1 overflow-y-auto p-4 space-y-1">
@@ -408,9 +354,6 @@ const Sidebar = () => {
 						/>
 					))}
 				</nav>
-
-				{/* Footer */}
-				<SidebarFooter />
 			</motion.aside>
 		</>
 	);

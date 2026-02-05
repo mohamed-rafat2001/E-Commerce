@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
+import useLogout from '../../../features/auth/hooks/useLogout.jsx';
 import { roleThemes } from "../../constants/theme.js";
 import { Avatar, Badge } from '../../ui/index.js';
 import {
@@ -8,15 +10,39 @@ import {
 	HomeIcon,
 	StoreIcon,
 	HeartIcon,
+	DashboardIcon,
+	LogoutIcon,
+	ChevronRightIcon,
+	SettingsIcon
 } from '../../constants/icons.jsx';
 
 const Header = () => {
 	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
+	const { logout } = useLogout();
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const dropdownRef = useRef(null);
+
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	const fullName = user?.userId
 		? `${user.userId.firstName} ${user.userId.lastName}`
 		: 'Guest';
+
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+				setIsDropdownOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	const handleLogout = () => {
+		logout();
+		setIsDropdownOpen(false);
+	};
 
 	return (
 		<motion.header
@@ -127,26 +153,80 @@ const Header = () => {
 							{/* User profile */}
 							{!isLoading && (
 								isAuthenticated ? (
-									<Link
-										to={`/${userRole?.toLowerCase()}/dashboard`}
-										className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
-											hover:bg-gray-100/80 transition-all duration-200"
-									>
-										<Avatar 
-											src={user?.userId?.profileImg?.secure_url}
-											name={fullName} 
-											size="sm" 
-											status="online" 
-										/>
-										<div className="hidden sm:block">
-											<p className="text-sm font-semibold text-gray-800 truncate max-w-[120px]">
-												{fullName}
-											</p>
-											<Badge variant="primary" size="sm">
-												{userRole}
-											</Badge>
-										</div>
-									</Link>
+									<div className="relative" ref={dropdownRef}>
+										<button
+											onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+											className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
+												hover:bg-gray-100/80 transition-all duration-200 border border-transparent hover:border-gray-200"
+										>
+											<Avatar 
+												src={user?.userId?.profileImg?.secure_url}
+												name={fullName} 
+												size="md" 
+												status="online"
+												ring
+												ringColor="ring-indigo-500/20"
+											/>
+											<div className="hidden sm:block text-left">
+												<p className="text-sm font-bold text-gray-900 truncate max-w-[150px]">
+													{fullName}
+												</p>
+												<Badge variant="gradient" size="sm">
+													{userRole}
+												</Badge>
+											</div>
+											<ChevronRightIcon className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-90' : ''}`} />
+										</button>
+
+										{/* Dropdown Menu */}
+										<AnimatePresence>
+											{isDropdownOpen && (
+												<motion.div
+													initial={{ opacity: 0, y: 10, scale: 0.95 }}
+													animate={{ opacity: 1, y: 0, scale: 1 }}
+													exit={{ opacity: 0, y: 10, scale: 0.95 }}
+													transition={{ duration: 0.2 }}
+													className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+												>
+													<div className="px-4 py-3 border-b border-gray-50 mb-1">
+														<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
+													</div>
+													
+													<Link
+														to={`/${userRole?.toLowerCase()}/dashboard`}
+														onClick={() => setIsDropdownOpen(false)}
+														className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
+													>
+														<div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+															<DashboardIcon className="w-4 h-4" />
+														</div>
+														<span className="font-medium">User Panel</span>
+													</Link>
+
+													<Link
+														to={`/${userRole?.toLowerCase()}/settings`}
+														onClick={() => setIsDropdownOpen(false)}
+														className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
+													>
+														<div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+															<SettingsIcon className="w-4 h-4" />
+														</div>
+														<span className="font-medium">Settings</span>
+													</Link>
+
+													<button
+														onClick={handleLogout}
+														className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors group"
+													>
+														<div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+															<LogoutIcon className="w-4 h-4" />
+														</div>
+														<span className="font-medium">Logout</span>
+													</button>
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
 								) : (
 									<div className="flex items-center gap-2">
 										<Link

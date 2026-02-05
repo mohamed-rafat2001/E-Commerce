@@ -171,8 +171,9 @@ const PaymentMethodForm = ({ isOpen, onClose, initialData }) => {
 						</label>
 					</div>
 				</div>
+			</div>
 
-				<div className="flex gap-3 pt-2">
+			<div className="flex gap-3 pt-2">
 					<Button 
 						type="button" 
 						variant="ghost" 
