@@ -1,8 +1,9 @@
-<div align="center">
+<p align="center">
   <img src="https://raw.githubusercontent.com/ABSphreak/ABSphreak/master/gifs/Hi.gif" width="30px">
-  <h1>Hi there! I'm Mohamed Rafat</h1>
-  <h3>Full Stack Web & Mobile Developer | OutSystems Specialist</h3>
-</div>
+</p>
+
+# <p align="center">Hi there! I'm Mohamed Rafat</p>
+### <p align="center">Full Stack Web & Mobile Developer | OutSystems Specialist</p>
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=0078D4&center=true&vCenter=true&width=435&lines=Full+Stack+Developer;MERN+Stack+Specialist;Passionate+Problem+Solver;Turning+Coffee+into+Code" alt="Typing SVG" />
@@ -19,12 +20,12 @@
 
 ### 🚀 About Me
 
-I am a results-driven **Full Stack Developer** specializing in the **MERN stack**. My expertise lies in building scalable, high-performance web applications with a focus on clean architecture, intuitive user experiences, and robust backend systems.
+I am a dedicated Full Stack Developer with a deep passion for creating seamless digital experiences. My journey began with a curiosity for how things work on the web, which quickly evolved into a career building robust applications. With a strong foundation in both frontend and backend technologies, I enjoy bridging the gap between design and technical implementation. I thrive in collaborative environments where I can solve complex problems and contribute to innovative solutions.
 
 - 🔭 **Currently focused on**: Advanced Microservices and E-Commerce System Architecture.
 - 🌱 **Learning**: Cloud Computing (AWS/Azure) and System Design Patterns.
 - 👯 **Open to**: Collaborating on innovative Open Source projects and complex web solutions.
-- 💬 **Ask me about**: React, Node.js, Express, MongoDB, and modern web development workflows.
+- 💬 **Ask me about**: React, Node.js, Express, MongoDB, React Native (Mobile Developer), OutSystems (Reactive Web & Mobile Apps), and modern web development workflows.
 
 ---
 
@@ -32,12 +33,17 @@ I am a results-driven **Full Stack Developer** specializing in the **MERN stack*
 
 <div align="center">
 
-| **Frontend** | **Backend** | **Database & Cloud** | **Tools** |
-| :--- | :--- | :--- | :--- |
-| <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" /> | <img src="https://img.shields.io/badge/Node.js-43853D?style=flat-square&logo=node.js&logoColor=white" /> | <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=flat-square&logo=mongodb&logoColor=white" /> | <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" /> |
-| <img src="https://img.shields.io/badge/Redux_Toolkit-764ABC?style=flat-square&logo=redux&logoColor=white" /> | <img src="https://img.shields.io/badge/Express.js-404D59?style=flat-square&logo=express&logoColor=white" /> | <img src="https://img.shields.io/badge/Mongoose-880000?style=flat-square&logo=mongoose&logoColor=white" /> | <img src="https://img.shields.io/badge/VS_Code-0078D4?style=flat-square&logo=visual-studio-code&logoColor=white" /> |
-| <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" /> | <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=json-web-tokens&logoColor=white" /> | <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white" /> | <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" /> |
-| <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white" /> | <img src="https://img.shields.io/badge/Nodemailer-339933?style=flat-square&logo=gmail&logoColor=white" /> | <img src="https://img.shields.io/badge/REST_API-005571?style=flat-square&logo=postman&logoColor=white" /> | <img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white" /> |
+| **Frontend** | **Backend** | **Mobile Development** | **Fundamentals** | **DB & Cloud** |
+| :--- | :--- | :--- | :--- | :--- |
+| <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" /> | <img src="https://img.shields.io/badge/Node.js-43853D?style=flat-square&logo=node.js&logoColor=white" /> | <img src="https://img.shields.io/badge/React_Native-20232A?style=flat-square&logo=react&logoColor=61DAFB" /> | <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> | <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=flat-square&logo=mongodb&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white" /> | <img src="https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white" /> | <img src="https://img.shields.io/badge/OutSystems-red?style=flat-square&logo=outsystems&logoColor=white" /> | <img src="https://img.shields.io/badge/Data_Structures-FFA500?style=flat-square&logo=google-chrome&logoColor=white" /> | <img src="https://img.shields.io/badge/MySQL-005C84?style=flat-square&logo=mysql&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" /> | <img src="https://img.shields.io/badge/Express.js-404D59?style=flat-square&logo=express&logoColor=white" /> | | <img src="https://img.shields.io/badge/Algorithms-005571?style=flat-square&logo=google-chrome&logoColor=white" /> | <img src="https://img.shields.io/badge/SQL_Server-CC2927?style=flat-square&logo=microsoft-sql-server&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=next.js&logoColor=white" /> | <img src="https://img.shields.io/badge/OutSystems-red?style=flat-square&logo=outsystems&logoColor=white" /> | | <img src="https://img.shields.io/badge/OOP-4B0082?style=flat-square&logo=google-chrome&logoColor=white" /> | <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/Redux_Toolkit-764ABC?style=flat-square&logo=redux&logoColor=white" /> | <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=json-web-tokens&logoColor=white" /> | | <img src="https://img.shields.io/badge/Design_Patterns-2E8B57?style=flat-square&logo=google-chrome&logoColor=white" /> | <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/React_Query-FF4154?style=flat-square&logo=react-query&logoColor=white" /> | <img src="https://img.shields.io/badge/Mongoose-880000?style=flat-square&logo=mongoose&logoColor=white" /> | | | <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" /> | <img src="https://img.shields.io/badge/REST_API-005571?style=flat-square&logo=postman&logoColor=white" /> | | | <img src="https://img.shields.io/badge/VS_Code-0078D4?style=flat-square&logo=visual-studio-code&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white" /> | | | | <img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white" /> |
+| <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white" /> | | | | |
 
 </div>
 
@@ -46,12 +52,19 @@ I am a results-driven **Full Stack Developer** specializing in the **MERN stack*
 ### 📈 GitHub Stats
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=mohamed-rafat2001&show_icons=true&theme=tokyonight&count_private=true&hide_border=true&include_all_commits=true" alt="Mohamed's GitHub stats" height="180px" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=mohamed-rafat2001&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" alt="Top Langs" height="180px" />
+  <a href="https://github.com/mohamed-rafat2001">
+    <img src="https://github-readme-stats-sigma-five.vercel.app/api?username=mohamed-rafat2001&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" alt="Mohamed's GitHub stats" height="180" />
+  </a>
+  <a href="https://github.com/mohamed-rafat2001">
+    <img src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=mohamed-rafat2001&layout=compact&theme=tokyonight&hide_border=true" alt="Top Langs" height="180" />
+  </a>
 </p>
 
 <p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=mohamed-rafat2001&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
+  <a href="https://github.com/mohamed-rafat2001">
+    <img src="https://github-readme-streak-stats-sigma-five.vercel.app/?user=mohamed-rafat2001&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
+  </a>
+  <img src="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=mohamed-rafat2001&theme=tokyonight" alt="Most Commit Languages" height="180" />
 </p>
 
 ---
@@ -74,6 +87,18 @@ I am a results-driven **Full Stack Developer** specializing in the **MERN stack*
 **Scalable social platform for community interaction.**
 - **Core Features:** Real-time updates for posts, comments, and likes.
 - **User Experience:** Smooth navigation and interactive UI elements using modern React patterns.
+
+#### 🧠 [Quiz App](https://github.com/mohamed-rafat2001/quiz-app)
+**Full-stack MERN quiz platform with advanced Role-Based Access Control.**
+- **RBAC:** Tailored experiences for Admins, Teachers (quiz creation/monitoring), and Students (interactive taking/progress tracking).
+- **Features:** Dynamic quiz generation, real-time feedback, and detailed performance analytics dashboards.
+- **Security:** Robust protection with JWT, rate limiting, and comprehensive data sanitization.
+
+#### 👤 [Professional Portfolio](https://github.com/mohamed-rafat2001/Portfolio-project)
+**High-performance full-stack portfolio with integrated management system.**
+- **Modern Stack:** Built with React 19 and Tailwind CSS 4 for a cutting-edge, responsive user experience.
+- **Admin Panel:** Secure dashboard for real-time management of projects, skills, and contact inquiries.
+- **Cloud Services:** Seamless Cloudinary integration for media assets and Nodemailer for automated notifications.
 
 ---
 

@@ -11,7 +11,7 @@ import {
 } from '../../constants/icons.jsx';
 
 const Header = () => {
-	const { userRole, user, isLoggedIn } = useCurrentUser();
+	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	const fullName = user?.userId
@@ -125,45 +125,47 @@ const Header = () => {
 							<div className="hidden sm:block w-px h-8 bg-gray-200"></div>
 
 							{/* User profile */}
-							{isLoggedIn ? (
-								<Link
-									to={`/${userRole?.toLowerCase()}/personalDetails`}
-									className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
-										hover:bg-gray-100/80 transition-all duration-200"
-								>
-									<Avatar 
-										src={user?.userId?.profileImg?.secure_url}
-										name={fullName} 
-										size="sm" 
-										status="online" 
-									/>
-									<div className="hidden sm:block">
-										<p className="text-sm font-semibold text-gray-800 truncate max-w-[120px]">
-											{fullName}
-										</p>
-										<Badge variant="primary" size="sm">
-											{userRole}
-										</Badge>
+							{!isLoading && (
+								isAuthenticated ? (
+									<Link
+										to={`/${userRole?.toLowerCase()}/dashboard`}
+										className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
+											hover:bg-gray-100/80 transition-all duration-200"
+									>
+										<Avatar 
+											src={user?.userId?.profileImg?.secure_url}
+											name={fullName} 
+											size="sm" 
+											status="online" 
+										/>
+										<div className="hidden sm:block">
+											<p className="text-sm font-semibold text-gray-800 truncate max-w-[120px]">
+												{fullName}
+											</p>
+											<Badge variant="primary" size="sm">
+												{userRole}
+											</Badge>
+										</div>
+									</Link>
+								) : (
+									<div className="flex items-center gap-2">
+										<Link
+											to="/login"
+											className="px-4 py-2 text-sm font-medium text-gray-700 
+												hover:text-indigo-600 transition-colors"
+										>
+											Sign In
+										</Link>
+										<Link
+											to="/register"
+											className="px-4 py-2 text-sm font-medium text-white rounded-xl
+												shadow-lg hover:shadow-xl transition-all duration-200"
+											style={{ background: roleTheme.gradient }}
+										>
+											Get Started
+										</Link>
 									</div>
-								</Link>
-							) : (
-								<div className="flex items-center gap-2">
-									<Link
-										to="/login"
-										className="px-4 py-2 text-sm font-medium text-gray-700 
-											hover:text-indigo-600 transition-colors"
-									>
-										Sign In
-									</Link>
-									<Link
-										to="/register"
-										className="px-4 py-2 text-sm font-medium text-white rounded-xl
-											shadow-lg hover:shadow-xl transition-all duration-200"
-										style={{ background: roleTheme.gradient }}
-									>
-										Get Started
-									</Link>
-								</div>
+								)
 							)}
 						</div>
 					</div>

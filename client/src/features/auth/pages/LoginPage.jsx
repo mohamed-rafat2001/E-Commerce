@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useLogin from "../hooks/useLogin.jsx";
+import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
 	MailIcon, 
 	LockIcon, 
@@ -14,7 +15,17 @@ import {
 
 function LoginPage() {
 	const { login, isLoggingIn } = useLogin();
+	const { isAuthenticated, userRole } = useCurrentUser();
+	const navigate = useNavigate();
 	const [showPassword, setShowPassword] = useState(false);
+
+	useEffect(() => {
+		if (isAuthenticated && userRole) {
+			const dashboardPath = `/${userRole.toLowerCase()}/dashboard`;
+			navigate(dashboardPath, { replace: true });
+		}
+	}, [isAuthenticated, userRole, navigate]);
+
 	const {
 		handleSubmit,
 		register,

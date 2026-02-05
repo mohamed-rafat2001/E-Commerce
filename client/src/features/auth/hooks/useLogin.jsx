@@ -20,13 +20,13 @@ export default function useLogin() {
 			
 			// Redirect based on role
 			if (userRole === "Customer") {
-				navigate("/customer/personalDetails");
+				navigate("/customer/dashboard");
 			} else if (userRole === "Seller") {
-				navigate("/seller/personalDetails");
+				navigate("/seller/dashboard");
 			} else if (userRole === "Employee") {
-				navigate("/employee/personalDetails");
+				navigate("/employee/dashboard");
 			} else if (userRole === "Admin") {
-				navigate("/admin/personalDetails");
+				navigate("/admin/dashboard");
 			} else {
 				navigate("/");
 			}

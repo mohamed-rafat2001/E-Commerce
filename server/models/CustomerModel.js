@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { addressSchema } from "./commonSchemas.js";
+import { addressSchema, paymentMethodSchema } from "./commonSchemas.js";
 
 const CustomerSchema = new mongoose.Schema(
 	{
@@ -9,6 +9,7 @@ const CustomerSchema = new mongoose.Schema(
 		},
 
 		addresses: [addressSchema],
+		paymentMethods: [paymentMethodSchema],
 		loyaltyPoints: {
 			type: Number,
 			default: 0,

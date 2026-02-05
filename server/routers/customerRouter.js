@@ -7,6 +7,9 @@ import {
 	deleteAddressFromCustomer,
 	setDefaultAddress,
 	updateAddress,
+	addPaymentMethod,
+	deletePaymentMethod,
+	setDefaultPaymentMethod,
 } from "../controllers/customerController.js";
 
 /**
@@ -130,6 +133,72 @@ router.delete("/addresses/:addressId", deleteAddressFromCustomer);
  *         description: Default address set successfully
  */
 router.patch("/addresses/:addressId/default", setDefaultAddress);
+
+/**
+ * @swagger
+ * /api/v1/customers/payment-methods:
+ *   patch:
+ *     summary: Add payment method to customer profile
+ *     tags: [Customers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               paymentMethod:
+ *                 type: object
+ *                 properties:
+ *                   type: { type: string, enum: [Visa, Mastercard, PayPal, Apple Pay, Google Pay] }
+ *                   last4: { type: string }
+ *                   expiry: { type: string }
+ *                   holder: { type: string }
+ *                   isDefault: { type: boolean }
+ *                   providerId: { type: string }
+ *     responses:
+ *       201:
+ *         description: Payment method added successfully
+ */
+router.patch("/payment-methods", addPaymentMethod);
+
+/**
+ * @swagger
+ * /api/v1/customers/payment-methods/{paymentMethodId}:
+ *   delete:
+ *     summary: Delete payment method from customer profile
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: paymentMethodId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Payment method deleted successfully
+ */
+router.delete("/payment-methods/:paymentMethodId", deletePaymentMethod);
+
+/**
+ * @swagger
+ * /api/v1/customers/payment-methods/{paymentMethodId}/default:
+ *   patch:
+ *     summary: Set default payment method
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: paymentMethodId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Default payment method set successfully
+ */
+router.patch("/payment-methods/:paymentMethodId/default", setDefaultPaymentMethod);
 
 export default router;
 

@@ -101,13 +101,8 @@ export const StoreIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FiShoppingCart className={className} {...props} />
 );
 
-export const HeartIcon = ({ className = 'w-5 h-5', filled = false, color, ...props }) => (
-	<FiHeart 
-		className={className} 
-		fill={filled ? (color || 'currentColor') : 'none'} 
-		stroke={color}
-		{...props} 
-	/>
+export const HeartIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiHeart className={className} {...props} />
 );
 
 export const NotificationIcon = ({ className = 'w-5 h-5', ...props }) => (

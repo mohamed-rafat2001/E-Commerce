@@ -71,3 +71,22 @@ export const moneySchema = new mongoose.Schema(
 	},
 	{ _id: false }
 );
+
+export const paymentMethodSchema = new mongoose.Schema(
+	{
+		type: {
+			type: String,
+			enum: ["Visa", "Mastercard", "PayPal", "Apple Pay", "Google Pay"],
+			required: true,
+		},
+		last4: String,
+		expiry: String,
+		holder: String,
+		isDefault: {
+			type: Boolean,
+			default: false,
+		},
+		providerId: String, // Stripe/PayPal payment method ID
+	},
+	{ _id: true }
+);

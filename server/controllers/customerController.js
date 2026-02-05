@@ -46,6 +46,59 @@ export const deleteAddressFromCustomer = catchAsync(async (req, res, next) => {
 	sendResponse(res, 200, customer);
 });
 
+// @desc Add payment method to customer
+// @Route PATCH /api/v1/customers/payment-methods
+// @access Private/Customer
+export const addPaymentMethod = catchAsync(async (req, res, next) => {
+	const customer = await CustomerModel.findOne({ userId: req.user._id });
+	if (!customer) return next(new appError("Customer not found", 404));
+
+	if (!req.body.paymentMethod) {
+		return next(new appError("Please provide payment method data", 400));
+	}
+
+	// If this is the first payment method or requested as default, unset other defaults
+	if (customer.paymentMethods.length === 0 || req.body.paymentMethod.isDefault) {
+		customer.paymentMethods.forEach((pm) => (pm.isDefault = false));
+		req.body.paymentMethod.isDefault = true;
+	}
+
+	customer.paymentMethods.push(req.body.paymentMethod);
+	await customer.save();
+
+	sendResponse(res, 201, customer);
+});
+
+// @desc Delete payment method from customer
+// @Route DELETE /api/v1/customers/payment-methods/:paymentMethodId
+// @access Private/Customer
+export const deletePaymentMethod = catchAsync(async (req, res, next) => {
+	const customer = await CustomerModel.findOne({ userId: req.user._id });
+	if (!customer) return next(new appError("Customer not found", 404));
+
+	customer.paymentMethods = customer.paymentMethods.filter(
+		(pm) => pm._id.toString() !== req.params.paymentMethodId
+	);
+
+	await customer.save();
+	sendResponse(res, 200, customer);
+});
+
+// @desc Set default payment method
+// @Route PATCH /api/v1/customers/payment-methods/:paymentMethodId/default
+// @access Private/Customer
+export const setDefaultPaymentMethod = catchAsync(async (req, res, next) => {
+	const customer = await CustomerModel.findOne({ userId: req.user._id });
+	if (!customer) return next(new appError("Customer not found", 404));
+
+	customer.paymentMethods.forEach((pm) => {
+		pm.isDefault = pm._id.toString() === req.params.paymentMethodId;
+	});
+
+	await customer.save();
+	sendResponse(res, 200, customer);
+});
+
 // @desc Update address
 // @Route PATCH /api/v1/customers/addresses/:addressId
 // @access Private/Customer

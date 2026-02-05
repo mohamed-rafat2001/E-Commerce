@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 import { moneySchema } from "./commonSchemas.js";
 
 const productSchema = new mongoose.Schema(
@@ -18,6 +19,7 @@ const productSchema = new mongoose.Schema(
 			required: false,
 			trim: true,
 			lowercase: true,
+			unique: true,
 		},
 		description: {
 			type: String,
@@ -93,9 +95,17 @@ productSchema.pre(/^find/, function (next) {
 	this.populate("category", "name description");
 	next();
 });
+
+productSchema.pre("save", function (next) {
+	if (!this.isModified("name")) return next();
+	this.slug = slugify(this.name, { lower: true, strict: true });
+	next();
+});
+
 //  mongoose indexs price
 productSchema.index({ price: 1 });
 // productSchema.index({ slug: 1 }, { unique: true });
+productSchema.index({ slug: 1 });
 productSchema.index({ userId: 1, status: 1 });
 
 export default mongoose.model("ProductModel", productSchema);
