@@ -65,7 +65,7 @@ const LoginForm = ({
 							<button
 								type="button"
 								onClick={() => setShowPassword(!showPassword)}
-								className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+								className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors cursor-pointer"
 							>
 								{showPassword ? (
 									<EyeOffIcon className="h-5 w-5" />
@@ -106,7 +106,7 @@ const LoginForm = ({
 			<button
 				type="submit"
 				disabled={isLoggingIn}
-				className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+				className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
 			>
 				{isLoggingIn ? "Logging in..." : "Log In"}
 			</button>

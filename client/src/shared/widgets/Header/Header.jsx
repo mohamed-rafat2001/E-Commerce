@@ -131,7 +131,12 @@ const Header = () => {
 									className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
 										hover:bg-gray-100/80 transition-all duration-200"
 								>
-									<Avatar name={fullName} size="sm" status="online" />
+									<Avatar 
+										src={user?.userId?.profileImg?.secure_url}
+										name={fullName} 
+										size="sm" 
+										status="online" 
+									/>
 									<div className="hidden sm:block">
 										<p className="text-sm font-semibold text-gray-800 truncate max-w-[120px]">
 											{fullName}

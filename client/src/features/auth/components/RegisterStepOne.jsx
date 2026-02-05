@@ -160,14 +160,16 @@ const RegisterStepOne = ({
 				)}
 			</div>
 
-			<button
-				type="button"
-				onClick={onNextStep}
-				className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 mt-2"
-			>
-				Next
-				<ChevronRightIcon className="w-5 h-5 ml-1" />
-			</button>
+			<div className="pt-2">
+				<button
+					type="button"
+					onClick={onNextStep}
+					className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+				>
+					Next Step
+					<ChevronRightIcon className="ml-2 h-4 w-4" />
+				</button>
+			</div>
 
 			<SocialLogin />
 		</motion.div>

@@ -15,7 +15,7 @@ const SocialLogin = () => {
 			<div className="grid grid-cols-2 gap-3 mt-4">
 				<button
 					type="button"
-					className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all"
+					className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
 				>
 					<GoogleIcon className="h-5 w-5 mr-2" />
 					<span className="sr-only">Sign in with Google</span>
@@ -23,7 +23,7 @@ const SocialLogin = () => {
 				</button>
 				<button
 					type="button"
-					className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all"
+					className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
 				>
 					<FacebookIcon className="h-5 w-5 mr-2 text-blue-600" />
 					<span className="sr-only">Sign in with Facebook</span>

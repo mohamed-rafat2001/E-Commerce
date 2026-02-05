@@ -7,6 +7,7 @@ import AuthBanner from "./components/AuthBanner.jsx";
 import RegisterStepOne from "./components/RegisterStepOne.jsx";
 import RegisterStepTwo from "./components/RegisterStepTwo.jsx";
 import RegisterStepThreeSeller from "./components/RegisterStepThreeSeller.jsx";
+import RegisterStepThreeCustomer from "./components/RegisterStepThreeCustomer.jsx";
 
 function RegisterPage() {
 	const { registerUser, isRegistering } = useRegister();
@@ -44,12 +45,7 @@ function RegisterPage() {
 			const fieldsStep2 = ["firstName", "lastName", "phoneNumber", "gender"];
 			const isStep2Valid = await trigger(fieldsStep2);
 			if (isStep2Valid) {
-				if (selectedRole === "Seller") {
-					setStep(3);
-				} else {
-					// For Customer, submit here or trigger form submit
-					handleSubmit(Submit)();
-				}
+				setStep(3);
 			}
 		}
 	}
@@ -79,7 +75,7 @@ function RegisterPage() {
 		}),
 	};
 
-	const totalSteps = selectedRole === "Seller" ? 3 : 2;
+	const totalSteps = 3;
 	const progressWidth = `${(step / totalSteps) * 100}%`;
 
 	return (
@@ -110,14 +106,14 @@ function RegisterPage() {
 
 					<div className="text-center pt-2">
 						<h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-							{step === 1 ? "Create account" : step === 2 ? "Your profile" : "Business Details"}
+							{step === 1 ? "Create account" : step === 2 ? "Your profile" : selectedRole === "Seller" ? "Business Details" : "Shipping Address"}
 						</h2>
 						<p className="mt-2 text-sm text-gray-500">
 							{step === 1
 								? "Enter your details to get started"
 								: step === 2 
 									? "Just a few more details"
-									: "Complete your seller profile"}
+									: selectedRole === "Seller" ? "Complete your seller profile" : "Tell us where to deliver"}
 						</p>
 					</div>
 
@@ -146,13 +142,23 @@ function RegisterPage() {
 									onPrevStep={onPrevStep}
 									isRegistering={isRegistering}
 									variants={variants}
-									onNextStep={onNextStep} // Add this if needed for custom submission logic
-									showNextButton={selectedRole === "Seller"}
+									onNextStep={onNextStep} 
+									showNextButton={true}
 								/>
 							)}
 
 							{step === 3 && selectedRole === "Seller" && (
 								<RegisterStepThreeSeller 
+									register={register}
+									errors={errors}
+									onPrevStep={onPrevStep}
+									isRegistering={isRegistering}
+									variants={variants}
+								/>
+							)}
+
+							{step === 3 && selectedRole === "Customer" && (
+								<RegisterStepThreeCustomer 
 									register={register}
 									errors={errors}
 									onPrevStep={onPrevStep}

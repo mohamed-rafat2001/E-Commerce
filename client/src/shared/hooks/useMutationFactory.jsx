@@ -9,10 +9,10 @@ export default function useMutationFactory(serviceFunc, keyName, err, success) {
 		onSuccess: () => {
 			// Update React Query cache
 			queryClient.invalidateQueries({ queryKey: [keyName] });
-			toast.success(<ToastSuccess successObj={success} />);
+			toast.success(<ToastSuccess successObj={success} />, { icon: null });
 		},
 		onError: () => {
-			toast.error(<ToastError errorObj={err} />);
+			toast.error(<ToastError errorObj={err} />, { icon: null });
 		},
 	});
 

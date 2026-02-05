@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const sizes = {
@@ -27,6 +28,12 @@ const Avatar = ({
 	ringColor = 'ring-indigo-500',
 	onClick = null,
 }) => {
+	const [imageError, setImageError] = useState(false);
+
+	useEffect(() => {
+		setImageError(false);
+	}, [src]);
+
 	const getInitials = (name) => {
 		if (!name) return '?';
 		const words = name.split(' ');
@@ -38,7 +45,9 @@ const Avatar = ({
 		'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold';
 
 	const ringClasses = ring ? `ring-4 ${ringColor} ring-offset-2` : '';
-	const clickableClasses = onClick ? 'cursor-pointer' : '';
+	const clickableClasses = onClick ? 'cursor-pointer' : 'cursor-default';
+
+	const showImage = src && !imageError;
 
 	return (
 		<motion.div
@@ -47,20 +56,17 @@ const Avatar = ({
 			whileHover={onClick ? { scale: 1.05 } : {}}
 			whileTap={onClick ? { scale: 0.95 } : {}}
 		>
-			{src ? (
+			{showImage && (
 				<img
 					src={src}
 					alt={alt}
 					className="w-full h-full object-cover"
-					onError={(e) => {
-						e.target.style.display = 'none';
-						e.target.nextSibling.style.display = 'flex';
-					}}
+					onError={() => setImageError(true)}
 				/>
-			) : null}
+			)}
 			<span
 				className={`absolute inset-0 flex items-center justify-center ${
-					src ? 'hidden' : 'flex'
+					showImage ? 'hidden' : 'flex'
 				}`}
 			>
 				{getInitials(name)}

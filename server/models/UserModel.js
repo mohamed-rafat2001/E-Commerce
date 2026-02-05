@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "password is required"],
 			trim: true,
+			select: false,
 			validate: [validator.isStrongPassword, "please enter strong password"],
 		},
 		confirmPassword: {
@@ -69,12 +70,11 @@ const userSchema = new mongoose.Schema(
 );
 
 // hash password before saving
-userSchema.pre("save", async function (next) {
-	if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+	if (!this.isModified("password")) return;
 
 	this.password = await bcryptjs.hash(this.password, 12);
 	this.confirmPassword = undefined;
-	next();
 });
 // create token using jsonwebtoken
 userSchema.methods.CreateToken = function () {

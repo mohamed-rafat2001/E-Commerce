@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ quiet: true });
 process.on("uncaughtException", (err) => {
 	console.log(err.name, err.message);
 	console.log("UNCAUGHT EXCEPTION ... SHUTTING DOWN..");

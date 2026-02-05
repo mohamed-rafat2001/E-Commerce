@@ -7,8 +7,8 @@
 	"type": "module",
 	"main": "server.js",
 	"scripts": {
-		"start": "node server/server.js",
-		"server": "nodemon server/server.js",
+		"start": "node server.js",
+		"server": "cross-env NODE_MODE=DEV nodemon server.js",
 		"client": "npm run dev --prefix ../client",
 		"dev": "concurrently \"npm run server\" \"npm run client\""
 	},

@@ -12,39 +12,35 @@ function App() {
 				<ReactQueryDevtools initialIsOpen={false} />
 				<RouterProvider router={router} />
 				<Toaster
-					position="bottom-right"
+					position="top-right"
 					toastOptions={{
 						duration: 4000,
+						className: "react-hot-toast",
 						style: {
-							background: '#1e293b',
-							color: '#fff',
-							padding: '16px 24px',
-							borderRadius: '16px',
-							boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-							fontSize: '14px',
-							fontWeight: '500',
+							background: 'rgba(255, 255, 255, 0.95)',
+							backdropFilter: 'blur(12px)',
+							color: '#1e293b',
+							padding: '12px 16px',
+							borderRadius: '20px',
+							boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.1), 0 10px 20px -10px rgba(0, 0, 0, 0.05)',
+							border: '1px solid rgba(255, 255, 255, 0.5)',
+							maxWidth: '400px',
 						},
 						success: {
-							iconTheme: {
-								primary: '#22c55e',
-								secondary: '#fff',
-							},
-							style: {
-								border: '1px solid rgba(34, 197, 94, 0.3)',
-							},
+							duration: 3000,
+							icon: null,
 						},
 						error: {
-							iconTheme: {
-								primary: '#ef4444',
-								secondary: '#fff',
-							},
-							style: {
-								border: '1px solid rgba(239, 68, 68, 0.3)',
-							},
+							duration: 5000,
+							icon: null,
 						},
 					}}
-					containerStyle={{ bottom: 40, right: 24 }}
-					reverseOrder={true}
+					containerStyle={{ 
+						top: 40, 
+						right: 24,
+					}}
+					gutter={12}
+					reverseOrder={false}
 				/>
 			</QueryClientProvider>
 		</div>

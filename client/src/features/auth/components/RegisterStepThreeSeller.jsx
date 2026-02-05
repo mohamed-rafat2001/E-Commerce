@@ -7,7 +7,7 @@ import {
 	UserIcon
 } from "../../../shared/constants/icons.jsx";
 import { motion } from "framer-motion";
-import { useCategories } from "../../category/hooks/useCategories.js";
+import useCategories from "../../category/hooks/useCategories.js";
 
 const RegisterStepThreeSeller = ({ 
 	register, 
@@ -27,13 +27,8 @@ const RegisterStepThreeSeller = ({
 			exit="exit"
 			transition={{ type: "spring", stiffness: 300, damping: 30 }}
 			custom={-1}
-			className="space-y-4"
+			className="space-y-4 max-w-md mx-auto"
 		>
-			<div className="text-center mb-4">
-				<h3 className="text-lg font-semibold text-gray-900">Seller Business Details</h3>
-				<p className="text-sm text-gray-500">Please provide your business information</p>
-			</div>
-
 			{/* Brand Name */}
 			<div>
 				<div className="relative">
@@ -64,7 +59,7 @@ const RegisterStepThreeSeller = ({
 					</div>
 					<textarea
 						placeholder="Brand Description"
-						rows="3"
+						rows="2"
 						className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm resize-none ${
 							errors.description ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 						}`}
@@ -79,52 +74,53 @@ const RegisterStepThreeSeller = ({
 				)}
 			</div>
 
-			{/* Business Email */}
-			<div>
-				<div className="relative">
-					<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-						<MailIcon className="h-5 w-5" />
+			{/* Business Contact Info */}
+			<div className="grid grid-cols-2 gap-3">
+				<div>
+					<div className="relative">
+						<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+							<MailIcon className="h-5 w-5" />
+						</div>
+						<input
+							type="email"
+							placeholder="Business Email"
+							className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
+								errors.businessEmail ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
+							}`}
+							{...register("businessEmail", {
+								required: "Required",
+								pattern: {
+									value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+									message: "Invalid email"
+								}
+							})}
+						/>
 					</div>
-					<input
-						type="email"
-						placeholder="Business Email"
-						className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
-							errors.businessEmail ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
-						}`}
-						{...register("businessEmail", {
-							required: "Business email is required",
-							pattern: {
-								value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-								message: "Invalid email address"
-							}
-						})}
-					/>
+					{errors.businessEmail && (
+						<p className="mt-1 text-xs text-red-500 font-medium">{errors.businessEmail.message}</p>
+					)}
 				</div>
-				{errors.businessEmail && (
-					<p className="mt-1 text-xs text-red-500 font-medium">{errors.businessEmail.message}</p>
-				)}
-			</div>
 
-			{/* Business Phone */}
-			<div>
-				<div className="relative">
-					<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-						<PhoneIcon className="h-5 w-5" />
+				<div>
+					<div className="relative">
+						<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+							<PhoneIcon className="h-5 w-5" />
+						</div>
+						<input
+							type="tel"
+							placeholder="Business Phone"
+							className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
+								errors.businessPhone ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
+							}`}
+							{...register("businessPhone", {
+								required: "Required",
+							})}
+						/>
 					</div>
-					<input
-						type="tel"
-						placeholder="Business Phone"
-						className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
-							errors.businessPhone ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
-						}`}
-						{...register("businessPhone", {
-							required: "Business phone is required",
-						})}
-					/>
+					{errors.businessPhone && (
+						<p className="mt-1 text-xs text-red-500 font-medium">{errors.businessPhone.message}</p>
+					)}
 				</div>
-				{errors.businessPhone && (
-					<p className="mt-1 text-xs text-red-500 font-medium">{errors.businessPhone.message}</p>
-				)}
 			</div>
 
 			{/* Primary Category */}
@@ -134,7 +130,7 @@ const RegisterStepThreeSeller = ({
 						<OrderIcon className="h-5 w-5" />
 					</div>
 					<select
-						className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
+						className={`appearance-none block w-full pl-11 pr-10 py-3 border rounded-xl shadow-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
 							errors.primaryCategory ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 						}`}
 						{...register("primaryCategory", {
@@ -152,6 +148,11 @@ const RegisterStepThreeSeller = ({
 							))
 						)}
 					</select>
+					<div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+						<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</div>
 				</div>
 				{errors.primaryCategory && (
 					<p className="mt-1 text-xs text-red-500 font-medium">{errors.primaryCategory.message}</p>
@@ -164,7 +165,7 @@ const RegisterStepThreeSeller = ({
 				<button
 					type="button"
 					onClick={onPrevStep}
-					className="flex-1 flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+					className="flex-1 flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors cursor-pointer"
 				>
 					<ChevronLeftIcon className="w-5 h-5 mr-1" />
 					Back
@@ -172,7 +173,7 @@ const RegisterStepThreeSeller = ({
 				<button
 					type="submit"
 					disabled={isRegistering}
-					className="flex-[2] flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+					className="flex-2 flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 				>
 					{isRegistering ? "Creating..." : "Complete Registration"}
 				</button>

@@ -20,6 +20,7 @@ import {
 	ChevronRightIcon,
 	MenuIcon,
 	CloseIcon,
+	StoreIcon
 } from '../../constants/icons.jsx';
 
 // Navigation link configurations for each role
@@ -124,6 +125,12 @@ const roleNavigationConfig = {
 			path: 'orderHistory',
 			icon: OrderIcon,
 			description: 'Past purchases',
+		},
+		{
+			label: 'My Cart',
+			path: 'cart',
+			icon: StoreIcon,
+			description: 'Items in your cart',
 		},
 	],
 	Employee: [
@@ -258,6 +265,7 @@ const SidebarHeader = ({ user, roleTheme, userRole }) => {
 
 			<div className="flex items-center gap-4">
 				<Avatar
+					src={user?.userId?.profileImg?.secure_url}
 					name={fullName}
 					size="lg"
 					status="online"
@@ -394,11 +402,4 @@ const Sidebar = () => {
 					))}
 				</nav>
 
-				{/* Footer */}
-				<SidebarFooter roleTheme={roleTheme} />
-			</motion.aside>
-		</>
-	);
-};
-
-export default Sidebar;
+				{/* Footer */

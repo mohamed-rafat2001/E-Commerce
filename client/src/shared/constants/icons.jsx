@@ -27,6 +27,9 @@ import {
 	FiEyeOff,
 	FiCheck,
 	FiFacebook,
+	FiMapPin,
+	FiFlag,
+	FiMap,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -161,4 +164,16 @@ export const FacebookIcon = ({ className = 'w-5 h-5', ...props }) => (
 
 export const GoogleIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FcGoogle className={className} {...props} />
+);
+
+export const MapPinIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiMapPin className={className} {...props} />
+);
+
+export const FlagIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiFlag className={className} {...props} />
+);
+
+export const BuildingOfficeIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiMap className={className} {...props} />
 );

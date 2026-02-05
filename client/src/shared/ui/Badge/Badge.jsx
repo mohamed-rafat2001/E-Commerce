@@ -27,7 +27,7 @@ const Badge = ({
 	animate = true,
 }) => {
 	const baseClasses =
-		'inline-flex items-center font-medium rounded-full whitespace-nowrap';
+		'inline-flex items-center font-medium rounded-full whitespace-nowrap cursor-default';
 
 	const Component = animate ? motion.span : 'span';
 	const animationProps = animate

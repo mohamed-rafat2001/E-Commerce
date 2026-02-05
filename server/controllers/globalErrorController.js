@@ -58,7 +58,7 @@ export default function globalError(error, req, res, next) {
 
 	if (process.env.NODE_MODE === "DEV") {
 		sendErrorDev(error, res);
-	} else if (process.env.NODE_MODE === "PROD") {
+	} else {
 		let errorCopy = { ...error };
 		errorCopy.message = error.message;
 

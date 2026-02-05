@@ -24,17 +24,19 @@ export default function useRegister() {
 						title: "Registration Successful",
 						message: "Welcome to our platform!",
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
-		onError: () => {
+		onError: (err) => {
 			toast.error(
 				<ToastError
 					errorObj={{
 						title: "Registration Failed",
-						message: "Please try again.",
+						message: err?.response?.data?.message || "Please try again.",
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
 	});

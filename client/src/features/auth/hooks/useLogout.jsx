@@ -19,7 +19,8 @@ export default function useLogout() {
 						title: "Logout Successful",
 						message: "You have been signed out.",
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
 		onError: () => {
@@ -29,7 +30,8 @@ export default function useLogout() {
 						title: "Logout Failed",
 						message: "Please try again.",
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
 	});

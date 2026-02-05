@@ -11,7 +11,7 @@ export const app = express();
 
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: ["http://localhost:5173", "http://localhost:5174"],
 		credentials: true,
 		allowedHeaders: [
 			"Content-Type",
@@ -22,7 +22,7 @@ app.use(
 	})
 );
 // set security HTTP headers.
-app.use(helmet.xssFilter());
+app.use(helmet());
 
 //limit requests from same API
 const limiter = rateLimit({
@@ -39,8 +39,9 @@ app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 // Data sanitization against noSQL query injection
 app.use((req, res, next) => {
-	req.body = mongoSanitize.sanitize(req.body);
-	req.params = mongoSanitize.sanitize(req.params);
+	if (req.body) mongoSanitize.sanitize(req.body);
+	if (req.query) mongoSanitize.sanitize(req.query);
+	if (req.params) mongoSanitize.sanitize(req.params);
 	next();
 });
 

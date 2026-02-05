@@ -17,6 +17,8 @@ export default function useLogin() {
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 			const userRole = data?.data?.data?.user?.role;
+			
+			// Redirect based on role
 			if (userRole === "Customer") {
 				navigate("/customer/personalDetails");
 			} else if (userRole === "Seller") {
@@ -25,27 +27,29 @@ export default function useLogin() {
 				navigate("/employee/personalDetails");
 			} else if (userRole === "Admin") {
 				navigate("/admin/personalDetails");
+			} else {
+				navigate("/");
 			}
-			// } else {
-			// 	navigate("/");
-			// }
+
 			toast.success(
 				<ToastSuccess
 					successObj={{
 						title: "Login Successful",
-						message: "Welcome Back,you are now signed in",
+						message: `Welcome Back, ${data?.data?.data?.user?.firstName}!`,
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
-		onError: () => {
+		onError: (err) => {
 			toast.error(
 				<ToastError
 					errorObj={{
 						title: "Login Failed",
-						message: "Invalid credentials, please try again.",
+						message: err.response?.data?.message || "Invalid credentials, please try again.",
 					}}
-				/>
+				/>,
+				{ icon: null }
 			);
 		},
 	});
