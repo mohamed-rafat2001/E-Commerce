@@ -226,7 +226,15 @@ export const getOneByOwner = (Model) =>
 			doc = await Model.findOne(query);
 		}
 
-		if (!doc) return next(new appError("doc not Found", 404));
+		if (!doc) {
+			if (Model.modelName === "CartModel") {
+				return sendResponse(res, 200, { items: [], totalPrice: { amount: 0, currency: "USD" } });
+			}
+			if (Model.modelName === "WishListModel") {
+				return sendResponse(res, 200, { items: [] });
+			}
+			return next(new appError("doc not Found", 404));
+		}
 
 		sendResponse(res, 200, doc);
 	});

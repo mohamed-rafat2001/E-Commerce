@@ -90,10 +90,9 @@ productSchema.virtual("reviews", {
 	foreignField: "itemId",
 });
 //  mongoose query middlewares
-productSchema.pre(/^find/, function (next) {
+productSchema.pre(/^find/, function () {
 	this.populate("reviews");
 	this.populate("category", "name description");
-	next();
 });
 
 productSchema.pre("save", function (next) {

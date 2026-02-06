@@ -27,14 +27,13 @@ const cartSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-cartSchema.pre("findOne", function (next) {
+cartSchema.pre(/^find/, function () {
 	this.populate("items.item");
 	this.find({
 		active: {
 			$ne: false,
 		},
 	});
-	next();
 });
 
 cartSchema.pre("save", async function (next) {

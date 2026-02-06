@@ -30,9 +30,8 @@ const ReviewsSchema = new mongoose.Schema(
 		id: false,
 	}
 );
-ReviewsSchema.pre(/^find/, function (next) {
+ReviewsSchema.pre(/^find/, function () {
 	this.populate("userId", "firstName lastName profileImg");
-	next();
 });
 //  calculate ratings and average ratings
 ReviewsSchema.statics.calculateRatings = async function (itemId) {

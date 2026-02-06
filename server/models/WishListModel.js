@@ -14,8 +14,7 @@ const wishListSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
-wishListSchema.pre("findOne", function (next) {
+wishListSchema.pre(/^find/, function () {
 	this.populate("items");
-	next();
 });
 export default mongoose.model("WishListModel", wishListSchema);

@@ -119,10 +119,9 @@ SellerSchema.virtual("reviews", {
 	foreignField: "itemId",
 });
 //  mongoose query middlewares
-SellerSchema.pre(/^find/, function (next) {
+SellerSchema.pre(/^find/, function () {
 	this.populate("reviews");
 	this.populate("primaryCategory","name description");
-	next();
 });
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });
