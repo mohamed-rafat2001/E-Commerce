@@ -2,52 +2,60 @@ import WelcomeBanner from '../components/WelcomeBanner.jsx';
 import DashboardStatCard from '../components/DashboardStatCard.jsx';
 import RecentOrders from '../components/RecentOrders.jsx';
 import WishlistPreview from '../components/WishlistPreview.jsx';
+import useOrderHistory from '../hooks/useOrderHistory.js';
+import useWishlist from '../../wishList/hooks/useWishlist.js';
+import useCustomerProfile from '../hooks/useCustomerProfile.js';
 import {
 	OrderIcon,
 	HeartIcon,
 	ShippingIcon,
 } from '../../../shared/constants/icons.jsx';
 
-const recentOrders = [
-	{
-		id: 'ORD-7821',
-		date: 'Feb 3, 2026',
-		items: 2,
-		total: '$189.00',
-		status: 'Delivered',
-		statusColor: 'success',
-	},
-	{
-		id: 'ORD-7820',
-		date: 'Feb 1, 2026',
-		items: 1,
-		total: '$49.00',
-		status: 'Shipped',
-		statusColor: 'info',
-	},
-	{
-		id: 'ORD-7819',
-		date: 'Jan 28, 2026',
-		items: 3,
-		total: '$329.00',
-		status: 'Processing',
-		statusColor: 'warning',
-	},
-];
-
-const wishlistItems = [
-	{ id: 1, name: 'Sony WH-1000XM5', price: '$349.00', image: '🎧', discount: '-15%' },
-	{ id: 2, name: 'Apple Watch Ultra', price: '$799.00', image: '⌚', discount: null },
-	{ id: 3, name: 'Nike Air Max', price: '$159.00', image: '👟', discount: '-20%' },
-];
-
-const stats = [
-	{ icon: OrderIcon, label: 'Total Orders', value: '24', color: 'from-blue-500 to-cyan-500' },
-	{ icon: HeartIcon, label: 'Wishlist Items', value: '12', color: 'from-pink-500 to-rose-500' },
-	{ icon: ShippingIcon, label: 'Saved Addresses', value: '3', color: 'from-emerald-500 to-teal-500' },
-];
-
 const CustomerDashboardPage = () => {
+	const { orders, isLoading: ordersLoading } = useOrderHistory();
+	const { wishlist, isLoading: wishlistLoading } = useWishlist();
+	const { addresses, isLoading: profileLoading } = useCustomerProfile();
+
+	const stats = [
+		{ 
+			icon: OrderIcon, 
+			label: 'Total Orders', 
+			value: ordersLoading ? '...' : orders.length.toString(), 
+			color: 'from-blue-500 to-cyan-500' 
+		},
+		{ 
+			icon: HeartIcon, 
+			label: 'Wishlist Items', 
+			value: wishlistLoading ? '...' : (wishlist?.items?.length || 0).toString(), 
+			color: 'from-pink-500 to-rose-500' 
+		},
+		{ 
+			icon: ShippingIcon, 
+			label: 'Saved Addresses', 
+			value: profileLoading ? '...' : addresses.length.toString(), 
+			color: 'from-emerald-500 to-teal-500' 
+		},
+	];
+
+	// Prepare recent orders (last 3)
+	const recentOrders = orders.slice(0, 3).map(order => ({
+		id: order._id.substring(order._id.length - 8).toUpperCase(),
+		date: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+		items: order.items.length,
+		total: `$${order.totalPrice?.amount || 0}`,
+		status: order.status,
+		statusColor: order.status === 'Delivered' ? 'success' : order.status === 'Processing' ? 'warning' : 'info'
+	}));
+
+	// Prepare wishlist items (last 3)
+	const wishlistPreviewItems = (wishlist?.items || []).slice(0, 3).map(item => ({
+		id: item.itemId._id,
+		name: item.itemId.name,
+		price: `$${item.itemId.price}`,
+		image: item.itemId.image?.secure_url || '📦',
+		discount: null // Could be calculated if needed
+	}));
+
 	return (
 		<div className="space-y-8">
 			{/* Welcome Banner */}
@@ -69,7 +77,7 @@ const CustomerDashboardPage = () => {
 				<RecentOrders orders={recentOrders} />
 
 				{/* Wishlist Preview */}
-				<WishlistPreview items={wishlistItems} />
+				<WishlistPreview items={wishlistPreviewItems} />
 			</div>
 		</div>
 	);

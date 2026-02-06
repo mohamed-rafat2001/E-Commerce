@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Card, Badge } from '../../../shared/ui/index.js';
 import { OrderIcon } from '../../../shared/constants/icons.jsx';
 
@@ -14,12 +15,14 @@ const RecentOrders = ({ orders }) => {
 				<Card.Header>
 					<div className="flex items-center justify-between">
 						<Card.Title>Recent Orders</Card.Title>
-						<motion.button
-							className="text-sm font-medium text-blue-600 hover:text-blue-700"
-							whileHover={{ scale: 1.05 }}
-						>
-							View All
-						</motion.button>
+						<Link to="/customer/orderHistory">
+							<motion.button
+								className="text-sm font-medium text-blue-600 hover:text-blue-700"
+								whileHover={{ scale: 1.05 }}
+							>
+								View All
+							</motion.button>
+						</Link>
 					</div>
 				</Card.Header>
 				<Card.Content className="space-y-4">

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Card, Badge, Button } from '../../../shared/ui/index.js';
 import { HeartIcon } from '../../../shared/constants/icons.jsx';
 
@@ -26,9 +27,13 @@ const WishlistPreview = ({ items }) => {
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.5 + index * 0.05 }}
 						>
-							<span className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xl">
-								{item.image}
-							</span>
+							<div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xl overflow-hidden shrink-0">
+								{item.image.startsWith('http') ? (
+									<img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+								) : (
+									<span>{item.image}</span>
+								)}
+							</div>
 							<div className="flex-1 min-w-0">
 								<p className="font-medium text-gray-900 truncate">{item.name}</p>
 								<div className="flex items-center gap-2">
@@ -42,9 +47,11 @@ const WishlistPreview = ({ items }) => {
 							</div>
 						</motion.div>
 					))}
-					<Button variant="outline" fullWidth className="mt-4">
-						View All Wishlist
-					</Button>
+					<Link to="/customer/wishlist">
+						<Button variant="outline" fullWidth className="mt-4">
+							View All Wishlist
+						</Button>
+					</Link>
 				</Card.Content>
 			</Card>
 		</motion.div>
