@@ -7,7 +7,7 @@ export const addToWishlist = (id) => addFunc(`wishlist/${id}`);
 export const deleteFromWishlist = (id) => updateFunc(`wishlist/${id}`);
 
 // show  wishlist
-export const showWishlist = (id) => getFunc(`wishlist/${id}`);
+export const showWishList = () => getFunc(`wishlist/user`);
 
 // delete  cart
 export const deleteWishlist = (id) => deleteFunc(`wishlist/${id}`);

@@ -1,24 +1,46 @@
 import { useQuery } from "@tanstack/react-query";
-import { showWishlist } from "../services/wishList.js";
+import { showWishList } from "../services/wishList.js";
+import useCurrentUser from "../../user/hooks/useCurrentUser.js";
+import { useState, useEffect } from "react";
 
 /**
- * Get current user query
+ * Get current user wishlist query
  */
 export default function useWishlist() {
+	const { user } = useCurrentUser();
+	const userId = user?.userId?._id;
+	const [guestWishlist, setGuestWishlist] = useState(null);
+
 	const {
 		data: response,
 		isLoading,
 		error,
 	} = useQuery({
-		queryKey: ["wishlist"],
-		queryFn: showWishlist,
+		queryKey: ["wishlist", userId],
+		queryFn: () => showWishList(),
+		enabled: !!userId,
 	});
 
-	const wishlist = response?.data?.data;
+	useEffect(() => {
+		if (!userId) {
+			const savedWishlist = localStorage.getItem("guest_wishlist");
+			if (savedWishlist) {
+				try {
+					setGuestWishlist(JSON.parse(savedWishlist));
+				} catch {
+					setGuestWishlist({ items: [] });
+				}
+			} else {
+				setGuestWishlist({ items: [] });
+			}
+		}
+	}, [userId]);
+
+	const wishlist = userId ? (response?.data?.data?.wishlist || response?.data?.data) : guestWishlist;
 
 	return {
 		wishlist,
-		isLoading,
+		isLoading: userId ? isLoading : false,
 		error,
 	};
 }

@@ -5,6 +5,14 @@ import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import useLogout from '../../../features/auth/hooks/useLogout.jsx';
 import { roleThemes } from "../../constants/theme.js";
 import { Avatar, Badge, Modal, Button } from '../../ui/index.js';
+import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
+import useCart from '../../../features/cart/hooks/useCart.js';
+import CartDropdown from './CartDropdown.jsx';
+import WishlistDropdown from './WishlistDropdown.jsx';
+import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
+import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
+import useAddToCart from '../../../features/cart/hooks/useAddToCart.js';
+import toast from 'react-hot-toast';
 import {
 	NotificationIcon,
 	StoreIcon,
@@ -19,8 +27,36 @@ const Header = ({ isPanel = false }) => {
 	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
 	const { logout } = useLogout();
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [isCartOpen, setIsCartOpen] = useState(false);
+	const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+	
 	const dropdownRef = useRef(null);
+	const cartRef = useRef(null);
+	const wishlistRef = useRef(null);
+
+	const { deleteFromCart } = useDeleteFromCart();
+	const { deleteFromWishlist } = useDeleteFromWishlist();
+	const { addToCart } = useAddToCart();
+
+	const { cart } = useCart();
+	const cartItems = cart?.items || [];
+	const cartCount = cartItems.length;
+	const cartTotal = cartItems.reduce((acc, item) => acc + (item.itemId.price.amount * item.quantity), 0);
+
+	const { wishlist } = useWishlist();
+	const wishlistItems = wishlist?.items || [];
+	const wishlistCount = wishlistItems.length;
+
+	const handleMoveToCart = async (product) => {
+		try {
+			await addToCart({ itemId: product._id, quantity: 1 });
+			await deleteFromWishlist(product._id);
+			toast.success(`${product.name} moved to cart!`);
+		} catch {
+			toast.error("Failed to move item to cart");
+		}
+	};
 
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
@@ -34,6 +70,12 @@ const Header = ({ isPanel = false }) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
 				setIsDropdownOpen(false);
 			}
+			if (cartRef.current && !cartRef.current.contains(event.target)) {
+				setIsCartOpen(false);
+			}
+			if (wishlistRef.current && !wishlistRef.current.contains(event.target)) {
+				setIsWishlistOpen(false);
+			}
 		};
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -43,6 +85,9 @@ const Header = ({ isPanel = false }) => {
 		logout();
 		setIsDropdownOpen(false);
 	};
+
+	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/public-cart";
+	const wishlistViewAllPath = isAuthenticated ? "/customer/wishlist" : "/public-wishlist";
 
 	return (
 		<motion.header
@@ -105,30 +150,65 @@ const Header = ({ isPanel = false }) => {
 						<div className={`flex items-center gap-2 sm:gap-4 ${isPanel ? 'ml-auto' : ''}`}>
 							{/* Quick action buttons */}
 							<div className="flex items-center gap-1">
-								<motion.button
-									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-										hover:bg-gray-100 transition-all duration-200"
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-								>
-									<HeartIcon className="w-5 h-5" />
-									<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 
-										text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-										3
-									</span>
-								</motion.button>
-								<motion.button
-									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-										hover:bg-gray-100 transition-all duration-200"
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-								>
-									<StoreIcon className="w-5 h-5" />
-									<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-500 
-										text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-										2
-									</span>
-								</motion.button>
+								<div className="relative" ref={wishlistRef}>
+									<motion.button
+										onClick={() => setIsWishlistOpen(!isWishlistOpen)}
+										className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
+											hover:bg-gray-100 transition-all duration-200"
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+									>
+										<HeartIcon className="w-5 h-5" />
+										{wishlistCount > 0 && (
+											<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 
+												text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+												{wishlistCount}
+											</span>
+										)}
+									</motion.button>
+									
+									<AnimatePresence>
+										{isWishlistOpen && (
+											<WishlistDropdown 
+												items={wishlistItems}
+												isLoading={isLoading}
+												viewAllPath={wishlistViewAllPath}
+												onRemove={deleteFromWishlist}
+												onMoveToCart={handleMoveToCart}
+											/>
+										)}
+									</AnimatePresence>
+								</div>
+
+								<div className="relative" ref={cartRef}>
+									<motion.button
+										onClick={() => setIsCartOpen(!isCartOpen)}
+										className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
+											hover:bg-gray-100 transition-all duration-200"
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+									>
+										<StoreIcon className="w-5 h-5" />
+										{cartCount > 0 && (
+											<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-500 
+												text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+												{cartCount}
+											</span>
+										)}
+									</motion.button>
+
+									<AnimatePresence>
+										{isCartOpen && (
+											<CartDropdown 
+												items={cartItems}
+												total={cartTotal}
+												isLoading={isLoading}
+												viewAllPath={cartViewAllPath}
+												onRemove={deleteFromCart}
+											/>
+										)}
+									</AnimatePresence>
+								</div>
 								<motion.button
 									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
 										hover:bg-gray-100 transition-all duration-200"

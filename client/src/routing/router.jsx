@@ -7,6 +7,7 @@ import DashboardLayout from "../layouts/DashboardLayout.jsx";
 // Pages - Public
 import { HomePage } from "../features/home/pages/index.js";
 import { LoginPage, RegisterPage } from "../features/auth/pages/index.js";
+import { PublicCartPage, PublicWishlistPage } from "../features/public/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
 import { AdminDashboardPage } from "../features/admin/pages/index.js";
@@ -15,7 +16,9 @@ import {
 	CustomerDashboardPage, 
 	ShippingAddressesPage, 
 	PaymentMethodsPage, 
-	OrderHistoryPage 
+	OrderHistoryPage,
+	CartPage,
+	WishlistPage 
 } from "../features/customer/pages/index.js";
 import { EmployeeDashboardPage } from "../features/employee/pages/index.js";
 
@@ -33,6 +36,8 @@ const router = createBrowserRouter([
 	{ path: "/", element: <HomePage /> },
 	{ path: "/login", element: <LoginPage /> },
 	{ path: "/register", element: <RegisterPage /> },
+	{ path: "/public-cart", element: <PublicCartPage /> },
+	{ path: "/public-wishlist", element: <PublicWishlistPage /> },
 
 	// Admin Routes
 	{
@@ -128,11 +133,11 @@ const router = createBrowserRouter([
 					},
 					{ 
 						path: "cart", 
-						element: <PlaceholderPage title="My Cart" /> 
+						element: <CartPage /> 
 					},
 					{ 
 						path: "wishlist", 
-						element: <PlaceholderPage title="Wishlist" /> 
+						element: <WishlistPage /> 
 					},
 					{ path: "settings", element: <SettingsPage /> },
 				],

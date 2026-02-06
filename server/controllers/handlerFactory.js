@@ -210,26 +210,23 @@ export const getOneByOwner = (Model) =>
 		const userId = req.user._id;
 		let doc;
 
-		if (Model.modelName === "OrderItemsModel") {
-			doc = await Model.findOne({
-				_id: req.params.id,
-				sellerId: userId,
-			});
-		}
-		if (Model.modelName === "CartModel") {
-			doc = await Model.findOne({
-				_id: req.params.id,
-				userId,
-				active: true,
-			});
+		if (req.params.id === "user") {
+			if (Model.modelName === "CartModel") {
+				doc = await Model.findOne({ userId, active: true });
+			} else {
+				doc = await Model.findOne({ userId });
+			}
+		} else {
+			const query = { _id: req.params.id };
+			if (Model.modelName === "OrderItemsModel") {
+				query.sellerId = userId;
+			} else {
+				query.userId = userId;
+			}
+			doc = await Model.findOne(query);
 		}
 
-		doc = await Model.findOne({
-			_id: req.params.id,
-			userId,
-		});
-
-		if (!doc) return next(new appError("doc not Found", 400));
+		if (!doc) return next(new appError("doc not Found", 404));
 
 		sendResponse(res, 200, doc);
 	});
@@ -243,13 +240,13 @@ export const getAllByOwner = (Model) =>
 			docs = await Model.find({
 				sellerId: userId,
 			});
+		} else {
+			docs = await Model.find({
+				userId,
+			});
 		}
 
-		docs = await Model.find({
-			userId,
-		});
-
-		if (!docs) return next(new appError("docs not Found", 400));
+		if (!docs) return next(new appError("docs not Found", 404));
 
 		sendResponse(res, 200, docs);
 	});
