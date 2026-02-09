@@ -1,17 +1,14 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ProductIcon } from '../../../shared/constants/icons.jsx';
 import { Button, Modal, Badge, LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { 
 	FiSearch, 
-	FiFilter, 
 	FiEdit2, 
 	FiTrash2, 
 	FiEye, 
 	FiEyeOff,
 	FiImage,
 	FiPackage,
-	FiDollarSign,
 	FiUser,
 	FiChevronDown,
 	FiActivity,
@@ -19,55 +16,68 @@ import {
 	FiBox,
 	FiLayers,
 	FiPlus,
-	FiArchive,
 	FiAlertCircle,
-	FiTrendingUp
+	FiStar,
+	FiDollarSign,
+	FiGlobe,
+	FiLock,
+	FiCalendar,
+	FiHash,
+	FiX,
+	FiAlertTriangle,
+	FiChevronLeft,
+	FiChevronRight,
+	FiExternalLink
 } from 'react-icons/fi';
-import { useAdminProducts } from '../hooks/index.js';
+import { useAdminProducts, useUpdateProduct, useDeleteProduct, useAdminCategories } from '../hooks/index.js';
 
+// --- Configuration ---
 const statusConfig = {
-	active: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', label: 'Active', icon: FiActivity },
-	draft: { color: 'bg-amber-50 text-amber-600 border-amber-100', label: 'Draft', icon: FiEdit2 },
-	inactive: { color: 'bg-slate-50 text-slate-600 border-slate-100', label: 'Inactive', icon: FiEyeOff },
-	archived: { color: 'bg-indigo-50 text-indigo-600 border-indigo-100', label: 'Archived', icon: FiPackage },
+	active: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', dot: 'bg-emerald-500', label: 'Active' },
+	draft: { color: 'bg-amber-50 text-amber-600 border-amber-100', dot: 'bg-amber-500', label: 'Draft' },
+	inactive: { color: 'bg-slate-50 text-slate-500 border-slate-200', dot: 'bg-slate-400', label: 'Inactive' },
+	archived: { color: 'bg-indigo-50 text-indigo-600 border-indigo-100', dot: 'bg-indigo-500', label: 'Archived' },
 };
 
 const statusOptions = [
-	{ value: 'active', label: 'Active Node' },
-	{ value: 'draft', label: 'Provisional' },
-	{ value: 'inactive', label: 'Terminated' },
+	{ value: 'active', label: 'Active' },
+	{ value: 'draft', label: 'Draft' },
+	{ value: 'inactive', label: 'Inactive' },
 	{ value: 'archived', label: 'Archived' },
 ];
 
-const StatCard = ({ label, value, icon: Icon, color, trend }) => (
+const ITEMS_PER_PAGE = 10;
+
+// --- Stat Card ---
+const StatCard = ({ label, value, icon: Icon, color }) => (
 	<motion.div 
-		whileHover={{ y: -5, scale: 1.02 }}
-		className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-xl shadow-slate-200/50 flex items-center justify-between"
+		whileHover={{ y: -4, scale: 1.01 }}
+		className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-slate-100/50 flex items-center justify-between"
 	>
 		<div className="space-y-1">
-			<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-			<h3 className="text-3xl font-black text-gray-900 tracking-tighter tabular-nums">{value}</h3>
-			{trend && <p className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none">+{trend}% Flow</p>}
+			<p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{label}</p>
+			<h3 className="text-3xl font-extrabold text-gray-900 tabular-nums">{value}</h3>
 		</div>
-		<div className={`w-14 h-14 rounded-2xl ${color} flex items-center justify-center text-white shadow-xl shadow-${color.split('-')[1]}-100 transition-transform`}>
-			<Icon className="w-7 h-7" />
+		<div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center text-white`}>
+			<Icon className="w-6 h-6" />
 		</div>
 	</motion.div>
 );
 
-// Quick Status Selector
+// --- Inline Status Selector ---
 const StatusSelector = ({ value, onChange }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const config = statusConfig[value] || statusConfig.draft;
 	
 	return (
 		<div className="relative">
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-[8px] font-black uppercase tracking-wider transition-all ${statusConfig[value]?.color} hover:shadow-md`}
+				className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${config.color} hover:shadow-sm`}
 			>
-				<div className={`w-1.5 h-1.5 rounded-full ${value === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-				{statusConfig[value]?.label}
-				<FiChevronDown className={`w-2 h-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+				<div className={`w-1.5 h-1.5 rounded-full ${config.dot} ${value === 'active' ? 'animate-pulse' : ''}`} />
+				{config.label}
+				<FiChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
 			</button>
 			
 			<AnimatePresence>
@@ -78,16 +88,16 @@ const StatusSelector = ({ value, onChange }) => {
 							initial={{ opacity: 0, y: 5, scale: 0.95 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: 5, scale: 0.95 }}
-							className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-2xl border border-slate-100 p-1 z-40"
+							className="absolute top-full left-0 mt-1.5 w-36 bg-white rounded-xl shadow-2xl border border-gray-100 p-1.5 z-40"
 						>
 							{statusOptions.map((opt) => (
 								<button
 									key={opt.value}
 									onClick={() => { onChange(opt.value); setIsOpen(false); }}
-									className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'}`}
+									className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-xs font-medium transition-all ${value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-50 text-gray-600'}`}
 								>
-									<div className={`w-1 h-1 rounded-full ${opt.value === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-									<span className="text-[9px] font-black uppercase tracking-tight">{opt.label}</span>
+									<div className={`w-1.5 h-1.5 rounded-full ${statusConfig[opt.value]?.dot}`} />
+									{opt.label}
 								</button>
 							))}
 						</motion.div>
@@ -98,201 +108,560 @@ const StatusSelector = ({ value, onChange }) => {
 	);
 };
 
-// Product Row Component
-const ProductRow = ({ product, onView, onDelete, onUpdateField, isDeleting }) => {
+// --- Product Detail Modal ---
+const ProductDetailModal = ({ product, isOpen, onClose }) => {
+	if (!product) return null;
+
+	const rating = product.ratingAverage || 0;
+	const reviewCount = product.ratingCount || 0;
+
+	return (
+		<Modal isOpen={isOpen} onClose={onClose} title="Product Details" size="lg">
+			<div className="space-y-6">
+				{/* Image Section */}
+				<div className="flex flex-col sm:flex-row gap-5">
+					<div className="w-full sm:w-48 h-48 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
+						{product.coverImage?.secure_url ? (
+							<img src={product.coverImage.secure_url} alt={product.name} className="w-full h-full object-cover" crossOrigin="anonymous" />
+						) : (
+							<div className="w-full h-full flex items-center justify-center text-gray-300">
+								<FiImage className="w-12 h-12" />
+							</div>
+						)}
+					</div>
+					<div className="flex-1 space-y-3">
+						<div>
+							<h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
+							<div className="flex items-center gap-2 mt-1">
+								<Badge variant="secondary" className="text-xs">{product.brand}</Badge>
+								<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium ${statusConfig[product.status]?.color}`}>
+									<span className={`w-1.5 h-1.5 rounded-full ${statusConfig[product.status]?.dot}`} />
+									{statusConfig[product.status]?.label}
+								</span>
+							</div>
+						</div>
+						<p className="text-2xl font-extrabold text-indigo-600">${product.price?.amount?.toFixed(2)} <span className="text-sm font-medium text-gray-400">{product.price?.currency}</span></p>
+						<div className="flex items-center gap-4 text-sm text-gray-500">
+							<span className="flex items-center gap-1.5"><FiStar className="w-4 h-4 text-amber-400" /> {rating.toFixed(1)} ({reviewCount} reviews)</span>
+							<span className="flex items-center gap-1.5"><FiBox className="w-4 h-4" /> {product.countInStock} in stock</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Description */}
+				<div>
+					<h4 className="text-sm font-bold text-gray-700 mb-2">Description</h4>
+					<p className="text-sm text-gray-500 leading-relaxed bg-gray-50 rounded-xl p-4 border border-gray-100">
+						{product.description || 'No description provided.'}
+					</p>
+				</div>
+
+				{/* Additional gallery images */}
+				{product.images?.length > 0 && (
+					<div>
+						<h4 className="text-sm font-bold text-gray-700 mb-2">Gallery ({product.images.length} images)</h4>
+						<div className="flex gap-2 overflow-x-auto pb-2">
+							{product.images.map((img, i) => (
+								<div key={i} className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
+									<img src={img.secure_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+
+				{/* Metadata Grid */}
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Category</p>
+						<p className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+							<FiLayers className="w-3.5 h-3.5 text-indigo-500" />
+							{product.category?.name || '—'}
+						</p>
+					</div>
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Visibility</p>
+						<p className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+							{product.visibility === 'public' ? <FiGlobe className="w-3.5 h-3.5 text-emerald-500" /> : <FiLock className="w-3.5 h-3.5 text-amber-500" />}
+							{product.visibility === 'public' ? 'Public' : 'Private'}
+						</p>
+					</div>
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Seller</p>
+						<p className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+							<FiUser className="w-3.5 h-3.5 text-blue-500" />
+							{product.userId?.firstName ? `${product.userId.firstName} ${product.userId.lastName || ''}` : product.userId || '—'}
+						</p>
+					</div>
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Slug</p>
+						<p className="text-sm font-semibold text-gray-800 truncate">{product.slug || '—'}</p>
+					</div>
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Created</p>
+						<p className="text-sm font-semibold text-gray-800">
+							{product.createdAt ? new Date(product.createdAt).toLocaleDateString() : '—'}
+						</p>
+					</div>
+					<div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Updated</p>
+						<p className="text-sm font-semibold text-gray-800">
+							{product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : '—'}
+						</p>
+					</div>
+				</div>
+
+				{/* Reviews Preview */}
+				{product.reviews?.length > 0 && (
+					<div>
+						<h4 className="text-sm font-bold text-gray-700 mb-2">Recent Reviews ({product.reviews.length})</h4>
+						<div className="space-y-2 max-h-40 overflow-y-auto">
+							{product.reviews.slice(0, 3).map((review, i) => (
+								<div key={i} className="flex items-start gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
+									<div className="flex items-center gap-0.5">
+										{[...Array(5)].map((_, idx) => (
+											<FiStar key={idx} className={`w-3 h-3 ${idx < review.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} />
+										))}
+									</div>
+									<p className="text-xs text-gray-600 flex-1 line-clamp-2">{review.comment || 'No comment'}</p>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+
+				<div className="flex justify-end pt-4 border-t border-gray-100">
+					<Button variant="secondary" onClick={onClose}>Close</Button>
+				</div>
+			</div>
+		</Modal>
+	);
+};
+
+// --- Delete Confirmation Modal ---
+const DeleteConfirmModal = ({ isOpen, onClose, product, onConfirm, isLoading }) => {
+	if (!product) return null;
+
+	return (
+		<Modal isOpen={isOpen} onClose={onClose} title="Delete Product" size="sm">
+			<div className="text-center space-y-6">
+				<div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500">
+					<FiAlertTriangle className="w-10 h-10" />
+				</div>
+				<div className="space-y-2">
+					<h3 className="text-xl font-bold text-gray-900">Are you sure?</h3>
+					<p className="text-gray-500 text-sm leading-relaxed px-4">
+						You are about to delete <span className="font-bold text-gray-900">"{product.name}"</span>.
+						This action cannot be undone.
+					</p>
+				</div>
+				<div className="flex gap-3 pt-4">
+					<Button variant="secondary" onClick={onClose} fullWidth disabled={isLoading}>
+						Cancel
+					</Button>
+					<Button 
+						variant="primary" 
+						className="bg-rose-500 hover:bg-rose-600 border-rose-600 shadow-rose-200"
+						onClick={onConfirm} 
+						fullWidth 
+						loading={isLoading}
+					>
+						Yes, Delete
+					</Button>
+				</div>
+			</div>
+		</Modal>
+	);
+};
+
+// --- Product Row ---
+const ProductRow = ({ product, onView, onDelete, onUpdateField, isUpdating }) => {
 	const [isEditingStock, setIsEditingStock] = useState(false);
 	const [stockVal, setStockVal] = useState(product.countInStock);
+
+	const stockColor = product.countInStock > 10 
+		? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+		: product.countInStock > 0 
+			? 'bg-amber-50 text-amber-600 border-amber-100' 
+			: 'bg-rose-50 text-rose-600 border-rose-100';
 
 	return (
 		<motion.tr
 			layout
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			className="border-b border-slate-50 hover:bg-slate-50/80 transition-all group/row"
+			className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors group"
 		>
-			<td className="py-3 px-4 whitespace-nowrap">
+			{/* Product */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
 				<div className="flex items-center gap-3">
-					<div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center overflow-hidden border border-slate-100 flex-shrink-0 shadow-xs">
+					<div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 flex-shrink-0">
 						{product.coverImage?.secure_url ? (
 							<img src={product.coverImage.secure_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
 						) : (
-							<FiImage className="w-4 h-4 text-slate-300" />
+							<FiImage className="w-4 h-4 text-gray-300" />
 						)}
 					</div>
-					<span className="font-black text-gray-900 text-[10px] tracking-tight truncate max-w-[120px] uppercase">{product.name}</span>
+					<div className="min-w-0">
+						<p className="font-bold text-gray-900 text-sm truncate max-w-[160px]">{product.name}</p>
+						<p className="text-xs text-gray-400 truncate max-w-[160px]">{product.slug}</p>
+					</div>
 				</div>
 			</td>
-			<td className="py-3 px-4 whitespace-nowrap">
-				<div className="flex items-center gap-1.5 text-gray-400">
-					<FiTag className="w-3 h-3" />
-					<span className="text-[9px] font-extrabold uppercase tracking-widest">{product.brand}</span>
+
+			{/* Brand */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
+				<div className="flex items-center gap-1.5">
+					<FiTag className="w-3.5 h-3.5 text-gray-400" />
+					<span className="text-sm font-medium text-gray-600">{product.brand}</span>
 				</div>
 			</td>
-			<td className="py-3 px-3 whitespace-nowrap">
-				<span className="font-black text-indigo-600 text-[11px] tabular-nums tracking-tighter">${product.price?.amount?.toFixed(2)}</span>
+
+			{/* Price */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
+				<span className="font-bold text-indigo-600 text-sm tabular-nums">${product.price?.amount?.toFixed(2)}</span>
 			</td>
-			<td className="py-3 px-3 whitespace-nowrap">
+
+			{/* Stock */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
 				{isEditingStock ? (
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1.5">
 						<input
 							type="number"
 							value={stockVal}
 							onChange={(e) => setStockVal(e.target.value)}
-							className="w-14 px-2 py-1 rounded bg-white border border-indigo-200 text-[10px] font-black outline-none"
+							className="w-16 px-2 py-1.5 rounded-lg bg-white border border-indigo-200 text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-100"
 							autoFocus
+							min="0"
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									onUpdateField(product._id, { countInStock: parseInt(stockVal) || 0 });
+									setIsEditingStock(false);
+								}
+								if (e.key === 'Escape') {
+									setStockVal(product.countInStock);
+									setIsEditingStock(false);
+								}
+							}}
 						/>
 						<button 
-							onClick={() => { onUpdateField(product._id, { countInStock: parseInt(stockVal) }); setIsEditingStock(false); }}
-							className="p-1.5 bg-indigo-600 text-white rounded hover:bg-black transition-colors"
+							onClick={() => { onUpdateField(product._id, { countInStock: parseInt(stockVal) || 0 }); setIsEditingStock(false); }}
+							className="p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
 						>
 							<FiActivity className="w-3 h-3" />
+						</button>
+						<button 
+							onClick={() => { setStockVal(product.countInStock); setIsEditingStock(false); }}
+							className="p-1.5 bg-gray-100 text-gray-500 rounded-lg hover:bg-gray-200 transition-colors"
+						>
+							<FiX className="w-3 h-3" />
 						</button>
 					</div>
 				) : (
 					<button 
 						onClick={() => setIsEditingStock(true)}
-						className={`flex items-center gap-1.5 text-[10px] font-black tabular-nums px-2.5 py-1 rounded-xl border transition-all ${product.countInStock > 10 ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white' : product.countInStock > 0 ? 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-600 hover:text-white' : 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-600 hover:text-white'}`}
+						className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all hover:shadow-sm ${stockColor}`}
+						title="Click to edit stock"
 					>
-						<FiBox className="w-3 h-3" />
+						<FiBox className="w-3.5 h-3.5" />
 						{product.countInStock}
+						{product.countInStock === 0 && <span className="text-[10px]">(Out)</span>}
 					</button>
 				)}
 			</td>
-			<td className="py-3 px-3 whitespace-nowrap">
-				<div className="flex items-center gap-1.5 text-slate-500">
-					<FiLayers className="w-3 h-3" />
-					<span className="font-black text-[8px] uppercase tracking-[0.15em] italic">{product.category?.name || '---'}</span>
+
+			{/* Category */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
+				<div className="flex items-center gap-1.5 text-gray-500">
+					<FiLayers className="w-3.5 h-3.5" />
+					<span className="text-sm font-medium">{product.category?.name || '—'}</span>
 				</div>
 			</td>
-			<td className="py-3 px-3 whitespace-nowrap">
+
+			{/* Rating */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
+				<div className="flex items-center gap-1">
+					<FiStar className="w-3.5 h-3.5 text-amber-400" />
+					<span className="text-sm font-semibold text-gray-700 tabular-nums">{(product.ratingAverage || 0).toFixed(1)}</span>
+					<span className="text-xs text-gray-400">({product.ratingCount || 0})</span>
+				</div>
+			</td>
+
+			{/* Status */}
+			<td className="py-3.5 px-4 whitespace-nowrap">
 				<StatusSelector 
 					value={product.status} 
 					onChange={(newStatus) => onUpdateField(product._id, { status: newStatus })} 
 				/>
 			</td>
-			<td className="py-3 px-4 whitespace-nowrap text-right">
-				<div className="flex items-center justify-end gap-1">
-					<button onClick={() => onView(product)} className="p-1.5 bg-white hover:bg-slate-50 text-indigo-500 rounded-lg shadow-xs border border-slate-100"><FiEye className="w-3 h-3" /></button>
-					<button onClick={() => onDelete(product._id)} className="p-1.5 bg-white hover:bg-rose-50 text-rose-500 rounded-lg shadow-xs border border-slate-100" disabled={isDeleting}><FiTrash2 className="w-3 h-3" /></button>
+
+			{/* Actions */}
+			<td className="py-3.5 px-4 whitespace-nowrap text-right">
+				<div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
+					<button 
+						onClick={() => onView(product)} 
+						className="p-2 bg-white hover:bg-indigo-50 text-indigo-500 rounded-lg border border-gray-100 shadow-sm transition-all hover:shadow-md" 
+						title="View details"
+					>
+						<FiEye className="w-3.5 h-3.5" />
+					</button>
+					<button 
+						onClick={() => onDelete(product)} 
+						className="p-2 bg-white hover:bg-rose-50 text-rose-500 rounded-lg border border-gray-100 shadow-sm transition-all hover:shadow-md" 
+						title="Delete product"
+					>
+						<FiTrash2 className="w-3.5 h-3.5" />
+					</button>
 				</div>
 			</td>
 		</motion.tr>
 	);
 };
 
+// --- Empty State ---
+const EmptyState = ({ searchQuery, onClear }) => (
+	<div className="text-center py-16">
+		<div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+			<FiPackage className="w-10 h-10 text-gray-300" />
+		</div>
+		<h3 className="text-lg font-bold text-gray-900 mb-2">
+			{searchQuery ? 'No products found' : 'No products yet'}
+		</h3>
+		<p className="text-gray-500 text-sm max-w-sm mx-auto">
+			{searchQuery 
+				? `No products match "${searchQuery}". Try a different search term.` 
+				: 'Products created by sellers will appear here.'}
+		</p>
+		{searchQuery && (
+			<Button variant="ghost" className="mt-4" onClick={onClear}>
+				Clear Search
+			</Button>
+		)}
+	</div>
+);
+
+// --- Main Page ---
 const ProductsPage = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all');
 	const [categoryFilter, setCategoryFilter] = useState('all');
 	const [viewingProduct, setViewingProduct] = useState(null);
+	const [productToDelete, setProductToDelete] = useState(null);
+	const [currentPage, setCurrentPage] = useState(1);
 	
-	const { products: fetchedProducts, isLoading, updateProduct } = useAdminProducts();
-	const products = fetchedProducts || [];
+	const { products: fetchedProducts, isLoading } = useAdminProducts();
+	const { categories: fetchedCategories } = useAdminCategories();
+	const { updateProduct, isUpdating } = useUpdateProduct();
+	const { deleteProduct, isDeleting } = useDeleteProduct();
 
-	const categories = useMemo(() => {
-		const cats = [...new Set(products.map(p => p.category?.name).filter(Boolean))];
-		return cats;
-	}, [products]);
+	const products = fetchedProducts || [];
+	const categories = fetchedCategories || [];
 
 	const filteredProducts = useMemo(() => {
 		return products.filter(p => {
 			const name = (p.name || '').toLowerCase();
 			const brand = (p.brand || '').toLowerCase();
-			const matchesSearch = name.includes(searchQuery.toLowerCase()) || brand.includes(searchQuery.toLowerCase());
+			const query = searchQuery.toLowerCase();
+			const matchesSearch = name.includes(query) || brand.includes(query);
 			const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
 			const matchesCategory = categoryFilter === 'all' || p.category?.name === categoryFilter;
 			return matchesSearch && matchesStatus && matchesCategory;
 		});
 	}, [products, searchQuery, statusFilter, categoryFilter]);
 
-	const stats = useMemo(() => {
-		return {
-			total: products.length,
-			active: products.filter(p => p.status === 'active').length,
-			draft: products.filter(p => p.status === 'draft').length,
-			lowStock: products.filter(p => p.countInStock <= 10 && p.countInStock > 0).length
-		};
-	}, [products]);
+	// Pagination
+	const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+	const paginatedProducts = useMemo(() => {
+		const start = (currentPage - 1) * ITEMS_PER_PAGE;
+		return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+	}, [filteredProducts, currentPage]);
+
+	// Reset page when filters change
+	useMemo(() => {
+		setCurrentPage(1);
+	}, [searchQuery, statusFilter, categoryFilter]);
+
+	const stats = useMemo(() => ({
+		total: products.length,
+		active: products.filter(p => p.status === 'active').length,
+		draft: products.filter(p => p.status === 'draft').length,
+		lowStock: products.filter(p => p.countInStock <= 10 && p.countInStock > 0).length,
+		outOfStock: products.filter(p => p.countInStock === 0).length,
+	}), [products]);
+
+	const categoryOptions = useMemo(() => {
+		const names = [...new Set(categories.map(c => c.name).filter(Boolean))];
+		return names.map(name => ({ value: name, label: name }));
+	}, [categories]);
 
 	const handleUpdateField = (id, data) => {
 		updateProduct({ id, data });
 	};
 
+	const handleConfirmDelete = () => {
+		if (productToDelete) {
+			deleteProduct(productToDelete._id, {
+				onSuccess: () => {
+					setProductToDelete(null);
+				}
+			});
+		}
+	};
+
+	if (isLoading) {
+		return (
+			<div className="flex justify-center items-center min-h-[400px]">
+				<LoadingSpinner size="lg" message="Loading products..." />
+			</div>
+		);
+	}
+
 	return (
-		<div className="space-y-8 pb-10">
-			<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-				<div className="space-y-1">
-					<div className="flex items-center gap-3">
-						<div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-indigo-200">
-							<FiPackage className="w-7 h-7 font-black" />
+		<div className="space-y-6 pb-10">
+			{/* Header */}
+			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+				<div>
+					<h1 className="text-3xl font-bold text-gray-900">Products</h1>
+					<p className="text-gray-500 mt-1">Manage all products across your marketplace</p>
+				</div>
+			</div>
+
+			{/* Stats */}
+			<div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+				<StatCard label="Total Products" value={stats.total} icon={FiPackage} color="bg-gray-900" />
+				<StatCard label="Active" value={stats.active} icon={FiActivity} color="bg-emerald-600" />
+				<StatCard label="Draft" value={stats.draft} icon={FiEdit2} color="bg-amber-500" />
+				<StatCard label="Low Stock" value={stats.lowStock} icon={FiAlertCircle} color="bg-orange-500" />
+				<StatCard label="Out of Stock" value={stats.outOfStock} icon={FiBox} color="bg-rose-500" />
+			</div>
+
+			{/* Table Card */}
+			<div className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-slate-100/50 overflow-hidden">
+				{/* Filters */}
+				<div className="p-5 border-b border-gray-100">
+					<div className="flex flex-col lg:flex-row gap-4 items-end">
+						<div className="relative flex-1 w-full">
+							<FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+							<input
+								type="text"
+								placeholder="Search by name or brand..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-50 transition-all outline-none text-sm font-medium"
+							/>
 						</div>
-						<div>
-							<h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic leading-none">Asset Manifold</h1>
-							<p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1">Real-Time Inventory Synchronization</p>
+						<div className="flex gap-3 w-full lg:w-auto">
+							<Select 
+								containerClassName="min-w-[170px] flex-1 lg:flex-none" 
+								label="Category" 
+								value={categoryFilter} 
+								onChange={setCategoryFilter} 
+								options={[{ value: 'all', label: 'All Categories' }, ...categoryOptions]} 
+							/>
+							<Select 
+								containerClassName="min-w-[170px] flex-1 lg:flex-none" 
+								label="Status" 
+								value={statusFilter} 
+								onChange={setStatusFilter} 
+								options={[{ value: 'all', label: 'All Statuses' }, ...statusOptions]} 
+							/>
 						</div>
 					</div>
 				</div>
-				<motion.button 
-					whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' }}
-					whileTap={{ scale: 0.95 }}
-					className="h-14 px-8 rounded-[1.5rem] bg-indigo-600 hover:bg-black text-white font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3 transition-all shadow-xl shadow-indigo-100"
-				>
-					<div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
-						<FiPlus className="w-4 h-4" />
-					</div>
-					Release Asset
-				</motion.button>
+
+				{/* Table */}
+				{filteredProducts.length > 0 ? (
+					<>
+						<div className="overflow-x-auto">
+							<table className="w-full text-left">
+								<thead>
+									<tr className="bg-gray-50/80 border-b border-gray-100">
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Product</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Brand</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Price</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Stock</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Category</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Rating</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Status</th>
+										<th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap text-right">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<AnimatePresence>
+										{paginatedProducts.map(p => (
+											<ProductRow 
+												key={p._id} 
+												product={p} 
+												onView={setViewingProduct} 
+												onUpdateField={handleUpdateField} 
+												onDelete={setProductToDelete} 
+												isUpdating={isUpdating}
+											/>
+										))}
+									</AnimatePresence>
+								</tbody>
+							</table>
+						</div>
+
+						{/* Pagination */}
+						{totalPages > 1 && (
+							<div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+								<p className="text-sm text-gray-500">
+									Showing <span className="font-semibold text-gray-700">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> of <span className="font-semibold text-gray-700">{filteredProducts.length}</span> products
+								</p>
+								<div className="flex items-center gap-2">
+									<button 
+										onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+										disabled={currentPage === 1}
+										className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+									>
+										<FiChevronLeft className="w-4 h-4" />
+									</button>
+									{Array.from({ length: totalPages }, (_, i) => i + 1)
+										.filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+										.map((page, idx, arr) => (
+											<span key={page} className="flex items-center">
+												{idx > 0 && arr[idx - 1] !== page - 1 && <span className="text-gray-400 px-1">...</span>}
+												<button
+													onClick={() => setCurrentPage(page)}
+													className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${currentPage === page ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 border border-gray-200'}`}
+												>
+													{page}
+												</button>
+											</span>
+										))
+									}
+									<button 
+										onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+										disabled={currentPage === totalPages}
+										className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+									>
+										<FiChevronRight className="w-4 h-4" />
+									</button>
+								</div>
+							</div>
+						)}
+					</>
+				) : (
+					<EmptyState searchQuery={searchQuery} onClear={() => setSearchQuery('')} />
+				)}
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-				<StatCard label="Total Inventory" value={stats.total} icon={FiPackage} color="bg-gray-900" trend="5" />
-				<StatCard label="Active Nodes" value={stats.active} icon={FiActivity} color="bg-emerald-600" trend="12" />
-				<StatCard label="Provisional" value={stats.draft} icon={FiEdit2} color="bg-amber-600" trend="3" />
-				<StatCard label="Critical Reserves" value={stats.lowStock} icon={FiAlertCircle} color="bg-rose-600" trend="Low" />
-			</div>
+			{/* Product Detail Modal */}
+			<ProductDetailModal 
+				product={viewingProduct} 
+				isOpen={!!viewingProduct} 
+				onClose={() => setViewingProduct(null)} 
+			/>
 
-			<div className="bg-white p-5 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-slate-200/50 space-y-5">
-				<div className="flex flex-col lg:flex-row gap-4 px-2 items-end">
-					<div className="relative flex-1 group w-full">
-						<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1 opacity-0 pointer-events-none">Search Label Placeholder</p>
-						<FiSearch className="absolute left-4 top-[calc(50%+10px)] transform -translate-y-1/2 text-gray-300 group-focus-within:text-indigo-500 w-4 h-4 transition-colors" />
-						<input
-							type="text"
-							placeholder="Scan Resource Registers (Global Search)..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full pl-10 pr-4 py-3.5 rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-[4px] focus:ring-indigo-50 transition-all outline-none font-bold text-xs shadow-inner"
-						/>
-					</div>
-					<div className="flex gap-3 w-full lg:w-auto">
-						<Select containerClassName="min-w-[180px] flex-1 lg:flex-none" label="Sector Scan" value={categoryFilter} onChange={setCategoryFilter} options={[{ value: 'all', label: 'All Managed Segments' }, ...categories.map(cat => ({ value: cat, label: cat }))]} />
-						<Select containerClassName="min-w-[180px] flex-1 lg:flex-none" label="Lifecycle" value={statusFilter} onChange={setStatusFilter} options={[{ value: 'all', label: 'All Lifecycle States' }, ...statusOptions]} />
-					</div>
-				</div>
-
-				<div className="overflow-x-auto rounded-3xl border border-slate-100 custom-scrollbar">
-					<table className="w-full text-left">
-						<thead>
-							<tr className="bg-slate-50 border-b border-slate-100 italic">
-								<th className="py-5 px-4 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Asset (Mapping)</th>
-								<th className="py-5 px-4 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Source</th>
-								<th className="py-5 px-3 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Valuation</th>
-								<th className="py-5 px-3 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Reserve Vol.</th>
-								<th className="py-5 px-3 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Segment</th>
-								<th className="py-5 px-3 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap">Lifecycle</th>
-								<th className="py-5 px-4 font-black text-slate-400 uppercase text-[8px] tracking-[0.3em] whitespace-nowrap text-right">Resource Cmds</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-slate-50">
-							{isLoading ? (
-								<tr><td colSpan={7} className="py-20 text-center"><LoadingSpinner size="sm" color="indigo" /></td></tr>
-							) : filteredProducts.map(p => (
-								<ProductRow key={p._id} product={p} onView={setViewingProduct} onUpdateField={handleUpdateField} onDelete={() => {}} isDeleting={false} />
-							))}
-						</tbody>
-					</table>
-				</div>
-			</div>
+			{/* Delete Confirmation Modal */}
+			<DeleteConfirmModal 
+				isOpen={!!productToDelete}
+				onClose={() => setProductToDelete(null)}
+				product={productToDelete}
+				onConfirm={handleConfirmDelete}
+				isLoading={isDeleting}
+			/>
 		</div>
 	);
 };

@@ -8,3 +8,10 @@ export {
 	useUpdateCategory, 
 	useDeleteCategory 
 } from './useCategoryMutations.js';
+export { 
+	useUpdateProduct, 
+	useDeleteProduct 
+} from './useProductMutations.js';
+export { 
+	useUpdateOrder 
+} from './useOrderMutations.js';
