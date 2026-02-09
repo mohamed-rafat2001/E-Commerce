@@ -10,8 +10,22 @@ import { LoginPage, RegisterPage } from "../features/auth/pages/index.js";
 import { PublicCartPage, PublicWishlistPage } from "../features/public/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
-import { AdminDashboardPage } from "../features/admin/pages/index.js";
-import { SellerDashboardPage } from "../features/seller/pages/index.js";
+import { 
+	AdminDashboardPage,
+	UsersPage as AdminUsersPage,
+	ProductsPage as AdminProductsPage,
+	OrdersPage as AdminOrdersPage,
+	AnalyticsPage as AdminAnalyticsPage
+} from "../features/admin/pages/index.js";
+
+import { 
+	SellerDashboardPage,
+	ProductsPage as SellerProductsPage,
+	InventoryPage as SellerInventoryPage,
+	OrdersPage as SellerOrdersPage,
+	AnalyticsPage as SellerAnalyticsPage
+} from "../features/seller/pages/index.js";
+
 import { 
 	CustomerDashboardPage, 
 	ShippingAddressesPage, 
@@ -20,6 +34,7 @@ import {
 	CartPage,
 	WishlistPage 
 } from "../features/customer/pages/index.js";
+
 import { EmployeeDashboardPage } from "../features/employee/pages/index.js";
 
 // Pages - Shared
@@ -60,10 +75,10 @@ const router = createBrowserRouter([
 						element: <PersonalDetailsPage />,
 					},
 					{ path: "settings", element: <SettingsPage /> },
-					{ path: "users", element: <PlaceholderPage title="User Management" /> },
-					{ path: "products", element: <PlaceholderPage title="Product Management" /> },
-					{ path: "orders", element: <PlaceholderPage title="Order Management" /> },
-					{ path: "analytics", element: <PlaceholderPage title="Analytics & Reports" /> },
+					{ path: "users", element: <AdminUsersPage /> },
+					{ path: "products", element: <AdminProductsPage /> },
+					{ path: "orders", element: <AdminOrdersPage /> },
+					{ path: "analytics", element: <AdminAnalyticsPage /> },
 				],
 			},
 		],
@@ -90,10 +105,10 @@ const router = createBrowserRouter([
 						element: <PersonalDetailsPage />,
 					},
 					{ path: "settings", element: <SettingsPage /> },
-					{ path: "products", element: <PlaceholderPage title="My Products" /> },
-					{ path: "inventory", element: <PlaceholderPage title="Inventory" /> },
-					{ path: "orders", element: <PlaceholderPage title="Orders" /> },
-					{ path: "analytics", element: <PlaceholderPage title="Sales Analytics" /> },
+					{ path: "products", element: <SellerProductsPage /> },
+					{ path: "inventory", element: <SellerInventoryPage /> },
+					{ path: "orders", element: <SellerOrdersPage /> },
+					{ path: "analytics", element: <SellerAnalyticsPage /> },
 				],
 			},
 		],

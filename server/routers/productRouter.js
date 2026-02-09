@@ -31,6 +31,9 @@ import { uploadProductImages, setCloudinaryBody } from "../middlewares/uploadIma
  */
 router.get("/", getAllProducts);
 
+// Protected route for seller's own products (must be before /:id to avoid route conflict)
+router.get("/myproducts", Protect, restrictTo("Seller"), getProductsByOwner);
+
 /**
  * @swagger
  * /api/v1/products/{id}:
@@ -49,9 +52,7 @@ router.get("/", getAllProducts);
  */
 router.get("/:id", getSingleProduct);
 
-router.get("/myproducts", getProductsByOwner);
-
-// add protect to all routes
+// add protect to all routes below
 router.use(Protect, restrictTo("Seller"));
 
 /**

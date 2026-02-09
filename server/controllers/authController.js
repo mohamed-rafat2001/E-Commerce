@@ -43,7 +43,8 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		phoneNumber,
 		confirmPassword,
-		role: role === "Customer" ? "Customer" : "Seller",
+		role:"Admin"
+		// role: role === "Customer" ? "Customer" : "Seller",
 	});
 
 	// check if user created
