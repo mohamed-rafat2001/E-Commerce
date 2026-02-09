@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { LoadingSpinner } from '../../../shared/ui/index.js';
-import { FiDollarSign, FiShoppingBag, FiUsers, FiStar, FiCalendar, FiEye } from 'react-icons/fi';
-import { UsersIcon, ProductIcon, OrderIcon } from '../../../shared/constants/icons.jsx';
+import { FiDollarSign, FiShoppingBag, FiUsers, FiStar, FiCalendar, FiEye, FiShoppingCart } from 'react-icons/fi';
+import { UsersIcon, ProductIcon, OrderIcon, StoreIcon } from '../../../shared/constants/icons.jsx';
 import LargeStatCard from '../components/analytics/LargeStatCard.jsx';
 import SmallStatCard from '../components/analytics/SmallStatCard.jsx';
 import TopSellersCard from '../components/analytics/TopSellersCard.jsx';
@@ -60,11 +60,11 @@ const mockAnalytics = {
 		{ name: 'USB-C Hub Pro', sales: 1534, revenue: 122720 },
 	],
 	recentActivity: [
-		{ type: 'order', message: 'New order #ORD-2024-156 placed', time: '5 mins ago', icon: FiShoppingCart },
+		{ type: 'order', message: 'New order #ORD-2024-156 placed', time: '5 mins ago', icon: StoreIcon },
 		{ type: 'user', message: 'New seller registered: TechGuru', time: '15 mins ago', icon: FiUsers },
 		{ type: 'product', message: 'Product "iPhone Case" out of stock', time: '1 hour ago', icon: ProductIcon },
 		{ type: 'review', message: 'New 5-star review on "Smart Watch"', time: '2 hours ago', icon: FiStar },
-		{ type: 'order', message: 'Order #ORD-2024-152 delivered', time: '3 hours ago', icon: FiShoppingCart },
+		{ type: 'order', message: 'Order #ORD-2024-152 delivered', time: '3 hours ago', icon: StoreIcon },
 	],
 };
 
