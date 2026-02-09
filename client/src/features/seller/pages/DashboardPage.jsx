@@ -39,9 +39,9 @@ const QuickActionCard = ({ title, description, to, icon: Icon, gradient }) => (
 // Alert Card
 const AlertCard = ({ title, message, type = 'warning', action }) => {
 	const typeStyles = {
-		warning: 'bg-amber-50 border-amber-200 text-amber-800',
-		danger: 'bg-rose-50 border-rose-200 text-rose-800',
-		info: 'bg-blue-50 border-blue-200 text-blue-800',
+		warning: 'bg-amber-500 border-amber-200 text-amber-800',
+		danger: 'bg-rose-500 border-rose-200 text-rose-800',
+		info: 'bg-blue-500 border-blue-200 text-blue-800',
 	};
 
 	return (
@@ -130,7 +130,7 @@ const SellerDashboardPage = () => {
 					return (
 						<StatCard 
 							key={stat.id} 
-							stat={{...stat, icon: IconComponent}} 
+							stat={{...stat, icon: IconComponent}}
 							index={index} 
 						/>
 					);
