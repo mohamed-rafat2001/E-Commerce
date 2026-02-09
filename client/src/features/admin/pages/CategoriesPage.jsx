@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Button, LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { PlusIcon, SearchIcon } from '../../../shared/constants/icons.jsx';
-import { useAdminCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../hooks/index.js';
+import { useAdminCategories, useCreateCategory, useUpdateCategory, useDeleteCategory, useCategoriesPage } from '../hooks/index.js';
 import { FiLayers, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import AdminStatCard from '../components/AdminStatCard.jsx';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
@@ -10,71 +10,48 @@ import CategoryFormModal from '../components/categories/CategoryFormModal.jsx';
 import CategoryCard from '../components/categories/CategoryCard.jsx';
 
 const CategoriesPage = () => {
-	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [editingCategory, setEditingCategory] = useState(null);
-	const [categoryToDelete, setCategoryToDelete] = useState(null);
-
-	const { categories: allCategories, isLoading: isFetching } = useAdminCategories();
+	const { 
+		searchQuery, 
+		setSearchQuery, 
+		selectedCategory, 
+		isModalOpen, 
+		categoryToDelete,
+		categories,
+		allCategories,
+		isLoading,
+		filteredCategories,
+		handleEdit,
+		handleDelete,
+		handleCreate,
+		closeModal,
+		closeDeleteModal,
+		statusFilter,
+		setStatusFilter,
+		stats
+	} = useCategoriesPage();
+	
 	const { addCategory, isCreating } = useCreateCategory();
 	const { editCategory, isUpdating } = useUpdateCategory();
 	const { removeCategory, isDeleting } = useDeleteCategory();
-
-	const categories = allCategories || [];
-
-	const filteredCategories = useMemo(() => {
-		return categories.filter(cat => {
-			const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				cat.description?.toLowerCase().includes(searchQuery.toLowerCase());
-			const matchesStatus = statusFilter === 'all' || 
-				(statusFilter === 'active' && cat.isActive) || 
-				(statusFilter === 'inactive' && !cat.isActive);
-			return matchesSearch && matchesStatus;
-		});
-	}, [categories, searchQuery, statusFilter]);
-
-	const stats = useMemo(() => ({
-		total: categories.length,
-		active: categories.filter(c => c.isActive).length,
-		inactive: categories.filter(c => !c.isActive).length,
-	}), [categories]);
-
-	const handleAdd = () => {
-		setEditingCategory(null);
-		setIsModalOpen(true);
-	};
-
-	const handleEdit = (category) => {
-		setEditingCategory(category);
-		setIsModalOpen(true);
-	};
-
-	const handleDeletePrompt = (category) => {
-		setCategoryToDelete(category);
-		setIsDeleteModalOpen(true);
-	};
 
 	const handleConfirmDelete = () => {
 		if (categoryToDelete) {
 			removeCategory(categoryToDelete._id, {
 				onSuccess: () => {
-					setIsDeleteModalOpen(false);
-					setCategoryToDelete(null);
+					closeDeleteModal();
 				}
 			});
 		}
 	};
 
 	const handleSubmit = (data) => {
-		if (editingCategory) {
-			editCategory({ id: editingCategory._id, data }, {
-				onSuccess: () => setIsModalOpen(false)
+		if (selectedCategory) {
+			editCategory({ id: selectedCategory._id, data }, {
+				onSuccess: () => closeModal()
 			});
 		} else {
 			addCategory(data, {
-				onSuccess: () => setIsModalOpen(false)
+				onSuccess: () => closeModal()
 			});
 		}
 	};
@@ -86,7 +63,7 @@ const CategoriesPage = () => {
 		});
 	};
 
-	if (isFetching) {
+	if (isLoading) {
 		return (
 			<div className="flex justify-center items-center min-h-[400px]">
 				<LoadingSpinner size="lg" message="Loading categories..." />
@@ -101,7 +78,7 @@ const CategoriesPage = () => {
 					<h1 className="text-3xl font-bold text-gray-900">Categories</h1>
 					<p className="text-gray-500 mt-1">Manage product classification and hierarchy</p>
 				</div>
-				<Button onClick={handleAdd} icon={<PlusIcon />}>
+				<Button onClick={handleCreate} icon={<PlusIcon />}>
 					Add New Category
 				</Button>
 			</div>
@@ -145,7 +122,7 @@ const CategoriesPage = () => {
 								category={category}
 								onToggleStatus={handleToggleStatus}
 								onEdit={handleEdit}
-								onDelete={handleDeletePrompt}
+								onDelete={handleDelete}
 								isDeleting={isDeleting}
 							/>
 						))}
@@ -170,15 +147,15 @@ const CategoriesPage = () => {
 
 			<CategoryFormModal
 				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				category={editingCategory}
+				onClose={closeModal}
+				category={selectedCategory}
 				onSubmit={handleSubmit}
-				isLoading={editingCategory ? isUpdating : isCreating}
+				isLoading={selectedCategory ? isUpdating : isCreating}
 			/>
 
 			<DeleteConfirmModal
-				isOpen={isDeleteModalOpen}
-				onClose={() => setIsDeleteModalOpen(false)}
+				isOpen={!!categoryToDelete}
+				onClose={closeDeleteModal}
 				title="Delete Category"
 				entityName={categoryToDelete?.name}
 				description={` This action cannot be undone and may affect associated products.`}

@@ -18,3 +18,9 @@ export {
 export { default as useUserDetails } from './useUserDetails.js';
 export { default as useAccordionSections } from './useAccordionSections.js';
 export { default as useUserData } from './useUserData.js';
+export { default as useUsersPage } from './useUsersPage.js';
+export { default as useProductsPage } from './useProductsPage.js';
+export { default as useOrdersPage } from './useOrdersPage.js';
+export { default as useCategoriesPage } from './useCategoriesPage.js';
+export { default as useDashboardPage } from './useDashboardPage.js';
+export { default as useAnalyticsPage } from './useAnalyticsPage.js';
