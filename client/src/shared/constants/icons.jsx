@@ -30,6 +30,12 @@ import {
 	FiMapPin,
 	FiFlag,
 	FiMap,
+	FiLayers,
+	FiPlus,
+	FiSearch,
+	FiFilter,
+	FiEdit2,
+	FiTrash2,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -171,4 +177,28 @@ export const FlagIcon = ({ className = 'w-5 h-5', ...props }) => (
 
 export const BuildingOfficeIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FiMap className={className} {...props} />
+);
+
+export const CategoryIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiLayers className={className} {...props} />
+);
+
+export const PlusIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiPlus className={className} {...props} />
+);
+
+export const SearchIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiSearch className={className} {...props} />
+);
+
+export const FilterIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiFilter className={className} {...props} />
+);
+
+export const EditIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiEdit2 className={className} {...props} />
+);
+
+export const TrashIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiTrash2 className={className} {...props} />
 );

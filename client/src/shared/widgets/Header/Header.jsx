@@ -62,7 +62,9 @@ const Header = ({ isPanel = false }) => {
 
 	const fullName = user?.userId
 		? `${user.userId.firstName} ${user.userId.lastName}`
-		: 'Guest';
+		: user?.firstName 
+			? `${user.firstName} ${user.lastName}`
+			: 'Guest';
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -236,7 +238,7 @@ const Header = ({ isPanel = false }) => {
 												hover:bg-gray-100/80 transition-all duration-200 border border-transparent hover:border-gray-200"
 										>
 											<Avatar 
-												src={user?.userId?.profileImg?.secure_url}
+												src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
 												name={fullName} 
 												size="md" 
 												ring

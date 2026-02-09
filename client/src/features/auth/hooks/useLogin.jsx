@@ -16,7 +16,7 @@ export default function useLogin() {
 		mutationFn: LoginFunc,
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({ queryKey: ["user"] });
-			const userRole = data?.data?.data?.user?.role;
+			const userRole = data?.data?.data?.user?.role || data?.data?.data?.user?.userId?.role;
 			
 			// Redirect based on role
 			if (userRole === "Customer") {

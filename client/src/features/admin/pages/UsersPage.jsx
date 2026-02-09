@@ -436,7 +436,7 @@ const UsersPage = () => {
 											onEdit={handleEdit}
 											onDelete={handleDelete}
 											onToggleStatus={handleToggleStatus}
-											isDeleting={deletingId === user._id}
+											isDeleting={isDeleting}
 										/>
 									))}
 								</AnimatePresence>

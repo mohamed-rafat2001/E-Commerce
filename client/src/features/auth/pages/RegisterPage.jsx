@@ -143,7 +143,8 @@ function RegisterPage() {
 									isRegistering={isRegistering}
 									variants={variants}
 									onNextStep={onNextStep} 
-									showNextButton={true}
+									showNextButton={selectedRole !== "Admin"}
+									selectedRole={selectedRole}
 								/>
 							)}
 
@@ -164,6 +165,7 @@ function RegisterPage() {
 									onPrevStep={onPrevStep}
 									isRegistering={isRegistering}
 									variants={variants}
+									selectedRole={selectedRole}
 								/>
 							)}
 						</AnimatePresence>

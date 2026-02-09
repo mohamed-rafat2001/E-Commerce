@@ -43,8 +43,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		phoneNumber,
 		confirmPassword,
-		role:"Admin"
-		// role: role === "Customer" ? "Customer" : "Seller",
+		role: (role === "Admin" || role === "Seller") ? role : "Customer",
 	});
 
 	// check if user created
@@ -86,7 +85,8 @@ export const signUp = catchAsync(async (req, res, next) => {
 	}
 
 	// check if user model created
-	if (!userModel) {
+	// check if user model created
+	if (!userModel && userRole !== "Admin" && userRole !== "SuperAdmin") {
 		// Rollback user creation if profile creation fails
 		await UserModel.findByIdAndDelete(user._id);
 		return next(new appError(`${userRole} profile not created`, 400));
@@ -96,8 +96,13 @@ export const signUp = catchAsync(async (req, res, next) => {
 	sendCookies(res, token);
 	
 	// Get populated profile model to maintain consistent response structure
-	const populatedUser = await userModel.constructor.findById(userModel._id)
-		.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	let populatedUser;
+	if (userRole === "Admin" || userRole === "SuperAdmin") {
+		populatedUser = user;
+	} else {
+		populatedUser = await userModel.constructor.findById(userModel._id)
+			.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	}
 
 	// send response to client
 	sendResponse(res, 201, { user: populatedUser, token });
@@ -131,6 +136,8 @@ export const login = catchAsync(async (req, res, next) => {
 	} else if (user.role === "Seller") {
 		userProfile = await SellerModel.findOne({ userId: user._id })
 			.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	} else if (user.role === "Admin" || user.role === "SuperAdmin") {
+		userProfile = user;
 	}
 
 	if (!userProfile) return next(new appError("User profile not found", 404));
@@ -150,12 +157,15 @@ export const getMe = catchAsync(async (req, res, next) => {
 	let user;
 	const role = req.user.role;
 	// find the user depend on user role
-	if (role === "Customer") user = CustomerModel;
-	if (role === "Seller") user = SellerModel;
-
-	user = await user
-		.findOne({ userId: req.user._id })
-		.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	if (role === "Customer") {
+		user = await CustomerModel.findOne({ userId: req.user._id })
+			.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	} else if (role === "Seller") {
+		user = await SellerModel.findOne({ userId: req.user._id })
+			.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	} else if (role === "Admin" || role === "SuperAdmin") {
+		user = req.user;
+	}
 
 	if (!user) return next(new appError("user not found", 400));
 
@@ -182,6 +192,8 @@ export const updatePersonalDetails = catchAsync(async (req, res, next) => {
 	} else if (user.role === "Seller") {
 		userProfile = await SellerModel.findOne({ userId: user._id })
 			.populate("userId", "firstName lastName email phoneNumber role profileImg");
+	} else if (user.role === "Admin" || user.role === "SuperAdmin") {
+		userProfile = user;
 	}
 
 	sendResponse(res, 200, { user: userProfile });
@@ -201,12 +213,16 @@ export const deleteMe = catchAsync(async (req, res, next) => {
 	if (role === "Seller") model = SellerModel;
 
 	// change the status
-	model = await model.findByIdAndUpdate(
-		req.user._id,
-		{ status: "deleted" },
-		{ runValidators: true, new: true }
-	);
-	if (!user && !model) return next(new appError("user didn't deleted"));
+	let profileDeleted;
+	if (model) {
+		profileDeleted = await model.findOneAndUpdate(
+			{ userId: req.user._id },
+			{ status: "deleted" },
+			{ runValidators: true, new: true }
+		);
+	}
+	
+	if (!user && !profileDeleted) return next(new appError("user didn't deleted"));
 	sendCookies(res, "");
 	sendResponse(res, 200, {});
 });

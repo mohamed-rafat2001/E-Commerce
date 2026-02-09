@@ -14,8 +14,11 @@ const RegisterStepThreeCustomer = ({
 	errors, 
 	onPrevStep, 
 	isRegistering,
-	variants 
+	variants,
+	selectedRole
 }) => {
+	const isAddressRequired = selectedRole !== "Admin";
+
 	return (
 		<motion.div
 			key="step3-customer"
@@ -41,7 +44,7 @@ const RegisterStepThreeCustomer = ({
 								errors.label ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
 							{...register("label", {
-								required: "Label is required",
+								required: isAddressRequired ? "Label is required" : false,
 							})}
 						/>
 					</div>
@@ -63,7 +66,7 @@ const RegisterStepThreeCustomer = ({
 								errors.recipientName ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
 							{...register("recipientName", {
-								required: "Recipient name is required",
+								required: isAddressRequired ? "Recipient name is required" : false,
 							})}
 						/>
 					</div>
@@ -86,7 +89,7 @@ const RegisterStepThreeCustomer = ({
 							errors.addressPhone ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 						}`}
 						{...register("addressPhone", {
-							required: "Phone number is required",
+							required: isAddressRequired ? "Phone number is required" : false,
 						})}
 					/>
 				</div>
@@ -108,7 +111,7 @@ const RegisterStepThreeCustomer = ({
 							errors.line1 ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 						}`}
 						{...register("line1", {
-							required: "Address line 1 is required",
+							required: isAddressRequired ? "Address line 1 is required" : false,
 						})}
 					/>
 				</div>
@@ -131,7 +134,7 @@ const RegisterStepThreeCustomer = ({
 								errors.city ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
 							{...register("city", {
-								required: "City is required",
+								required: isAddressRequired ? "City is required" : false,
 							})}
 						/>
 					</div>
@@ -152,7 +155,7 @@ const RegisterStepThreeCustomer = ({
 								errors.postalCode ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
 							{...register("postalCode", {
-								required: "Postal code is required",
+								required: isAddressRequired ? "Postal code is required" : false,
 							})}
 						/>
 					</div>
@@ -192,7 +195,7 @@ const RegisterStepThreeCustomer = ({
 								errors.country ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
 							{...register("country", {
-								required: "Country is required",
+								required: isAddressRequired ? "Country is required" : false,
 							})}
 						/>
 					</div>

@@ -21,7 +21,7 @@ const router = express.Router();
 
 // All routes here are protected and restricted to SuperAdmin
 router.use(Protect);
-router.use(restrictTo("SuperAdmin"));
+router.use(restrictTo("SuperAdmin", "Admin"));
 
 router.param("model", resolveModel);
 

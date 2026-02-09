@@ -31,7 +31,7 @@ export default function useCurrentUser() {
 	return {
 		isAuthenticated: !!user && !isError,
 		user,
-		userRole: user?.userId?.role,
+		userRole: user?.role || user?.userId?.role,
 		isLoading: isLoading && !isError,
 		error,
 	};
