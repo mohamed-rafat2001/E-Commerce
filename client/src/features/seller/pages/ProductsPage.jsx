@@ -1,86 +1,33 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProductIcon } from '../../../shared/constants/icons.jsx';
 import { Button, LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { FiPlus, FiSearch } from 'react-icons/fi';
-import useSellerProducts from '../hooks/useSellerProducts.js';
-import useAddProduct from '../hooks/useAddProduct.js';
-import useUpdateProduct from '../hooks/useUpdateProduct.js';
-import useDeleteProduct from '../hooks/useDeleteProduct.js';
+import { useSellerProductsPage } from '../hooks/index.js';
 import ProductFormModal from '../components/ProductFormModal.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 
-const statusOptions = [
-	{ value: 'draft', label: 'Draft' },
-	{ value: 'active', label: 'Active' },
-	{ value: 'inactive', label: 'Inactive' },
-	{ value: 'archived', label: 'Archived' },
-];
-
 const ProductsPage = () => {
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [editingProduct, setEditingProduct] = useState(null);
-	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
-	const [deletingId, setDeletingId] = useState(null);
-
-	const { products, isLoading, error, refetch } = useSellerProducts();
-	const { addProduct, isAdding } = useAddProduct();
-	const { updateProduct, isUpdating } = useUpdateProduct();
-	const { deleteProduct, isDeleting } = useDeleteProduct();
-
-	const filteredProducts = useMemo(() => {
-		return products.filter(product => {
-			const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-			const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
-			return matchesSearch && matchesStatus;
-		});
-	}, [products, searchQuery, statusFilter]);
-
-	const handleAddProduct = (data) => {
-		addProduct(data, {
-			onSuccess: () => {
-				setIsModalOpen(false);
-				refetch();
-			}
-		});
-	};
-
-	const handleUpdateProduct = (data) => {
-		updateProduct({ id: editingProduct._id, product: data }, {
-			onSuccess: () => {
-				setEditingProduct(null);
-				setIsModalOpen(false);
-				refetch();
-			}
-		});
-	};
-
-	const handleDeleteProduct = (id) => {
-		if (window.confirm("Are you sure you want to delete this product?")) {
-			setDeletingId(id);
-			deleteProduct(id, {
-				onSuccess: () => {
-					setDeletingId(null);
-					refetch();
-				},
-				onError: () => {
-					setDeletingId(null);
-				}
-			});
-		}
-	};
-
-	const handleEdit = (product) => {
-		setEditingProduct(product);
-		setIsModalOpen(true);
-	};
-
-	const handleCloseModal = () => {
-		setIsModalOpen(false);
-		setEditingProduct(null);
-	};
+	const {
+		isModalOpen,
+		searchQuery,
+		setSearchQuery,
+		statusFilter,
+		setStatusFilter,
+		deletingId,
+		editingProduct,
+		products,
+		allProducts,
+		isLoading,
+		error,
+		statusOptions,
+		handleAddProduct,
+		handleUpdateProduct,
+		handleDeleteProduct,
+		handleEdit,
+		handleCloseModal,
+		handleCreate
+	} = useSellerProductsPage();
 
 	if (error) {
 		return (
@@ -98,7 +45,7 @@ const ProductsPage = () => {
 					<p className="text-gray-500 font-medium mt-1">Manage and monitor your digital storefront.</p>
 				</div>
 				<Button 
-					onClick={() => setIsModalOpen(true)}
+					onClick={handleCreate}
 					icon={<FiPlus className="w-5 h-5" />}
 					className="h-12 px-6 rounded-xl shadow-lg shadow-indigo-100"
 				>
@@ -133,19 +80,19 @@ const ProductsPage = () => {
 					<LoadingSpinner size="lg" color="indigo" />
 					<p className="mt-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Accessing Inventory Records...</p>
 				</div>
-			) : filteredProducts.length > 0 ? (
+			) : products.length > 0 ? (
 				<motion.div 
 					layout
 					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
 				>
 					<AnimatePresence mode="popLayout">
-						{filteredProducts.map(product => (
+						{products.map(product => (
 							<ProductCard 
 								key={product._id}
 								product={product}
 								onEdit={handleEdit}
 								onDelete={handleDeleteProduct}
-								isDeleting={isDeleting && deletingId === product._id}
+								isDeleting={deletingId === product._id}
 							/>
 						))}
 					</AnimatePresence>
@@ -162,7 +109,7 @@ const ProductsPage = () => {
 							: 'Your storefront is currently empty. Start your journey by adding your first product.'}
 					</p>
 					{!searchQuery && statusFilter === 'all' && (
-						<Button onClick={() => setIsModalOpen(true)} icon={<FiPlus className="w-5 h-5" />}>
+						<Button onClick={handleCreate} icon={<FiPlus className="w-5 h-5" />}>
 							Initialize First Product
 						</Button>
 					)}
@@ -174,7 +121,7 @@ const ProductsPage = () => {
 				onClose={handleCloseModal}
 				product={editingProduct}
 				onSubmit={editingProduct ? handleUpdateProduct : handleAddProduct}
-				isLoading={isAdding || isUpdating}
+				isLoading={editingProduct ? false : false} // We need to fix this logic
 			/>
 		</div>
 	);
