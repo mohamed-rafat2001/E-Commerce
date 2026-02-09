@@ -33,10 +33,9 @@ const categorySchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-categorySchema.pre("save", function (next) {
-	if (!this.isModified("name")) return next();
+categorySchema.pre("save", async function () {
+	if (!this.isModified("name")) return;
 	this.slug = slugify(this.name, { lower: true });
-	next();
 });
 
 // categorySchema.index({ slug: 1 }, { unique: true });

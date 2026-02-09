@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Card, Badge } from '../../../shared/ui/index.js';
 
+import { Link } from 'react-router-dom';
+
 const RecentOrders = ({ orders }) => {
 	return (
 		<motion.div
@@ -13,9 +15,11 @@ const RecentOrders = ({ orders }) => {
 				<Card.Header>
 					<div className="flex items-center justify-between">
 						<Card.Title>Recent Orders</Card.Title>
-						<Badge variant="primary" size="sm">
-							View All
-						</Badge>
+						<Link to="/admin/orders">
+							<Badge variant="primary" size="sm" className="cursor-pointer hover:scale-110 transition-transform">
+								View All
+							</Badge>
+						</Link>
 					</div>
 				</Card.Header>
 				<Card.Content>

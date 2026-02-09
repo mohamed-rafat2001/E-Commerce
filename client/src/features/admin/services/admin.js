@@ -26,6 +26,7 @@ export const deleteAllAdminData = (model) => deleteFunc(`admin/${model}`);
 // Users
 export const getAllUsers = () => getAdminData("users");
 export const getUserById = (id) => getAdminDataById("users", id);
+export const createUser = (data) => createAdminData("users", data);
 export const updateUser = (id, data) => updateAdminData("users", id, data);
 export const deleteUser = (id) => deleteAdminDataById("users", id);
 

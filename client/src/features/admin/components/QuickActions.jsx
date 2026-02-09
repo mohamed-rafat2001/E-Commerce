@@ -15,28 +15,28 @@ const actions = [
 		description: 'View and manage all users',
 		icon: FiUserPlus, 
 		color: 'from-indigo-500 to-purple-500', 
-		to: 'users' 
+		to: '/admin/users' 
 	},
 	{ 
 		label: 'Manage Products', 
 		description: 'Review and update products',
 		icon: FiPlus, 
 		color: 'from-emerald-500 to-teal-500', 
-		to: 'products' 
+		to: '/admin/products' 
 	},
 	{ 
 		label: 'View Reports', 
 		description: 'Check sales and performance',
 		icon: FiBarChart2, 
 		color: 'from-orange-500 to-red-500', 
-		to: 'analytics' 
+		to: '/admin/analytics' 
 	},
 	{ 
 		label: 'Platform Settings', 
 		description: 'Configure system options',
 		icon: FiSettings, 
 		color: 'from-gray-500 to-gray-700', 
-		to: 'settings' 
+		to: '/admin/settings' 
 	},
 ];
 

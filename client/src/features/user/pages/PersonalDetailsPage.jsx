@@ -6,9 +6,14 @@ import useCurrentUser from '../hooks/useCurrentUser.js';
 import useUpdateUser from '../hooks/useUpdateUser.js';
 import useUpdateAvatar from '../hooks/useUpdateAvatar.jsx';
 import { roleThemes } from '../../../shared/constants/theme.js';
-import { UserIcon } from '../../../shared/constants/icons.jsx';
+import { UserIcon, LockIcon, TrashIcon, ShieldIcon } from '../../../shared/constants/icons.jsx';
+import { updatePassword as updatePasswordService, deleteMe as deleteMeService } from '../../auth/services/auth.js';
+import toast from 'react-hot-toast';
+import { ToastSuccess, ToastError } from '../../../shared/ui/index.js';
+import { useNavigate } from 'react-router-dom';
 
 const PersonalDetailsPage = () => {
+	const navigate = useNavigate();
 	const { user, userRole } = useCurrentUser();
 	const { updateDetails, isLoading: isUpdating } = useUpdateUser();
 	const { 
@@ -21,11 +26,17 @@ const PersonalDetailsPage = () => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [isAccountDeleteModalOpen, setIsAccountDeleteModalOpen] = useState(false);
+	const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 	const fileInputRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [previewUrl, setPreviewUrl] = useState(null);
+	const [isChangingPassword, setIsChangingPassword] = useState(false);
+	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
+	const isStaff = userRole === 'Admin' || userRole === 'SuperAdmin';
+	const userData = isStaff ? user : user?.userId;
 
 	const {
 		register,
@@ -34,27 +45,41 @@ const PersonalDetailsPage = () => {
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
-			firstName: user?.userId?.firstName || '',
-			lastName: user?.userId?.lastName || '',
-			email: user?.userId?.email || '',
-			phoneNumber: user?.userId?.phoneNumber || '',
+			firstName: userData?.firstName || '',
+			lastName: userData?.lastName || '',
+			email: userData?.email || '',
+			phoneNumber: userData?.phoneNumber || '',
+		},
+	});
+	
+	const {
+		register: passwordRegister,
+		handleSubmit: handlePasswordSubmit,
+		reset: resetPasswordForm,
+		formState: { errors: passwordErrors },
+		watch: watchPassword,
+	} = useForm({
+		defaultValues: {
+			currentPassword: '',
+			newPassword: '',
+			confirmPassword: '',
 		},
 	});
 
 	// Update form values when user data changes
 	useEffect(() => {
-		if (user?.userId) {
+		if (userData) {
 			reset({
-				firstName: user.userId.firstName || '',
-				lastName: user.userId.lastName || '',
-				email: user.userId.email || '',
-				phoneNumber: user.userId.phoneNumber || '',
+				firstName: userData.firstName || '',
+				lastName: userData.lastName || '',
+				email: userData.email || '',
+				phoneNumber: userData.phoneNumber || '',
 			});
 		}
-	}, [user, reset]);
+	}, [userData, reset]);
 
-	const fullName = user?.userId
-		? `${user.userId.firstName} ${user.userId.lastName}`
+	const fullName = userData
+		? `${userData.firstName} ${userData.lastName}`
 		: 'User';
 
 	const onSubmit = (data) => {
@@ -100,6 +125,69 @@ const PersonalDetailsPage = () => {
 	const memberSince = user?.createdAt 
 		? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 		: 'January 2024';
+		
+	const onPasswordSubmit = async (data) => {
+		try {
+			setIsUpdatingPassword(true);
+			const response = await updatePasswordService(data);
+			
+			if (response.status === 200 || response.status === 201) {
+				toast.success(
+					<ToastSuccess 
+						successObj={{ 
+							title: 'Password Updated', 
+							message: 'Your password has been changed successfully.' 
+						}} 
+					/>,
+					{ icon: null }
+				);
+				setIsChangingPassword(false);
+				resetPasswordForm();
+			}
+		} catch (error) {
+			toast.error(
+				<ToastError 
+					errorObj={{ 
+						title: 'Password Update Failed', 
+						message: error.response?.data?.message || 'Something went wrong. Please check your current password.' 
+					}} 
+				/>,
+				{ icon: null }
+			);
+		} finally {
+			setIsUpdatingPassword(false);
+		}
+	};
+
+	const handleAccountDeletion = async () => {
+		try {
+			setIsDeletingAccount(true);
+			await deleteMeService();
+			toast.success(
+				<ToastSuccess 
+					successObj={{ 
+						title: 'Account Deleted', 
+						message: 'Your account has been deactivated successfully.' 
+					}} 
+				/>,
+				{ icon: null }
+			);
+			navigate('/login');
+		} catch (error) {
+			toast.error(
+				<ToastError 
+					errorObj={{ 
+						title: 'Deletion Failed', 
+						message: error.response?.data?.message || 'Something went wrong.' 
+					}} 
+				/>,
+				{ icon: null }
+			);
+		} finally {
+			setIsDeletingAccount(false);
+			setIsAccountDeleteModalOpen(false);
+		}
+	};
 
 	return (
 		<div className="space-y-6 max-w-4xl mx-auto">
@@ -134,7 +222,7 @@ const PersonalDetailsPage = () => {
 									trigger={
 										<div className="relative cursor-pointer">
 											<Avatar
-												src={user?.userId?.profileImg?.secure_url}
+												src={userData?.profileImg?.secure_url}
 												name={fullName}
 												size="2xl"
 												ring
@@ -171,7 +259,7 @@ const PersonalDetailsPage = () => {
 											</svg>
 										}
 										onClick={() => setIsDeleteModalOpen(true)}
-										disabled={!user?.userId?.profileImg?.secure_url}
+										disabled={!userData?.profileImg?.secure_url}
 									>
 										Delete Image
 									</Dropdown.Item>
@@ -349,6 +437,45 @@ const PersonalDetailsPage = () => {
 				</div>
 			</Modal>
 
+			{/* Delete Account Confirmation Modal */}
+			<Modal
+				isOpen={isAccountDeleteModalOpen}
+				onClose={() => setIsAccountDeleteModalOpen(false)}
+				title="Deactivate Account"
+				size="sm"
+			>
+				<div className="space-y-6">
+					<div className="flex flex-col items-center justify-center text-center">
+						<div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-4 text-red-600">
+							<TrashIcon className="w-8 h-8" />
+						</div>
+						<h3 className="text-xl font-bold text-gray-900">Are you absolutely sure?</h3>
+						<p className="text-gray-500 mt-2 text-sm leading-relaxed px-4">
+							This will deactivate your account and hide your profile. You can reactivate it later by logging back in.
+						</p>
+					</div>
+
+					<div className="flex gap-3">
+						<Button 
+							variant="ghost" 
+							className="flex-1"
+							onClick={() => setIsAccountDeleteModalOpen(false)}
+							disabled={isDeletingAccount}
+						>
+							Cancel
+						</Button>
+						<Button 
+							variant="danger" 
+							className="flex-1"
+							onClick={handleAccountDeletion}
+							loading={isDeletingAccount}
+						>
+							Deactivate
+						</Button>
+					</div>
+				</div>
+			</Modal>
+
 			{/* Info Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 				{/* Account Overview */}
@@ -374,8 +501,8 @@ const PersonalDetailsPage = () => {
 									Account Status
 								</p>
 								<div className="flex items-center gap-2 mt-1">
-									<div className={`w-2 h-2 rounded-full ${user?.userId?.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`} />
-									<p className="text-gray-900 font-medium capitalize">{user?.userId?.status || 'active'}</p>
+									<div className={`w-2 h-2 rounded-full ${userData?.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+									<p className="text-gray-900 font-medium capitalize">{userData?.status || 'active'}</p>
 								</div>
 							</div>
 						</Card.Content>
@@ -467,6 +594,166 @@ const PersonalDetailsPage = () => {
 							</form>
 						</Card.Content>
 					</Card>
+				</motion.div>
+				{/* Security & Password Section */}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.5 }}
+					className="md:col-span-3"
+				>
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						{/* Password & Security Card */}
+						<Card variant="elevated" className="lg:col-span-2">
+							<Card.Header className="flex flex-row items-center justify-between border-b border-gray-100">
+								<div className="flex items-center gap-3">
+									<div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+										<ShieldIcon className="w-5 h-5" />
+									</div>
+									<Card.Title>Security Settings</Card.Title>
+								</div>
+								{!isChangingPassword && (
+									<Button
+										variant="secondary"
+										size="sm"
+										onClick={() => setIsChangingPassword(true)}
+									>
+										Change Password
+									</Button>
+								)}
+							</Card.Header>
+							<Card.Content className="pt-6">
+								{!isChangingPassword ? (
+									<div className="space-y-4">
+										<div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100">
+											<div className="flex items-center gap-4">
+												<div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400">
+													<LockIcon className="w-6 h-6" />
+												</div>
+												<div>
+													<p className="font-semibold text-gray-900">Password Control</p>
+													<p className="text-sm text-gray-500">Regularly update your password to stay secure.</p>
+												</div>
+											</div>
+											<div className="text-emerald-600 flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full text-xs font-bold shrink-0">
+												<div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+												SECURE
+											</div>
+										</div>
+										
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+											<div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
+												<p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Last Change</p>
+												<p className="text-sm font-medium text-gray-700">6 months ago</p>
+											</div>
+											<div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
+												<p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Security Score</p>
+												<div className="flex items-center gap-2">
+													<div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+														<div className="h-full bg-emerald-500 w-[85%]" />
+													</div>
+													<span className="text-xs font-bold text-emerald-600">85%</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								) : (
+									<form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-6">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+											<div className="sm:col-span-2">
+												<Input
+													type="password"
+													label="Current Password"
+													placeholder="Enter your current password"
+													error={passwordErrors.currentPassword?.message}
+													{...passwordRegister('currentPassword', {
+														required: 'Current password is required',
+													})}
+												/>
+											</div>
+											<Input
+												type="password"
+												label="New Password"
+												placeholder="Minimum 8 characters"
+												error={passwordErrors.newPassword?.message}
+												{...passwordRegister('newPassword', {
+													required: 'New password is required',
+													minLength: { value: 8, message: 'Minimum 8 characters' },
+													validate: (value) => {
+														const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+														return strongRegex.test(value) || 'Must contain uppercase, lowercase, number and special character';
+													}
+												})}
+											/>
+											<Input
+												type="password"
+												label="Confirm New Password"
+												placeholder="Repeat your new password"
+												error={passwordErrors.confirmPassword?.message}
+												{...passwordRegister('confirmPassword', {
+													required: 'Please confirm your new password',
+													validate: (value) => 
+														value === watchPassword('newPassword') || 'Passwords do not match'
+												})}
+											/>
+										</div>
+										
+										<div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+											<Button 
+												variant="ghost" 
+												type="button"
+												onClick={() => {
+													setIsChangingPassword(false);
+													resetPasswordForm();
+												}}
+												disabled={isUpdatingPassword}
+											>
+												Cancel
+											</Button>
+											<Button 
+												variant="primary" 
+												type="submit"
+												loading={isUpdatingPassword}
+											>
+												Update Password
+											</Button>
+										</div>
+									</form>
+								)}
+							</Card.Content>
+						</Card>
+
+						{/* Account Actions Card */}
+						<Card variant="elevated">
+							<Card.Header>
+								<Card.Title>Account Control</Card.Title>
+							</Card.Header>
+							<Card.Content className="space-y-6">
+								<div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
+									<p className="text-sm font-semibold text-orange-800 mb-1">Session Management</p>
+									<p className="text-xs text-orange-600 mb-4">You are currently logged into this device.</p>
+									<Button variant="outline" size="sm" className="w-full bg-white border-orange-200 text-orange-700 hover:bg-orange-100">
+										Log out everywhere
+									</Button>
+								</div>
+
+								<div className="pt-6 border-t border-gray-100">
+									<p className="text-sm font-semibold text-red-600 mb-2">Danger Zone</p>
+									<p className="text-xs text-gray-500 mb-4">
+										Deleting your account will deactivate your profile. All your data will be archived.
+									</p>
+									<Button 
+										variant="danger" 
+										size="sm" 
+										className="w-full"
+										onClick={() => setIsAccountDeleteModalOpen(true)}
+									>
+										Deactivate Account
+									</Button>
+								</div>
+							</Card.Content>
+						</Card>
+					</div>
 				</motion.div>
 			</div>
 		</div>

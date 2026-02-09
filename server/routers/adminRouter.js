@@ -7,6 +7,7 @@ import {
 	updateOne,
 	deleteOne,
 	deleteAll,
+	getDashboardStats,
 } from "../controllers/adminController.js";
 import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -22,6 +23,7 @@ const router = express.Router();
 // All routes here are protected and restricted to SuperAdmin
 router.use(Protect);
 router.use(restrictTo("SuperAdmin", "Admin"));
+router.get("/stats", getDashboardStats);
 
 router.param("model", resolveModel);
 

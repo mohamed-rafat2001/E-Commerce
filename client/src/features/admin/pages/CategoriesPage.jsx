@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
 	PlusIcon, 
@@ -13,20 +13,69 @@ import {
 	useUpdateCategory, 
 	useDeleteCategory 
 } from '../hooks/index.js';
-import { FiImage, FiSettings, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiImage, FiSettings, FiCheckCircle, FiXCircle, FiUploadCloud, FiX, FiCheck } from 'react-icons/fi';
+import { uploadSingleImage } from '../../../shared/services/uploadService.js';
+import { toast } from 'react-hot-toast';
 
 const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 	const [formData, setFormData] = useState({
 		name: category?.name || '',
 		description: category?.description || '',
 		isActive: category?.isActive !== undefined ? category.isActive : true,
-		coverImage: {
-			secure_url: category?.coverImage?.secure_url || ''
-		}
+		coverImage: category?.coverImage || { public_id: '', secure_url: '' }
 	});
+
+	const [uploading, setUploading] = useState(false);
+	const [uploadProgress, setUploadProgress] = useState(0);
+	const fileInputRef = useRef(null);
+
+	const handleFileChange = async (e) => {
+		const file = e.target.files[0];
+		if (!file) return;
+
+		// Basic validation
+		if (!file.type.startsWith('image/')) {
+			return toast.error("Please select a valid image file");
+		}
+
+		try {
+			setUploading(true);
+			setUploadProgress(0);
+			
+			const response = await uploadSingleImage(file, (progress) => {
+				setUploadProgress(progress);
+			});
+
+			if (response.status === 'success') {
+				setFormData(prev => ({
+					...prev,
+					coverImage: {
+						public_id: response.data.public_id,
+						secure_url: response.data.secure_url
+					}
+				}));
+				toast.success("Image uploaded successfully!");
+			}
+		} catch (error) {
+			toast.error("Failed to upload image. Please try again.");
+			console.error("Upload error:", error);
+		} finally {
+			setUploading(false);
+			setUploadProgress(0);
+		}
+	};
+
+	const removeImage = () => {
+		setFormData(prev => ({
+			...prev,
+			coverImage: { public_id: '', secure_url: '' }
+		}));
+		if (fileInputRef.current) fileInputRef.current.value = '';
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		if (uploading) return toast.error("Please wait for the image to finish uploading");
 		onSubmit(formData);
 	};
 
@@ -38,6 +87,59 @@ const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 			size="md"
 		>
 			<form onSubmit={handleSubmit} className="space-y-4">
+				<div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 group hover:border-indigo-300 transition-colors relative transition-all duration-300 min-h-[160px]">
+					{formData.coverImage.secure_url ? (
+						<div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md">
+							<img 
+								src={formData.coverImage.secure_url} 
+								alt="Preview" 
+								className="w-full h-full object-cover"
+							/>
+							<button
+								type="button"
+								onClick={removeImage}
+								className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-full shadow-lg hover:bg-red-50 transition-colors z-10"
+							>
+								<FiX className="w-4 h-4" />
+							</button>
+						</div>
+					) : (
+						<div 
+							onClick={() => fileInputRef.current?.click()}
+							className="flex flex-col items-center cursor-pointer text-gray-500 group-hover:text-indigo-600 transition-colors"
+						>
+							<div className="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:shadow-indigo-100 transition-all">
+								<FiUploadCloud className="w-6 h-6" />
+							</div>
+							<p className="text-sm font-semibold">Click to upload image</p>
+							<p className="text-xs text-gray-400 mt-1">PNG, JPG or WebP up to 5MB</p>
+						</div>
+					)}
+
+					<input 
+						ref={fileInputRef}
+						type="file" 
+						className="hidden" 
+						accept="image/*"
+						onChange={handleFileChange}
+						disabled={uploading}
+					/>
+
+					{/* Upload Progress Overlay */}
+					{uploading && (
+						<div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20 transition-all">
+							<div className="w-2/3 h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+								<motion.div 
+									className="h-full bg-indigo-500"
+									initial={{ width: 0 }}
+									animate={{ width: `${uploadProgress}%` }}
+								/>
+							</div>
+							<p className="text-sm font-bold text-indigo-600">Uploading {uploadProgress}%</p>
+						</div>
+					)}
+				</div>
+
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
 					<Input
@@ -58,19 +160,6 @@ const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 					/>
 				</div>
 
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Image URL (Optional)</label>
-					<Input
-						value={formData.coverImage.secure_url}
-						onChange={(e) => setFormData({ 
-							...formData, 
-							coverImage: { ...formData.coverImage, secure_url: e.target.value } 
-						})}
-						placeholder="https://example.com/image.jpg"
-						icon={<FiImage />}
-					/>
-				</div>
-
 				<div className="flex items-center gap-2 pt-2">
 					<input
 						type="checkbox"
@@ -88,7 +177,7 @@ const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 					<Button variant="secondary" type="button" onClick={onClose}>
 						Cancel
 					</Button>
-					<Button type="submit" loading={isLoading}>
+					<Button type="submit" loading={isLoading || uploading}>
 						{category ? "Update Category" : "Create Category"}
 					</Button>
 				</div>
@@ -97,10 +186,59 @@ const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 	);
 };
 
+const DeleteConfirmModal = ({ isOpen, onClose, category, onConfirm, isLoading }) => {
+	if (!category) return null;
+
+	return (
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title="Confirm Deletion"
+			size="sm"
+		>
+			<div className="text-center space-y-6">
+				<div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500">
+					<TrashIcon className="w-10 h-10" />
+				</div>
+				
+				<div className="space-y-2">
+					<h3 className="text-xl font-bold text-gray-900">Are you sure?</h3>
+					<p className="text-gray-500 text-sm leading-relaxed px-4">
+						You are about to delete <span className="font-bold text-gray-900">"{category.name}"</span>. 
+						This action cannot be undone and may affect associated products.
+					</p>
+				</div>
+
+				<div className="flex gap-3 pt-4">
+					<Button 
+						variant="secondary" 
+						onClick={onClose} 
+						fullWidth
+						disabled={isLoading}
+					>
+						No, Keep it
+					</Button>
+					<Button 
+						variant="primary" 
+						className="bg-rose-500 hover:bg-rose-600 border-rose-600 shadow-rose-200"
+						onClick={onConfirm} 
+						fullWidth
+						loading={isLoading}
+					>
+						Yes, Delete
+					</Button>
+				</div>
+			</div>
+		</Modal>
+	);
+};
+
 const CategoriesPage = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [editingCategory, setEditingCategory] = useState(null);
+	const [categoryToDelete, setCategoryToDelete] = useState(null);
 
 	// Real Hooks
 	const { categories, isLoading: isFetching } = useAdminCategories();
@@ -125,9 +263,19 @@ const CategoriesPage = () => {
 		setIsModalOpen(true);
 	};
 
-	const handleDelete = (id) => {
-		if(window.confirm('Delete this category? All products in this category might become uncategorized.')) {
-			removeCategory(id);
+	const handleDeletePrompt = (category) => {
+		setCategoryToDelete(category);
+		setIsDeleteModalOpen(true);
+	};
+
+	const handleConfirmDelete = () => {
+		if (categoryToDelete) {
+			removeCategory(categoryToDelete._id, {
+				onSuccess: () => {
+					setIsDeleteModalOpen(false);
+					setCategoryToDelete(null);
+				}
+			});
 		}
 	};
 
@@ -183,11 +331,11 @@ const CategoriesPage = () => {
 						className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
 					/>
 				</div>
-				<div className="flex gap-2">
+				<div className="flex gap-2 text-nowrap">
 					<div className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-semibold border border-indigo-100">
 						{categories.length} Total
 					</div>
-					<div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-semibold border border-emerald-100">
+					<div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-semibold border border-emerald-100 text-nowrap">
 						{categories.filter(c => c.isActive).length} Active
 					</div>
 				</div>
@@ -195,76 +343,109 @@ const CategoriesPage = () => {
 
 			{/* Grid */}
 			{filteredCategories.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
 					<AnimatePresence mode="popLayout">
 						{filteredCategories.map((category) => (
 							<motion.div
 								key={category._id}
 								layout
-								initial={{ opacity: 0, scale: 0.95 }}
-								animate={{ opacity: 1, scale: 1 }}
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, scale: 0.95 }}
-								className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl transition-all group relative overflow-hidden"
+								whileHover={{ y: -8 }}
+								className="group relative h-[380px] rounded-[2.5rem] overflow-hidden border border-white/20 shadow-xl hover:shadow-[0_40px_80px_rgba(0,0,0,0.4)] transition-all duration-700 cursor-pointer"
 							>
-								{/* Card Actions Overlay */}
-								<div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
-									<button 
-										onClick={() => handleEdit(category)}
-										className="p-2 bg-white/90 backdrop-blur shadow-md hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 rounded-xl transition-all transform hover:scale-110"
-										title="Edit Category"
-									>
-										<EditIcon className="w-4 h-4" />
-									</button>
-									<button 
-										onClick={() => handleDelete(category._id)}
-										className="p-2 bg-white/90 backdrop-blur shadow-md hover:bg-rose-50 text-gray-600 hover:text-rose-600 rounded-xl transition-all transform hover:scale-110"
-										title="Delete Category"
-										disabled={isDeleting}
-									>
-										<TrashIcon className="w-4 h-4" />
-									</button>
-								</div>
-
-								{/* Category Image/Icon */}
-								<div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center mb-4 overflow-hidden shadow-inner">
-									{category.coverImage?.secure_url ? (
+								{/* Background Image/Gradient */}
+								{category.coverImage?.secure_url ? (
+									<>
 										<img 
 											src={category.coverImage.secure_url} 
-											alt={category.name}
-											className="w-full h-full object-cover transition-transform group-hover:scale-110"
+											alt="" 
+											className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
 										/>
-									) : (
-										<span className="text-2xl font-bold bg-gradient-to-br from-indigo-500 to-purple-600 bg-clip-text text-transparent">
-											{category.name[0]}
-										</span>
-									)}
-								</div>
-								
-								<h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
-									{category.name}
-								</h3>
-								<p className="text-gray-500 text-sm line-clamp-2 min-h-[40px] mb-4">
-									{category.description || "No description provided for this category."}
-								</p>
-								
-								<div className="pt-4 border-t border-gray-50 flex justify-between items-center text-sm">
+										<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
+									</>
+								) : (
+									<div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
+										<div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
+										<div className="absolute inset-0 flex items-center justify-center opacity-10">
+											<span className="text-[12rem] font-black text-white select-none">
+												{category.name[0]}
+											</span>
+										</div>
+									</div>
+								)}
+
+								{/* Header: Status & Actions (Top aligned) */}
+								<div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
 									<button 
 										onClick={() => handleToggleStatus(category)}
-										className="cursor-pointer transition-transform hover:scale-105"
+										className="cursor-pointer"
 									>
 										<Badge 
 											variant={category.isActive ? 'success' : 'secondary'}
-											dot={true}
-											icon={category.isActive ? <FiCheckCircle /> : <FiXCircle />}
+											className={`px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] font-black ${
+												category.isActive 
+												? 'bg-emerald-500/90 text-white border-none backdrop-blur-md' 
+												: 'bg-white/20 text-white border-white/20 backdrop-blur-md'
+											}`}
 										>
-											{category.isActive ? 'Active' : 'Inactive'}
+											{category.isActive ? 'Active' : 'Draft'}
 										</Badge>
 									</button>
-									<span className="text-xs font-mono text-gray-400">ID: {category._id.substring(0, 8)}...</span>
+									
+									<div className="flex gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 ease-out">
+										<button 
+											onClick={() => handleEdit(category)}
+											className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl hover:bg-white hover:text-indigo-600 transition-all duration-300"
+											title="Edit"
+										>
+											<EditIcon className="w-5 h-5" />
+										</button>
+										<button 
+											onClick={() => handleDeletePrompt(category)}
+											className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl hover:bg-rose-500 hover:border-rose-500 transition-all duration-300"
+											title="Delete"
+											disabled={isDeleting}
+										>
+											<TrashIcon className="w-5 h-5" />
+										</button>
+									</div>
 								</div>
 
-								{/* Hover Background Pattern */}
-								<div className="absolute -bottom-4 -right-4 w-24 h-24 bg-indigo-50 rounded-full opacity-0 group-hover:opacity-20 transition-all blur-2xl" />
+								{/* Main Content (Bottom aligned) */}
+								<div className="absolute bottom-0 left-0 right-0 p-8 z-20 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-700">
+									<div className="space-y-4">
+										<div>
+											<h3 className="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-indigo-300 transition-colors drop-shadow-lg">
+												{category.name}
+											</h3>
+											<p className="text-sm text-gray-300 font-medium leading-relaxed line-clamp-2 mt-2 drop-shadow-md">
+												{category.description || "Explore our premium collection of products curated just for your lifestyle."}
+											</p>
+										</div>
+
+										<div className="pt-6 border-t border-white/10 flex items-center gap-8">
+											<div className="space-y-1">
+												<p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Inventory</p>
+												<div className="flex items-center gap-2">
+													<div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+													<p className="text-lg font-black text-white">240</p>
+												</div>
+											</div>
+											<div className="space-y-1">
+												<p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Engage</p>
+												<div className="flex items-center gap-2">
+													<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.5)]" />
+													<p className="text-lg font-black text-white">1.2k</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								{/* Glass Lens Flare Effect */}
+								<div className="absolute inset-0 pointer-events-none bg-linear-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 							</motion.div>
 						))}
 					</AnimatePresence>
@@ -293,6 +474,16 @@ const CategoriesPage = () => {
 					category={editingCategory}
 					onSubmit={handleSubmit}
 					isLoading={editingCategory ? isUpdating : isCreating}
+				/>
+			)}
+
+			{isDeleteModalOpen && (
+				<DeleteConfirmModal
+					isOpen={isDeleteModalOpen}
+					onClose={() => setIsDeleteModalOpen(false)}
+					category={categoryToDelete}
+					onConfirm={handleConfirmDelete}
+					isLoading={isDeleting}
 				/>
 			)}
 		</div>

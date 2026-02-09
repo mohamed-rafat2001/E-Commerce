@@ -65,6 +65,7 @@ import globalError from "./controllers/globalErrorController.js";
 import reviewRouter from "./routers/reviewRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 import adminRouter from "./routers/adminRouter.js";
+import uploadRouter from "./routers/uploadRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
 app.use("/api/v1/admin", adminRouter);
@@ -76,6 +77,7 @@ app.use("/api/v1/wishlist", wishListRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/orders", orderRouter);
+app.use("/api/v1/upload", uploadRouter);
 
 // global error handler
 app.use(globalError);

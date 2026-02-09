@@ -1,6 +1,30 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUser, deleteUser } from "../services/admin.js";
+import { createUser, updateUser, deleteUser } from "../services/admin.js";
 import toast from "react-hot-toast";
+
+/**
+ * Hook to create a user
+ */
+export function useCreateUser() {
+	const queryClient = useQueryClient();
+
+	const { mutate, isPending, error } = useMutation({
+		mutationFn: createUser,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+			toast.success("User created successfully!");
+		},
+		onError: (err) => {
+			toast.error(err?.response?.data?.message || "Failed to create user");
+		},
+	});
+
+	return {
+		createUser: mutate,
+		isCreating: isPending,
+		error,
+	};
+}
 
 /**
  * Hook to update a user

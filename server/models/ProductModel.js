@@ -95,10 +95,9 @@ productSchema.pre(/^find/, function () {
 	this.populate("category", "name description");
 });
 
-productSchema.pre("save", function (next) {
-	if (!this.isModified("name")) return next();
+productSchema.pre("save", async function () {
+	if (!this.isModified("name")) return;
 	this.slug = slugify(this.name, { lower: true, strict: true });
-	next();
 });
 
 //  mongoose indexs price
