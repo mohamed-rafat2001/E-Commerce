@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button, Select, LoadingSpinner } from '../../../shared/ui/index.js';
-import { FiSearch, FiPlus, FiUsers, FiUser, FiShoppingBag, FiShield, FiUserX } from 'react-icons/fi';
+import { FiSearch, FiPlus, FiUsers, FiUser, FiShoppingBag, FiShield, FiUserX, FiExternalLink } from 'react-icons/fi';
 import { useAdminUsers, useCreateUser, useUpdateUser, useDeleteUser } from '../hooks/index.js';
 import useCurrentUser from '../../user/hooks/useCurrentUser.js';
 import { roleOptions, statusOptions, ITEMS_PER_PAGE } from '../components/users/userConstants.js';
@@ -9,16 +10,15 @@ import AdminStatCard from '../components/AdminStatCard.jsx';
 import Pagination from '../components/Pagination.jsx';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
 import EmptyState from '../components/EmptyState.jsx';
-import UserDetailModal from '../components/users/UserDetailModal.jsx';
 import UserFormModal from '../components/users/UserFormModal.jsx';
 import UserRow from '../components/users/UserRow.jsx';
 
 const UsersPage = () => {
+	const navigate = useNavigate();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [roleFilter, setRoleFilter] = useState('all');
 	const [statusFilter, setStatusFilter] = useState('all');
 	const [selectedUser, setSelectedUser] = useState(null);
-	const [viewingUser, setViewingUser] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [userToDelete, setUserToDelete] = useState(null);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +64,10 @@ const UsersPage = () => {
 		if (userToDelete) {
 			deleteUser(userToDelete._id, { onSuccess: () => setUserToDelete(null) });
 		}
+	};
+
+	const handleViewUser = (user) => {
+		navigate(`/admin/users/${user._id}`);
 	};
 
 	if (isLoading) {
@@ -141,7 +145,7 @@ const UsersPage = () => {
 												user={u} 
 												onUpdateField={handleUpdateField} 
 												onEdit={(u) => { setSelectedUser(u); setIsModalOpen(true); }} 
-												onView={setViewingUser}
+												onView={handleViewUser}
 												onDelete={setUserToDelete} 
 												currentUserId={currUser?.userId?._id} 
 											/>
@@ -170,8 +174,6 @@ const UsersPage = () => {
 					/>
 				)}
 			</div>
-
-			<UserDetailModal user={viewingUser} isOpen={!!viewingUser} onClose={() => setViewingUser(null)} />
 
 			<UserFormModal 
 				isOpen={isModalOpen} 

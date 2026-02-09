@@ -13,6 +13,7 @@ import { PublicCartPage, PublicWishlistPage } from "../features/public/pages/ind
 import { 
 	AdminDashboardPage,
 	UsersPage as AdminUsersPage,
+	UserDetailsPage,
 	ProductsPage as AdminProductsPage,
 	OrdersPage as AdminOrdersPage,
 	AnalyticsPage as AdminAnalyticsPage,
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
 					},
 					{ path: "settings", element: <SettingsPage /> },
 					{ path: "users", element: <AdminUsersPage /> },
+					{ path: "users/:userId", element: <UserDetailsPage /> },
 					{ path: "products", element: <AdminProductsPage /> },
 					{ path: "orders", element: <AdminOrdersPage /> },
 					{ path: "analytics", element: <AdminAnalyticsPage /> },
