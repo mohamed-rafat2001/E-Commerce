@@ -96,8 +96,8 @@ const models = {
 	},
 	categories: {
 		model: CategoryModel,
-		createFields: ["name", "description", "image", "isActive"],
-		updateFields: ["name", "description", "image", "isActive"],
+		createFields: ["name", "description", "coverImage", "isActive"],
+		updateFields: ["name", "description", "coverImage", "isActive"],
 	},
 	carts: {
 		model: CartModel,

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 const categorySchema = new mongoose.Schema(
 	{
 		userId: {
@@ -31,5 +32,12 @@ const categorySchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
+
+categorySchema.pre("save", function (next) {
+	if (!this.isModified("name")) return next();
+	this.slug = slugify(this.name, { lower: true });
+	next();
+});
+
 // categorySchema.index({ slug: 1 }, { unique: true });
 export default mongoose.model("CategoryModel", categorySchema);
