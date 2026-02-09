@@ -6,8 +6,7 @@ import {
 } from '../../../shared/constants/icons.jsx';
 import { Button, Badge, LoadingSpinner, Input, Select } from '../../../shared/ui/index.js';
 import { FiSearch, FiFilter, FiAlertTriangle, FiTrendingUp, FiTrendingDown, FiPackage, FiEdit2, FiSave } from 'react-icons/fi';
-import useSellerProducts from '../hooks/useSellerProducts.js';
-import useUpdateProduct from '../hooks/useUpdateProduct.js';
+import { useSellerInventoryPage } from '../hooks/index.js';
 
 // Inventory Row Component
 const InventoryRow = ({ product, onUpdateStock, isUpdating }) => {
@@ -90,24 +89,16 @@ const InventoryRow = ({ product, onUpdateStock, isUpdating }) => {
 };
 
 const InventoryPage = () => {
-	const [searchQuery, setSearchQuery] = useState('');
-	const [stockFilter, setStockFilter] = useState('all');
-	const [updatingId, setUpdatingId] = useState(null);
-
-	const { products: allProducts, isLoading, refetch } = useSellerProducts();
-	const { updateProduct, isUpdating } = useUpdateProduct();
-	const products = allProducts || [];
-
-	const filteredProducts = useMemo(() => {
-		return products.filter(p => {
-			const matchesSearch = p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand?.toLowerCase().includes(searchQuery.toLowerCase());
-			let matchesStock = true;
-			if (stockFilter === 'out') matchesStock = p.countInStock === 0;
-			else if (stockFilter === 'low') matchesStock = p.countInStock > 0 && p.countInStock <= 10;
-			else if (stockFilter === 'good') matchesStock = p.countInStock > 10;
-			return matchesSearch && matchesStock;
-		});
-	}, [products, searchQuery, stockFilter]);
+	const {
+		searchQuery,
+		setSearchQuery,
+		stockFilter,
+		setStockFilter,
+		products,
+		isLoading,
+		handleUpdateStock,
+		refetch
+	} = useSellerInventoryPage();
 
 	return (
 		<div className="space-y-8 pb-10">
@@ -156,8 +147,8 @@ const InventoryPage = () => {
 						<tbody className="divide-y divide-slate-50">
 							{isLoading ? (
 								<tr><td colSpan={5} className="py-20 text-center"><LoadingSpinner size="sm" color="indigo" /></td></tr>
-							) : filteredProducts.map(p => (
-								<InventoryRow key={p._id} product={p} onUpdateStock={(id, stock) => updateProduct({ id, product: { countInStock: stock } }, { onSuccess: refetch })} isUpdating={isUpdating} />
+							) : products.map(p => (
+								<InventoryRow key={p._id} product={p} onUpdateStock={handleUpdateStock} isUpdating={false} />
 							))}
 						</tbody>
 					</table>

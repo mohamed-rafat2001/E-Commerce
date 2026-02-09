@@ -4,3 +4,7 @@ export { default as useAddProduct } from './useAddProduct.js';
 export { default as useUpdateProduct } from './useUpdateProduct.js';
 export { default as useDeleteProduct } from './useDeleteProduct.js';
 export { default as useSellerProductsPage } from './useSellerProductsPage.js';
+export { default as useSellerOrdersPage } from './useSellerOrdersPage.js';
+export { default as useSellerInventoryPage } from './useSellerInventoryPage.js';
+export { default as useSellerDashboardPage } from './useSellerDashboardPage.js';
+export { default as useSellerAnalyticsPage } from './useSellerAnalyticsPage.js';

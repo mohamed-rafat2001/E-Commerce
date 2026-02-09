@@ -20,6 +20,8 @@ const ProductsPage = () => {
 		allProducts,
 		isLoading,
 		error,
+		isAdding,
+		isUpdating,
 		statusOptions,
 		handleAddProduct,
 		handleUpdateProduct,
@@ -121,7 +123,7 @@ const ProductsPage = () => {
 				onClose={handleCloseModal}
 				product={editingProduct}
 				onSubmit={editingProduct ? handleUpdateProduct : handleAddProduct}
-				isLoading={editingProduct ? false : false} // We need to fix this logic
+				isLoading={editingProduct ? isUpdating : isAdding}
 			/>
 		</div>
 	);

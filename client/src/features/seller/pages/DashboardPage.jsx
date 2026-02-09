@@ -13,7 +13,7 @@ import {
 } from '../../../shared/constants/icons.jsx';
 import { LoadingSpinner, Button } from '../../../shared/ui/index.js';
 import { FiPlus, FiArrowRight, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
-import useSellerProducts from '../hooks/useSellerProducts.js';
+import { useSellerDashboardPage } from '../hooks/index.js';
 
 // Quick Action Card
 const QuickActionCard = ({ title, description, to, icon: Icon, gradient }) => (
@@ -64,103 +64,32 @@ const AlertCard = ({ title, message, type = 'warning', action }) => {
 	);
 };
 
+// Icon mapping function
+const getIconByName = (iconName) => {
+	switch(iconName) {
+		case 'ProductIcon':
+			return ProductIcon;
+		case 'OrderIcon':
+			return OrderIcon;
+		case 'InventoryIcon':
+			return InventoryIcon;
+		case 'AnalyticsIcon':
+			return AnalyticsIcon;
+		default:
+			return ProductIcon; // fallback icon
+	}
+};
+
 const SellerDashboardPage = () => {
-	const { products, isLoading, error } = useSellerProducts();
-
-	// Calculate real stats from products
-	const stats = useMemo(() => {
-		const totalProducts = products?.length || 0;
-		const activeProducts = products?.filter(p => p.status === 'active').length || 0;
-		const lowStockProducts = products?.filter(p => p.countInStock > 0 && p.countInStock <= 10).length || 0;
-		const outOfStockProducts = products?.filter(p => p.countInStock === 0).length || 0;
-		const totalStock = products?.reduce((sum, p) => sum + (p.countInStock || 0), 0) || 0;
-
-		return [
-			{
-				id: 1,
-				name: 'Total Products',
-				value: totalProducts.toString(),
-				change: `${activeProducts} active`,
-				changeType: 'neutral',
-				icon: ProductIcon,
-				gradient: 'from-emerald-500 to-teal-600',
-			},
-			{
-				id: 2,
-				name: 'Active Orders',
-				value: '43',
-				change: '+12.5%',
-				changeType: 'positive',
-				icon: OrderIcon,
-				gradient: 'from-indigo-500 to-purple-600',
-			},
-			{
-				id: 3,
-				name: 'Total Stock',
-				value: totalStock.toLocaleString(),
-				change: lowStockProducts > 0 ? `${lowStockProducts} low stock` : 'All good',
-				changeType: lowStockProducts > 0 ? 'warning' : 'positive',
-				icon: InventoryIcon,
-				gradient: 'from-orange-500 to-red-500',
-			},
-			{
-				id: 4,
-				name: 'Revenue Today',
-				value: '$4,821',
-				change: '+23.1%',
-				changeType: 'positive',
-				icon: AnalyticsIcon,
-				gradient: 'from-pink-500 to-rose-500',
-			},
-		];
-	}, [products]);
-
-	// Get top products by stock (mock - would be by sales in real data)
-	const topProducts = useMemo(() => {
-		return products?.slice(0, 4).map(p => ({
-			id: p._id,
-			name: p.name,
-			sold: Math.floor(Math.random() * 200) + 50,
-			revenue: `$${(Math.random() * 10000 + 1000).toFixed(0)}`,
-			image: p.coverImage?.secure_url ? 
-				<img src={p.coverImage.secure_url} alt="" className="w-8 h-8 rounded-lg object-cover" /> : 
-				'📦',
-		})) || [];
-	}, [products]);
-
-	// Mock pending orders
-	const pendingOrders = [
-		{ id: 'ORD-891', customer: 'Alex Chen', items: 3, total: '$289.00' },
-		{ id: 'ORD-892', customer: 'Maria Lopez', items: 1, total: '$199.00' },
-		{ id: 'ORD-893', customer: 'James Wilson', items: 5, total: '$459.00' },
-	];
-
-	// Alerts
-	const alerts = useMemo(() => {
-		const alertList = [];
-		const lowStock = products?.filter(p => p.countInStock > 0 && p.countInStock <= 10) || [];
-		const outOfStock = products?.filter(p => p.countInStock === 0) || [];
-
-		if (outOfStock.length > 0) {
-			alertList.push({
-				title: `${outOfStock.length} product${outOfStock.length > 1 ? 's' : ''} out of stock`,
-				message: 'Customers cannot purchase these items',
-				type: 'danger',
-				action: { to: 'inventory', label: 'Manage Inventory →' },
-			});
-		}
-
-		if (lowStock.length > 0) {
-			alertList.push({
-				title: `${lowStock.length} product${lowStock.length > 1 ? 's' : ''} running low`,
-				message: 'Stock levels below 10 units',
-				type: 'warning',
-				action: { to: 'inventory', label: 'View Inventory →' },
-			});
-		}
-
-		return alertList;
-	}, [products]);
+	const {
+		products,
+		stats,
+		topProducts,
+		pendingOrders,
+		alerts,
+		isLoading,
+		error
+	} = useSellerDashboardPage();
 
 	if (isLoading) {
 		return (
@@ -196,9 +125,16 @@ const SellerDashboardPage = () => {
 
 			{/* Stats Grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-				{stats.map((stat, index) => (
-					<StatCard key={stat.id} stat={stat} index={index} />
-				))}
+				{stats.map((stat, index) => {
+					const IconComponent = getIconByName(stat.icon);
+					return (
+						<StatCard 
+							key={stat.id} 
+							stat={{...stat, icon: IconComponent}} 
+							index={index} 
+						/>
+					);
+				})}
 			</div>
 
 			{/* Quick Actions */}

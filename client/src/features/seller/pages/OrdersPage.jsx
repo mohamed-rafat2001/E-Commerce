@@ -1,41 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OrderIcon } from '../../../shared/constants/icons.jsx';
 import { Button, LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { FiSearch, FiFilter, FiEye, FiPackage, FiTruck, FiCheck, FiX, FiClock } from 'react-icons/fi';
 import OrderCard from '../components/OrderCard.jsx';
 import StatCard from '../components/StatCard.jsx';
-import useSellerOrders from '../hooks/useSellerOrders.js';
+import { useSellerOrdersPage } from '../hooks/index.js';
 
 const OrdersPage = () => {
-	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
-	const [isLoading, setIsLoading] = useState(false);
-	const { orders, error } = useSellerOrders();
-
-	// Calculate order stats
-	const orderStats = useMemo(() => ({
-		pending: orders.filter(o => o.status === 'Pending').length,
-		processing: orders.filter(o => o.status === 'Processing').length,
-		shipped: orders.filter(o => o.status === 'Shipped').length,
-		delivered: orders.filter(o => o.status === 'Delivered').length,
-	}), [orders]);
-
-	// Filter orders
-	const filteredOrders = useMemo(() => {
-		return orders.filter(order => {
-			const matchesSearch = 
-				order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				order.customer.name.toLowerCase().includes(searchQuery.toLowerCase());
-			const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-			return matchesSearch && matchesStatus;
-		});
-	}, [orders, searchQuery, statusFilter]);
-
-	const handleUpdateStatus = (orderId, newStatus) => {
-		// TODO: Call API to update order status
-		console.log(`Updating order ${orderId} to ${newStatus}`);
-	};
+	const {
+		searchQuery,
+		setSearchQuery,
+		statusFilter,
+		setStatusFilter,
+		orders,
+		orderStats,
+		error,
+		handleUpdateStatus
+	} = useSellerOrdersPage();
 
 	if (error) {
 		return (
@@ -89,14 +71,10 @@ const OrdersPage = () => {
 				</div>
 			</div>
 
-			{isLoading ? (
-				<div className="flex justify-center py-20">
-					<LoadingSpinner />
-				</div>
-			) : filteredOrders.length > 0 ? (
+			{orders.length > 0 ? (
 				<motion.div layout className="space-y-4">
 					<AnimatePresence mode="popLayout">
-						{filteredOrders.map(order => (
+						{orders.map(order => (
 							<OrderCard 
 								key={order.id}
 								order={order}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
 	AnalyticsIcon,
@@ -15,6 +15,7 @@ import {
 	FiStar,
 	FiCalendar
 } from 'react-icons/fi';
+import { useSellerAnalyticsPage } from '../hooks/index.js';
 
 // Mock analytics data
 const mockAnalytics = {
@@ -223,9 +224,12 @@ const RatingCard = ({ average, count }) => (
 
 // Main Analytics Page
 const AnalyticsPage = () => {
-	const [timeRange, setTimeRange] = useState('month');
-	const isLoading = false;
-	const analytics = mockAnalytics;
+	const {
+		timeRange,
+		setTimeRange,
+		analytics,
+		isLoading
+	} = useSellerAnalyticsPage();
 
 	return (
 		<div className="space-y-6">
