@@ -36,6 +36,7 @@ import {
 	FiFilter,
 	FiEdit2,
 	FiTrash2,
+	FiShield,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -201,4 +202,8 @@ export const EditIcon = ({ className = 'w-5 h-5', ...props }) => (
 
 export const TrashIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FiTrash2 className={className} {...props} />
+);
+
+export const ShieldIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiShield className={className} {...props} />
 );

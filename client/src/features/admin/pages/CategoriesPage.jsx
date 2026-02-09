@@ -94,6 +94,7 @@ const CategoryModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
 								src={formData.coverImage.secure_url} 
 								alt="Preview" 
 								className="w-full h-full object-cover"
+								crossOrigin="anonymous"
 							/>
 							<button
 								type="button"

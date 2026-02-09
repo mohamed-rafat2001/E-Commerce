@@ -78,6 +78,7 @@ const WishlistPage = () => {
 										src={item.itemId.image?.secure_url || "/placeholder-product.png"}
 										alt={item.itemId.name}
 										className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+										crossOrigin="anonymous"
 									/>
 									<button
 										onClick={() => deleteFromWishlist(item.itemId._id)}

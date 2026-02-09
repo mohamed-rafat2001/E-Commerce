@@ -61,6 +61,7 @@ const Avatar = ({
 					src={src}
 					alt={alt}
 					className="w-full h-full object-cover"
+					crossOrigin="anonymous"
 					onError={() => setImageError(true)}
 				/>
 			)}

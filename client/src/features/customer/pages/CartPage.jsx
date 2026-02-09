@@ -112,6 +112,7 @@ const CartPage = () => {
 												src={item.itemId.image?.secure_url || "/placeholder-product.png"}
 												alt={item.itemId.name}
 												className="w-full h-full object-cover"
+												crossOrigin="anonymous"
 											/>
 										</div>
 
