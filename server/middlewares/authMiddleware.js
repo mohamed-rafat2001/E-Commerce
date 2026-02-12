@@ -11,23 +11,39 @@ export const Protect = catchAsync(async (req, res, next) => {
 		req.headers.authorization.startsWith("Bearer")
 	) {
 		token = req.headers.authorization.split(" ")[1];
-	} else if (req.cookies.token) token = req.cookies.token;
-	else  {
-		return next(new appError("no token", 404));
+	} else if (req.cookies.accessToken) {
+		token = req.cookies.accessToken;
 	}
 
-	// veryfication token
-	const decode = jwt.verify(token, process.env.JWT_KEY);
+	if (!token) {
+		return next(new appError("You are not logged in! Please log in to get access.", 401));
+	}
 
-	// check user if still exist
-	const user = await UserModel.findById(decode._id);
+	// verification token
+	try {
+		const decode = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-	if (!user)
-		return next(
-			new appError("the user belong to this token does'nt exist", 400)
-		);
-	req.user = user;
-	next();
+		// check user if still exist
+		const user = await UserModel.findById(decode._id);
+
+		if (!user) {
+			return next(
+				new appError("The user belonging to this token no longer exists.", 401)
+			);
+		}
+
+		if (user.status !== "active") {
+			return next(new appError("Your account has been deactivated.", 403));
+		}
+
+		req.user = user;
+		next();
+	} catch (error) {
+		if (error.name === "TokenExpiredError") {
+			return next(new appError("Token expired", 401));
+		}
+		return next(new appError("Invalid token", 401));
+	}
 });
 
 //authorization and permession

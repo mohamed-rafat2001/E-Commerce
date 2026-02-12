@@ -76,12 +76,18 @@ userSchema.pre("save", async function () {
 	this.password = await bcryptjs.hash(this.password, 12);
 	this.confirmPassword = undefined;
 });
-// create token using jsonwebtoken
-userSchema.methods.CreateToken = function () {
-	const token = jwt.sign({ _id: this._id }, process.env.JWT_KEY, {
-		expiresIn: process.env.JWT_EXPIRES,
+// create access token using jsonwebtoken
+userSchema.methods.CreateAccessToken = function () {
+	return jwt.sign({ _id: this._id }, process.env.JWT_ACCESS_SECRET, {
+		expiresIn: process.env.JWT_ACCESS_EXPIRES,
 	});
-	return token;
+};
+
+// create refresh token using jsonwebtoken
+userSchema.methods.CreateRefreshToken = function () {
+	return jwt.sign({ _id: this._id }, process.env.JWT_REFRESH_SECRET, {
+		expiresIn: process.env.JWT_REFRESH_EXPIRES,
+	});
 };
 
 // create passwordResetToken

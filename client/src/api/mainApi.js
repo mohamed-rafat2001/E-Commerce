@@ -18,8 +18,30 @@ mainApi.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
-		// Just reject the error and let the application logic handle redirects
-		// to avoid infinite loops or conflicting redirect behavior
+		const originalRequest = error.config;
+
+		// If the error is 401 and not already retried
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
+
+			try {
+				// Attempt to refresh the token
+				await axios.post(
+					`${import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1/"}authentications/refresh-token`,
+					{},
+					{ withCredentials: true }
+				);
+
+				// Retry the original request
+				return mainApi(originalRequest);
+			} catch (refreshError) {
+				// If refresh also fails, clear state and redirect to login
+				// This part depends on your auth state management, 
+				// but at minimum we should reject the promise
+				return Promise.reject(refreshError);
+			}
+		}
+
 		return Promise.reject(error);
 	}
 );

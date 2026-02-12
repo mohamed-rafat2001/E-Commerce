@@ -1,4 +1,5 @@
 import catchAsync from "../middlewares/catchAsync.js";
+import jwt from "jsonwebtoken";
 import UserModel from "../models/UserModel.js";
 import CustomerModel from "../models/CustomerModel.js";
 import SellerModel from "../models/SellerModel.js";
@@ -43,14 +44,15 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		phoneNumber,
 		confirmPassword,
-		role: (role === "Admin" || role === "Seller") ? role : "Customer",
+		role: role === "Seller" ? role : "Customer",
 	});
 
 	// check if user created
 	if (!user) return next(new appError("user not created", 400));
 
-	// create token
-	const token = user.CreateToken();
+	// create tokens
+	const accessToken = user.CreateAccessToken();
+	const refreshToken = user.CreateRefreshToken();
 	
 	let userModel;
 	const userRole = user.role;
@@ -85,28 +87,23 @@ export const signUp = catchAsync(async (req, res, next) => {
 	}
 
 	// check if user model created
-	// check if user model created
-	if (!userModel && userRole !== "Admin" && userRole !== "SuperAdmin") {
+	if (!userModel) {
 		// Rollback user creation if profile creation fails
 		await UserModel.findByIdAndDelete(user._id);
 		return next(new appError(`${userRole} profile not created`, 400));
 	}
 
 	// send cookies
-	sendCookies(res, token);
+	sendCookies(res, accessToken, refreshToken);
 	
 	// Get populated profile model to maintain consistent response structure
-	let populatedUser;
-	if (userRole === "Admin" || userRole === "SuperAdmin") {
-		populatedUser = user;
-	} else {
-		populatedUser = await userModel.constructor.findById(userModel._id)
-			.populate("userId", "firstName lastName email phoneNumber role profileImg");
-	}
+	const populatedUser = await userModel.constructor.findById(userModel._id)
+		.populate("userId", "firstName lastName email phoneNumber role profileImg");
 
 	// send response to client
-	sendResponse(res, 201, { user: populatedUser, token });
+	sendResponse(res, 201, { user: populatedUser });
 });
+
 export const login = catchAsync(async (req, res, next) => {
 	const { email, password } = req.body;
 
@@ -122,11 +119,12 @@ export const login = catchAsync(async (req, res, next) => {
 	if (!isPasswordCorrect)
 		return next(new appError("email or password is incorrect", 400));
 
-	// create token
-	const token = user.CreateToken();
+	// create tokens
+	const accessToken = user.CreateAccessToken();
+	const refreshToken = user.CreateRefreshToken();
 
 	// send cookies
-	sendCookies(res, token);
+	sendCookies(res, accessToken, refreshToken);
 	
 	// Get populated profile model to maintain consistent response structure
 	let userProfile;
@@ -143,12 +141,38 @@ export const login = catchAsync(async (req, res, next) => {
 	if (!userProfile) return next(new appError("User profile not found", 404));
 
 	// send response
-	sendResponse(res, 200, { user: userProfile, token });
+	sendResponse(res, 200, { user: userProfile });
+});
+
+export const refreshToken = catchAsync(async (req, res, next) => {
+	const refreshToken = req.cookies.refreshToken;
+
+	if (!refreshToken) {
+		return next(new appError("You are not logged in! Please log in to get access.", 401));
+	}
+
+	// Verify refresh token
+	const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+	// Check if user still exists
+	const user = await UserModel.findById(decoded._id);
+	if (!user) {
+		return next(new appError("The user belonging to this token no longer exists.", 401));
+	}
+
+	// Create new tokens
+	const newAccessToken = user.CreateAccessToken();
+	const newRefreshToken = user.CreateRefreshToken();
+
+	// Send new cookies
+	sendCookies(res, newAccessToken, newRefreshToken);
+
+	sendResponse(res, 200, { status: "success" });
 });
 
 // logOut function
 export const logOut = catchAsync(async (req, res, next) => {
-	sendCookies(res, "");
+	sendCookies(res, null, null);
 	sendResponse(res, 200, {});
 });
 
@@ -278,10 +302,11 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 	user.passwordResetExpires = undefined;
 	await user.save();
 
-	const token = user.CreateToken();
+	const accessToken = user.CreateAccessToken();
+	const refreshToken = user.CreateRefreshToken();
 
-	sendCookies(res, token);
-	sendResponse(res, 200, { user, token });
+	sendCookies(res, accessToken, refreshToken);
+	sendResponse(res, 200, { user });
 });
 
 // update password
@@ -305,8 +330,10 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 	user.confirmPassword = confirmPassword;
 	await user.save();
 
-	// create token
-	const token = user.CreateToken();
-	sendCookies(res, token);
-	sendResponse(res, 200, { user, token });
+	// create tokens
+	const accessToken = user.CreateAccessToken();
+	const refreshToken = user.CreateRefreshToken();
+
+	sendCookies(res, accessToken, refreshToken);
+	sendResponse(res, 200, { user });
 });

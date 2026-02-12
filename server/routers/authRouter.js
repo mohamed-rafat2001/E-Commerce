@@ -9,6 +9,7 @@ import {
 	getMe,
 	updatePersonalDetails,
 	deleteMe,
+	refreshToken,
 } from "../controllers/authController.js";
 import { Protect } from "../middlewares/authMiddleware.js";
 import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
@@ -95,6 +96,18 @@ router.post("/signUp", signUp);
  *         description: Login successful
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /api/v1/authentications/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ */
+router.post("/refresh-token", refreshToken);
 
 /**
  * @swagger
