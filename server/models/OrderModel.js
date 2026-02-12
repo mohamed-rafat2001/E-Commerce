@@ -7,7 +7,12 @@ const orderSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
-		sellerIds: [],
+		sellerIds: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "SellerModel",
+			},
+		],
 		items: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

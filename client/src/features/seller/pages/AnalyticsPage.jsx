@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-	AnalyticsIcon,
-	ProductIcon,
-	OrderIcon 
+	ProductIcon
 } from '../../../shared/constants/icons.jsx';
-import { LoadingSpinner } from '../../../shared/ui/index.js';
+import { LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { 
 	FiTrendingUp, 
 	FiTrendingDown, 
@@ -77,7 +75,7 @@ const MiniBarChart = ({ data, color = 'indigo' }) => {
 					initial={{ height: 0 }}
 					animate={{ height: `${(value / max) * 100}%` }}
 					transition={{ delay: index * 0.05 }}
-					className={`flex-1 rounded-t bg-gradient-to-t ${colorClasses[color]} opacity-80 hover:opacity-100 transition-opacity`}
+					className={`flex-1 rounded-t bg-linear-to-t ${colorClasses[color]} opacity-80 hover:opacity-100 transition-opacity`}
 				/>
 			))}
 		</div>
@@ -103,9 +101,9 @@ const LargeStatCard = ({ title, value, change, icon: Icon, chartData, color, pre
 						<span>{isPositive ? '+' : ''}{change}% from last month</span>
 					</div>
 				</div>
-				<div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${color}-500 to-${color}-600 flex items-center justify-center`}
+				<div className={`w-12 h-12 rounded-xl bg-linear-to-br from-${color}-500 to-${color}-600 flex items-center justify-center`}
 					style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }}>
-					<Icon className="w-6 h-6 text-white" />
+					{Icon && <Icon className="w-6 h-6 text-white" />}
 				</div>
 			</div>
 			{chartData && <MiniBarChart data={chartData} color={color} />}
@@ -121,8 +119,8 @@ const SmallStatCard = ({ title, value, icon: Icon, gradient }) => (
 		className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
 	>
 		<div className="flex items-center gap-4">
-			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-				<Icon className="w-6 h-6 text-white" />
+			<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${gradient} flex items-center justify-center`}>
+				{Icon && <Icon className="w-6 h-6 text-white" />}
 			</div>
 			<div>
 				<h4 className="text-2xl font-bold text-gray-900">{value}</h4>
@@ -203,7 +201,7 @@ const RatingCard = ({ average, count }) => (
 	<motion.div
 		initial={{ opacity: 0, scale: 0.9 }}
 		animate={{ opacity: 1, scale: 1 }}
-		className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-6 text-white"
+		className="bg-linear-to-br from-amber-500 to-orange-500 rounded-2xl p-6 text-white"
 	>
 		<div className="flex items-center gap-4">
 			<div className="text-5xl font-bold">{average}</div>
@@ -224,12 +222,13 @@ const RatingCard = ({ average, count }) => (
 
 // Main Analytics Page
 const AnalyticsPage = () => {
+	const [timeRange, setTimeRange] = useState('month');
 	const {
-		timeRange,
-		setTimeRange,
 		analytics,
 		isLoading
-	} = useSellerAnalyticsPage();
+	} = useSellerAnalyticsPage(timeRange);
+
+	const safeAnalytics = analytics || mockAnalytics;
 
 	return (
 		<div className="space-y-6">
@@ -239,16 +238,18 @@ const AnalyticsPage = () => {
 					<h1 className="text-3xl font-bold text-gray-900">Sales Analytics 📈</h1>
 					<p className="text-gray-500 mt-1">Track your store performance and insights</p>
 				</div>
-				<select
-					value={timeRange}
-					onChange={(e) => setTimeRange(e.target.value)}
-					className="px-4 py-2 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-				>
-					<option value="week">Last 7 days</option>
-					<option value="month">Last 30 days</option>
-					<option value="quarter">Last 3 months</option>
-					<option value="year">Last 12 months</option>
-				</select>
+				<div className="min-w-[200px]">
+					<Select
+						value={timeRange}
+						onChange={setTimeRange}
+						options={[
+							{ value: 'week', label: 'Last 7 days' },
+							{ value: 'month', label: 'Last 30 days' },
+							{ value: 'quarter', label: 'Last 3 months' },
+							{ value: 'year', label: 'Last 12 months' },
+						]}
+					/>
+				</div>
 			</div>
 
 			{isLoading ? (
@@ -261,19 +262,19 @@ const AnalyticsPage = () => {
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<LargeStatCard
 							title="Total Revenue"
-							value={analytics.revenue.total.toFixed(2)}
-							change={analytics.revenue.change}
+							value={safeAnalytics.revenue.total.toFixed(2)}
+							change={safeAnalytics.revenue.change}
 							icon={FiDollarSign}
-							chartData={analytics.revenue.chartData}
+							chartData={safeAnalytics.revenue.chartData}
 							color="emerald"
 							prefix="$"
 						/>
 						<LargeStatCard
 							title="Total Orders"
-							value={analytics.orders.total}
-							change={analytics.orders.change}
+							value={safeAnalytics.orders.total}
+							change={safeAnalytics.orders.change}
 							icon={FiShoppingBag}
-							chartData={analytics.orders.chartData}
+							chartData={safeAnalytics.orders.chartData}
 							color="indigo"
 						/>
 					</div>
@@ -282,25 +283,25 @@ const AnalyticsPage = () => {
 					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 						<SmallStatCard
 							title="Total Products"
-							value={analytics.products.total}
+							value={safeAnalytics.products.total}
 							icon={ProductIcon}
 							gradient="from-violet-500 to-purple-600"
 						/>
 						<SmallStatCard
 							title="Active Listings"
-							value={analytics.products.active}
+							value={safeAnalytics.products.active}
 							icon={FiShoppingBag}
 							gradient="from-emerald-500 to-teal-600"
 						/>
 						<SmallStatCard
 							title="Total Customers"
-							value={analytics.customers.total}
+							value={safeAnalytics.customers.total}
 							icon={FiUsers}
 							gradient="from-blue-500 to-indigo-600"
 						/>
 						<SmallStatCard
 							title="Returning Customers"
-							value={analytics.customers.returning}
+							value={safeAnalytics.customers.returning}
 							icon={FiUsers}
 							gradient="from-pink-500 to-rose-600"
 						/>
@@ -310,13 +311,13 @@ const AnalyticsPage = () => {
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 						{/* Top Products - Takes 2 columns */}
 						<div className="lg:col-span-2">
-							<TopProductsCard products={analytics.topProducts} />
+							<TopProductsCard products={safeAnalytics.topProducts} />
 						</div>
 
 						{/* Right Column */}
 						<div className="space-y-6">
-							<RatingCard average={analytics.rating.average} count={analytics.rating.count} />
-							<RecentSalesCard sales={analytics.recentSales} />
+							<RatingCard average={safeAnalytics.rating.average} count={safeAnalytics.rating.count} />
+							<RecentSalesCard sales={safeAnalytics.recentSales} />
 						</div>
 					</div>
 				</>

@@ -10,7 +10,7 @@ const StatCard = ({ stat, index, title, value, change, changeType, icon: Icon, g
   const finalChange = useStatObject ? stat.change : change;
   const finalChangeType = useStatObject ? stat.changeType : changeType;
   const finalGradient = useStatObject ? stat.gradient : gradient || color;
-  const finalIcon = useStatObject ? stat.icon : Icon;
+  const FinalIcon = useStatObject ? stat.icon : Icon;
   
   const isPositive = finalChangeType === 'positive';
   const isNeutral = finalChangeType === 'neutral';
@@ -27,8 +27,8 @@ const StatCard = ({ stat, index, title, value, change, changeType, icon: Icon, g
           <p className="text-gray-500 text-sm font-medium">{finalTitle}</p>
           <h3 className="text-2xl font-bold text-gray-900 mt-1">{finalValue}</h3>
         </div>
-        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${finalGradient} flex items-center justify-center`}>
-          {finalIcon && <finalIcon className="w-5 h-5 text-white" />}
+        <div className={`w-10 h-10 rounded-xl bg-linear-to-br ${finalGradient} flex items-center justify-center`}>
+          {FinalIcon && <FinalIcon className="w-5 h-5 text-white" />}
         </div>
       </div>
       {finalChange && (

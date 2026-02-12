@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import useSellerProducts from '../hooks/useSellerProducts.js';
-import useAddProduct from '../hooks/useAddProduct.js';
-import useUpdateProduct from '../hooks/useUpdateProduct.js';
-import useDeleteProduct from '../hooks/useDeleteProduct.js';
+import useSellerProducts from './useSellerProducts.js';
+import useAddProduct from './useAddProduct.js';
+import useUpdateProduct from './useUpdateProduct.js';
+import useDeleteProduct from './useDeleteProduct.js';
 
 const statusOptions = [
 	{ value: 'draft', label: 'Draft' },

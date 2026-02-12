@@ -23,7 +23,7 @@ const QuickActionCard = ({ title, description, to, icon: Icon, gradient }) => (
 			whileTap={{ scale: 0.98 }}
 			className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer group"
 		>
-			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4`}>
+			<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${gradient} flex items-center justify-center mb-4`}>
 				<Icon className="w-6 h-6 text-white" />
 			</div>
 			<h3 className="font-bold text-gray-900 mb-1">{title}</h3>
@@ -50,7 +50,7 @@ const AlertCard = ({ title, message, type = 'warning', action }) => {
 			animate={{ opacity: 1, x: 0 }}
 			className={`p-4 rounded-xl border ${typeStyles[type]} flex items-start gap-3`}
 		>
-			<FiAlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+			<FiAlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
 			<div className="flex-1">
 				<h4 className="font-semibold">{title}</h4>
 				<p className="text-sm opacity-80">{message}</p>
@@ -84,17 +84,45 @@ const SellerDashboardPage = () => {
 	const {
 		products,
 		stats,
+		statsArray,
 		topProducts,
 		pendingOrders,
 		alerts,
 		isLoading,
-		error
+		error,
+		refetch,
+		isError
 	} = useSellerDashboardPage();
 
 	if (isLoading) {
 		return (
 			<div className="flex justify-center items-center py-20">
 				<LoadingSpinner />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="flex flex-col items-center justify-center py-20 px-4">
+				<div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md w-full text-center">
+					<div className="text-red-500 mb-4">
+						<FiAlertTriangle className="w-12 h-12 mx-auto" />
+					</div>
+					<h2 className="text-xl font-bold text-gray-900 mb-2">Dashboard Unavailable</h2>
+					<p className="text-gray-600 mb-6">{error}</p>
+					<div className="flex flex-col sm:flex-row gap-3 justify-center">
+						<Button 
+							onClick={refetch}
+							className="bg-red-500 hover:bg-red-600 text-white"
+						>
+							Retry Load
+						</Button>
+						<Link to="/seller/products">
+							<Button variant="outline">View Products</Button>
+						</Link>
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -115,7 +143,7 @@ const SellerDashboardPage = () => {
 			</div>
 
 			{/* Alerts */}
-			{alerts.length > 0 && (
+			{alerts && alerts.length > 0 && (
 				<div className="space-y-3">
 					{alerts.map((alert, index) => (
 						<AlertCard key={index} {...alert} />
@@ -125,7 +153,7 @@ const SellerDashboardPage = () => {
 
 			{/* Stats Grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-				{stats.map((stat, index) => {
+				{statsArray.map((stat, index) => {
 					const IconComponent = getIconByName(stat.icon);
 					return (
 						<StatCard 
@@ -183,7 +211,7 @@ const SellerDashboardPage = () => {
 						animate={{ opacity: 1, y: 0 }}
 						className="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 text-center"
 					>
-						<div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<div className="w-16 h-16 bg-linear-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
 							<ProductIcon className="w-8 h-8 text-indigo-500" />
 						</div>
 						<h3 className="text-lg font-bold text-gray-900 mb-2">No products yet</h3>

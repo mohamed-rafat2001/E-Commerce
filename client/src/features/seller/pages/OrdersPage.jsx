@@ -85,7 +85,7 @@ const OrdersPage = () => {
 				</motion.div>
 			) : (
 				<div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-					<div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<div className="w-20 h-20 bg-linear-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
 						<OrderIcon className="w-10 h-10 text-indigo-500" />
 					</div>
 					<h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Card, Badge } from '../../../shared/ui/index.js';
 
-const PendingOrders = ({ orders }) => {
+const PendingOrders = ({ orders = [] }) => {
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
@@ -13,12 +13,12 @@ const PendingOrders = ({ orders }) => {
 					<div className="flex items-center justify-between">
 						<Card.Title>Pending Orders</Card.Title>
 						<Badge variant="warning" size="sm">
-							{orders.length} New
+							{(orders || []).length} New
 						</Badge>
 					</div>
 				</Card.Header>
 				<Card.Content className="space-y-3">
-					{orders.map((order, index) => (
+					{(orders || []).map((order, index) => (
 						<motion.div
 							key={order.id}
 							className="p-4 rounded-xl border border-gray-100 hover:border-emerald-200 

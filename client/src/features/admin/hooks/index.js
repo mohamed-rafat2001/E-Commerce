@@ -24,3 +24,5 @@ export { default as useOrdersPage } from './useOrdersPage.js';
 export { default as useCategoriesPage } from './useCategoriesPage.js';
 export { default as useDashboardPage } from './useDashboardPage.js';
 export { default as useAnalyticsPage } from './useAnalyticsPage.js';
+export { useDashboardStats } from './useDashboardStats.js';
+export { useAdminAnalytics } from './useAdminAnalytics.js';

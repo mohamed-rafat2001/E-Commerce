@@ -1,4 +1,6 @@
 import OrderModel from "../models/OrderModel.js";
+import SellerModel from "../models/SellerModel.js";
+import OrderItemsModel from "../models/OrderItemsModel.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -24,6 +26,43 @@ export const createOrder = createDoc(OrderModel, [
 // @route   GET /api/v1/orders/:id
 // @access  Private
 export const getOrderById = getById(OrderModel);
+
+// @desc    Get seller orders
+// @route   GET /api/v1/orders/seller
+// @access  Private/Seller
+export const getSellerOrders = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
+
+	const orderItems = await OrderItemsModel.find({ sellerId: seller._id })
+		.populate({
+			path: "orderId",
+			populate: { path: "userId", select: "name email" },
+		})
+		.populate("items.item", "name coverImage brand price")
+		.sort("-createdAt");
+
+	const transformedOrders = orderItems.map((oi) => ({
+		id: oi.orderId?._id || oi._id,
+		status: oi.orderId?.status || "Pending",
+		date: oi.createdAt,
+		customer: {
+			name: oi.orderId?.userId?.name || "Unknown",
+			email: oi.orderId?.userId?.email || "N/A",
+		},
+		total: oi.totalPrice?.amount || 0,
+		items: oi.items.map((item) => ({
+			name: item.item?.name || "Product",
+			quantity: item.quantity,
+			price: item.price?.amount || 0,
+			image: item.item?.coverImage?.secure_url || "📦", // Default icon if no image
+		})),
+	}));
+
+	sendResponse(res, 200, transformedOrders);
+});
 
 // @desc    Update order status
 // @route   PATCH /api/v1/orders/:id/status

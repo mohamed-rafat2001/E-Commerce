@@ -4,9 +4,10 @@ import {
 	getOrderById,
 	getMyOrder,
 	getMyOrders,
+	getSellerOrders,
 	updateOrderStatus,
 } from "../controllers/orderController.js";
-import { Protect } from "../middlewares/authMiddleware.js";
+import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -65,6 +66,20 @@ router.route("/").post(createOrder);
 router.route("/myorders").get(getMyOrders);
 
 router.route("/myorders/:id").get(getMyOrder);
+
+/**
+ * @swagger
+ * /api/v1/orders/seller:
+ *   get:
+ *     summary: Get all orders for the current seller
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of seller's orders
+ */
+router.route("/seller").get(restrictTo("Seller"), getSellerOrders);
 
 /**
  * @swagger
