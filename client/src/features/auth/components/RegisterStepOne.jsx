@@ -70,21 +70,6 @@ const RegisterStepOne = ({
 						<StoreIcon className={`w-5 h-5 mr-2 ${selectedRole === "Seller" ? "text-blue-600" : "text-gray-400"}`} />
 						<span className="font-medium text-sm">Seller</span>
 					</label>
-					<label
-						className={`col-span-2 relative flex flex-row items-center justify-center p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50 ${
-							selectedRole === "Admin"
-								? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
-								: "border-gray-200 text-gray-600"
-						}`}
-					>
-						<input
-							type="radio"
-							value="Admin"
-							className="sr-only"
-							{...register("role")}
-						/>
-						<span className="font-medium text-sm">Admin (Testing Only)</span>
-					</label>
 				</div>
 			</div>
 
