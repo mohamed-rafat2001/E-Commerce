@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Card, Badge } from '../../../shared/ui/index.js';
 
-const TopProducts = ({ products }) => {
+const TopProducts = ({ products = [] }) => {
 	return (
 		<motion.div
 			className="lg:col-span-2"
@@ -20,9 +20,9 @@ const TopProducts = ({ products }) => {
 				</Card.Header>
 				<Card.Content>
 					<div className="space-y-4">
-						{products.map((product, index) => (
+						{(products || []).map((product, index) => (
 							<motion.div
-								key={product.id}
+								key={product._id || product.id}
 								className="flex items-center gap-4 p-4 rounded-xl bg-gray-50/50 
 									hover:bg-gray-100/50 transition-all duration-200"
 								initial={{ opacity: 0, x: -20 }}
@@ -31,15 +31,15 @@ const TopProducts = ({ products }) => {
 							>
 								<span className="w-12 h-12 rounded-xl bg-white shadow-sm 
 									flex items-center justify-center text-2xl">
-									{product.image}
+									{product.name?.charAt(0) || 'P'}
 								</span>
 								<div className="flex-1">
 									<p className="font-semibold text-gray-900">{product.name}</p>
-									<p className="text-sm text-gray-500">{product.sold} units sold</p>
+									<p className="text-sm text-gray-500">Rating: {product.ratingAverage || 'N/A'}</p>
 								</div>
 								<div className="text-right">
-									<p className="font-bold text-gray-900">{product.revenue}</p>
-									<p className="text-xs text-gray-500">Total Revenue</p>
+									<p className="font-bold text-gray-900">${product.price || '0.00'}</p>
+									<p className="text-xs text-gray-500">Price</p>
 								</div>
 							</motion.div>
 						))}

@@ -29,12 +29,12 @@ const PendingOrders = ({ orders = [] }) => {
 						>
 							<div className="flex items-center justify-between mb-2">
 								<span className="font-mono text-sm text-gray-500">{order.id}</span>
-								<Badge variant="warning" size="sm">Pending</Badge>
+								<Badge variant="warning" size="sm">{order.status}</Badge>
 							</div>
 							<p className="font-semibold text-gray-900">{order.customer}</p>
 							<div className="flex items-center justify-between mt-2 text-sm">
-								<span className="text-gray-500">{order.items} items</span>
-								<span className="font-bold text-emerald-600">{order.total}</span>
+								<span className="text-gray-500">{order.amount?.toFixed(2) || 'N/A'} USD</span>
+								<span className="font-bold text-emerald-600">{order.date ? new Date(order.date).toLocaleDateString() : 'N/A'}</span>
 							</div>
 						</motion.div>
 					))}

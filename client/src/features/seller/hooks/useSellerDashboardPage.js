@@ -18,90 +18,42 @@ const useSellerDashboardPage = () => {
     cacheTime: 300000, // Cache data for 5 minutes
   });
 
-  // Enhanced mock data with realistic scenarios
-  const generateMockData = () => {
-    const baseProducts = [
-      { id: 1, name: "Wireless Bluetooth Headphones", sales: 45, revenue: 2250, stock: 15 },
-      { id: 2, name: "Smart Fitness Tracker", sales: 38, revenue: 1900, stock: 8 },
-      { id: 3, name: "Portable Phone Charger", sales: 32, revenue: 1600, stock: 2 },
-      { id: 4, name: "Ergonomic Office Chair", sales: 28, revenue: 2800, stock: 5 },
-      { id: 5, name: "Stainless Steel Water Bottle", sales: 22, revenue: 660, stock: 0 }
-    ];
-
-    const baseOrders = [
-      { id: "ORD-001", customer: "John Smith", amount: 250.99, status: "completed", date: "2024-01-15", items: 3 },
-      { id: "ORD-002", customer: "Sarah Johnson", amount: 180.50, status: "pending", date: "2024-01-15", items: 2 },
-      { id: "ORD-003", customer: "Mike Wilson", amount: 320.75, status: "shipped", date: "2024-01-14", items: 1 },
-      { id: "ORD-004", customer: "Emily Davis", amount: 145.25, status: "processing", date: "2024-01-14", items: 4 },
-      { id: "ORD-005", customer: "Robert Brown", amount: 89.99, status: "completed", date: "2024-01-13", items: 1 }
-    ];
-
-    // Simulate some dynamic data
-    const lowStockItems = baseProducts.filter(p => p.stock <= 5).length;
-    const pendingOrders = baseOrders.filter(o => o.status === "pending" || o.status === "processing").length;
-    
-    return {
-      totalProducts: baseProducts.length,
-      totalOrders: baseOrders.length * 12, // Simulate monthly orders
-      totalRevenue: baseProducts.reduce((sum, p) => sum + p.revenue, 0) * 4, // Simulate monthly revenue
-      pendingOrders: pendingOrders,
-      lowStockItems: lowStockItems,
-      recentOrders: baseOrders,
-      topProducts: baseProducts.sort((a, b) => b.sales - a.sales),
-      revenueTrend: [
-        { month: "Jan", revenue: 8500 },
-        { month: "Feb", revenue: 9200 },
-        { month: "Mar", revenue: 11800 },
-        { month: "Apr", revenue: 10500 },
-        { month: "May", revenue: 12500 },
-        { month: "Jun", revenue: 13200 }
-      ],
-      orderStats: {
-        completed: baseOrders.filter(o => o.status === "completed").length * 8,
-        pending: pendingOrders * 4,
-        shipped: baseOrders.filter(o => o.status === "shipped").length * 6,
-        cancelled: 3
-      }
-    };
-  };
-
-  const mockSellerStats = generateMockData();
-
-  // Merge with API data if available
+  // Use only real API data
   const stats = {
-    totalProducts: statsData?.data?.totalProducts || mockSellerStats.totalProducts,
-    totalOrders: statsData?.data?.totalOrders || mockSellerStats.totalOrders,
-    totalRevenue: statsData?.data?.totalRevenue || mockSellerStats.totalRevenue,
-    pendingOrders: statsData?.data?.pendingOrders || mockSellerStats.pendingOrders,
-    lowStockItems: statsData?.data?.lowStockItems || mockSellerStats.lowStockItems,
-    recentOrders: statsData?.data?.recentOrders || mockSellerStats.recentOrders,
-    topProducts: statsData?.data?.topProducts || mockSellerStats.topProducts,
-    revenueTrend: statsData?.data?.revenueTrend || mockSellerStats.revenueTrend,
-    orderStats: statsData?.data?.orderStats || mockSellerStats.orderStats
+    totalProducts: statsData?.data?.totalProducts || 0,
+    totalOrders: statsData?.data?.totalOrders || 0,
+    totalRevenue: statsData?.data?.totalRevenue || 0,
+    pendingOrders: statsData?.data?.pendingOrders || 0,
+    lowStockItems: statsData?.data?.lowStockItems || 0,
+    recentOrders: statsData?.data?.recentOrders || [],
+    topProducts: statsData?.data?.topProducts || [],
+    revenueTrend: statsData?.data?.revenueTrend || [],
+    orderStats: statsData?.data?.orderStats || {}
   };
 
-  // Mock alerts data
-  const alerts = [
-    {
+  // Dynamic alerts based on real data
+  const alerts = [];
+  
+  if (stats.lowStockItems > 0) {
+    alerts.push({
       title: "Low Stock Alert",
-      message: "3 products are running low on inventory",
+      message: `${stats.lowStockItems} products are running low on inventory`,
       type: "warning",
       action: { to: "/seller/inventory", label: "View Inventory" }
-    },
-    {
+    });
+  }
+  
+  if (stats.pendingOrders > 0) {
+    alerts.push({
       title: "New Order",
-      message: "You have 2 new orders to fulfill",
+      message: `You have ${stats.pendingOrders} new orders to fulfill`,
       type: "info",
       action: { to: "/seller/orders", label: "View Orders" }
-    }
-  ];
+    });
+  }
 
-  // Mock products data
-  const products = [
-    { id: 1, name: "Product A", stock: 5, status: "active" },
-    { id: 2, name: "Product B", stock: 0, status: "out_of_stock" },
-    { id: 3, name: "Product C", stock: 12, status: "active" }
-  ];
+  // Use real products data from seller's inventory
+  const products = stats.topProducts || [];
 
   // Enhanced error handling with user-friendly messages
   const error = statsError || statsData?.error;

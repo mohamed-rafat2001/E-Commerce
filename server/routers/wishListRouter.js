@@ -17,6 +17,21 @@ const router = express.Router();
 
 router.use(Protect);
 
+// Get user's wishlist
+router.get("/user", showWishList);
+
+/**
+ * @swagger
+ * /api/v1/wishlist/user:
+ *   get:
+ *     summary: Get current user's wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User's wishlist retrieved successfully
+ */
 /**
  * @swagger
  * /api/v1/wishlist/{id}:

@@ -35,6 +35,8 @@ const DashboardPage = () => {
 		alerts,
 		isLoading,
 		error,
+		refetch,
+		isError
 	} = useSellerDashboardPage();
 
 	return (
@@ -92,67 +94,44 @@ const DashboardPage = () => {
 
 					{/* Main Stats */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-						{(statsArray && statsArray.length > 0 ? statsArray : [
-							{
-								title: 'Total Revenue',
-								value: `$${(stats?.totalRevenue || 0).toLocaleString()}`,
-								change: stats?.revenueChange || '+0%',
-								icon: <FiDollarSign className="w-5 h-5 text-white" />,
-								gradient: 'from-emerald-500 to-teal-600',
-							},
-							{
-								title: 'Total Orders',
-								value: stats?.totalOrders || 0,
-								change: stats?.ordersChange || '+0%',
-								icon: <FiShoppingBag className="w-5 h-5 text-white" />,
-								gradient: 'from-blue-500 to-indigo-600',
-							},
-							{
-								title: 'Total Products',
-								value: stats?.totalProducts || 0,
-								change: stats?.productsChange || '+0',
-								icon: <FiBox className="w-5 h-5 text-white" />,
-								gradient: 'from-violet-500 to-purple-600',
-							},
-							{
-								title: 'Low Stock',
-								value: stats?.lowStockCount || 0,
-								change: 'Needs attention',
-								icon: <FiAlertTriangle className="w-5 h-5 text-white" />,
-								gradient: 'from-rose-500 to-red-600',
-							},
-						]).map((stat, index) => (
-							<motion.div
-								key={stat.title}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: index * 0.1 }}
-								className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
-							>
-								<div className="flex items-center justify-between mb-3">
-									<div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-										{stat.icon}
+						{statsArray && statsArray.length > 0 ? (
+							statsArray.map((stat, index) => (
+								<motion.div
+									key={stat.id}
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: index * 0.1 }}
+									className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
+								>
+									<div className="flex items-center justify-between mb-3">
+										<div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+											{stat.icon}
+										</div>
+										<span className={`text-xs font-bold px-2 py-1 rounded-lg ${
+											stat.changeType === 'positive'
+												? 'bg-emerald-50 text-emerald-700'
+												: stat.changeType === 'negative'
+													? 'bg-rose-50 text-rose-700'
+													: 'bg-gray-50 text-gray-600'
+										}`}>
+											{stat.change}
+										</span>
 									</div>
-									<span className={`text-xs font-bold px-2 py-1 rounded-lg ${
-										String(stat.change).startsWith('+') || String(stat.change).startsWith('$') 
-											? 'bg-emerald-50 text-emerald-700' 
-											: String(stat.change).includes('attention')
-												? 'bg-rose-50 text-rose-700'
-												: 'bg-gray-50 text-gray-600'
-									}`}>
-										{stat.change}
-									</span>
-								</div>
-								<h4 className="text-2xl font-black text-gray-900">{stat.value}</h4>
-								<p className="text-sm text-gray-500 font-medium">{stat.title}</p>
-							</motion.div>
-						))}
+									<h4 className="text-2xl font-black text-gray-900">{stat.value}</h4>
+									<p className="text-sm text-gray-500 font-medium">{stat.title}</p>
+								</motion.div>
+							))
+						) : (
+							<div className="col-span-4 text-center py-10 text-gray-500">
+								<p>Loading stats...</p>
+							</div>
+						)}
 					</div>
 
 					{/* Middle Section */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						<PendingOrders orders={stats?.recentOrders} />
-						<TopProducts products={products || stats?.topProducts} />
+						<PendingOrders orders={stats?.recentOrders || []} />
+						<TopProducts products={products || stats?.topProducts || []} />
 					</div>
 
 					{/* Quick Actions */}
