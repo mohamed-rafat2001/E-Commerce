@@ -20,11 +20,14 @@ export const deleteAllProducts = () => deleteFunc("products");
 // Get seller's orders (orders containing seller's products)
 export const getSellerOrders = () => getFunc("orders/seller");
 
-// Update order item status (for seller's items in an order)
-export const updateOrderItemStatus = (orderId, itemId, status) => 
-	updateFunc(`orders/${orderId}/items/${itemId}/status`, { status });
+// Update order status from seller panel
+export const updateSellerOrderStatus = (orderId, status) => 
+	updateFunc(`sellers/orders/${orderId}/status`, { status });
 
 // ===== SELLER PROFILE SERVICES =====
+// Get seller profile
+export const getSellerProfile = () => getFunc("sellers/profile");
+
 // Update seller profile
 export const updateSellerProfile = (data) => updateFunc("sellers", data);
 

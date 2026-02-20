@@ -5,43 +5,59 @@ const useSellerAnalyticsPage = (dateRange = 'month') => {
   const { data: response, isLoading, error } = useQuery({
     queryKey: ["sellerAnalytics", dateRange],
     queryFn: getSellerAnalytics,
-    refetchInterval: 300000, // Refetch every 5 minutes
+    refetchInterval: 300000,
   });
 
   const data = response?.data?.data;
 
-  // Transform data for the UI
-  const analytics = {
+  // Transform data for the UI with proper fallbacks
+  const analytics = data ? {
     revenue: {
-      total: data?.totalRevenue || 0,
-      change: 12.5, // Placeholder for actual calculation
-      chartData: data?.revenueTrend?.map(d => d.revenue) || [0, 0, 0, 0, 0, 0, 0],
+      total: data.totalRevenue || 0,
+      change: data.revenueTrend?.length >= 2 
+        ? ((data.revenueTrend[data.revenueTrend.length - 1]?.revenue - data.revenueTrend[data.revenueTrend.length - 2]?.revenue) / 
+           (data.revenueTrend[data.revenueTrend.length - 2]?.revenue || 1) * 100).toFixed(1)
+        : 0,
+      chartData: data.revenueTrend?.map(d => d.revenue) || [],
     },
     orders: {
-      total: data?.totalOrders || 0,
-      change: 8.2, // Placeholder
-      chartData: data?.revenueTrend?.map(d => d.revenue > 0 ? Math.floor(d.revenue / 50) : 0) || [0, 0, 0, 0], // Simple mock for orders trend
+      total: data.totalOrders || 0,
+      change: data.revenueTrend?.length >= 2 
+        ? ((data.revenueTrend[data.revenueTrend.length - 1]?.orders - data.revenueTrend[data.revenueTrend.length - 2]?.orders) /
+           (data.revenueTrend[data.revenueTrend.length - 2]?.orders || 1) * 100).toFixed(1)
+        : 0,
+      chartData: data.revenueTrend?.map(d => d.orders) || [],
     },
     products: {
-      total: data?.totalProducts || 0,
-      active: data?.totalProducts || 0,
-      draft: 0,
+      total: data.totalProducts || 0,
+      active: data.activeProducts || 0,
+      draft: data.draftProducts || 0,
     },
     customers: {
-      total: 89, // Placeholder
-      returning: 45, // Placeholder
-      new: 44, // Placeholder
+      total: data.statusBreakdown
+        ? Object.values(data.statusBreakdown).reduce((a, b) => a + b, 0) 
+        : 0,
+      returning: data.statusBreakdown?.Delivered || 0,
+      new: data.statusBreakdown?.Pending || 0,
     },
     rating: {
-      average: 4.7, // Placeholder
-      count: 234, // Placeholder
+      average: data.sellerRating?.average || 0,
+      count: data.sellerRating?.count || 0,
     },
-    topProducts: data?.topProducts || [],
-    recentSales: [
-      { date: '2 hours ago', product: 'Wireless Headphones', amount: 149.99 },
-      { date: '5 hours ago', product: 'Smart Watch', amount: 299.99 },
-    ], // Placeholder
-  };
+    statusBreakdown: data.statusBreakdown || {},
+    topProducts: (data.topProducts || []).map(p => ({
+      name: p.name,
+      sales: p.sales,
+      revenue: p.revenue,
+      image: p.image || '📦'
+    })),
+    recentSales: (data.recentSales || []).map(s => ({
+      date: formatTimeAgo(s.date),
+      product: s.product,
+      amount: s.amount,
+      status: s.status
+    })),
+  } : null;
 
   return {
     analytics,
@@ -50,5 +66,19 @@ const useSellerAnalyticsPage = (dateRange = 'month') => {
     timeRange: dateRange,
   };
 };
+
+function formatTimeAgo(dateStr) {
+  if (!dateStr) return 'N/A';
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now - date;
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString();
+}
 
 export default useSellerAnalyticsPage;

@@ -1,234 +1,198 @@
-import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import DashboardHeader from '../components/DashboardHeader.jsx';
+import { Card, LoadingSpinner } from '../../../shared/ui/index.js';
+import { 
+	FiDollarSign, FiShoppingBag, FiPackage, FiAlertTriangle,
+	FiArrowRight, FiTrendingUp, FiTrendingDown, FiBox,
+	FiBarChart2, FiSettings, FiPlus, FiArchive
+} from 'react-icons/fi';
 import StatCard from '../components/StatCard.jsx';
-import TopProducts from '../components/TopProducts.jsx';
 import PendingOrders from '../components/PendingOrders.jsx';
-import {
-	ProductIcon,
-	OrderIcon,
-	AnalyticsIcon,
-	InventoryIcon,
-} from '../../../shared/constants/icons.jsx';
-import { LoadingSpinner, Button } from '../../../shared/ui/index.js';
-import { FiPlus, FiArrowRight, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
+import TopProducts from '../components/TopProducts.jsx';
 import { useSellerDashboardPage } from '../hooks/index.js';
 
-// Quick Action Card
-const QuickActionCard = ({ title, description, to, icon: Icon, gradient }) => (
-	<Link to={to}>
-		<motion.div
-			whileHover={{ scale: 1.02, y: -2 }}
-			whileTap={{ scale: 0.98 }}
-			className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer group"
+const QuickActionCard = ({ icon: Icon, title, to, gradient, description }) => (
+	<Link to={to} className="group">
+		<motion.div 
+			whileHover={{ y: -4, scale: 1.02 }}
+			className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-xl transition-all duration-300 relative overflow-hidden"
 		>
-			<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${gradient} flex items-center justify-center mb-4`}>
+			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 shadow-lg`}>
 				<Icon className="w-6 h-6 text-white" />
 			</div>
-			<h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-			<p className="text-sm text-gray-500 mb-3">{description}</p>
-			<div className="flex items-center gap-2 text-indigo-600 font-medium text-sm group-hover:gap-3 transition-all">
-				<span>Go to {title}</span>
-				<FiArrowRight className="w-4 h-4" />
-			</div>
+			<h4 className="font-bold text-gray-900 mb-1">{title}</h4>
+			<p className="text-sm text-gray-500">{description}</p>
+			<FiArrowRight className="absolute top-5 right-5 w-5 h-5 text-gray-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
 		</motion.div>
 	</Link>
 );
 
-// Alert Card
-const AlertCard = ({ title, message, type = 'warning', action }) => {
-	const typeStyles = {
-		warning: 'bg-amber-500 border-amber-200 text-amber-800',
-		danger: 'bg-rose-500 border-rose-200 text-rose-800',
-		info: 'bg-blue-500 border-blue-200 text-blue-800',
-	};
-
-	return (
-		<motion.div
-			initial={{ opacity: 0, x: 20 }}
-			animate={{ opacity: 1, x: 0 }}
-			className={`p-4 rounded-xl border ${typeStyles[type]} flex items-start gap-3`}
-		>
-			<FiAlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
-			<div className="flex-1">
-				<h4 className="font-semibold">{title}</h4>
-				<p className="text-sm opacity-80">{message}</p>
-				{action && (
-					<Link to={action.to} className="text-sm font-medium underline mt-1 inline-block hover:no-underline">
-						{action.label}
-					</Link>
-				)}
-			</div>
-		</motion.div>
-	);
-};
-
-// Icon mapping function
-const getIconByName = (iconName) => {
-	switch(iconName) {
-		case 'ProductIcon':
-			return ProductIcon;
-		case 'OrderIcon':
-			return OrderIcon;
-		case 'InventoryIcon':
-			return InventoryIcon;
-		case 'AnalyticsIcon':
-			return AnalyticsIcon;
-		default:
-			return ProductIcon; // fallback icon
-	}
-};
-
-const SellerDashboardPage = () => {
+const DashboardPage = () => {
 	const {
-		products,
 		stats,
 		statsArray,
-		topProducts,
-		pendingOrders,
+		products,
 		alerts,
 		isLoading,
 		error,
-		refetch,
-		isError
 	} = useSellerDashboardPage();
 
-	if (isLoading) {
-		return (
-			<div className="flex justify-center items-center py-20">
-				<LoadingSpinner />
-			</div>
-		);
-	}
-
-	if (error) {
-		return (
-			<div className="flex flex-col items-center justify-center py-20 px-4">
-				<div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md w-full text-center">
-					<div className="text-red-500 mb-4">
-						<FiAlertTriangle className="w-12 h-12 mx-auto" />
-					</div>
-					<h2 className="text-xl font-bold text-gray-900 mb-2">Dashboard Unavailable</h2>
-					<p className="text-gray-600 mb-6">{error}</p>
-					<div className="flex flex-col sm:flex-row gap-3 justify-center">
-						<Button 
-							onClick={refetch}
-							className="bg-red-500 hover:bg-red-600 text-white"
-						>
-							Retry Load
-						</Button>
-						<Link to="/seller/products">
-							<Button variant="outline">View Products</Button>
-						</Link>
-					</div>
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<div className="space-y-8">
-			{/* Page Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<DashboardHeader 
-					title="Store Dashboard 🏪"
-					subtitle="Track your sales and manage your products."
-				/>
-				<Link to="products">
-					<Button icon={<FiPlus className="w-5 h-5" />}>
-						Add Product
-					</Button>
+		<div className="space-y-6 pb-10">
+			{/* Welcome Header */}
+			<motion.div 
+				initial={{ opacity: 0, y: -20 }} 
+				animate={{ opacity: 1, y: 0 }}
+				className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+			>
+				<div>
+					<h1 className="text-3xl font-black text-gray-900 tracking-tight">Welcome Back 👋</h1>
+					<p className="text-gray-500 font-medium mt-1">Here's what's happening with your store today</p>
+				</div>
+				<Link 
+					to="/seller/analytics"
+					className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all"
+				>
+					<FiBarChart2 className="w-5 h-5" />
+					View Analytics
 				</Link>
-			</div>
+			</motion.div>
 
-			{/* Alerts */}
-			{alerts && alerts.length > 0 && (
-				<div className="space-y-3">
-					{alerts.map((alert, index) => (
-						<AlertCard key={index} {...alert} />
-					))}
+			{/* Stats/Quick Overview */}
+			{isLoading ? (
+				<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100">
+					<LoadingSpinner size="lg" color="indigo" />
+					<p className="mt-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Loading Dashboard...</p>
 				</div>
-			)}
-
-			{/* Stats Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-				{statsArray.map((stat, index) => {
-					const IconComponent = getIconByName(stat.icon);
-					return (
-						<StatCard 
-							key={stat.id} 
-							stat={{...stat, icon: IconComponent}}
-							index={index} 
-						/>
-					);
-				})}
-			</div>
-
-			{/* Quick Actions */}
-			<div>
-				<h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					<QuickActionCard
-						title="Products"
-						description="Manage your product listings"
-						to="products"
-						icon={ProductIcon}
-						gradient="from-violet-500 to-purple-600"
-					/>
-					<QuickActionCard
-						title="Inventory"
-						description="Monitor stock levels"
-						to="inventory"
-						icon={InventoryIcon}
-						gradient="from-emerald-500 to-teal-600"
-					/>
-					<QuickActionCard
-						title="Orders"
-						description="Process customer orders"
-						to="orders"
-						icon={OrderIcon}
-						gradient="from-blue-500 to-indigo-600"
-					/>
-					<QuickActionCard
-						title="Analytics"
-						description="View sales performance"
-						to="analytics"
-						icon={AnalyticsIcon}
-						gradient="from-orange-500 to-red-500"
-					/>
-				</div>
-			</div>
-
-			{/* Main Content Grid */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				{/* Top Products */}
-				{topProducts.length > 0 ? (
-					<TopProducts products={topProducts} />
-				) : (
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						className="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 text-center"
-					>
-						<div className="w-16 h-16 bg-linear-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-							<ProductIcon className="w-8 h-8 text-indigo-500" />
+			) : (
+				<>
+					{/* Alerts Banner */}
+					{alerts && alerts.length > 0 && (
+						<div className="space-y-3">
+							{alerts.map((alert, i) => (
+								<motion.div
+									key={i}
+									initial={{ opacity: 0, x: -20 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ delay: i * 0.1 }}
+									className={`flex items-center gap-3 p-4 rounded-xl border ${
+										alert.type === 'warning' 
+											? 'bg-amber-50 border-amber-200 text-amber-800' 
+											: alert.type === 'error'
+												? 'bg-rose-50 border-rose-200 text-rose-800'
+												: 'bg-blue-50 border-blue-200 text-blue-800'
+									}`}
+								>
+									<FiAlertTriangle className="w-5 h-5 flex-shrink-0" />
+									<span className="text-sm font-medium">{alert.message}</span>
+								</motion.div>
+							))}
 						</div>
-						<h3 className="text-lg font-bold text-gray-900 mb-2">No products yet</h3>
-						<p className="text-gray-500 mb-4">Add your first product to start selling</p>
-						<Link to="products">
-							<Button size="sm" icon={<FiPlus className="w-4 h-4" />}>
-								Add Product
-							</Button>
-						</Link>
-					</motion.div>
-				)}
+					)}
 
-				{/* Pending Orders */}
-				<PendingOrders orders={pendingOrders} />
-			</div>
+					{/* Main Stats */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+						{(statsArray && statsArray.length > 0 ? statsArray : [
+							{
+								title: 'Total Revenue',
+								value: `$${(stats?.totalRevenue || 0).toLocaleString()}`,
+								change: stats?.revenueChange || '+0%',
+								icon: <FiDollarSign className="w-5 h-5 text-white" />,
+								gradient: 'from-emerald-500 to-teal-600',
+							},
+							{
+								title: 'Total Orders',
+								value: stats?.totalOrders || 0,
+								change: stats?.ordersChange || '+0%',
+								icon: <FiShoppingBag className="w-5 h-5 text-white" />,
+								gradient: 'from-blue-500 to-indigo-600',
+							},
+							{
+								title: 'Total Products',
+								value: stats?.totalProducts || 0,
+								change: stats?.productsChange || '+0',
+								icon: <FiBox className="w-5 h-5 text-white" />,
+								gradient: 'from-violet-500 to-purple-600',
+							},
+							{
+								title: 'Low Stock',
+								value: stats?.lowStockCount || 0,
+								change: 'Needs attention',
+								icon: <FiAlertTriangle className="w-5 h-5 text-white" />,
+								gradient: 'from-rose-500 to-red-600',
+							},
+						]).map((stat, index) => (
+							<motion.div
+								key={stat.title}
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: index * 0.1 }}
+								className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
+							>
+								<div className="flex items-center justify-between mb-3">
+									<div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+										{stat.icon}
+									</div>
+									<span className={`text-xs font-bold px-2 py-1 rounded-lg ${
+										String(stat.change).startsWith('+') || String(stat.change).startsWith('$') 
+											? 'bg-emerald-50 text-emerald-700' 
+											: String(stat.change).includes('attention')
+												? 'bg-rose-50 text-rose-700'
+												: 'bg-gray-50 text-gray-600'
+									}`}>
+										{stat.change}
+									</span>
+								</div>
+								<h4 className="text-2xl font-black text-gray-900">{stat.value}</h4>
+								<p className="text-sm text-gray-500 font-medium">{stat.title}</p>
+							</motion.div>
+						))}
+					</div>
+
+					{/* Middle Section */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+						<PendingOrders orders={stats?.recentOrders} />
+						<TopProducts products={products || stats?.topProducts} />
+					</div>
+
+					{/* Quick Actions */}
+					<div>
+						<h3 className="text-xl font-black text-gray-900 mb-4">Quick Actions ⚡</h3>
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+							<QuickActionCard
+								icon={FiPlus}
+								title="Add Product"
+								to="/seller/products"
+								gradient="from-indigo-500 to-purple-600"
+								description="Create a new product listing"
+							/>
+							<QuickActionCard
+								icon={FiShoppingBag}
+								title="View Orders"
+								to="/seller/orders"
+								gradient="from-blue-500 to-indigo-600"
+								description="Manage customer orders"
+							/>
+							<QuickActionCard
+								icon={FiArchive}
+								title="Inventory"
+								to="/seller/inventory"
+								gradient="from-emerald-500 to-teal-600"
+								description="Update stock levels"
+							/>
+							<QuickActionCard
+								icon={FiSettings}
+								title="Store Settings"
+								to="/seller/settings"
+								gradient="from-violet-500 to-purple-600"
+								description="Configure your brand"
+							/>
+						</div>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };
 
-export default SellerDashboardPage;
+export default DashboardPage;

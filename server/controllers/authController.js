@@ -8,7 +8,7 @@ import { passwordResetCodeTemplate } from "../utils/emailTemplates.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendResponse.js";
-import { updateByOwner } from "./handlerFactory.js";
+
 
 export const signUp = catchAsync(async (req, res, next) => {
 	const {

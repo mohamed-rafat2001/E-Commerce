@@ -81,7 +81,7 @@ function RegisterPage() {
 	return (
 		<div className="flex h-screen overflow-hidden bg-gray-50">
 			<AuthBanner 
-				image="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
+				image="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=2070&auto=format&fit=crop"
 				title={<>Start Your <br /><span className="text-indigo-400">Next Chapter.</span></>}
 				subtitle="Join millions of users. Shop the latest trends or start selling your own products today."
 				accentColor="indigo"

@@ -84,34 +84,39 @@ const useSellerProductsPage = () => {
 	return {
 		// State
 		isModalOpen,
+		setIsModalOpen,
 		searchQuery,
 		setSearchQuery,
 		statusFilter,
 		setStatusFilter,
 		deletingId,
 		editingProduct,
+		setEditingProduct,
 		
 		// Data
-		products: filteredProducts,
+		products,
+		filteredProducts,
 		allProducts: products,
 		isLoading,
 		error,
 		
 		// Loading states
 		isAdding,
+		isCreating: isAdding,
 		isUpdating,
+		isDeleting,
 		
 		// Options
 		statusOptions,
 		
 		// Handlers
 		handleAddProduct,
+		handleCreateProduct: handleAddProduct,
 		handleUpdateProduct,
 		handleDeleteProduct,
 		handleEdit,
 		handleCloseModal,
 		handleCreate,
-		setIsModalOpen
 	};
 };
 

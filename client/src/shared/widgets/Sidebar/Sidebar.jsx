@@ -18,7 +18,8 @@ import {
 	CloseIcon,
 	StoreIcon,
 	HeartIcon,
-	CategoryIcon
+	CategoryIcon,
+	SettingsIcon
 } from '../../constants/icons.jsx';
 
 // Navigation link configurations for each role
@@ -103,6 +104,12 @@ const roleNavigationConfig = {
 			path: 'analytics',
 			icon: AnalyticsIcon,
 			description: 'Sales performance',
+		},
+		{
+			label: 'Store Settings',
+			path: 'store-settings',
+			icon: SettingsIcon,
+			description: 'Brand & payouts',
 		},
 	],
 	Customer: [

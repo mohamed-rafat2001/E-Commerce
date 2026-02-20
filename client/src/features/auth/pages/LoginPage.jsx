@@ -44,7 +44,7 @@ function LoginPage() {
 					<div className="absolute inset-0 bg-blue-900/20 z-10 mix-blend-multiply"></div>
 					<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10"></div>
 					<img 
-						src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop" 
+						src="https://images.unsplash.com/photo-1557821552-17105176677c?q=80&w=2089&auto=format&fit=crop" 
 						alt="E-commerce shopping" 
 						className="absolute inset-0 w-full h-full object-cover"
 					/>

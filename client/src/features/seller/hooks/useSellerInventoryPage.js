@@ -15,9 +15,9 @@ const useSellerInventoryPage = () => {
 		return products.filter(p => {
 			const matchesSearch = p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand?.toLowerCase().includes(searchQuery.toLowerCase());
 			let matchesStock = true;
-			if (stockFilter === 'out') matchesStock = p.countInStock === 0;
-			else if (stockFilter === 'low') matchesStock = p.countInStock > 0 && p.countInStock <= 10;
-			else if (stockFilter === 'good') matchesStock = p.countInStock > 10;
+			if (stockFilter === 'out_of_stock') matchesStock = p.countInStock === 0;
+			else if (stockFilter === 'low_stock') matchesStock = p.countInStock > 0 && p.countInStock <= 10;
+			else if (stockFilter === 'in_stock') matchesStock = p.countInStock > 10;
 			return matchesSearch && matchesStock;
 		});
 	}, [products, searchQuery, stockFilter]);
@@ -37,7 +37,8 @@ const useSellerInventoryPage = () => {
 		updatingId,
 
 		// Data
-		products: filteredProducts,
+		filteredProducts,
+		products,
 		allProducts: products,
 		isLoading,
 

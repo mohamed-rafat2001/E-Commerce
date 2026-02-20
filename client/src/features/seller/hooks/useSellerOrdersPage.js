@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react';
 import useSellerOrders from './useSellerOrders.js';
+import useUpdateOrderStatus from './useUpdateOrderStatus.js';
 
 const useSellerOrdersPage = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all');
 
-	const { orders, error } = useSellerOrders();
+	const { orders, isLoading: ordersLoading, error, refetch } = useSellerOrders();
+	const { updateOrderStatus, isUpdating } = useUpdateOrderStatus();
 
 	// Calculate order stats
 	const orderStats = useMemo(() => ({
@@ -20,16 +22,18 @@ const useSellerOrdersPage = () => {
 		if (!orders) return [];
 		return orders.filter(order => {
 			const matchesSearch = 
-				order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				order.customer.name.toLowerCase().includes(searchQuery.toLowerCase());
+				order.id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+				order.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase());
 			const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 			return matchesSearch && matchesStatus;
 		});
 	}, [orders, searchQuery, statusFilter]);
 
 	const handleUpdateStatus = (orderId, newStatus) => {
-		// TODO: Call API to update order status
-		console.log(`Updating order ${orderId} to ${newStatus}`);
+		updateOrderStatus(
+			{ orderId, status: newStatus },
+			{ onSuccess: () => refetch() }
+		);
 	};
 
 	return {
@@ -44,6 +48,8 @@ const useSellerOrdersPage = () => {
 		allOrders: orders,
 		orderStats,
 		error,
+		isLoading: ordersLoading,
+		isUpdating,
 
 		// Handlers
 		handleUpdateStatus

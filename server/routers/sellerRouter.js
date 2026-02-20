@@ -7,6 +7,8 @@ import {
 	completeSellerDoc,
 	getSellerDashboardStats,
 	getSellerAnalytics,
+	getSellerProfile,
+	updateSellerOrderStatus,
 } from "../controllers/sellerController.js";
 
 /**
@@ -17,6 +19,20 @@ import {
  */
 
 router.use(Protect, restrictTo("Seller"));
+
+/**
+ * @swagger
+ * /api/v1/sellers/profile:
+ *   get:
+ *     summary: Get seller's own profile
+ *     tags: [Sellers]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Seller profile retrieved successfully
+ */
+router.get("/profile", getSellerProfile);
 
 /**
  * @swagger
@@ -86,40 +102,6 @@ router.patch("/payoutMethods", addPayoutMethodtoSeller);
  *     responses:
  *       200:
  *         description: Dashboard statistics retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "success"
- *                 data:
- *                   type: object
- *                   properties:
- *                     totalProducts:
- *                       type: number
- *                       example: 25
- *                     totalOrders:
- *                       type: number
- *                       example: 156
- *                     totalRevenue:
- *                       type: number
- *                       example: 12500
- *                     pendingOrders:
- *                       type: number
- *                       example: 12
- *                     lowStockItems:
- *                       type: number
- *                       example: 3
- *                     recentOrders:
- *                       type: array
- *                       items:
- *                         type: object
- *                     topProducts:
- *                       type: array
- *                       items:
- *                         type: object
  */
 router.get("/dashboard-stats", getSellerDashboardStats);
 
@@ -136,5 +118,36 @@ router.get("/dashboard-stats", getSellerDashboardStats);
  *         description: Analytics data retrieved successfully
  */
 router.get("/analytics", getSellerAnalytics);
+
+/**
+ * @swagger
+ * /api/v1/sellers/orders/{orderId}/status:
+ *   patch:
+ *     summary: Update order status by seller
+ *     tags: [Sellers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Processing, Shipped]
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ */
+router.patch("/orders/:orderId/status", updateSellerOrderStatus);
 
 export default router;
