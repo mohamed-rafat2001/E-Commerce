@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Button, LoadingSpinner, Select, Badge } from '../../../shared/ui/index.js';
-import { PlusIcon, SearchIcon, FiLayers, FiTag, FiCheckCircle, FiXCircle, FiChevronDown, FiChevronRight } from '../../../shared/constants/icons.jsx';
+import { PlusIcon, SearchIcon, CategoryIcon, TagIcon, CheckCircleIcon, XCircleIcon, ChevronDownIcon, ChevronRightIcon } from '../../../shared/constants/icons.jsx';
 import { useAdminCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../hooks/index.js';
 import { useAdminSubCategories, useCreateSubCategory, useUpdateSubCategory, useDeleteSubCategory } from '../../subCategory/hooks/index.js';
 import useToast from '../../../shared/hooks/useToast.js';
@@ -257,7 +257,7 @@ const CategoriesAndSubCategoriesPage = () => {
 					}`}
 				>
 					<div className="flex items-center gap-2">
-						<FiLayers className="w-4 h-4" />
+						<CategoryIcon className="w-4 h-4" />
 						Categories
 						<Badge variant="secondary" size="sm">
 							{stats.categories.total}
@@ -273,7 +273,7 @@ const CategoriesAndSubCategoriesPage = () => {
 					}`}
 				>
 					<div className="flex items-center gap-2">
-						<FiTag className="w-4 h-4" />
+						<TagIcon className="w-4 h-4" />
 						Subcategories
 						<Badge variant="secondary" size="sm">
 							{stats.subCategories.total}
@@ -287,25 +287,25 @@ const CategoriesAndSubCategoriesPage = () => {
 				<AdminStatCard 
 					label="Total Categories" 
 					value={stats.categories.total} 
-					icon={FiLayers} 
+					icon={CategoryIcon} 
 					color="bg-gray-900" 
 				/>
 				<AdminStatCard 
 					label="Active Categories" 
 					value={stats.categories.active} 
-					icon={FiCheckCircle} 
+					icon={CheckCircleIcon} 
 					color="bg-emerald-600" 
 				/>
 				<AdminStatCard 
 					label="Total Subcategories" 
 					value={stats.subCategories.total} 
-					icon={FiTag} 
+					icon={TagIcon} 
 					color="bg-indigo-600" 
 				/>
 				<AdminStatCard 
 					label="Active Subcategories" 
 					value={stats.subCategories.active} 
-					icon={FiCheckCircle} 
+					icon={CheckCircleIcon} 
 					color="bg-blue-500" 
 				/>
 			</div>

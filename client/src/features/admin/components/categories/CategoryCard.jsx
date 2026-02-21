@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Badge } from '../../../../shared/ui/index.js';
-import { EditIcon, TrashIcon, FiChevronDown, FiChevronRight } from '../../../../shared/constants/icons.jsx';
+import { EditIcon, TrashIcon, ChevronDownIcon, ChevronRightIcon } from '../../../../shared/constants/icons.jsx';
 
 const CategoryCard = ({ 
 	category, 
@@ -31,10 +31,10 @@ const CategoryCard = ({
 						className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
 						crossOrigin="anonymous"
 					/>
-					<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
+					<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
 				</>
 			) : (
-				<div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+				<div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
 					<div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
 					<div className="absolute inset-0 flex items-center justify-center opacity-10">
 						<span className="text-[12rem] font-black text-white select-none">
@@ -102,9 +102,9 @@ const CategoryCard = ({
 								className="flex items-center gap-2 text-sm font-medium text-white hover:text-indigo-200 transition-colors"
 							>
 								{isExpanded ? (
-									<FiChevronDown className="w-4 h-4" />
+									<ChevronDownIcon className="w-4 h-4" />
 								) : (
-									<FiChevronRight className="w-4 h-4" />
+									<ChevronRightIcon className="w-4 h-4" />
 								)}
 								<span>
 									{isExpanded ? 'Hide' : 'Show'} Subcategories 
@@ -133,7 +133,7 @@ const CategoryCard = ({
 			</div>
 
 			{/* Hover effect */}
-			<div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+			<div className="absolute inset-0 pointer-events-none bg-linear-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 		</motion.div>
 	);
 };

@@ -16,6 +16,7 @@ import {
 	FiHeart,
 	FiBell,
 	FiChevronRight,
+	FiChevronDown,
 	FiMenu,
 	FiX,
 	FiArchive,
@@ -37,6 +38,10 @@ import {
 	FiEdit2,
 	FiTrash2,
 	FiShield,
+	FiImage,
+	FiTag,
+	FiCheckCircle,
+	FiXCircle,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -118,6 +123,10 @@ export const NotificationIcon = ({ className = 'w-5 h-5', ...props }) => (
 
 export const ChevronRightIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FiChevronRight className={className} {...props} />
+);
+
+export const ChevronDownIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiChevronDown className={className} {...props} />
 );
 
 export const ChevronLeftIcon = ({ className = 'w-5 h-5', ...props }) => (
@@ -206,4 +215,24 @@ export const TrashIcon = ({ className = 'w-5 h-5', ...props }) => (
 
 export const ShieldIcon = ({ className = 'w-5 h-5', ...props }) => (
 	<FiShield className={className} {...props} />
+);
+
+export const ImageIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiImage className={className} {...props} />
+);
+
+export const XIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiX className={className} {...props} />
+);
+
+export const TagIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiTag className={className} {...props} />
+);
+
+export const CheckCircleIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiCheckCircle className={className} {...props} />
+);
+
+export const XCircleIcon = ({ className = 'w-5 h-5', ...props }) => (
+	<FiXCircle className={className} {...props} />
 );

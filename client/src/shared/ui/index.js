@@ -2,6 +2,7 @@
 export { default as Button } from './Button/Button.jsx';
 export { default as Card } from './Card/Card.jsx';
 export { default as Input } from './Input/Input.jsx';
+export { default as Textarea } from './Textarea/Textarea.jsx';
 export { default as Badge } from './Badge/Badge.jsx';
 export { default as Avatar } from './Avatar/Avatar.jsx';
 export { default as Select } from './Select/Select.jsx';
