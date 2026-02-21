@@ -57,7 +57,9 @@ function RegisterPage() {
 	}
 
 	function onPrevStep() {
-		setStep((prev) => prev - 1);
+		if (step > 1) {
+			setStep((prev) => prev - 1);
+		}
 	}
 
 	function Submit(data) {
@@ -81,7 +83,7 @@ function RegisterPage() {
 		}),
 	};
 
-	const totalSteps = 3;
+	const totalSteps = 4;
 	const progressWidth = `${(step / totalSteps) * 100}%`;
 
 	return (
@@ -199,7 +201,7 @@ function RegisterPage() {
 								/>
 							)}
 
-							{step === 2 && (
+							{step === 3 && (
 								<RegisterStepTwo 
 									register={register}
 									errors={errors}
@@ -208,12 +210,12 @@ function RegisterPage() {
 									isRegistering={isRegistering}
 									variants={variants}
 									onNextStep={onNextStep} 
-									showNextButton={selectedRole !== "Admin"}
+									showNextButton={true}
 									selectedRole={selectedRole}
 								/>
 							)}
-
-							{step === 3 && selectedRole === "Seller" && (
+														
+							{step === 4 && selectedRole === "Seller" && (
 								<RegisterStepThreeSeller 
 									register={register}
 									errors={errors}
@@ -222,8 +224,8 @@ function RegisterPage() {
 									variants={variants}
 								/>
 							)}
-
-							{step === 3 && selectedRole === "Customer" && (
+														
+							{step === 4 && selectedRole === "Customer" && (
 								<RegisterStepThreeCustomer 
 									register={register}
 									errors={errors}

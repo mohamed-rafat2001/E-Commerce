@@ -30,8 +30,15 @@ const categorySchema = new mongoose.Schema(
 			default: true,
 		},
 	},
-	{ timestamps: true }
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// Virtual populate for subcategories
+categorySchema.virtual("subCategories", {
+	ref: "SubCategoryModel",
+	localField: "_id",
+	foreignField: "categoryId",
+});
 
 categorySchema.pre("save", async function () {
 	if (!this.isModified("name")) return;

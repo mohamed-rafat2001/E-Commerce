@@ -49,7 +49,7 @@ const productSchema = new mongoose.Schema(
 		},
 		subCategory: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "CategoryModel",
+			ref: "SubCategoryModel",
 		},
 		price: moneySchema,
 		ratingAverage: {
@@ -97,7 +97,7 @@ productSchema.pre(/^find/, function () {
 	this.populate("reviews");
 	this.populate("brandId", "name description logo");
 	this.populate("primaryCategory", "name description");
-	this.populate("subCategory", "name description");
+	this.populate("subCategory", "name description categoryId");
 });
 
 productSchema.pre("save", async function () {

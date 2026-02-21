@@ -205,7 +205,7 @@ export const getSellerAnalytics = catchAsync(async (req, res, next) => {
 		totalProducts,
 		activeProducts,
 		draftProducts,
-		sellerRating: { average: seller.ratingAverage, count: seller.ratingCount },
+		sellerRating: { average: seller.averageBrandRating, count: seller.totalReviews },
 	});
 });
 

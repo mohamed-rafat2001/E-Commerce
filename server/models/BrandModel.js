@@ -39,6 +39,18 @@ const BrandSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "CategoryModel",
 		}],
+		ratingAverage: {
+			type: Number,
+			min: 0,
+			max: 5,
+			default: 0,
+			set: (val) => Math.round(val * 10) / 10, // Round to 1 decimal place
+		},
+		ratingCount: {
+			type: Number,
+			min: 0,
+			default: 0,
+		},
 	},
 	{
 		toJSON: { virtuals: true },

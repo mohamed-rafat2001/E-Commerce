@@ -20,12 +20,6 @@ export const signUp = catchAsync(async (req, res, next) => {
 		confirmPassword,
 		role,
 		gender,
-		// Seller fields
-		brand,
-		description,
-		businessEmail,
-		businessPhone,
-		primaryCategory,
 		// Customer address fields
 		label,
 		recipientName,
@@ -46,6 +40,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 		phoneNumber,
 		confirmPassword,
 		role: role === "Seller" ? role : "Customer",
+		gender,
 	});
 
 	// check if user created
@@ -77,13 +72,9 @@ export const signUp = catchAsync(async (req, res, next) => {
 			addresses: address,
 		});
 	} else if (userRole === "Seller") {
+		// Create seller profile without brand information
 		userModel = await SellerModel.create({
 			userId: user._id,
-			brand,
-			description,
-			businessEmail,
-			businessPhone,
-			primaryCategory: (primaryCategory && primaryCategory !== "undefined") ? primaryCategory : undefined,
 		});
 	}
 

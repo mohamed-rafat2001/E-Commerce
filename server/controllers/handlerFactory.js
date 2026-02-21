@@ -42,10 +42,14 @@ export const createDoc = (Model, Fields = []) =>
 			}
 			
 			if (object.subCategory) {
-				const CategoryModel = mongoose.model("CategoryModel");
-				const subCategory = await CategoryModel.findById(object.subCategory);
+				const SubCategoryModel = mongoose.model("SubCategoryModel");
+				const subCategory = await SubCategoryModel.findById(object.subCategory);
 				if (!subCategory) {
 					return next(new appError("Sub category not found", 404));
+				}
+				// Validate that subcategory belongs to the primary category
+				if (object.primaryCategory && subCategory.categoryId.toString() !== object.primaryCategory) {
+					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
 				}
 			}
 			
@@ -177,10 +181,14 @@ export const updateByOwner = (Model, Fields = []) =>
 			}
 			
 			if (object.subCategory) {
-				const CategoryModel = mongoose.model("CategoryModel");
-				const subCategory = await CategoryModel.findById(object.subCategory);
+				const SubCategoryModel = mongoose.model("SubCategoryModel");
+				const subCategory = await SubCategoryModel.findById(object.subCategory);
 				if (!subCategory) {
 					return next(new appError("Sub category not found", 404));
+				}
+				// Validate that subcategory belongs to the primary category
+				if (object.primaryCategory && subCategory.categoryId.toString() !== object.primaryCategory) {
+					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
 				}
 			}
 			

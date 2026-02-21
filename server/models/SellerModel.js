@@ -65,17 +65,6 @@ const SellerSchema = new mongoose.Schema(
 
 
 		addresses: [addressSchema],
-		ratingAverage: {
-			type: Number,
-			min: 0,
-			max: 5,
-			default: 0,
-		},
-		ratingCount: {
-			type: Number,
-			min: 0,
-			default: 0,
-		},
 		status: {
 			type: String,
 			enum: ["active", "suspended", "deleted"],
@@ -107,6 +96,25 @@ SellerSchema.virtual("brands", {
 	ref: "BrandModel",
 	localField: "_id",
 	foreignField: "sellerId",
+});
+
+// Virtual field for average brand rating (calculated from all active brands)
+SellerSchema.virtual("averageBrandRating").get(function() {
+	if (!this.brands || this.brands.length === 0) return 0;
+	
+	const activeBrands = this.brands.filter(brand => brand.isActive);
+	if (activeBrands.length === 0) return 0;
+	
+	const totalRating = activeBrands.reduce((sum, brand) => sum + (brand.ratingAverage || 0), 0);
+	return Math.round((totalRating / activeBrands.length) * 10) / 10; // Round to 1 decimal
+});
+
+// Virtual field for total reviews (sum of all active brand review counts)
+SellerSchema.virtual("totalReviews").get(function() {
+	if (!this.brands || this.brands.length === 0) return 0;
+	
+	const activeBrands = this.brands.filter(brand => brand.isActive);
+	return activeBrands.reduce((sum, brand) => sum + (brand.ratingCount || 0), 0);
 });
 
 //  mongoose query middlewares

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import ProductModel from "./ProductModel.js";
-import SellerModel from "./SellerModel.js";
+import BrandModel from "./BrandModel.js";
 const ReviewsSchema = new mongoose.Schema(
 	{
 		userId: {
@@ -10,6 +10,10 @@ const ReviewsSchema = new mongoose.Schema(
 		itemId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "ProductModel",
+		},
+		brandId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "BrandModel",
 		},
 		rating: {
 			type: Number,
@@ -33,11 +37,15 @@ const ReviewsSchema = new mongoose.Schema(
 ReviewsSchema.pre(/^find/, function () {
 	this.populate("userId", "firstName lastName profileImg");
 });
-//  calculate ratings and average ratings
+//  calculate ratings and average ratings for products and brands
 ReviewsSchema.statics.calculateRatings = async function (itemId) {
-	const stats = await this.aggregate([
+	// Calculate product ratings
+	const productStats = await this.aggregate([
 		{
-			$match: { itemId: new mongoose.Types.ObjectId(itemId) },
+			$match: { 
+				itemId: new mongoose.Types.ObjectId(itemId),
+				brandId: { $exists: false } // Only product reviews
+			},
 		},
 		{
 			$group: {
@@ -47,37 +55,57 @@ ReviewsSchema.statics.calculateRatings = async function (itemId) {
 			},
 		},
 	]);
-	if (stats.length > 0) {
+	
+	// Calculate brand ratings
+	const brandStats = await this.aggregate([
+		{
+			$match: { 
+				brandId: new mongoose.Types.ObjectId(itemId),
+				itemId: { $exists: false } // Only brand reviews
+			},
+		},
+		{
+			$group: {
+				_id: "$brandId",
+				nRating: { $sum: 1 },
+				avgRating: { $avg: "$rating" },
+			},
+		},
+	]);
+	
+	// Update product ratings
+	if (productStats.length > 0) {
 		const item = await ProductModel.findById(itemId);
-		const seller = await SellerModel.findOne({ userId: itemId });
 		if (item) {
 			await ProductModel.findByIdAndUpdate(itemId, {
-				ratingAverage: stats[0].avgRating,
-				ratingCount: stats[0].nRating,
+				ratingAverage: productStats[0].avgRating,
+				ratingCount: productStats[0].nRating,
 			});
-		} else if (seller) {
-			await SellerModel.findOneAndUpdate(
-				{ userId: itemId },
-				{
-					ratingAverage: stats[0].avgRating,
-					ratingCount: stats[0].nRating,
-				}
-			);
 		}
 	} else {
 		await ProductModel.findByIdAndUpdate(itemId, {
 			ratingAverage: 0,
 			ratingCount: 0,
 		});
-		await SellerModel.findOneAndUpdate(
-			{ userId: itemId },
-			{
-				ratingAverage: 0,
-				ratingCount: 0,
-			}
-		);
 	}
-	return stats;
+	
+	// Update brand ratings
+	if (brandStats.length > 0) {
+		const brand = await BrandModel.findById(itemId);
+		if (brand) {
+			await BrandModel.findByIdAndUpdate(itemId, {
+				ratingAverage: Math.round(brandStats[0].avgRating * 10) / 10,
+				ratingCount: brandStats[0].nRating,
+			});
+		}
+	} else {
+		await BrandModel.findByIdAndUpdate(itemId, {
+			ratingAverage: 0,
+			ratingCount: 0,
+		});
+	}
+	
+	return { productStats, brandStats };
 };
 //  add rating to product
 ReviewsSchema.post("save", async function () {
