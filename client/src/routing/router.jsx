@@ -26,7 +26,8 @@ import {
 	InventoryPage as SellerInventoryPage,
 	OrdersPage as SellerOrdersPage,
 	AnalyticsPage as SellerAnalyticsPage,
-	StoreSettingsPage as SellerStoreSettingsPage
+	StoreSettingsPage as SellerStoreSettingsPage,
+	BrandsManagementPage
 } from "../features/seller/pages/index.js";
 
 import { 
@@ -115,6 +116,7 @@ const router = createBrowserRouter([
 					{ path: "orders", element: <SellerOrdersPage /> },
 					{ path: "analytics", element: <SellerAnalyticsPage /> },
 					{ path: "store-settings", element: <SellerStoreSettingsPage /> },
+					{ path: "brands", element: <BrandsManagementPage /> },
 				],
 			},
 		],

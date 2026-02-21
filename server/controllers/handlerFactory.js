@@ -17,6 +17,43 @@ export const createDoc = (Model, Fields = []) =>
 					new appError("please provide  val id fiel ds to update", 400)
 				);
 		}
+		
+		// Additional validation for ProductModel references
+		if (Model.modelName === "ProductModel") {
+			// Validate brand exists and belongs to seller
+			if (object.brandId) {
+				const BrandModel = mongoose.model("BrandModel");
+				const brand = await BrandModel.findOne({
+					_id: object.brandId,
+					sellerId: req.user._id
+				});
+				if (!brand) {
+					return next(new appError("Brand not found or doesn't belong to you", 404));
+				}
+			}
+			
+			// Validate categories exist
+			if (object.primaryCategory) {
+				const CategoryModel = mongoose.model("CategoryModel");
+				const category = await CategoryModel.findById(object.primaryCategory);
+				if (!category) {
+					return next(new appError("Primary category not found", 404));
+				}
+			}
+			
+			if (object.subCategory) {
+				const CategoryModel = mongoose.model("CategoryModel");
+				const subCategory = await CategoryModel.findById(object.subCategory);
+				if (!subCategory) {
+					return next(new appError("Sub category not found", 404));
+				}
+			}
+			
+			// Validate images array length
+			if (object.images && object.images.length > 10) {
+				return next(new appError("Maximum 10 additional images allowed", 400));
+			}
+		}
 
 		// create new doc
 		let doc;
@@ -114,6 +151,43 @@ export const updateByOwner = (Model, Fields = []) =>
 			object = validationBody(req.body, Fields);
 			if (!object || Object.keys(object).length === 0)
 				return next(new appError("please provide valid fields to update", 400));
+		}
+		
+		// Additional validation for ProductModel references on update
+		if (Model.modelName === "ProductModel" && object) {
+			// Validate brand exists and belongs to seller
+			if (object.brandId) {
+				const BrandModel = mongoose.model("BrandModel");
+				const brand = await BrandModel.findOne({
+					_id: object.brandId,
+					sellerId: req.user._id
+				});
+				if (!brand) {
+					return next(new appError("Brand not found or doesn't belong to you", 404));
+				}
+			}
+			
+			// Validate categories exist
+			if (object.primaryCategory) {
+				const CategoryModel = mongoose.model("CategoryModel");
+				const category = await CategoryModel.findById(object.primaryCategory);
+				if (!category) {
+					return next(new appError("Primary category not found", 404));
+				}
+			}
+			
+			if (object.subCategory) {
+				const CategoryModel = mongoose.model("CategoryModel");
+				const subCategory = await CategoryModel.findById(object.subCategory);
+				if (!subCategory) {
+					return next(new appError("Sub category not found", 404));
+				}
+			}
+			
+			// Validate images array length
+			if (object.images && object.images.length > 10) {
+				return next(new appError("Maximum 10 additional images allowed", 400));
+			}
 		}
 		// update doc
 		let doc;

@@ -9,6 +9,9 @@ import {
 	getSellerAnalytics,
 	getSellerProfile,
 	updateSellerOrderStatus,
+	updateSellerBrandImage,
+	deleteSellerBrandImage,
+	updateSellerCategories,
 } from "../controllers/sellerController.js";
 
 /**
@@ -149,5 +152,67 @@ router.get("/analytics", getSellerAnalytics);
  *         description: Order status updated successfully
  */
 router.patch("/orders/:orderId/status", updateSellerOrderStatus);
+
+/**
+ * @swagger
+ * /api/v1/sellers/brand-image:
+ *   patch:
+ *     summary: Update seller's brand image
+ *     tags: [Sellers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brandImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Brand image updated successfully
+ *   delete:
+ *     summary: Delete seller's brand image
+ *     tags: [Sellers]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Brand image deleted successfully
+ */
+router.patch("/brand-image", updateSellerBrandImage);
+router.delete("/brand-image", deleteSellerBrandImage);
+
+/**
+ * @swagger
+ * /api/v1/sellers/categories:
+ *   patch:
+ *     summary: Update seller's primary category and multiple subcategories
+ *     tags: [Sellers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               primaryCategory:
+ *                 type: string
+ *                 description: Category ID for primary category
+ *               subCategories:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of category IDs for subcategories
+ *     responses:
+ *       200:
+ *         description: Categories updated successfully
+ */
+router.patch("/categories", updateSellerCategories);
 
 export default router;

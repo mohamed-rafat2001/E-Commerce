@@ -35,43 +35,6 @@ const RegisterStepOne = ({
 			custom={1}
 			className="space-y-4"
 		>
-			{/* Role Selection */}
-			<div>
-				<div className="grid grid-cols-2 gap-3">
-					<label
-						className={`relative flex flex-row items-center justify-center p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50 ${
-							selectedRole === "Customer"
-								? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
-								: "border-gray-200 text-gray-600"
-						}`}
-					>
-						<input
-							type="radio"
-							value="Customer"
-							className="sr-only"
-							{...register("role")}
-						/>
-						<OrderIcon className={`w-5 h-5 mr-2 ${selectedRole === "Customer" ? "text-blue-600" : "text-gray-400"}`} />
-						<span className="font-medium text-sm">Customer</span>
-					</label>
-					<label
-						className={`relative flex flex-row items-center justify-center p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50 ${
-							selectedRole === "Seller"
-								? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
-								: "border-gray-200 text-gray-600"
-						}`}
-					>
-						<input
-							type="radio"
-							value="Seller"
-							className="sr-only"
-							{...register("role")}
-						/>
-						<StoreIcon className={`w-5 h-5 mr-2 ${selectedRole === "Seller" ? "text-blue-600" : "text-gray-400"}`} />
-						<span className="font-medium text-sm">Seller</span>
-					</label>
-				</div>
-			</div>
 
 			{/* Email */}
 			<div>

@@ -15,14 +15,20 @@ const QuickActionCard = ({ icon: Icon, title, to, gradient, description }) => (
 	<Link to={to} className="group">
 		<motion.div 
 			whileHover={{ y: -4, scale: 1.02 }}
-			className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+			whileTap={{ scale: 0.98 }}
+			className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl hover:border-indigo-100 
+				transition-all duration-300 relative overflow-hidden group"
 		>
-			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 shadow-lg`}>
+			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
 				<Icon className="w-6 h-6 text-white" />
 			</div>
-			<h4 className="font-bold text-gray-900 mb-1">{title}</h4>
-			<p className="text-sm text-gray-500">{description}</p>
-			<FiArrowRight className="absolute top-5 right-5 w-5 h-5 text-gray-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+			<h4 className="font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">{title}</h4>
+			<p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+			<div className="absolute top-6 right-6 w-8 h-8 rounded-full bg-gray-100 
+				flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+				<FiArrowRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 
+					group-hover:translate-x-0.5 transition-all duration-200" />
+			</div>
 		</motion.div>
 	</Link>
 );
@@ -40,32 +46,37 @@ const DashboardPage = () => {
 	} = useSellerDashboardPage();
 
 	return (
-		<div className="space-y-6 pb-10">
+		<div className="space-y-8 pb-12">
 			{/* Welcome Header */}
 			<motion.div 
 				initial={{ opacity: 0, y: -20 }} 
 				animate={{ opacity: 1, y: 0 }}
-				className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+				className="bg-gradient-to-r from-white to-gray-50 rounded-3xl p-6 border border-gray-100 shadow-sm"
 			>
-				<div>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">Welcome Back 👋</h1>
-					<p className="text-gray-500 font-medium mt-1">Here's what's happening with your store today</p>
+				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+					<div>
+						<h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Welcome Back 👋</h1>
+						<p className="text-gray-600 font-medium">Here's what's happening with your store today</p>
+					</div>
+					<Link 
+						to="/seller/analytics"
+						className="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 
+							text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-indigo-200 
+							hover:scale-105 transition-all duration-200 group"
+					>
+						<FiBarChart2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+						View Analytics
+					</Link>
 				</div>
-				<Link 
-					to="/seller/analytics"
-					className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all"
-				>
-					<FiBarChart2 className="w-5 h-5" />
-					View Analytics
-				</Link>
 			</motion.div>
 
 			{/* Stats/Quick Overview */}
 			{isLoading ? (
-				<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100">
-					<LoadingSpinner size="lg" color="indigo" />
-					<p className="mt-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Loading Dashboard...</p>
-				</div>
+				<Card variant="elevated" className="py-16">
+					<div className="flex flex-col items-center justify-center">
+						<LoadingSpinner size="lg" message="Loading your dashboard..." />
+					</div>
+				</Card>
 			) : (
 				<>
 					{/* Alerts Banner */}
@@ -77,7 +88,7 @@ const DashboardPage = () => {
 									initial={{ opacity: 0, x: -20 }}
 									animate={{ opacity: 1, x: 0 }}
 									transition={{ delay: i * 0.1 }}
-									className={`flex items-center gap-3 p-4 rounded-xl border ${
+									className={`flex items-start gap-3 p-4 rounded-2xl border ${
 										alert.type === 'warning' 
 											? 'bg-amber-50 border-amber-200 text-amber-800' 
 											: alert.type === 'error'
@@ -85,45 +96,57 @@ const DashboardPage = () => {
 												: 'bg-blue-50 border-blue-200 text-blue-800'
 									}`}
 								>
-									<FiAlertTriangle className="w-5 h-5 flex-shrink-0" />
-									<span className="text-sm font-medium">{alert.message}</span>
+									<div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+										alert.type === 'warning' 
+											? 'bg-amber-100 text-amber-600' 
+											: alert.type === 'error'
+												? 'bg-rose-100 text-rose-600'
+												: 'bg-blue-100 text-blue-600'
+									}`}>
+										<FiAlertTriangle className="w-4 h-4" />
+									</div>
+									<div className="flex-1">
+										<span className="text-sm font-semibold">{alert.title || 'Alert'}</span>
+										<p className="text-sm mt-1">{alert.message}</p>
+										{alert.action && (
+											<Link 
+												to={alert.action.to}
+												className={`inline-block mt-2 text-sm font-medium ${
+													alert.type === 'warning' 
+														? 'text-amber-700 hover:text-amber-800' 
+														: alert.type === 'error'
+															? 'text-rose-700 hover:text-rose-800'
+															: 'text-blue-700 hover:text-blue-800'
+												}`}
+											>
+												{alert.action.label} →
+											</Link>
+										)}
+									</div>
 								</motion.div>
 							))}
 						</div>
 					)}
 
 					{/* Main Stats */}
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 						{statsArray && statsArray.length > 0 ? (
 							statsArray.map((stat, index) => (
-								<motion.div
+								<StatCard 
 									key={stat.id}
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ delay: index * 0.1 }}
-									className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
-								>
-									<div className="flex items-center justify-between mb-3">
-										<div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-											{stat.icon}
-										</div>
-										<span className={`text-xs font-bold px-2 py-1 rounded-lg ${
-											stat.changeType === 'positive'
-												? 'bg-emerald-50 text-emerald-700'
-												: stat.changeType === 'negative'
-													? 'bg-rose-50 text-rose-700'
-													: 'bg-gray-50 text-gray-600'
-										}`}>
-											{stat.change}
-										</span>
-									</div>
-									<h4 className="text-2xl font-black text-gray-900">{stat.value}</h4>
-									<p className="text-sm text-gray-500 font-medium">{stat.title}</p>
-								</motion.div>
+									stat={stat}
+									index={index}
+								/>
 							))
 						) : (
-							<div className="col-span-4 text-center py-10 text-gray-500">
-								<p>Loading stats...</p>
+							<div className="col-span-4">
+								<Card variant="elevated" className="text-center py-12">
+									<div className="text-gray-400">
+										<FiPackage className="w-12 h-12 mx-auto mb-4 opacity-50" />
+										<p className="font-medium">No stats available</p>
+										<p className="text-sm mt-1">Loading dashboard data...</p>
+									</div>
+								</Card>
 							</div>
 						)}
 					</div>

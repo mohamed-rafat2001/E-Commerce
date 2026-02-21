@@ -48,20 +48,7 @@ const SellerSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
-		brand: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		brandImg: {
-				public_id: String,
-				secure_url: String,
-			},
-		description: {
-			type: String,
-			trim: true,
-			required: [true, "description is required"],
-		},
+
 		businessEmail: {
 			type: String,
 			required: [true, "email is required"],
@@ -75,10 +62,7 @@ const SellerSchema = new mongoose.Schema(
 			trim: true,
 			validate: [validator.isMobilePhone, "please enter valid phone number"],
 		},
-		primaryCategory: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "CategoryModel",
-		},
+
 
 		addresses: [addressSchema],
 		ratingAverage: {
@@ -118,10 +102,20 @@ SellerSchema.virtual("reviews", {
 	localField: "userId",
 	foreignField: "itemId",
 });
+
+SellerSchema.virtual("brands", {
+	ref: "BrandModel",
+	localField: "_id",
+	foreignField: "sellerId",
+});
+
 //  mongoose query middlewares
 SellerSchema.pre(/^find/, function () {
 	this.populate("reviews");
-	this.populate("primaryCategory","name description");
+	this.populate({
+		path: "brands",
+		match: { isActive: true }
+	});
 });
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });

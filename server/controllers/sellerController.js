@@ -6,6 +6,8 @@ import { updateByOwner } from "./handlerFactory.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
+import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
+import cloudinary from "../utils/cloudinary.js";
 
 //  @desc  Get seller's own profile
 // @Route  GET /api/v1/sellers/profile
@@ -26,6 +28,7 @@ export const completeSellerDoc = updateByOwner(SellerModel, [
 	"businessEmail",
 	"businessPhone",
 	"primaryCategory",
+	"subCategories",
 ]);
 
 //  @desc  add addresses to seller
@@ -251,6 +254,106 @@ export const updateSellerOrderStatus = catchAsync(async (req, res, next) => {
 
 	const updatedOrder = await order.save();
 	sendResponse(res, 200, updatedOrder);
+});
+
+// @desc    Update seller's brand image
+// @route   PATCH /api/v1/sellers/brand-image
+// @access  Private/Seller
+export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) return next(new appError("Seller profile not found", 404));
+
+	// Handle file upload
+	uploadSingleImage("brandImg")(req, res, async (err) => {
+		if (err) {
+			return next(new appError("Error uploading image", 400));
+		}
+
+		setCloudinaryBody(req, res, async () => {
+			// Delete old image if exists
+			if (seller.brandImg?.public_id) {
+				try {
+					await cloudinary.uploader.destroy(seller.brandImg.public_id);
+				} catch (error) {
+					console.log("Error deleting old image:", error);
+				}
+			}
+
+			// Update seller with new image
+			seller.brandImg = req.body.brandImg;
+			await seller.save();
+
+			sendResponse(res, 200, {
+				message: "Brand image updated successfully",
+				brandImg: seller.brandImg
+			});
+		});
+	});
+});
+
+// @desc    Delete seller's brand image
+// @route   DELETE /api/v1/sellers/brand-image
+// @access  Private/Seller
+export const deleteSellerBrandImage = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) return next(new appError("Seller profile not found", 404));
+
+	if (seller.brandImg?.public_id) {
+		try {
+			await cloudinary.uploader.destroy(seller.brandImg.public_id);
+		} catch (error) {
+			console.log("Error deleting image:", error);
+		}
+	}
+
+	seller.brandImg = undefined;
+	await seller.save();
+
+	sendResponse(res, 200, {
+		message: "Brand image deleted successfully"
+	});
+});
+
+// @desc    Update seller categories (primary and multiple subcategories)
+// @route   PATCH /api/v1/sellers/categories
+// @access  Private/Seller
+export const updateSellerCategories = catchAsync(async (req, res, next) => {
+	const { primaryCategory, subCategories } = req.body;
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	
+	if (!seller) return next(new appError("Seller profile not found", 404));
+
+	// Validate that subCategories don't contain the primary category
+	if (primaryCategory && subCategories && Array.isArray(subCategories)) {
+		if (subCategories.includes(primaryCategory)) {
+			return next(new appError("Primary category cannot be selected as a subcategory", 400));
+		}
+		
+		// Remove duplicates from subCategories
+		const uniqueSubCategories = [...new Set(subCategories)];
+		seller.subCategories = uniqueSubCategories;
+	} else if (subCategories === null || subCategories === undefined) {
+		// Clear subCategories if explicitly set to null/undefined
+		seller.subCategories = [];
+	}
+
+	seller.primaryCategory = primaryCategory || undefined;
+	
+	await seller.save();
+
+	// Populate the categories for response
+	await seller.populate([
+		{ path: "primaryCategory", select: "name description" },
+		{ path: "subCategories", select: "name description" }
+	]);
+
+	sendResponse(res, 200, {
+		message: "Categories updated successfully",
+		seller: {
+			primaryCategory: seller.primaryCategory,
+			subCategories: seller.subCategories
+		}
+	});
 });
 
 // add review to seller

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Select, LoadingSpinner, Badge, Modal } from '../../../shared/ui/index.js';
 import { 
 	FiSave, FiPlus, FiMapPin, FiCreditCard, FiEdit2, FiMail, 
 	FiPhone, FiGlobe, FiShield, FiImage, FiCheck, FiX, FiAlertTriangle,
-	FiUser, FiBriefcase, FiHash
+	FiUser, FiBriefcase, FiHash, FiCamera, FiTrash2
 } from 'react-icons/fi';
 import { useSellerProfile, useUpdateSellerProfile, useAddSellerAddress, useAddPayoutMethod } from '../hooks/index.js';
 import useCategories from '../../category/hooks/useCategories.js';
@@ -230,16 +230,13 @@ const StoreSettingsPage = () => {
 	const [isEditingProfile, setIsEditingProfile] = useState(false);
 
 	const [profileForm, setProfileForm] = useState({
-		brand: '', description: '', businessEmail: '', businessPhone: '', primaryCategory: ''
+		businessEmail: '', businessPhone: ''
 	});
 
 	const startEditProfile = () => {
 		setProfileForm({
-			brand: profile?.brand || '',
-			description: profile?.description || '',
 			businessEmail: profile?.businessEmail || '',
 			businessPhone: profile?.businessPhone || '',
-			primaryCategory: profile?.primaryCategory?._id || profile?.primaryCategory || '',
 		});
 		setIsEditingProfile(true);
 	};
@@ -332,113 +329,50 @@ const StoreSettingsPage = () => {
 				</div>
 			</motion.div>
 
-			{/* Brand Profile Section */}
+			{/* Business Information Section */}
 			<SettingsSection
-				title="Brand Profile"
-				subtitle="Your store's public-facing information"
+				title="Business Information"
+				subtitle="Your store's business details"
 				icon={FiBriefcase}
 				gradient="from-violet-500 to-purple-600"
 			>
 				{isEditingProfile ? (
 					<form onSubmit={handleProfileSubmit} className="space-y-4">
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">Brand Name</label>
-							<Input name="brand" value={profileForm.brand} onChange={handleProfileChange} placeholder="Your brand name" required />
-						</div>
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-							<textarea
-								name="description"
-								value={profileForm.description}
-								onChange={handleProfileChange}
-								placeholder="Tell customers about your brand..."
-								rows={3}
-								className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-								required
-							/>
-						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Business Email</label>
-								<Input type="email" name="businessEmail" value={profileForm.businessEmail} onChange={handleProfileChange} placeholder="contact@brand.com" required />
+								<Input type="email" name="businessEmail" value={profileForm.businessEmail} onChange={handleProfileChange} placeholder="contact@business.com" required />
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Business Phone</label>
 								<Input name="businessPhone" value={profileForm.businessPhone} onChange={handleProfileChange} placeholder="+1 234 567 890" required />
 							</div>
 						</div>
-						{categories && (
-							<Select
-								label="Primary Category"
-								value={profileForm.primaryCategory}
-								onChange={(val) => setProfileForm(prev => ({ ...prev, primaryCategory: val }))}
-								options={categories.map(c => ({ value: c._id, label: c.name }))}
-							/>
-						)}
 						<div className="flex gap-3 pt-2">
 							<Button variant="secondary" type="button" onClick={() => setIsEditingProfile(false)}>Cancel</Button>
 							<Button type="submit" loading={isUpdating} icon={<FiSave className="w-4 h-4" />}>Save Changes</Button>
 						</div>
 					</form>
 				) : (
-					<div className="space-y-6">
-						<div className="flex items-start gap-5">
-							{profile?.brandImg?.secure_url ? (
-								<img 
-									src={profile.brandImg.secure_url} 
-									alt={profile.brand} 
-									className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-100 shadow-sm"
-									crossOrigin="anonymous"
-								/>
-							) : (
-								<div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-100">
-									{profile?.brand?.[0]?.toUpperCase() || 'S'}
-								</div>
-							)}
-							<div className="flex-1">
-								<h4 className="text-xl font-black text-gray-900">{profile?.brand || 'Your Brand'}</h4>
-								<p className="text-gray-500 mt-1 mb-3 leading-relaxed">{profile?.description || 'No description set.'}</p>
-								<div className="flex flex-wrap gap-4 text-sm text-gray-600">
-									<span className="flex items-center gap-1.5">
-										<FiMail className="w-4 h-4 text-gray-400" />
-										{profile?.businessEmail || 'Not set'}
-									</span>
-									<span className="flex items-center gap-1.5">
-										<FiPhone className="w-4 h-4 text-gray-400" />
-										{profile?.businessPhone || 'Not set'}
-									</span>
-									{profile?.primaryCategory && (
-										<span className="flex items-center gap-1.5">
-											<FiGlobe className="w-4 h-4 text-gray-400" />
-											{profile.primaryCategory.name || 'N/A'}
-										</span>
-									)}
-								</div>
-							</div>
-							<Button 
-								variant="secondary" 
-								size="sm" 
-								onClick={startEditProfile}
-								icon={<FiEdit2 className="w-4 h-4" />}
-							>
-								Edit
-							</Button>
+					<div className="space-y-4">
+						<div className="flex flex-wrap gap-6 text-sm text-gray-600">
+							<span className="flex items-center gap-2">
+								<FiMail className="w-4 h-4 text-gray-400" />
+								{profile?.businessEmail || 'Not set'}
+							</span>
+							<span className="flex items-center gap-2">
+								<FiPhone className="w-4 h-4 text-gray-400" />
+								{profile?.businessPhone || 'Not set'}
+							</span>
 						</div>
-
-						{/* Rating Summary */}
-						<div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100">
-							<div className="text-3xl font-black text-amber-600">
-								{profile?.ratingAverage?.toFixed(1) || '0.0'}
-							</div>
-							<div>
-								<div className="flex gap-0.5">
-									{[1, 2, 3, 4, 5].map(star => (
-										<span key={star} className={`text-lg ${star <= Math.round(profile?.ratingAverage || 0) ? 'text-amber-400' : 'text-gray-200'}`}>★</span>
-									))}
-								</div>
-								<p className="text-xs text-amber-600 font-medium">{profile?.ratingCount || 0} reviews</p>
-							</div>
-						</div>
+						<Button 
+							variant="secondary" 
+							size="sm" 
+							onClick={startEditProfile}
+							icon={<FiEdit2 className="w-4 h-4" />}
+						>
+							Edit Business Info
+						</Button>
 					</div>
 				)}
 			</SettingsSection>

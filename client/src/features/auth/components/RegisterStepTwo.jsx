@@ -99,7 +99,7 @@ const RegisterStepTwo = ({
 					Gender
 				</label>
 				<div className="flex space-x-3">
-					{["male", "female"].map((g) => (
+					{["male", "female", "other"].map((g) => (
 						<label
 							key={g}
 							className={`flex-1 flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50 ${
@@ -112,7 +112,7 @@ const RegisterStepTwo = ({
 								type="radio"
 								value={g}
 								className="sr-only"
-								{...register("gender", { required: "Required" })}
+								{...register("gender", { required: "Gender is required" })}
 							/>
 							<span className="capitalize font-medium text-sm">{g}</span>
 						</label>

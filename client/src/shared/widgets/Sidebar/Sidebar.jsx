@@ -111,6 +111,12 @@ const roleNavigationConfig = {
 			icon: SettingsIcon,
 			description: 'Brand & payouts',
 		},
+		{
+			label: 'Brands',
+			path: 'brands',
+			icon: StoreIcon,
+			description: 'Manage your brands',
+		},
 	],
 	Customer: [
 		{

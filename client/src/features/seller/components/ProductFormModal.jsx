@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Modal, Input, Select } from '../../../shared/ui/index.js';
 import { FiImage, FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import useCategories from '../../category/hooks/useCategories.js';
+import useSellerBrands from '../hooks/useSellerBrands.js';
 import mainApi from '../../../api/mainApi.js';
 
 const statusOptions = [
@@ -15,20 +16,23 @@ const statusOptions = [
 const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading }) => {
 	const isEditing = !!product;
 	const { categories, isLoading: categoriesLoading } = useCategories();
+	const { brands, isLoading: brandsLoading } = useSellerBrands();
 	const fileInputRef = useRef(null);
 	
 	const [formData, setFormData] = useState({
 		name: '',
 		description: '',
 		price: '',
-		brand: '',
-		category: '',
+		brandId: '',
+		primaryCategory: '',
+		subCategory: '',
 		countInStock: 0,
 		status: 'draft',
 	});
 
 	const [coverImagePreview, setCoverImagePreview] = useState(null);
 	const [coverImageFile, setCoverImageFile] = useState(null);
+	const [additionalImages, setAdditionalImages] = useState([]); // Array of {file, preview, uploadProgress, isUploading}
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [formErrors, setFormErrors] = useState({});
@@ -40,13 +44,25 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				name: product?.name || '',
 				description: product?.description || '',
 				price: product?.price?.amount || '',
-				brand: product?.brand || '',
-				category: product?.category?._id || '',
+				brandId: product?.brandId?._id || product?.brandId || '',
+				primaryCategory: product?.primaryCategory?._id || product?.primaryCategory || '',
+				subCategory: product?.subCategory?._id || product?.subCategory || '',
 				countInStock: product?.countInStock || 0,
 				status: product?.status || 'draft',
 			});
 			setCoverImagePreview(product?.coverImage?.secure_url || null);
 			setCoverImageFile(null);
+			// Initialize additional images from product data
+			if (product?.images) {
+				const existingImages = product.images.map(img => ({
+					preview: img.secure_url,
+					uploaded: true,
+					public_id: img.public_id
+				}));
+				setAdditionalImages(existingImages);
+			} else {
+				setAdditionalImages([]);
+			}
 			setFormErrors({});
 			setUploadProgress(0);
 		}
@@ -89,6 +105,109 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		setFormErrors(prev => ({ ...prev, image: null }));
 	};
 
+	const handleAdditionalImagesSelect = (e) => {
+		const files = Array.from(e.target.files);
+		
+		// Check if we exceed the limit
+		if (additionalImages.length + files.length > 10) {
+			const remainingSlots = 10 - additionalImages.length;
+			setFormErrors(prev => ({ 
+				...prev, 
+				additionalImages: `You can only upload ${remainingSlots} more image(s). Maximum 10 images allowed.` 
+			}));
+			return;
+		}
+
+		const newImages = files.map(file => {
+			// Validate file type
+			if (!file.type.startsWith('image/')) {
+				setFormErrors(prev => ({ ...prev, additionalImages: 'Please select only image files' }));
+				return null;
+			}
+
+			// Validate file size (max 5MB each)
+			if (file.size > 5 * 1024 * 1024) {
+				setFormErrors(prev => ({ ...prev, additionalImages: 'Each image must be less than 5MB' }));
+				return null;
+			}
+
+			return {
+				file,
+				preview: URL.createObjectURL(file),
+				uploadProgress: 0,
+				isUploading: false,
+				uploaded: false
+			};
+		}).filter(Boolean);
+
+		if (newImages.length > 0) {
+			setAdditionalImages(prev => [...prev, ...newImages]);
+			setFormErrors(prev => ({ ...prev, additionalImages: null }));
+		}
+	};
+
+	const removeAdditionalImage = (index) => {
+		setAdditionalImages(prev => {
+			const newImages = [...prev];
+			const removedImage = newImages.splice(index, 1)[0];
+			
+			// Revoke object URL to prevent memory leaks
+			if (removedImage.preview && !removedImage.uploaded) {
+				URL.revokeObjectURL(removedImage.preview);
+			}
+			
+			return newImages;
+		});
+	};
+
+	const uploadAdditionalImage = async (index) => {
+		setAdditionalImages(prev => {
+			const newImages = [...prev];
+			newImages[index] = { ...newImages[index], isUploading: true, uploadProgress: 0 };
+			return newImages;
+		});
+
+		const imageToUpload = additionalImages[index];
+		
+		try {
+			const formDataUpload = new FormData();
+			formDataUpload.append('image', imageToUpload.file);
+			
+			const response = await mainApi.post('upload', formDataUpload, {
+				headers: { 'Content-Type': 'multipart/form-data' },
+				onUploadProgress: (progressEvent) => {
+					const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+					setAdditionalImages(prev => {
+						const newImages = [...prev];
+						newImages[index] = { ...newImages[index], uploadProgress: percent };
+						return newImages;
+					});
+				},
+			});
+			
+			// Update image with uploaded data
+			setAdditionalImages(prev => {
+				const newImages = [...prev];
+				newImages[index] = { 
+					...newImages[index], 
+					isUploading: false,
+					uploadProgress: 100,
+					uploaded: true,
+					public_id: response.data?.data?.public_id,
+					preview: response.data?.data?.secure_url
+				};
+				return newImages;
+			});
+		} catch (err) {
+			setAdditionalImages(prev => {
+				const newImages = [...prev];
+				newImages[index] = { ...newImages[index], isUploading: false, uploadProgress: 0 };
+				return newImages;
+			});
+			setFormErrors(prev => ({ ...prev, additionalImages: 'Failed to upload image. Try again.' }));
+		}
+	};
+
 	const removeImage = () => {
 		setCoverImageFile(null);
 		setCoverImagePreview(isEditing ? product?.coverImage?.secure_url : null);
@@ -100,8 +219,19 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		if (!formData.name.trim()) errors.name = 'Product name is required';
 		if (!formData.description.trim()) errors.description = 'Description is required';
 		if (!formData.price || parseFloat(formData.price) <= 0) errors.price = 'Valid price is required';
-		if (!formData.brand.trim()) errors.brand = 'Brand is required';
-		if (!formData.category) errors.category = 'Category is required';
+		if (!formData.brandId) errors.brandId = 'Brand is required';
+		if (!formData.primaryCategory) errors.primaryCategory = 'Primary category is required';
+		
+		// Check if all additional images are uploaded
+		const uploadingImages = additionalImages.filter(img => img.isUploading);
+		const unuploadedImages = additionalImages.filter(img => !img.uploaded && !img.isUploading);
+		
+		if (uploadingImages.length > 0) {
+			errors.additionalImages = 'Please wait for all images to finish uploading';
+		} else if (unuploadedImages.length > 0) {
+			errors.additionalImages = 'Please upload all selected images or remove them';
+		}
+		
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
 	};
@@ -111,8 +241,9 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		if (!validateForm()) return;
 
 		let coverImage = undefined;
+		let additionalImageUrls = [];
 
-		// Upload image if new file selected
+		// Upload cover image if new file selected
 		if (coverImageFile) {
 			try {
 				setIsUploading(true);
@@ -131,10 +262,18 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				setIsUploading(false);
 			} catch (err) {
 				setIsUploading(false);
-				setFormErrors(prev => ({ ...prev, image: 'Failed to upload image. Try again.' }));
+				setFormErrors(prev => ({ ...prev, image: 'Failed to upload cover image. Try again.' }));
 				return;
 			}
 		}
+
+		// Get uploaded additional images
+		additionalImageUrls = additionalImages
+			.filter(img => img.uploaded)
+			.map(img => ({
+				public_id: img.public_id,
+				secure_url: img.preview
+			}));
 
 		const submitData = {
 			...formData,
@@ -144,6 +283,10 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		if (coverImage) {
 			submitData.coverImage = coverImage;
 		}
+		
+		if (additionalImageUrls.length > 0) {
+			submitData.images = additionalImageUrls;
+		}
 
 		onSubmit(submitData);
 	};
@@ -152,6 +295,19 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		value: c._id,
 		label: c.name,
 	}));
+	
+	const brandOptions = (brands || []).map(b => ({
+		value: b._id,
+		label: b.name,
+	}));
+	
+	// Filter subcategories to exclude the primary category
+	const subCategoryOptions = (categories || [])
+		.filter(c => c._id !== formData.primaryCategory)
+		.map(c => ({
+			value: c._id,
+			label: c.name,
+		}));
 
 	return (
 		<Modal 
@@ -163,7 +319,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 			<form onSubmit={handleSubmit} className="space-y-5">
 				{/* Cover Image Upload */}
 				<div>
-					<label className="block text-sm font-semibold text-gray-700 mb-2">Product Image</label>
+					<label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
 					<div className="flex items-start gap-4">
 						<div 
 							onClick={() => fileInputRef.current?.click()}
@@ -190,7 +346,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 						/>
 						<div className="flex-1 space-y-2">
 							<p className="text-xs text-gray-500">
-								Drag and drop or click to upload. JPG, PNG, WebP supported. Max 5MB.
+								Main product image. JPG, PNG, WebP supported. Max 5MB.
 							</p>
 							{coverImagePreview && (
 								<Button variant="secondary" size="sm" type="button" onClick={removeImage} icon={<FiX className="w-3.5 h-3.5" />}>
@@ -215,6 +371,113 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 								</p>
 							)}
 						</div>
+					</div>
+				</div>
+
+				{/* Additional Images Upload */}
+				<div>
+					<div className="flex items-center justify-between mb-2">
+						<label className="block text-sm font-semibold text-gray-700">Additional Images</label>
+						<span className="text-xs text-gray-500">
+							{additionalImages.length}/10 images
+						</span>
+					</div>
+					<div className="space-y-3">
+						{/* Image Grid */}
+						{additionalImages.length > 0 && (
+							<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+								{additionalImages.map((image, index) => (
+									<div key={index} className="relative group">
+										<div className={`w-full aspect-square rounded-xl border-2 overflow-hidden transition-all ${
+											image.isUploading ? 'border-amber-300 bg-amber-50' :
+											image.uploaded ? 'border-emerald-300 bg-emerald-50' :
+											'border-gray-200 bg-gray-50 hover:border-indigo-300'
+										}`}>
+											{image.preview && (
+												<img 
+													src={image.preview} 
+													alt={`Additional ${index + 1}`}
+													className="w-full h-full object-cover"
+													crossOrigin="anonymous"
+												/>
+											)}
+											
+											{/* Upload Progress Overlay */}
+											{image.isUploading && (
+												<div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+													<div className="text-center">
+														<div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-1"></div>
+														<span className="text-white text-xs font-medium">{image.uploadProgress}%</span>
+													</div>
+												</div>
+											)}
+											
+											{/* Upload Button Overlay */}
+											{!image.isUploading && !image.uploaded && (
+												<div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+													<Button 
+														size="sm" 
+														variant="secondary"
+														onClick={() => uploadAdditionalImage(index)}
+														className="text-xs px-2 py-1"
+													>
+														Upload
+													</Button>
+												</div>
+											)}
+											
+											{/* Success Checkmark */}
+											{image.uploaded && (
+												<div className="absolute top-1 right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+													<FiCheck className="w-3 h-3 text-white" />
+												</div>
+											)}
+										</div>
+										
+										{/* Remove Button */}
+										<button
+											onClick={() => removeAdditionalImage(index)}
+											className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white hover:bg-rose-600 transition-colors shadow-lg"
+										>
+											<FiX className="w-3 h-3" />
+										</button>
+									</div>
+								))}
+							</div>
+						)}
+						
+						{/* Add Images Button */}
+						{additionalImages.length < 10 && (
+							<div>
+								<input
+									type="file"
+									accept="image/*"
+									onChange={handleAdditionalImagesSelect}
+									multiple
+									className="hidden"
+									id="additional-images-input"
+								/>
+								<label 
+									htmlFor="additional-images-input"
+									className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all"
+								>
+									<FiUpload className="w-5 h-5 text-gray-400" />
+									<span className="text-gray-600 font-medium">
+										Add Images ({10 - additionalImages.length} slots remaining)
+									</span>
+								</label>
+								<p className="text-xs text-gray-500 mt-1 text-center">
+									Select multiple images. JPG, PNG, WebP supported. Max 5MB each.
+								</p>
+							</div>
+						)}
+						
+						{/* Error Message */}
+						{formErrors.additionalImages && (
+							<p className="text-xs text-rose-500 flex items-center gap-1">
+								<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.additionalImages}
+							</p>
+						)}
 					</div>
 				</div>
 
@@ -276,30 +539,48 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 					</div>
 				</div>
 
-				{/* Brand & Category */}
-				<div className="grid grid-cols-2 gap-4">
+				{/* Brand Selection */}
+				<div>
+					<Select
+						label="Brand *"
+						value={formData.brandId}
+						onChange={(val) => handleSelectChange('brandId', val)}
+						options={[
+							{ value: '', label: 'Select brand...' },
+							...brandOptions
+						]}
+						loading={brandsLoading}
+					/>
+					{formErrors.brandId && <p className="text-xs text-rose-500 mt-1">{formErrors.brandId}</p>}
+				</div>
+
+				{/* Category Selection */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
-						<label className="block text-sm font-semibold text-gray-700 mb-1">Brand *</label>
-						<Input
-							name="brand"
-							value={formData.brand}
-							onChange={handleChange}
-							placeholder="Brand name"
-							required
+						<Select
+							label="Primary Category *"
+							value={formData.primaryCategory}
+							onChange={(val) => handleSelectChange('primaryCategory', val)}
+							options={[
+								{ value: '', label: 'Select primary category...' },
+								...categoryOptions
+							]}
+							loading={categoriesLoading}
 						/>
-						{formErrors.brand && <p className="text-xs text-rose-500 mt-1">{formErrors.brand}</p>}
+						{formErrors.primaryCategory && <p className="text-xs text-rose-500 mt-1">{formErrors.primaryCategory}</p>}
 					</div>
 					<div>
 						<Select
-							label="Category *"
-							value={formData.category}
-							onChange={(val) => handleSelectChange('category', val)}
+							label="Sub Category"
+							value={formData.subCategory}
+							onChange={(val) => handleSelectChange('subCategory', val)}
 							options={[
-								{ value: '', label: 'Select category...' },
-								...categoryOptions
+								{ value: '', label: 'Select sub category (optional)...' },
+								...subCategoryOptions
 							]}
+							disabled={!formData.primaryCategory}
+							loading={categoriesLoading}
 						/>
-						{formErrors.category && <p className="text-xs text-rose-500 mt-1">{formErrors.category}</p>}
 					</div>
 				</div>
 

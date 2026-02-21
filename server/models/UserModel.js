@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			validate: [validator.isMobilePhone, "please enter valid phone number"],
 		},
+		gender: {
+			type: String,
+			enum: ["male", "female", "other"],
+			default: "other",
+		},
 		profileImg: {
 				public_id: String,
 				secure_url: String,

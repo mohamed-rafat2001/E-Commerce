@@ -33,16 +33,43 @@ const ProductCard = ({ product, onEdit, onDelete, isDeleting }) => {
 					</div>
 				)}
 				
+				{/* Status Badge */}
 				<div className="absolute top-3 right-3">
 					<Badge variant={statusColors[product.status] || 'secondary'}>
 						{product.status}
 					</Badge>
 				</div>
+				
+				{/* Image Count Indicator */}
+				{(product.images?.length > 0) && (
+					<div className="absolute bottom-3 left-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs font-medium">
+						+{product.images.length} images
+					</div>
+				)}
 			</div>
 
 			<div className="p-5">
 				<h3 className="font-bold text-lg text-gray-900 truncate mb-1">{product.name}</h3>
 				<p className="text-gray-500 text-sm line-clamp-2 mb-3">{product.description}</p>
+				
+				{/* Brand and Category Info */}
+				<div className="flex flex-wrap gap-2 mb-3">
+					{product.brandId && (
+						<span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+							{product.brandId.name || 'Brand N/A'}
+						</span>
+					)}
+					{product.primaryCategory && (
+						<span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+							{product.primaryCategory.name || 'Category N/A'}
+						</span>
+					)}
+					{product.subCategory && (
+						<span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+							{product.subCategory.name || 'Sub N/A'}
+						</span>
+					)}
+				</div>
 				
 				<div className="flex items-center justify-between mb-4">
 					<span className="text-2xl font-bold text-indigo-600">

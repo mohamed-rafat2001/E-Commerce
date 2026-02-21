@@ -66,6 +66,7 @@ import reviewRouter from "./routers/reviewRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 import adminRouter from "./routers/adminRouter.js";
 import uploadRouter from "./routers/uploadRouter.js";
+import brandRouter from "./routers/brandRouter.js";
 
 app.use("/api/v1/authentications", authRouter);
 app.use("/api/v1/admin", adminRouter);
@@ -78,6 +79,7 @@ app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/upload", uploadRouter);
+app.use("/api/v1/brands", brandRouter);
 
 // global error handler
 app.use(globalError);

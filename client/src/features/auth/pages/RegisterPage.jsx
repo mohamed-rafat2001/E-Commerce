@@ -21,6 +21,7 @@ function RegisterPage() {
 		getValues,
 		trigger,
 		watch,
+		reset,
 		formState: { errors },
 	} = useForm({
 		mode: "onChange",
@@ -36,16 +37,21 @@ function RegisterPage() {
 
 	async function onNextStep() {
 		if (step === 1) {
-			const fieldsStep1 = ["email", "password", "confirmPassword", "role"];
-			const isStep1Valid = await trigger(fieldsStep1);
-			if (isStep1Valid) {
+			const isRoleSelected = selectedRole === "Customer" || selectedRole === "Seller";
+			if (isRoleSelected) {
 				setStep(2);
 			}
 		} else if (step === 2) {
-			const fieldsStep2 = ["firstName", "lastName", "phoneNumber", "gender"];
+			const fieldsStep2 = ["email", "password", "confirmPassword"];
 			const isStep2Valid = await trigger(fieldsStep2);
 			if (isStep2Valid) {
 				setStep(3);
+			}
+		} else if (step === 3) {
+			const fieldsStep3 = ["firstName", "lastName", "phoneNumber", "gender"];
+			const isStep3Valid = await trigger(fieldsStep3);
+			if (isStep3Valid) {
+				setStep(4);
 			}
 		}
 	}
@@ -106,20 +112,79 @@ function RegisterPage() {
 
 					<div className="text-center pt-2">
 						<h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-							{step === 1 ? "Create account" : step === 2 ? "Your profile" : selectedRole === "Seller" ? "Business Details" : "Shipping Address"}
+							{step === 1 ? "Choose your role" : step === 2 ? "Create account" : step === 3 ? "Your profile" : selectedRole === "Seller" ? "Business Details" : "Shipping Address"}
 						</h2>
 						<p className="mt-2 text-sm text-gray-500">
 							{step === 1
-								? "Enter your details to get started"
-								: step === 2 
-									? "Just a few more details"
-									: selectedRole === "Seller" ? "Complete your seller profile" : "Tell us where to deliver"}
+								? "Select if you want to buy or sell"
+								: step === 2
+									? "Enter your account details"
+									: step === 3
+										? "Just a few more details"
+										: selectedRole === "Seller" ? "Complete your seller profile" : "Tell us where to deliver"}
 						</p>
 					</div>
 
 					<form onSubmit={handleSubmit(Submit)} className="mt-6 space-y-5">
 						<AnimatePresence mode="wait" initial={false} custom={step}>
 							{step === 1 && (
+								<motion.div
+									key="role-selection"
+									variants={variants}
+									initial="enter"
+									animate="center"
+									exit="exit"
+									transition={{ type: "spring", stiffness: 300, damping: 30 }}
+									custom={1}
+									className="space-y-6"
+								>
+									<div className="grid grid-cols-2 gap-4">
+										<label
+											className={`relative flex flex-col items-center justify-center p-6 border-2 rounded-2xl cursor-pointer transition-all hover:bg-blue-50 ${
+												selectedRole === "Customer"
+													? "border-blue-600 bg-blue-50 text-blue-700 ring-2 ring-blue-600/20"
+													: "border-gray-200 text-gray-600 hover:border-blue-300"
+											}`}
+										>
+											<input
+												type="radio"
+												value="Customer"
+												className="sr-only"
+												{...register("role")}
+											/>
+											<OrderIcon className={`w-12 h-12 mb-3 ${selectedRole === "Customer" ? "text-blue-600" : "text-gray-400"}`} />
+											<span className="font-bold text-lg">Customer</span>
+											<p className="text-sm mt-1 text-center">Buy products from sellers</p>
+										</label>
+										<label
+											className={`relative flex flex-col items-center justify-center p-6 border-2 rounded-2xl cursor-pointer transition-all hover:bg-blue-50 ${
+												selectedRole === "Seller"
+													? "border-blue-600 bg-blue-50 text-blue-700 ring-2 ring-blue-600/20"
+													: "border-gray-200 text-gray-600 hover:border-blue-300"
+											}`}
+										>
+											<input
+												type="radio"
+												value="Seller"
+												className="sr-only"
+												{...register("role")}
+											/>
+											<StoreIcon className={`w-12 h-12 mb-3 ${selectedRole === "Seller" ? "text-blue-600" : "text-gray-400"}`} />
+											<span className="font-bold text-lg">Seller</span>
+											<p className="text-sm mt-1 text-center">Sell your products</p>
+										</label>
+									</div>
+									<button
+										type="button"
+										onClick={onNextStep}
+										className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-base font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+									>
+										Next Step
+										<ChevronRightIcon className="ml-2 h-5 w-5" />
+									</button>
+								</motion.div>
+							)}
+							{step === 2 && (
 								<RegisterStepOne 
 									register={register}
 									errors={errors}

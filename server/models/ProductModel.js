@@ -37,16 +37,19 @@ const productSchema = new mongoose.Schema(
 				secure_url: String,
 			},
 		],
-		brand: {
-			type: String,
-			required: [true, "Product Brand is required"],
-			minLength: 2,
-			trim: true,
+		brandId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "BrandModel",
+			required: [true, "Product brand is required"],
 		},
-		category: {
+		primaryCategory: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "CategoryModel",
-			required: [true, "Product category is required"],
+			required: [true, "Primary category is required"],
+		},
+		subCategory: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "CategoryModel",
 		},
 		price: moneySchema,
 		ratingAverage: {
@@ -92,7 +95,9 @@ productSchema.virtual("reviews", {
 //  mongoose query middlewares
 productSchema.pre(/^find/, function () {
 	this.populate("reviews");
-	this.populate("category", "name description");
+	this.populate("brandId", "name description logo");
+	this.populate("primaryCategory", "name description");
+	this.populate("subCategory", "name description");
 });
 
 productSchema.pre("save", async function () {

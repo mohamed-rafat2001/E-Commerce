@@ -13,3 +13,4 @@ export { default as useUpdateSellerProfile } from './useUpdateSellerProfile.js';
 export { default as useUpdateOrderStatus } from './useUpdateOrderStatus.js';
 export { default as useAddSellerAddress } from './useAddSellerAddress.js';
 export { default as useAddPayoutMethod } from './useAddPayoutMethod.js';
+export { default as useSellerBrands } from './useSellerBrands.js';

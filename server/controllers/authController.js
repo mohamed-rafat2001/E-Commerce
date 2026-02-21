@@ -19,6 +19,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 		password,
 		confirmPassword,
 		role,
+		gender,
 		// Seller fields
 		brand,
 		description,
