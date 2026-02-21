@@ -1,8 +1,18 @@
 import { motion } from 'framer-motion';
 import { Badge } from '../../../../shared/ui/index.js';
-import { EditIcon, TrashIcon } from '../../../../shared/constants/icons.jsx';
+import { EditIcon, TrashIcon, FiChevronDown, FiChevronRight } from '../../../../shared/constants/icons.jsx';
 
-const CategoryCard = ({ category, onToggleStatus, onEdit, onDelete, isDeleting }) => {
+const CategoryCard = ({ 
+	category, 
+	onToggleStatus, 
+	onEdit, 
+	onDelete, 
+	isDeleting,
+	showSubCategoriesToggle = false,
+	isExpanded = false,
+	onToggleExpand,
+	subCategoryCount = 0
+}) => {
 	return (
 		<motion.div
 			layout
@@ -83,6 +93,26 @@ const CategoryCard = ({ category, onToggleStatus, onEdit, onDelete, isDeleting }
 							{category.description || "No description provided."}
 						</p>
 					</div>
+
+					{/* Subcategories Info */}
+					{showSubCategoriesToggle && (
+						<div className="flex items-center justify-between pt-2">
+							<button
+								onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}
+								className="flex items-center gap-2 text-sm font-medium text-white hover:text-indigo-200 transition-colors"
+							>
+								{isExpanded ? (
+									<FiChevronDown className="w-4 h-4" />
+								) : (
+									<FiChevronRight className="w-4 h-4" />
+								)}
+								<span>
+									{isExpanded ? 'Hide' : 'Show'} Subcategories 
+									{subCategoryCount > 0 && ` (${subCategoryCount})`}
+								</span>
+							</button>
+						</div>
+					)}
 
 					<div className="pt-4 border-t border-white/10 flex items-center gap-6">
 						<div className="space-y-0.5">

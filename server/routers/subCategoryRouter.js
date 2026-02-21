@@ -9,6 +9,7 @@ import {
 	deleteSubCategory,
 	getSubCategoriesByCategory,
 	getSubCategoryDetails,
+	getSubCategoriesByBrand,
 } from "../controllers/subCategoryController.js";
 
 /**
@@ -80,6 +81,26 @@ router.route("/")
  *         description: List of subcategories for the category
  */
 router.get("/categories/:categoryId/subcategories", getSubCategoriesByCategory);
+
+/**
+ * @swagger
+ * /api/v1/subcategories/brand/{brandId}:
+ *   get:
+ *     summary: Get subcategories by brand ID
+ *     tags: [SubCategories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: brandId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of subcategories for the brand
+ */
+router.get("/brand/:brandId", Protect, restrictTo("Seller", "Admin", "SuperAdmin"), getSubCategoriesByBrand);
 
 /**
  * @swagger

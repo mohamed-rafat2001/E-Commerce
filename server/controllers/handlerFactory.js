@@ -356,7 +356,57 @@ export const getById = (Model) =>
 // get all docs
 export const getAll = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const docs = await Model.find({});
+		// Basic filtering
+		const queryObj = { ...req.query };
+		const excludedFields = ['page', 'sort', 'limit', 'fields'];
+		excludedFields.forEach(el => delete queryObj[el]);
+
+		// Advanced filtering (gte, lte, etc.)
+		let queryStr = JSON.stringify(queryObj);
+		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+		let query = Model.find(JSON.parse(queryStr));
+
+		// Sorting
+		if (req.query.sort) {
+			const sortBy = req.query.sort.split(',').join(' ');
+			query = query.sort(sortBy);
+		} else {
+			query = query.sort('-createdAt');
+		}
+
+		// Limiting fields
+		if (req.query.fields) {
+			const fields = req.query.fields.split(',').join(' ');
+			query = query.select(fields);
+		} else {
+			query = query.select('-__v');
+		}
+
+		// Pagination
+		const page = req.query.page * 1 || 1;
+		const limit = req.query.limit * 1 || 100;
+		const skip = (page - 1) * limit;
+
+		query = query.skip(skip).limit(limit);
+
+		// Population
+		if (req.query.populate) {
+			let populateFields;
+			try {
+				// check if it is a JSON string
+				if (req.query.populate.startsWith('{') || req.query.populate.startsWith('[')) {
+					populateFields = JSON.parse(req.query.populate);
+				} else {
+					populateFields = req.query.populate.split(',').join(' ');
+				}
+			} catch (e) {
+				populateFields = req.query.populate.split(',').join(' ');
+			}
+			query = query.populate(populateFields);
+		}
+
+		const docs = await query;
 
 		if (!docs) return next(new appError("docs not Found", 400));
 

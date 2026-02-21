@@ -9,69 +9,77 @@ import TopSellersCard from '../components/analytics/TopSellersCard.jsx';
 import TopProductsCard from '../components/analytics/TopProductsCard.jsx';
 import UserDistributionCard from '../components/analytics/UserDistributionCard.jsx';
 import RecentActivityCard from '../components/analytics/RecentActivityCard.jsx';
-
-// Mock analytics data
-const mockAnalytics = {
-	revenue: {
-		total: 248521.34,
-		change: 18.7,
-		chartData: [18200, 21100, 19800, 25200, 24800, 28100, 26800, 32200, 29800, 35100, 32500, 38900],
-		byMonth: [
-			{ month: 'Jan', revenue: 18200 },
-			{ month: 'Feb', revenue: 21100 },
-			{ month: 'Mar', revenue: 19800 },
-			{ month: 'Apr', revenue: 25200 },
-			{ month: 'May', revenue: 24800 },
-			{ month: 'Jun', revenue: 28100 },
-		],
-	},
-	orders: {
-		total: 34182,
-		change: 23.1,
-		chartData: [2800, 3200, 2900, 3800, 3500, 4200, 3900, 4800, 4200, 5100, 4700, 5400],
-	},
-	users: {
-		total: 12847,
-		newThisMonth: 892,
-		change: 12.5,
-		byRole: [
-			{ role: 'Customers', count: 11234, percentage: 87 },
-			{ role: 'Sellers', count: 1589, percentage: 12 },
-			{ role: 'Admins', count: 24, percentage: 1 },
-		],
-	},
-	products: {
-		total: 4523,
-		active: 3892,
-		outOfStock: 234,
-	},
-	topSellers: [
-		{ name: 'TechStore Pro', sales: 15234, revenue: 482400, rating: 4.9 },
-		{ name: 'FashionHub', sales: 12089, revenue: 356200, rating: 4.8 },
-		{ name: 'HomeDecor Plus', sales: 9856, revenue: 289100, rating: 4.7 },
-		{ name: 'GadgetWorld', sales: 8234, revenue: 245600, rating: 4.8 },
-		{ name: 'SportZone', sales: 7123, revenue: 198400, rating: 4.6 },
-	],
-	topProducts: [
-		{ name: 'Wireless Headphones Pro', sales: 2834, revenue: 424100 },
-		{ name: 'Smart Watch Ultra', sales: 2156, revenue: 862400 },
-		{ name: 'Laptop Stand Premium', sales: 1893, revenue: 151440 },
-		{ name: 'Mechanical Keyboard', sales: 1672, revenue: 267520 },
-		{ name: 'USB-C Hub Pro', sales: 1534, revenue: 122720 },
-	],
-	recentActivity: [
-		{ type: 'order', message: 'New order #ORD-2024-156 placed', time: '5 mins ago', icon: StoreIcon },
-		{ type: 'user', message: 'New seller registered: TechGuru', time: '15 mins ago', icon: FiUsers },
-		{ type: 'product', message: 'Product "iPhone Case" out of stock', time: '1 hour ago', icon: ProductIcon },
-		{ type: 'review', message: 'New 5-star review on "Smart Watch"', time: '2 hours ago', icon: FiStar },
-		{ type: 'order', message: 'Order #ORD-2024-152 delivered', time: '3 hours ago', icon: StoreIcon },
-	],
-};
+import { useAdminAnalytics } from '../hooks/useAdminAnalytics';
 
 const AnalyticsPage = () => {
 	const [timeRange, setTimeRange] = useState('month');
-	const isLoading = false;
-	const analytics = mockAnalytics;
+	const {
+		stats,
+		revenueData,
+		topProducts,
+		topSellers,
+		userGrowthData,
+		isLoading,
+		error
+	} = useAdminAnalytics(timeRange);
+
+	const analytics = useMemo(() => {
+		// Ensure defaults
+		const safeStats = stats || {};
+		const safeRevenueData = revenueData || [];
+		const safeTopProducts = topProducts || [];
+		const safeTopSellers = topSellers || [];
+		const safeUsersByRole = safeStats.usersByRole || [];
+
+		// Calculate total users from usersByRole if possible, or use stats.totalUsers
+		const totalUsersFromRole = safeUsersByRole.reduce((acc, curr) => acc + curr.count, 0);
+		const totalUsers = safeStats.totalUsers || totalUsersFromRole || 0;
+
+		const byRole = safeUsersByRole.map(role => ({
+			role: role._id,
+			count: role.count,
+			percentage: totalUsers > 0 ? Math.round((role.count / totalUsers) * 100) : 0
+		}));
+
+		return {
+			revenue: {
+				total: safeStats.totalRevenue || 0,
+				change: 0,
+				chartData: safeRevenueData.map(d => d.revenue),
+				byMonth: [],
+			},
+			orders: {
+				total: safeStats.totalOrders || 0,
+				change: 0,
+				chartData: safeRevenueData.map(d => d.orders),
+			},
+			users: {
+				total: totalUsers,
+				newThisMonth: 0,
+				change: 0,
+				byRole: byRole,
+			},
+			products: {
+				total: safeStats.totalProducts || 0,
+				active: safeStats.activeProducts || 0,
+				outOfStock: safeStats.outOfStockProducts || 0,
+			},
+			topSellers: safeTopSellers.map(s => ({
+				name: s.name,
+				sales: s.sales,
+				revenue: s.revenue,
+				rating: 0 
+			})),
+			topProducts: safeTopProducts.map(p => ({
+				name: p.name,
+				sales: p.sales,
+				revenue: p.revenue
+			})),
+			recentActivity: []
+		};
+	}, [stats, revenueData, topProducts, topSellers, userGrowthData]);
+
+	if (error) return <div className="text-red-500">Error loading analytics: {error.message}</div>;
 
 	return (
 		<div className="space-y-6">
@@ -135,15 +143,15 @@ const AnalyticsPage = () => {
 						/>
 						<SmallStatCard
 							title="Active Orders"
-							value="1,234"
+							value="0" // TODO: Add to API
 							subtitle="Processing now"
 							icon={OrderIcon}
 							gradient="from-blue-500 to-indigo-600"
 						/>
 						<SmallStatCard
 							title="Conversion Rate"
-							value="3.2%"
-							subtitle="+0.5% this week"
+							value="0%"
+							subtitle="+0% this week"
 							icon={FiEye}
 							gradient="from-pink-500 to-rose-600"
 						/>

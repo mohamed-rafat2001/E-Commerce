@@ -20,6 +20,8 @@ export const signUp = catchAsync(async (req, res, next) => {
 		confirmPassword,
 		role,
 		gender,
+		// Seller preferred categories
+		preferredCategories,
 		// Customer address fields
 		label,
 		recipientName,
@@ -72,10 +74,17 @@ export const signUp = catchAsync(async (req, res, next) => {
 			addresses: address,
 		});
 	} else if (userRole === "Seller") {
-		// Create seller profile without brand information
-		userModel = await SellerModel.create({
+		// Create seller profile with preferred categories
+		const sellerData = {
 			userId: user._id,
-		});
+		};
+		
+		// Add preferred categories if provided
+		if (preferredCategories && Array.isArray(preferredCategories) && preferredCategories.length > 0) {
+			sellerData.preferredCategories = preferredCategories;
+		}
+		
+		userModel = await SellerModel.create(sellerData);
 	}
 
 	// check if user model created

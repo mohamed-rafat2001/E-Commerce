@@ -62,3 +62,4 @@ export const deleteReview = (id) => deleteAdminDataById("reviews", id);
 // ===== DASHBOARD STATS =====
 // Note: You may need to create a custom endpoint for aggregated stats
 export const getAdminDashboardStats = () => getFunc("admin/stats");
+export const getAdminAnalytics = (timeRange) => getFunc(`admin/analytics?timeRange=${timeRange}`);

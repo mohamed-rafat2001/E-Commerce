@@ -9,6 +9,7 @@ import {
 	getProductsByOwner,
 	getSingleProduct,
 	updateProduct,
+	getProductsByBrand,
 } from "../controllers/productController.js";
 import { uploadProductImages, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 
@@ -33,6 +34,9 @@ router.get("/", getAllProducts);
 
 // Protected route for seller's own products (must be before /:id to avoid route conflict)
 router.get("/myproducts", Protect, restrictTo("Seller"), getProductsByOwner);
+
+// Route to get products by brand
+router.get("/brand/:brandId", Protect, restrictTo("Seller", "Admin", "SuperAdmin"), getProductsByBrand);
 
 /**
  * @swagger

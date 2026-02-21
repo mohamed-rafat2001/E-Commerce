@@ -8,6 +8,8 @@ import {
 	getById,
 	updateByOwner,
 } from "./handlerFactory.js";
+import catchAsync from "../middlewares/catchAsync.js";
+import sendResponse from "../utils/sendResponse.js";
 
 //  @desc   add new product
 // @Route  POST /api/v1/products
@@ -63,3 +65,18 @@ export const updateProduct = updateByOwner(ProductModel, [
 //  @Route  DELETE /api/v1/products
 //  @access Private/Admin || seller
 export const deleteAllProducts = deleteManyByOwner(ProductModel);
+
+//  @desc   Get products by brand ID
+// @Route   GET /api/v1/products/brand/:brandId
+// @access  Private/Seller
+export const getProductsByBrand = catchAsync(async (req, res, next) => {
+	const { brandId } = req.params;
+	
+	const products = await ProductModel.find({ 
+		brandId, 
+		isActive: true 
+	}).populate("subCategory", "name categoryId")
+	  .populate("primaryCategory", "name");
+	
+	sendResponse(res, 200, products);
+});

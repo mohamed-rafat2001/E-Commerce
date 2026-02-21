@@ -1,13 +1,10 @@
-import { useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button, LoadingSpinner } from '../../../shared/ui/index.js';
 import { FiMail, FiPhone, FiCalendar, FiMapPin, FiDollarSign, FiStar, FiInfo, FiUserCheck, FiCreditCard, FiArrowLeft, FiShoppingBag, FiPackage, FiTag, FiChevronDown, FiChevronUp, FiUser } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import useUserDetails from '../hooks/useUserDetails.js';
 import useAccordionSections from '../hooks/useAccordionSections.js';
-import useUserData from '../hooks/useUserData.js';
 import useUserOrders from '../hooks/useUserOrders.js';
-import { roleConfig } from '../components/users/userConstants.js';
 import UserHeader from '../components/UserHeader.jsx';
 
 // Accordion Section Component
@@ -106,7 +103,7 @@ const CustomerInformation = ({ user }) => (
       <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Loyalty Points</p>
         <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FiStar className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <FiStar className="w-4 h-4 text-amber-500 shrink-0" />
           {user.loyaltyPoints || 0}
         </p>
       </div>
@@ -115,7 +112,7 @@ const CustomerInformation = ({ user }) => (
       <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Addresses</p>
         <p className="text-sm font-semibold text-gray-800 flex items-start gap-2">
-          <FiMapPin className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+          <FiMapPin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
           <span>{user.addresses.length} address{user.addresses.length !== 1 ? 'es' : ''}</span>
         </p>
       </div>
@@ -124,8 +121,22 @@ const CustomerInformation = ({ user }) => (
 );
 
 // Purchase History Component
-const PurchaseHistory = ({ isLoadingOrders }) => {
-  const { mockOrders, mockProducts } = useUserData();
+const PurchaseHistory = ({ orders, purchasedProducts, isLoadingOrders }) => {
+  if (isLoadingOrders) {
+    return (
+      <div className="flex justify-center py-4">
+        <LoadingSpinner size="sm" />
+      </div>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="text-center py-6 text-gray-500">
+        No orders found.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -141,12 +152,19 @@ const PurchaseHistory = ({ isLoadingOrders }) => {
             </tr>
           </thead>
           <tbody>
-            {mockProducts.map((product) => (
-              <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="py-3 px-4 text-sm font-medium text-gray-800">{product.name}</td>
+            {purchasedProducts.map((product, idx) => (
+              <tr key={`${product.id}-${idx}`} className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-3 px-4 text-sm font-medium text-gray-800">
+                  <div className="flex items-center gap-2">
+                    {product.image && <img src={product.image} alt="" className="w-8 h-8 rounded object-cover" />}
+                    <span>{product.name}</span>
+                  </div>
+                </td>
                 <td className="py-3 px-4 text-sm font-semibold">${product.price.toFixed(2)}</td>
                 <td className="py-3 px-4 text-sm">{product.quantity}</td>
-                <td className="py-3 px-4 text-sm text-indigo-600 font-medium">{product.order}</td>
+                <td className="py-3 px-4 text-sm text-indigo-600 font-medium">
+                  <span title={product.order}>{product.order.substring(0, 8)}...</span>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -156,16 +174,16 @@ const PurchaseHistory = ({ isLoadingOrders }) => {
       <div className="mt-6">
         <h4 className="font-semibold text-gray-800 mb-3">Order History</h4>
         <div className="space-y-3">
-          {mockOrders.map((order) => (
+          {orders.map((order) => (
             <div key={order.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">{order.id}</p>
+                  <p className="text-sm font-semibold text-gray-800" title={order.id}>{order.id.substring(0, 8)}...</p>
                   <p className="text-xs text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-gray-800">${order.total.toFixed(2)}</p>
-                  <p className="text-xs font-semibold text-gray-500">{order.items} item{order.items !== 1 ? 's' : ''}</p>
+                  <p className="text-xs font-semibold text-gray-500">{order.itemsCount} item{order.itemsCount !== 1 ? 's' : ''}</p>
                   <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${
                     order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' :
                     order.status === 'Processing' ? 'bg-amber-100 text-amber-800' :
@@ -217,35 +235,35 @@ const SellerInformation = ({ user }) => (
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Company</p>
       <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-        <FiInfo className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+        <FiInfo className="w-4 h-4 text-indigo-500 shrink-0" />
         {user.companyName || '—'}
       </p>
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Business Email</p>
       <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-        <FiMail className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+        <FiMail className="w-4 h-4 text-emerald-500 shrink-0" />
         {user.businessEmail || user.email}
       </p>
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Business Phone</p>
       <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-        <FiPhone className="w-4 h-4 text-purple-500 flex-shrink-0" />
+        <FiPhone className="w-4 h-4 text-purple-500 shrink-0" />
         {user.businessPhone || user.phoneNumber || '—'}
       </p>
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Status</p>
       <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-        <FiUserCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />
+        <FiUserCheck className="w-4 h-4 text-blue-500 shrink-0" />
         {user.status || '—'}
       </p>
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Verification</p>
       <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-        <FiCreditCard className="w-4 h-4 text-green-500 flex-shrink-0" />
+        <FiCreditCard className="w-4 h-4 text-green-500 shrink-0" />
         {user.verificationStatus || '—'}
       </p>
     </div>
@@ -253,7 +271,7 @@ const SellerInformation = ({ user }) => (
       <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Rating</p>
         <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FiStar className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <FiStar className="w-4 h-4 text-amber-500 shrink-0" />
           {user.ratingAverage.toFixed(1)} ({user.ratingCount || 0} reviews)
         </p>
       </div>
@@ -262,7 +280,7 @@ const SellerInformation = ({ user }) => (
       <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Balance</p>
         <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FiDollarSign className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+          <FiDollarSign className="w-4 h-4 text-emerald-500 shrink-0" />
           ${user.balance.amount?.toFixed(2) || '0.00'} {user.balance.currency || 'USD'}
         </p>
       </div>
@@ -274,7 +292,7 @@ const SellerInformation = ({ user }) => (
 const UserDetailsPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { data: orders, isLoading: isLoadingOrders } = useUserOrders(userId);
+  const { orders, purchasedProducts, isLoading: isLoadingOrders } = useUserOrders(userId);
   const { user, loading } = useUserDetails(userId);
   const { openSections, toggleSection } = useAccordionSections();
   
@@ -364,7 +382,11 @@ const UserDetailsPage = () => {
                     <LoadingSpinner size="sm" />
                   </div>
                 ) : (
-                  <PurchaseHistory isLoadingOrders={isLoadingOrders} />
+                  <PurchaseHistory 
+                    orders={orders} 
+                    purchasedProducts={purchasedProducts} 
+                    isLoadingOrders={isLoadingOrders} 
+                  />
                 )}
               </AccordionSection>
             </>

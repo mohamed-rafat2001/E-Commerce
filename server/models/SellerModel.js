@@ -65,6 +65,12 @@ const SellerSchema = new mongoose.Schema(
 
 
 		addresses: [addressSchema],
+		preferredCategories: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "CategoryModel",
+			}
+		],
 		status: {
 			type: String,
 			enum: ["active", "suspended", "deleted"],
@@ -124,6 +130,7 @@ SellerSchema.pre(/^find/, function () {
 		path: "brands",
 		match: { isActive: true }
 	});
+	this.populate("preferredCategories", "name description");
 });
 SellerSchema.index({ status: 1 });
 SellerSchema.index({ verificationStatus: 1 });

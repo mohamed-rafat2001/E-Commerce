@@ -1,17 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, LoadingSpinner, Badge, Modal } from '../../../shared/ui/index.js';
+import useToast from '../../../shared/hooks/useToast.js';
 import { 
-	FiPlus, FiEdit2, FiTrash2, FiImage, FiGlobe, FiHash, FiCamera, FiSave, FiX, FiCheck
+	FiPlus, FiEdit2, FiTrash2, FiImage, FiGlobe, FiHash, FiCamera, FiSave, FiX, FiCheck, FiInfo
 } from 'react-icons/fi';
 import useCategories from '../../category/hooks/useCategories.js';
+import BrandDetailsSidebar from '../components/BrandDetailsSidebar.jsx';
 
 // Brand Card Component
-const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
+const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit, onSelect, isSelected }) => (
 	<motion.div
 		initial={{ opacity: 0, y: 20 }}
 		animate={{ opacity: 1, y: 0 }}
-		className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300"
+		className={`bg-white rounded-2xl border transition-all duration-300 ${
+			isSelected 
+				? 'border-indigo-500 ring-2 ring-indigo-200 shadow-lg' 
+				: 'border-gray-100 hover:shadow-lg'
+		}`}
 	>
 		<div className="flex items-start gap-5">
 			<div className="relative group">
@@ -41,9 +47,16 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 						<h4 className="text-lg font-bold text-gray-900">{brand.name}</h4>
 						<p className="text-gray-500 mt-1 text-sm leading-relaxed">{brand.description}</p>
 					</div>
-					<Badge variant={brand.isActive ? "success" : "secondary"} size="sm">
-						{brand.isActive ? "Active" : "Inactive"}
-					</Badge>
+					<div className="flex items-center gap-2">
+						{isSelected && (
+							<Badge variant="success" size="sm">
+								Selected
+							</Badge>
+						)}
+						<Badge variant={brand.isActive ? "success" : "secondary"} size="sm">
+							{brand.isActive ? "Active" : "Inactive"}
+						</Badge>
+					</div>
 				</div>
 				
 				<div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-600">
@@ -78,6 +91,14 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 			</div>
 			
 			<div className="flex flex-col gap-2">
+				<Button 
+					variant={isSelected ? "primary" : "secondary"} 
+					size="sm" 
+					onClick={() => onSelect(brand)}
+					icon={<FiInfo className="w-4 h-4" />}
+				>
+					{isSelected ? "Selected" : "View Details"}
+				</Button>
 				<Button 
 					variant="secondary" 
 					size="sm" 
@@ -320,7 +341,10 @@ const BrandsManagementPage = () => {
 	const [selectedBrand, setSelectedBrand] = useState(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const [currentlySelectedBrand, setCurrentlySelectedBrand] = useState(null);
 	const { categories } = useCategories();
+	const { showSuccess, showError } = useToast();
 	
 	// Fetch brands
 	useEffect(() => {
@@ -346,6 +370,23 @@ const BrandsManagementPage = () => {
 		}
 	};
 	
+	const handleSelectBrand = (brand) => {
+		if (currentlySelectedBrand?._id === brand._id) {
+			// Deselect if clicking the same brand
+			setCurrentlySelectedBrand(null);
+			setIsSidebarOpen(false);
+		} else {
+			// Select new brand
+			setCurrentlySelectedBrand(brand);
+			setIsSidebarOpen(true);
+		}
+	};
+	
+	const handleCloseSidebar = () => {
+		setIsSidebarOpen(false);
+		setCurrentlySelectedBrand(null);
+	};
+	
 	const handleCreateBrand = () => {
 		setSelectedBrand(null);
 		setIsFormModalOpen(true);
@@ -369,13 +410,14 @@ const BrandsManagementPage = () => {
 			
 			if (response.ok) {
 				fetchBrands();
+				showSuccess('Brand deleted successfully!');
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to delete brand');
+				showError(data.message || 'Failed to delete brand');
 			}
 		} catch (error) {
 			console.error('Error deleting brand:', error);
-			alert('Failed to delete brand');
+			showError('Failed to delete brand');
 		}
 	};
 	
@@ -398,13 +440,14 @@ const BrandsManagementPage = () => {
 			if (response.ok) {
 				setIsFormModalOpen(false);
 				fetchBrands();
+				showSuccess(brandId ? 'Brand updated successfully!' : 'Brand created successfully!');
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to save brand');
+				showError(data.message || 'Failed to save brand');
 			}
 		} catch (error) {
 			console.error('Error saving brand:', error);
-			alert('Failed to save brand');
+			showError('Failed to save brand');
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -433,13 +476,14 @@ const BrandsManagementPage = () => {
 			if (response.ok) {
 				setIsLogoModalOpen(false);
 				fetchBrands();
+				showSuccess('Logo updated successfully!');
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to update logo');
+				showError(data.message || 'Failed to update logo');
 			}
 		} catch (error) {
 			console.error('Error updating logo:', error);
-			alert('Failed to update logo');
+			showError('Failed to update logo');
 		} finally {
 			setIsUploading(false);
 		}
@@ -483,6 +527,8 @@ const BrandsManagementPage = () => {
 							onEdit={handleEditBrand}
 							onDelete={handleDeleteBrand}
 							onLogoEdit={handleLogoEdit}
+							onSelect={handleSelectBrand}
+							isSelected={currentlySelectedBrand?._id === brand._id}
 						/>
 					))}
 				</div>
@@ -517,6 +563,22 @@ const BrandsManagementPage = () => {
 				brand={selectedBrand}
 				isUploading={isUploading}
 			/>
+			
+			{/* Brand Details Sidebar */}
+			<BrandDetailsSidebar
+				brand={currentlySelectedBrand}
+				isOpen={isSidebarOpen}
+				onClose={handleCloseSidebar}
+				categories={categories}
+			/>
+			
+			{/* Overlay for sidebar */}
+			{isSidebarOpen && (
+				<div 
+					className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+					onClick={handleCloseSidebar}
+				/>
+			)}
 		</div>
 	);
 };

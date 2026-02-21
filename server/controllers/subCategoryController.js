@@ -82,3 +82,29 @@ export const getSubCategoryDetails = catchAsync(async (req, res, next) => {
 	// For now, we'll just return the subcategory with populated category
 	sendResponse(res, 200, subCategory);
 });
+
+//  @desc   Get subcategories by brand ID
+// @Route   GET /api/v1/subcategories/brand/:brandId
+// @access  Private/Seller
+export const getSubCategoriesByBrand = catchAsync(async (req, res, next) => {
+	const { brandId } = req.params;
+	
+	// Import ProductModel to get products for this brand
+	const ProductModel = (await import("../models/ProductModel.js")).default;
+	
+	// Get products for this brand
+	const products = await ProductModel.find({ 
+		brandId, 
+		isActive: true 
+	}).populate("subCategory", "name categoryId isActive");
+	
+	// Extract unique subcategories from products
+	const subCategoryIds = [...new Set(products.map(p => p.subCategory?._id).filter(Boolean))];
+	
+	const subCategories = await SubCategoryModel.find({ 
+		_id: { $in: subCategoryIds },
+		isActive: true 
+	}).populate("categoryId", "name description");
+	
+	sendResponse(res, 200, subCategories);
+});

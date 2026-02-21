@@ -17,7 +17,7 @@ import {
 	ProductsPage as AdminProductsPage,
 	OrdersPage as AdminOrdersPage,
 	AnalyticsPage as AdminAnalyticsPage,
-	CategoriesPage
+	CategoriesAndSubCategoriesPage
 } from "../features/admin/pages/index.js";
 
 import { 
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
 					{ path: "products", element: <AdminProductsPage /> },
 					{ path: "orders", element: <AdminOrdersPage /> },
 					{ path: "analytics", element: <AdminAnalyticsPage /> },
-					{ path: "categories", element: <CategoriesPage /> },
+					{ path: "categories", element: <CategoriesAndSubCategoriesPage /> },
 				],
 			},
 		],

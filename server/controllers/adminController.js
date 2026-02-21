@@ -10,6 +10,7 @@ import OrderModel from "../models/OrderModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
 import appError from "../utils/appError.js";
 import catchAsync from "../middlewares/catchAsync.js";
+import sendResponse from "../utils/sendResponse.js";
 
 import {
 	getAll as fetchAll,
@@ -102,49 +103,33 @@ const models = {
 	},
 	carts: {
 		model: CartModel,
-		createFields: ["items"],
-		updateFields: ["items"],
+		createFields: [],
+		updateFields: [],
 	},
 	wishlists: {
 		model: WishListModel,
-		createFields: ["items"],
-		updateFields: ["items"],
+		createFields: [],
+		updateFields: [],
 	},
 	reviews: {
 		model: ReviewsModel,
-		createFields: ["rating", "comment", "itemId"],
-		updateFields: ["rating", "comment"],
+		createFields: ["review", "rating", "isVisible"],
+		updateFields: ["review", "rating", "isVisible"],
 	},
 	orders: {
 		model: OrderModel,
-		createFields: [
-			"sellerId",
-			"items",
-			"shippingAddress",
-			"paymentMethod",
-			"taxPrice",
-			"shippingPrice",
-		],
-		updateFields: ["status", "isPaid", "isDelivered", "shippingAddress"],
-	},
-	orderitems: {
-		model: OrderItemsModel,
-		createFields: ["orderId", "items"],
-		updateFields: ["items"],
-	},
+		createFields: ["status", "isPaid", "paymentMethod"],
+		updateFields: ["status", "isPaid", "paymentMethod"],
+	}
 };
 
-export const resolveModel = (req, res, next) => {
-	const modelName = req.params.model.toLowerCase();
-	const config = models[modelName];
-
-	if (!config) {
-		return next(new appError(`No model found with name: ${modelName}`, 404));
+export const resolveModel = (req, res, next, modelName) => {
+	if (!models[modelName]) {
+		return next(new appError(`Model ${modelName} not found`, 404));
 	}
-
-	req.Model = config.model;
-	req.createFields = config.createFields;
-	req.updateFields = config.updateFields;
+	req.Model = models[modelName].model;
+	req.createFields = models[modelName].createFields;
+	req.updateFields = models[modelName].updateFields;
 	next();
 };
 
@@ -254,5 +239,193 @@ export const getDashboardStats = catchAsync(async (req, res, next) => {
 			recentOrders,
 			totalCategories
 		}
+	});
+});
+
+// @desc    Get detailed admin analytics
+// @route   GET /api/v1/admin/analytics
+// @access  Private/Admin
+export const getAnalytics = catchAsync(async (req, res, next) => {
+	const { timeRange } = req.query; // 'week', 'month', 'year'
+	
+	// Default to last 30 days if not specified
+	const endDate = new Date();
+	const startDate = new Date();
+	startDate.setDate(startDate.getDate() - 30);
+
+	// 1. Revenue Data (Daily for last 30 days)
+	const revenueData = await OrderModel.aggregate([
+		{
+			$match: {
+				createdAt: { $gte: startDate, $lte: endDate },
+				isPaid: true
+			}
+		},
+		{
+			$group: {
+				_id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+				revenue: { $sum: "$totalPrice.amount" },
+				orders: { $sum: 1 }
+			}
+		},
+		{ $sort: { _id: 1 } },
+		{
+			$project: {
+				date: "$_id",
+				revenue: 1,
+				orders: 1,
+				_id: 0
+			}
+		}
+	]);
+
+	// 2. Top Products (by revenue)
+	const topProducts = await OrderItemsModel.aggregate([
+		{
+			$match: {
+				createdAt: { $gte: startDate, $lte: endDate }
+			}
+		},
+		{ $unwind: "$items" },
+		{
+			$group: {
+				_id: "$items.item",
+				sales: { $sum: "$items.quantity" },
+				revenue: { $sum: "$items.price.amount" } // Assuming price is stored per item in array
+			}
+		},
+		{ $sort: { revenue: -1 } },
+		{ $limit: 5 },
+		{
+			$lookup: {
+				from: "products",
+				localField: "_id",
+				foreignField: "_id",
+				as: "product"
+			}
+		},
+		{ $unwind: "$product" },
+		{
+			$project: {
+				id: "$_id",
+				name: "$product.name",
+				sales: 1,
+				revenue: 1
+			}
+		}
+	]);
+
+	// 3. Top Sellers (by revenue)
+	const topSellers = await OrderItemsModel.aggregate([
+		{
+			$match: {
+				createdAt: { $gte: startDate, $lte: endDate }
+			}
+		},
+		{
+			$group: {
+				_id: "$sellerId",
+				sales: { $sum: 1 }, // Count of order items (approximate orders)
+				revenue: { $sum: "$totalPrice.amount" }
+			}
+		},
+		{ $sort: { revenue: -1 } },
+		{ $limit: 5 },
+		{
+			$lookup: {
+				from: "sellers",
+				localField: "_id",
+				foreignField: "_id",
+				as: "seller"
+			}
+		},
+		{ $unwind: "$seller" },
+		{
+			$lookup: {
+				from: "users",
+				localField: "seller.userId",
+				foreignField: "_id",
+				as: "user"
+			}
+		},
+		{ $unwind: "$user" },
+		{
+			$project: {
+				id: "$_id",
+				name: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+				brand: "$seller.brand",
+				sales: 1,
+				revenue: 1
+			}
+		}
+	]);
+
+	// 4. User Growth (Monthly for last 6 months)
+	const sixMonthsAgo = new Date();
+	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+	
+	const userGrowthData = await UserModel.aggregate([
+		{
+			$match: {
+				createdAt: { $gte: sixMonthsAgo },
+				role: "Customer" // Only count customers? Or all users? Let's do all.
+			}
+		},
+		{
+			$group: {
+				_id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+				users: { $sum: 1 }
+			}
+		},
+		{ $sort: { _id: 1 } },
+		{
+			$project: {
+				month: "$_id",
+				users: 1,
+				_id: 0
+			}
+		}
+	]);
+
+	// 5. Overall Stats
+	const totalRevenue = await OrderModel.aggregate([
+		{ $match: { isPaid: true } },
+		{ $group: { _id: null, total: { $sum: "$totalPrice.amount" } } }
+	]);
+	
+	const totalOrders = await OrderModel.countDocuments();
+	const totalUsers = await UserModel.countDocuments();
+	const totalProducts = await ProductModel.countDocuments();
+
+	// 6. User Distribution by Role
+	const usersByRole = await UserModel.aggregate([
+		{
+			$group: {
+				_id: "$role",
+				count: { $sum: 1 }
+			}
+		}
+	]);
+
+	// 7. Product Stats
+	const activeProducts = await ProductModel.countDocuments({ countInStock: { $gt: 0 } });
+	const outOfStockProducts = await ProductModel.countDocuments({ countInStock: 0 });
+
+	const stats = {
+		totalRevenue: totalRevenue[0]?.total || 0,
+		totalOrders,
+		totalUsers,
+		totalProducts,
+		activeProducts,
+		outOfStockProducts,
+		usersByRole
+	};
+
+	sendResponse(res, 200, {
+		stats,
+		revenueData,
+		topProducts,
+		topSellers,
+		userGrowthData
 	});
 });

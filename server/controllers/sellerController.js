@@ -184,6 +184,7 @@ export const getSellerAnalytics = catchAsync(async (req, res, next) => {
 
 	// Recent sales
 	const recentSales = orderItems.slice(0, 10).map(oi => ({
+		id: oi.orderId?._id || oi._id,
 		date: oi.createdAt,
 		product: oi.items?.[0]?.item?.name || 'Product',
 		amount: oi.totalPrice?.amount || 0,

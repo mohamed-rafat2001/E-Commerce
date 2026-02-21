@@ -222,6 +222,7 @@ function RegisterPage() {
 									onPrevStep={onPrevStep}
 									isRegistering={isRegistering}
 									variants={variants}
+									watch={watch}
 								/>
 							)}
 														
