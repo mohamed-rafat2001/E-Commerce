@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Button, Input, Textarea, Select, LoadingSpinner } from '../../../../shared/ui/index.js';
 import { PlusIcon, ImageIcon, XIcon } from '../../../../shared/constants/icons.jsx';
 
-const SubCategoryFormModal = ({ isOpen, onClose, onSubmit, subCategory, isLoading, categories = [] }) => {
+const SubCategoryFormModal = ({ isOpen, onClose, subCategory, onSubmit, isLoading, categories, uploadProgress }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		description: '',
-		categoryId: '',
+		categoryId: ''
 	});
-	const [imagePreview, setImagePreview] = useState(null);
 	const [selectedImage, setSelectedImage] = useState(null);
+	const [imagePreview, setImagePreview] = useState(null);
 	const fileInputRef = useRef(null);
 
 	useEffect(() => {
@@ -98,7 +98,7 @@ const SubCategoryFormModal = ({ isOpen, onClose, onSubmit, subCategory, isLoadin
 			{/* Modal */}
 			<div className="absolute inset-0 flex items-center justify-center p-4">
 				<div 
-					className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+					className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
 					onClick={(e) => e.stopPropagation()}
 				>
 					{/* Header */}
@@ -120,8 +120,8 @@ const SubCategoryFormModal = ({ isOpen, onClose, onSubmit, subCategory, isLoadin
 					</div>
 
 					{/* Form */}
-					<form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-						<div className="space-y-6">
+					<form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 min-h-0">
+						<div className="space-y-6 pb-6">
 							{/* Image Upload */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-3">
@@ -129,7 +129,7 @@ const SubCategoryFormModal = ({ isOpen, onClose, onSubmit, subCategory, isLoadin
 								</label>
 								<div className="flex items-start gap-6">
 									{/* Image Preview */}
-									<div className="flex-shrink-0">
+									<div className="shrink-0">
 										{imagePreview ? (
 											<div className="relative">
 												<img 
@@ -224,22 +224,33 @@ const SubCategoryFormModal = ({ isOpen, onClose, onSubmit, subCategory, isLoadin
 					</form>
 
 					{/* Footer */}
-					<div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50">
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={onClose}
-							disabled={isLoading}
-						>
+					<div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50 shrink-0">
+						{uploadProgress > 0 && uploadProgress < 100 ? (
+							<div className="flex-1 mr-4">
+								<div className="flex justify-between text-xs text-gray-500 mb-1">
+									<span>Uploading image...</span>
+									<span>{uploadProgress}%</span>
+								</div>
+								<div className="w-full bg-gray-200 rounded-full h-1.5">
+									<div 
+										className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
+										style={{ width: `${uploadProgress}%` }}
+									/>
+								</div>
+							</div>
+						) : null}
+						<Button variant="secondary" onClick={onClose} disabled={isLoading}>
 							Cancel
 						</Button>
-						<Button
-							type="submit"
-							onClick={handleSubmit}
-							disabled={!isValid || isLoading}
-							loading={isLoading}
-						>
-							{isLoading ? 'Saving...' : (subCategory ? 'Update Subcategory' : 'Create Subcategory')}
+						<Button type="submit" disabled={!isValid || isLoading}>
+							{isLoading ? (
+								<div className="flex items-center gap-2">
+									<LoadingSpinner size="sm" />
+									<span>{subCategory ? 'Updating...' : 'Creating...'}</span>
+								</div>
+							) : (
+								subCategory ? 'Update Subcategory' : 'Create Subcategory'
+							)}
 						</Button>
 					</div>
 				</div>

@@ -11,6 +11,7 @@ import {
 	getSubCategoryDetails,
 	getSubCategoriesByBrand,
 } from "../controllers/subCategoryController.js";
+import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ import {
  */
 router.route("/")
 	.get(getAllSubCategories)
-	.post(Protect, restrictTo("Admin", "SuperAdmin"), createSubCategory);
+	.post(Protect, restrictTo("Admin", "SuperAdmin"), uploadSingleImage("image"), setCloudinaryBody, createSubCategory);
 
 /**
  * @swagger
@@ -164,7 +165,7 @@ router.get("/brand/:brandId", Protect, restrictTo("Seller", "Admin", "SuperAdmin
  */
 router.route("/:id")
 	.get(getSubCategory)
-	.patch(Protect, restrictTo("Admin", "SuperAdmin"), updateSubCategory)
+	.patch(Protect, restrictTo("Admin", "SuperAdmin"), uploadSingleImage("image"), setCloudinaryBody, updateSubCategory)
 	.delete(Protect, restrictTo("Admin", "SuperAdmin"), deleteSubCategory);
 
 /**

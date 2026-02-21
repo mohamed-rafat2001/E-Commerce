@@ -13,7 +13,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 			<div className="space-y-6">
 				{/* Image Section */}
 				<div className="flex flex-col sm:flex-row gap-5">
-					<div className="w-full sm:w-48 h-48 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
+					<div className="w-full sm:w-48 h-48 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
 						{product.coverImage?.secure_url ? (
 							<img src={product.coverImage.secure_url} alt={product.name} className="w-full h-full object-cover" crossOrigin="anonymous" />
 						) : (
@@ -55,7 +55,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 						<h4 className="text-sm font-bold text-gray-700 mb-2">Gallery ({product.images.length} images)</h4>
 						<div className="flex gap-2 overflow-x-auto pb-2">
 							{product.images.map((img, i) => (
-								<div key={i} className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
+								<div key={i} className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
 									<img src={img.secure_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
 								</div>
 							))}

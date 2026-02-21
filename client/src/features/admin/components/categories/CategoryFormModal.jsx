@@ -170,15 +170,6 @@ const CategoryFormModal = ({ isOpen, onClose, category, onSubmit, isLoading }) =
 						Mark as active category
 					</label>
 				</div>
-				
-				<div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
-					<Button variant="secondary" type="button" onClick={onClose}>
-						Cancel
-					</Button>
-					<Button type="submit" loading={isLoading || uploading}>
-						{category ? "Update Category" : "Create Category"}
-					</Button>
-				</div>
 			</form>
 		</Modal>
 	);

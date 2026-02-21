@@ -358,7 +358,7 @@ export const getAll = (Model) =>
 	catchAsync(async (req, res, next) => {
 		// Basic filtering
 		const queryObj = { ...req.query };
-		const excludedFields = ['page', 'sort', 'limit', 'fields'];
+		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search'];
 		excludedFields.forEach(el => delete queryObj[el]);
 
 		// Advanced filtering (gte, lte, etc.)
@@ -366,6 +366,20 @@ export const getAll = (Model) =>
 		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
 		let query = Model.find(JSON.parse(queryStr));
+
+		// Search (Name & Description)
+		if (req.query.search) {
+			const searchRegex = new RegExp(req.query.search, 'i');
+			const searchConditions = [{ name: searchRegex }];
+			
+			// Check if description field exists in schema paths (optional, but good practice)
+			// For now, assuming description exists if it's searchable
+			if (Model.schema.paths.description) {
+				searchConditions.push({ description: searchRegex });
+			}
+			
+			query = query.find({ $or: searchConditions });
+		}
 
 		// Sorting
 		if (req.query.sort) {
@@ -407,10 +421,16 @@ export const getAll = (Model) =>
 		}
 
 		const docs = await query;
+		const totalDocs = await Model.countDocuments(JSON.parse(queryStr));
 
 		if (!docs) return next(new appError("docs not Found", 400));
 
-		sendResponse(res, 200, docs);
+		res.status(200).json({
+			status: "success",
+			results: docs.length,
+			total: totalDocs,
+			data: docs,
+		});
 	});
 
 //delete all docs

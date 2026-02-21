@@ -50,7 +50,7 @@ export const updateSeller = (id, data) => updateAdminData("sellers", id, data);
 export const getAllCustomers = () => getAdminData("customers");
 
 // Categories
-export const getAllCategories = () => getAdminData("categories");
+export const getAllCategories = (params) => getFunc("categories", { params });
 export const createCategory = (data) => createAdminData("categories", data);
 export const updateCategory = (id, data) => updateAdminData("categories", id, data);
 export const deleteCategory = (id) => deleteAdminDataById("categories", id);

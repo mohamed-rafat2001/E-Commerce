@@ -8,7 +8,7 @@ export function useAdminSubCategories() {
 	});
 
 	return {
-		subCategories: data?.data || [],
+		subCategories: data?.data?.data || [],
 		isLoading,
 		error,
 	};

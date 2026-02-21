@@ -4,7 +4,6 @@ import { Button, LoadingSpinner, Select, Badge } from '../../../shared/ui/index.
 import { PlusIcon, SearchIcon, CategoryIcon, TagIcon, CheckCircleIcon, XCircleIcon, ChevronDownIcon, ChevronRightIcon } from '../../../shared/constants/icons.jsx';
 import { useAdminCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../hooks/index.js';
 import { useAdminSubCategories, useCreateSubCategory, useUpdateSubCategory, useDeleteSubCategory } from '../../subCategory/hooks/index.js';
-import useToast from '../../../shared/hooks/useToast.js';
 import AdminStatCard from '../components/AdminStatCard.jsx';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
 import CategoryFormModal from '../components/categories/CategoryFormModal.jsx';
@@ -29,8 +28,8 @@ const CategoriesAndSubCategoriesPage = () => {
 	const { addCategory, isCreating: isCreatingCategory } = useCreateCategory();
 	const { editCategory, isUpdating: isUpdatingCategory } = useUpdateCategory();
 	const { removeCategory, isDeleting: isDeletingCategory } = useDeleteCategory();
-	const { addSubCategory, isCreating: isCreatingSubCategory } = useCreateSubCategory();
-	const { editSubCategory, isUpdating: isUpdatingSubCategory } = useUpdateSubCategory();
+	const { addSubCategory, isLoading: isCreatingSubCategory, uploadProgress: createProgress } = useCreateSubCategory();
+	const { editSubCategory, isLoading: isUpdatingSubCategory, uploadProgress: updateProgress } = useUpdateSubCategory();
 	const { removeSubCategory, isDeleting: isDeletingSubCategory } = useDeleteSubCategory();
 	const { showSuccess, showError } = useToast();
 	
@@ -119,11 +118,7 @@ const CategoriesAndSubCategoriesPage = () => {
 			removeCategory(categoryToDelete._id, {
 				onSuccess: () => {
 					setCategoryToDelete(null);
-					showSuccess('Category deleted successfully!');
 				},
-				onError: () => {
-					showError('Failed to delete category');
-				}
 			});
 		}
 	};
@@ -133,11 +128,7 @@ const CategoriesAndSubCategoriesPage = () => {
 			removeSubCategory(subCategoryToDelete._id, {
 				onSuccess: () => {
 					setSubCategoryToDelete(null);
-					showSuccess('Subcategory deleted successfully!');
 				},
-				onError: () => {
-					showError('Failed to delete subcategory');
-				}
 			});
 		}
 	};
@@ -147,21 +138,13 @@ const CategoriesAndSubCategoriesPage = () => {
 			editCategory({ id: selectedCategory._id, data }, {
 				onSuccess: () => {
 					setIsCategoryModalOpen(false);
-					showSuccess('Category updated successfully!');
 				},
-				onError: () => {
-					showError('Failed to update category');
-				}
 			});
 		} else {
 			addCategory(data, {
 				onSuccess: () => {
 					setIsCategoryModalOpen(false);
-					showSuccess('Category created successfully!');
 				},
-				onError: () => {
-					showError('Failed to create category');
-				}
 			});
 		}
 	};
@@ -171,21 +154,13 @@ const CategoriesAndSubCategoriesPage = () => {
 			editSubCategory({ id: selectedSubCategory._id, data }, {
 				onSuccess: () => {
 					setIsSubCategoryModalOpen(false);
-					showSuccess('Subcategory updated successfully!');
 				},
-				onError: () => {
-					showError('Failed to update subcategory');
-				}
 			});
 		} else {
 			addSubCategory(data, {
 				onSuccess: () => {
 					setIsSubCategoryModalOpen(false);
-					showSuccess('Subcategory created successfully!');
 				},
-				onError: () => {
-					showError('Failed to create subcategory');
-				}
 			});
 		}
 	};
@@ -195,14 +170,7 @@ const CategoriesAndSubCategoriesPage = () => {
 		const id = item._id;
 		const data = { isActive: !item.isActive };
 		
-		service({ id, data }, {
-			onSuccess: () => {
-				showSuccess(`Item ${item.isActive ? 'deactivated' : 'activated'} successfully!`);
-			},
-			onError: () => {
-				showError('Failed to update status');
-			}
-		});
+		service({ id, data });
 	};
 	
 	const closeModal = () => {
@@ -456,6 +424,7 @@ const CategoriesAndSubCategoriesPage = () => {
 				subCategory={selectedSubCategory}
 				onSubmit={handleSubmitSubCategory}
 				isLoading={selectedSubCategory ? isUpdatingSubCategory : isCreatingSubCategory}
+				uploadProgress={selectedSubCategory ? updateProgress : createProgress}
 				categories={categories}
 			/>
 			

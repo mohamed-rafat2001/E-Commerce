@@ -52,8 +52,14 @@ const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 			onClose={onClose} 
 			title={isEdit ? "Edit User" : "Create New User"}
 			size="md"
+			footer={
+				<>
+					<Button variant="secondary" type="button" onClick={onClose}>Cancel</Button>
+					<Button type="submit" form="user-form" loading={isLoading}>{isEdit ? "Save Changes" : "Create User"}</Button>
+				</>
+			}
 		>
-			<form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-5">
+			<form id="user-form" onSubmit={handleSubmit(onInternalSubmit)} className="space-y-5">
 				<div className="flex flex-col items-center justify-center p-5 bg-gray-50 rounded-2xl border border-gray-100">
 					<div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center text-indigo-600 mb-3 border border-indigo-50">
 						{isEdit ? <FiEdit2 className="w-7 h-7" /> : <FiUserCheck className="w-7 h-7" />}

@@ -7,6 +7,7 @@ const Modal = ({
 	onClose, 
 	title, 
 	children, 
+	footer,
 	size = 'md',
 	showClose = true 
 }) => {
@@ -84,9 +85,16 @@ const Modal = ({
 						)}
 
 						{/* Body */}
-						<div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+						<div className="p-6 overflow-y-auto custom-scrollbar flex-1 min-h-0">
 							{children}
 						</div>
+
+						{/* Footer */}
+						{footer && (
+							<div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50 shrink-0">
+								{footer}
+							</div>
+						)}
 					</motion.div>
 				</div>
 			)}

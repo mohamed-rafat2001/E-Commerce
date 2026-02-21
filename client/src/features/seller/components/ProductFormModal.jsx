@@ -315,8 +315,23 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 			onClose={onClose} 
 			title={isEditing ? 'Edit Product' : 'Add New Product'}
 			size="lg"
+			footer={
+				<>
+					<Button variant="secondary" type="button" onClick={onClose}>
+						Cancel
+					</Button>
+					<Button 
+						type="submit" 
+						form="product-form"
+						loading={isLoading || isUploading} 
+						icon={isEditing ? <FiCheck className="w-4 h-4" /> : <FiImage className="w-4 h-4" />}
+					>
+						{isEditing ? 'Update Product' : 'Add Product'}
+					</Button>
+				</>
+			}
 		>
-			<form onSubmit={handleSubmit} className="space-y-5">
+			<form id="product-form" onSubmit={handleSubmit} className="space-y-5">
 				{/* Cover Image Upload */}
 				<div>
 					<label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
@@ -357,7 +372,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 								<div className="space-y-1">
 									<div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
 										<motion.div 
-											className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full"
+											className="bg-linear-to-r from-indigo-500 to-purple-500 h-full rounded-full"
 											initial={{ width: 0 }}
 											animate={{ width: `${uploadProgress}%` }}
 										/>

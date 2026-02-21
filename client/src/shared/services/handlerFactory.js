@@ -7,8 +7,8 @@ export const addFunc = async (url, data) => {
 };
 
 // get func
-export const getFunc = async (url) => {
-	const res = await mainApi.get(url);
+export const getFunc = async (url, config = {}) => {
+	const res = await mainApi.get(url, config);
 	return res;
 };
 

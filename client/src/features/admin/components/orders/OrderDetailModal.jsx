@@ -74,7 +74,7 @@ const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus, isUpdating }
 					<div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
 						<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Shipping Address</p>
 						<div className="flex items-start gap-2">
-							<FiMapPin className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+							<FiMapPin className="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" />
 							<div className="text-sm text-gray-700">
 								{addr.recipientName && <p className="font-semibold">{addr.recipientName}</p>}
 								<p>{[addr.line1, addr.line2].filter(Boolean).join(', ')}</p>
@@ -94,11 +94,11 @@ const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus, isUpdating }
 							{allItems.map((item, idx) => (
 								<div key={idx} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
 									{item.image ? (
-										<div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
+										<div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0">
 											<img src={item.image} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
 										</div>
 									) : (
-										<div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+										<div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
 											<FiBox className="w-4 h-4 text-gray-400" />
 										</div>
 									)}
