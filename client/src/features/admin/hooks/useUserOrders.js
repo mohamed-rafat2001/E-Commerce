@@ -13,7 +13,7 @@ const useUserOrders = (userId) => {
     enabled: !!userId,
   });
 
-  const orders = data?.data?.map(order => {
+  const orders = (data?.data?.data || []).map(order => {
     // Calculate total items count across all OrderItems (sellers)
     const itemsCount = order.items?.reduce((acc, orderItem) => {
       return acc + (orderItem.items?.length || 0);

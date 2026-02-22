@@ -358,7 +358,7 @@ export const getAll = (Model) =>
 	catchAsync(async (req, res, next) => {
 		// Basic filtering
 		const queryObj = { ...req.query };
-		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search'];
+		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'populate'];
 		excludedFields.forEach(el => delete queryObj[el]);
 
 		// Advanced filtering (gte, lte, etc.)

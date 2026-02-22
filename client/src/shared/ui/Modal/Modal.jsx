@@ -61,7 +61,7 @@ const Modal = ({
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
-						className={`relative w-full ${sizes[size]} bg-white rounded-3xl shadow-2xl overflow-hidden z-10`}
+						className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col bg-white rounded-3xl shadow-2xl overflow-hidden z-10`}
 					>
 						{/* Header */}
 						{(title || showClose) && (

@@ -1,7 +1,7 @@
 import mainApi from "../../../api/mainApi.js";
 
-export const getSubCategories = () => {
-	return mainApi.get("/subcategories");
+export const getSubCategories = (params) => {
+	return mainApi.get("/subcategories", { params });
 };
 
 export const addSubCategory = (subCategoryData, onUploadProgress) => {

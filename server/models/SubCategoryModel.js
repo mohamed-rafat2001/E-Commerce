@@ -54,6 +54,14 @@ SubCategorySchema.virtual("products", {
 	foreignField: "subCategory",
 });
 
+// Virtual populate for product count
+SubCategorySchema.virtual("productCount", {
+	ref: "ProductModel",
+	localField: "_id",
+	foreignField: "subCategory",
+	count: true
+});
+
 // Populate middleware
 SubCategorySchema.pre(/^find/, function () {
 	this.populate("categoryId", "name description");

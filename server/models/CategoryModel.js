@@ -40,6 +40,21 @@ categorySchema.virtual("subCategories", {
 	foreignField: "categoryId",
 });
 
+// Virtual populate for products
+categorySchema.virtual("products", {
+	ref: "ProductModel",
+	localField: "_id",
+	foreignField: "primaryCategory",
+});
+
+// Virtual populate for product count
+categorySchema.virtual("productCount", {
+	ref: "ProductModel",
+	localField: "_id",
+	foreignField: "primaryCategory",
+	count: true
+});
+
 categorySchema.pre("save", async function () {
 	if (!this.isModified("name")) return;
 	this.slug = slugify(this.name, { lower: true });

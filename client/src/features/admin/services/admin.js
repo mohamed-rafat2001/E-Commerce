@@ -51,9 +51,9 @@ export const getAllCustomers = () => getAdminData("customers");
 
 // Categories
 export const getAllCategories = (params) => getFunc("categories", { params });
-export const createCategory = (data) => createAdminData("categories", data);
-export const updateCategory = (id, data) => updateAdminData("categories", id, data);
-export const deleteCategory = (id) => deleteAdminDataById("categories", id);
+export const createCategory = (data) => addFunc("categories", data);
+export const updateCategory = (id, data) => updateFunc(`categories/${id}`, data);
+export const deleteCategory = (id) => deleteFunc(`categories/${id}`);
 
 // Reviews
 export const getAllReviews = () => getAdminData("reviews");

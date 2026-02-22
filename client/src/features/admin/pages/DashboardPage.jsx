@@ -8,6 +8,7 @@ import {
 	ProductIcon,
 	OrderIcon,
 	AnalyticsIcon,
+	TagIcon,
 } from '../../../shared/constants/icons.jsx';
 
 import { useDashboardStats } from '../hooks/useDashboardStats.js';
@@ -18,6 +19,7 @@ const iconMap = {
 	ProductIcon,
 	OrderIcon,
 	AnalyticsIcon,
+	TagIcon,
 };
 
 const AdminDashboardPage = () => {

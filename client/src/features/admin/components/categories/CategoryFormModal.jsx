@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Modal, Input } from '../../../../shared/ui/index.js';
+import { Button, Modal, Input, LoadingSpinner } from '../../../../shared/ui/index.js';
 import { FiUploadCloud, FiX } from 'react-icons/fi';
 import { uploadSingleImage } from '../../../../shared/services/uploadService.js';
 import { toast } from 'react-hot-toast';
@@ -82,9 +82,19 @@ const CategoryFormModal = ({ isOpen, onClose, category, onSubmit, isLoading }) =
 			isOpen={isOpen}
 			onClose={onClose}
 			title={category ? "Edit Category" : "Add Category"}
-			size="md"
+			size="sm"
+			footer={
+				<>
+					<Button variant="secondary" onClick={onClose} disabled={isLoading}>
+						Cancel
+					</Button>
+					<Button type="submit" form="category-form" disabled={isLoading || uploading}>
+						{isLoading ? <LoadingSpinner size="sm" /> : (category ? "Update" : "Create")}
+					</Button>
+				</>
+			}
 		>
-			<form onSubmit={handleSubmit} className="space-y-4">
+			<form id="category-form" onSubmit={handleSubmit} className="space-y-4">
 				<div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 group hover:border-indigo-300 transition-colors relative min-h-[160px]">
 					{formData.coverImage?.secure_url ? (
 						<div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md">

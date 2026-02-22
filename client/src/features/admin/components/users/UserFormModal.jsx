@@ -86,11 +86,6 @@ const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 						<Input label="Confirm Password" type="password" placeholder="••••••••" {...register('confirmPassword', { required: !isEdit ? 'Confirmation is required' : false })} error={errors.confirmPassword?.message} />
 					</div>
 				)}
-
-				<div className="flex gap-3 pt-4 border-t border-gray-100">
-					<Button variant="secondary" type="button" onClick={onClose} fullWidth>Cancel</Button>
-					<Button type="submit" loading={isLoading} fullWidth>{isEdit ? "Save Changes" : "Create User"}</Button>
-				</div>
 			</form>
 		</Modal>
 	);

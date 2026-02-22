@@ -2,6 +2,7 @@ import UserModel from "../models/UserModel.js";
 import SellerModel from "../models/SellerModel.js";
 import CustomerModel from "../models/CustomerModel.js";
 import ProductModel from "../models/ProductModel.js";
+import BrandModel from "../models/BrandModel.js";
 import CategoryModel from "../models/CategoryModel.js";
 import CartModel from "../models/CartModel.js";
 import WishListModel from "../models/WishListModel.js";
@@ -170,6 +171,7 @@ export const getDashboardStats = catchAsync(async (req, res, next) => {
 		totalProducts,
 		totalOrders,
 		totalCategories,
+		totalBrands,
 		recentOrders,
 		revenueData
 	] = await Promise.all([
@@ -177,6 +179,7 @@ export const getDashboardStats = catchAsync(async (req, res, next) => {
 		ProductModel.countDocuments({ status: { $ne: 'deleted' } }),
 		OrderModel.countDocuments(),
 		CategoryModel.countDocuments(),
+		BrandModel.countDocuments(),
 		OrderModel.find()
 			.sort('-createdAt')
 			.limit(5)
@@ -229,6 +232,15 @@ export const getDashboardStats = catchAsync(async (req, res, next) => {
 			changeType: 'positive',
 			icon: 'AnalyticsIcon',
 			gradient: 'from-pink-500 to-rose-500',
+		},
+		{
+			id: 5,
+			name: 'Total Brands',
+			value: totalBrands.toLocaleString(),
+			change: '+8%',
+			changeType: 'positive',
+			icon: 'TagIcon',
+			gradient: 'from-blue-500 to-cyan-500',
 		},
 	];
 
