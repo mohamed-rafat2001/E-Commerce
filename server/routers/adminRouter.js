@@ -9,6 +9,7 @@ import {
 	deleteAll,
 	getDashboardStats,
 	getAnalytics,
+	getUserFullDetails,
 } from "../controllers/adminController.js";
 import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -26,6 +27,7 @@ router.use(Protect);
 router.use(restrictTo("SuperAdmin", "Admin"));
 router.get("/stats", getDashboardStats);
 router.get("/analytics", getAnalytics);
+router.get("/users/:id/full", getUserFullDetails);
 
 router.param("model", resolveModel);
 

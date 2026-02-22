@@ -26,6 +26,7 @@ export const deleteAllAdminData = (model) => deleteFunc(`admin/${model}`);
 // Users
 export const getAllUsers = () => getAdminData("users");
 export const getUserById = (id) => getAdminDataById("users", id);
+export const getUserFullDetails = (id) => getFunc(`admin/users/${id}/full`);
 export const createUser = (data) => createAdminData("users", data);
 export const updateUser = (id, data) => updateAdminData("users", id, data);
 export const deleteUser = (id) => deleteAdminDataById("users", id);
@@ -48,6 +49,11 @@ export const updateSeller = (id, data) => updateAdminData("sellers", id, data);
 
 // Customers
 export const getAllCustomers = () => getAdminData("customers");
+
+// Brands
+export const getAllBrands = (params) => getFunc("admin/brands", { params });
+export const updateBrand = (id, data) => updateAdminData("brands", id, data);
+export const deleteBrand = (id) => deleteAdminDataById("brands", id);
 
 // Categories
 export const getAllCategories = (params) => getFunc("categories", { params });

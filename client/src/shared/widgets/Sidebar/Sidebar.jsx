@@ -19,7 +19,8 @@ import {
 	StoreIcon,
 	HeartIcon,
 	CategoryIcon,
-	SettingsIcon
+	SettingsIcon,
+	TagIcon
 } from '../../constants/icons.jsx';
 
 // Navigation link configurations for each role
@@ -54,6 +55,12 @@ const roleNavigationConfig = {
 			path: 'categories',
 			icon: CategoryIcon,
 			description: 'Manage product categories',
+		},
+		{
+			label: 'Brands',
+			path: 'brands',
+			icon: TagIcon,
+			description: 'Manage brands',
 		},
 		{
 			label: 'Orders',

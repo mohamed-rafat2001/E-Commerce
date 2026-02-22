@@ -1,12 +1,13 @@
 import express from "express";
-const router = express.Router();
 import { Protect } from "../middlewares/authMiddleware.js";
 import {
-	addReview,
-	deleteReview,
-	getSingleReview,
-	updateReview,
+  addReview,
+  deleteReview,
+  getSingleReview,
+  updateReview,
 } from "../controllers/reviewController.js";
+
+const router = express.Router();
 
 /**
  * @swagger
@@ -102,10 +103,10 @@ router.use(Protect);
  *         description: Review deleted
  */
 router
-	.route("/:id")
-	.post(addReview)
-	.patch(updateReview)
-	.delete(deleteReview)
-	.get(getSingleReview);
+  .route("/:id")
+  .post(addReview)
+  .patch(updateReview)
+  .delete(deleteReview)
+  .get(getSingleReview);
 
 export default router;

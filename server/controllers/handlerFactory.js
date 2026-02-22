@@ -3,6 +3,7 @@ import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
+import APIFeatures from "../utils/apiFeatures.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
 import ProductModel from "../models/ProductModel.js";
 
@@ -356,53 +357,13 @@ export const getById = (Model) =>
 // get all docs
 export const getAll = (Model) =>
 	catchAsync(async (req, res, next) => {
-		// Basic filtering
-		const queryObj = { ...req.query };
-		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'populate'];
-		excludedFields.forEach(el => delete queryObj[el]);
-
-		// Advanced filtering (gte, lte, etc.)
-		let queryStr = JSON.stringify(queryObj);
-		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-		let query = Model.find(JSON.parse(queryStr));
-
-		// Search (Name & Description)
-		if (req.query.search) {
-			const searchRegex = new RegExp(req.query.search, 'i');
-			const searchConditions = [{ name: searchRegex }];
-			
-			// Check if description field exists in schema paths (optional, but good practice)
-			// For now, assuming description exists if it's searchable
-			if (Model.schema.paths.description) {
-				searchConditions.push({ description: searchRegex });
-			}
-			
-			query = query.find({ $or: searchConditions });
-		}
-
-		// Sorting
-		if (req.query.sort) {
-			const sortBy = req.query.sort.split(',').join(' ');
-			query = query.sort(sortBy);
-		} else {
-			query = query.sort('-createdAt');
-		}
-
-		// Limiting fields
-		if (req.query.fields) {
-			const fields = req.query.fields.split(',').join(' ');
-			query = query.select(fields);
-		} else {
-			query = query.select('-__v');
-		}
-
-		// Pagination
-		const page = req.query.page * 1 || 1;
-		const limit = req.query.limit * 1 || 100;
-		const skip = (page - 1) * limit;
-
-		query = query.skip(skip).limit(limit);
+		// Execute query using APIFeatures
+		const features = new APIFeatures(Model.find(), req.query)
+			.filter()
+			.search(Model.schema)
+			.sort()
+			.limitFields()
+			.paginate();
 
 		// Population
 		if (req.query.populate) {
@@ -417,11 +378,17 @@ export const getAll = (Model) =>
 			} catch (e) {
 				populateFields = req.query.populate.split(',').join(' ');
 			}
-			query = query.populate(populateFields);
+			features.query = features.query.populate(populateFields);
 		}
 
-		const docs = await query;
-		const totalDocs = await Model.countDocuments(JSON.parse(queryStr));
+		const docs = await features.query;
+
+		// Count total documents for pagination (including search)
+		const countFeatures = new APIFeatures(Model.find(), req.query)
+			.filter()
+			.search(Model.schema);
+		
+		const totalDocs = await countFeatures.query.countDocuments();
 
 		if (!docs) return next(new appError("docs not Found", 400));
 

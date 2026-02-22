@@ -102,6 +102,11 @@ const models = {
 		createFields: ["name", "description", "coverImage", "isActive"],
 		updateFields: ["name", "description", "coverImage", "isActive"],
 	},
+	brands: {
+		model: BrandModel,
+		createFields: ["name", "description", "logo", "website", "isActive", "sellerId", "primaryCategory", "subCategories"],
+		updateFields: ["name", "description", "logo", "website", "isActive", "primaryCategory", "subCategories"],
+	},
 	carts: {
 		model: CartModel,
 		createFields: [],
@@ -365,7 +370,6 @@ export const getAnalytics = catchAsync(async (req, res, next) => {
 			$project: {
 				id: "$_id",
 				name: { $concat: ["$user.firstName", " ", "$user.lastName"] },
-				brand: "$seller.brand",
 				sales: 1,
 				revenue: 1
 			}
@@ -379,8 +383,7 @@ export const getAnalytics = catchAsync(async (req, res, next) => {
 	const userGrowthData = await UserModel.aggregate([
 		{
 			$match: {
-				createdAt: { $gte: sixMonthsAgo },
-				role: "Customer" // Only count customers? Or all users? Let's do all.
+				createdAt: { $gte: sixMonthsAgo }
 			}
 		},
 		{
@@ -440,4 +443,28 @@ export const getAnalytics = catchAsync(async (req, res, next) => {
 		topSellers,
 		userGrowthData
 	});
+});
+
+// @desc    Get full user details including role-specific data
+// @route   GET /api/v1/admin/users/:id/full
+// @access  Private/Admin
+export const getUserFullDetails = catchAsync(async (req, res, next) => {
+	const user = await UserModel.findById(req.params.id);
+	if (!user) return next(new appError("User not found", 404));
+
+	let userDetails = user.toObject();
+
+	if (user.role === "Seller") {
+		const seller = await SellerModel.findOne({ userId: user._id });
+		if (seller) {
+			userDetails.seller = seller.toObject();
+		}
+	} else if (user.role === "Customer") {
+		const customer = await CustomerModel.findOne({ userId: user._id });
+		if (customer) {
+			userDetails.customer = customer.toObject();
+		}
+	}
+
+	sendResponse(res, 200, userDetails);
 });

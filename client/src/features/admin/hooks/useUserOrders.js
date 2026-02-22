@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAdminData } from "../services/admin";
 
-const useUserOrders = (userId) => {
+const useUserOrders = (userId, page = 1, limit = 5) => {
   const populateQuery = JSON.stringify({
     path: 'items',
     populate: { path: 'items.item' }
   });
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["admin", "orders", userId],
-    queryFn: () => getAdminData(`orders?userId=${userId}&populate=${encodeURIComponent(populateQuery)}`),
+    queryKey: ["admin", "orders", userId, page, limit],
+    queryFn: () => getAdminData(`orders?userId=${userId}&page=${page}&limit=${limit}&populate=${encodeURIComponent(populateQuery)}`),
     enabled: !!userId,
+    keepPreviousData: true,
   });
 
   const orders = (data?.data?.data || []).map(order => {
@@ -52,12 +53,18 @@ const useUserOrders = (userId) => {
     }
   });
 
+  const total = data?.data?.total || 0;
+  const totalPages = Math.ceil(total / limit);
+
   return {
     orders,
     purchasedProducts,
     isLoading,
     isError,
-    error
+    error,
+    total,
+    totalPages,
+    page
   };
 };
 
