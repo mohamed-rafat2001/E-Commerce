@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Button, Badge } from '../../../shared/ui/index.js';
+import { Button, Badge } from '../../../../shared/ui/index.js';
 import { FiEdit2, FiTrash2, FiImage } from 'react-icons/fi';
 
 const ProductCard = ({ product, onEdit, onDelete, isDeleting }) => {

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card } from '../../../shared/ui/index.js';
+import { Card } from '../../../../shared/ui/index.js';
 
 const RevenueChart = () => {
 	// Dummy data for visual representation

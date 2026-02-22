@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LoadingSpinner, Badge } from '../../../shared/ui/index.js';
-import useToast from '../../../shared/hooks/useToast.js';
+import { LoadingSpinner, Badge } from '../../../../shared/ui/index.js';
+import useToast from '../../../../shared/hooks/useToast.js';
 import { FiX, FiPackage, FiTag, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const BrandDetailsSidebar = ({ brand, isOpen, onClose }) => {

@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, LoadingSpinner, Select } from '../../../shared/ui/index.js';
 import { FiSearch, FiFilter, FiPlus, FiPackage } from 'react-icons/fi';
-import ProductFormModal from '../components/ProductFormModal.jsx';
-import ProductCard from '../components/ProductCard.jsx';
+import ProductFormModal from '../components/products/ProductFormModal.jsx';
+import ProductCard from '../components/products/ProductCard.jsx';
 import { useSellerProductsPage } from '../hooks/index.js';
 
 const ProductsPage = () => {
@@ -68,7 +68,7 @@ const ProductsPage = () => {
 				<Button 
 					onClick={openAddModal}
 					icon={<FiPlus className="w-5 h-5" />}
-					className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-200 transition-all"
+					className="bg-linear-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-200 transition-all"
 				>
 					Add Product
 				</Button>
@@ -87,7 +87,7 @@ const ProductsPage = () => {
 					/>
 				</div>
 				<div className="flex items-center gap-2">
-					<FiFilter className="text-gray-400 w-5 h-5 flex-shrink-0" />
+					<FiFilter className="text-gray-400 w-5 h-5 shrink-0" />
 					<Select
 						containerClassName="min-w-[160px]"
 						value={statusFilter}
@@ -124,7 +124,7 @@ const ProductsPage = () => {
 				</motion.div>
 			) : (
 				<div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-					<div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<div className="w-20 h-20 bg-linear-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
 						<FiPackage className="w-10 h-10 text-indigo-500" />
 					</div>
 					<h3 className="text-xl font-bold text-gray-900 mb-2">

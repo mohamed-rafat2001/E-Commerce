@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Modal, Input, Select } from '../../../shared/ui/index.js';
+import { Button, Modal, Input, Select } from '../../../../shared/ui/index.js';
 import { FiImage, FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
-import useCategories from '../../category/hooks/useCategories.js';
-import useSellerBrands from '../hooks/useSellerBrands.js';
-import mainApi from '../../../api/mainApi.js';
+import useCategories from '../../../category/hooks/useCategories.js';
+import useSellerBrands from '../../hooks/useSellerBrands.js';
+import mainApi from '../../../../api/mainApi.js';
 
 const statusOptions = [
 	{ value: 'draft', label: 'Draft' },

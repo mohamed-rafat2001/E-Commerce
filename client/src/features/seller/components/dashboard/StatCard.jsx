@@ -23,7 +23,7 @@ const StatCard = ({ stat, index, title, value, change, changeType, icon: Icon, g
       className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
     >
       <div className="flex items-center justify-between mb-3">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${finalGradient} flex items-center justify-center shadow-lg mb-3`}>
+        <div className={`w-12 h-12 rounded-xl bg-linear-to-br ${finalGradient} flex items-center justify-center shadow-lg mb-3`}>
           {FinalIcon && <FinalIcon className="w-6 h-6 text-white" />}
         </div>
         <div className="text-right">

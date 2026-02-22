@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Badge } from '../../../shared/ui/index.js';
+import { Badge } from '../../../../shared/ui/index.js';
 
 const DashboardHeader = ({ title, subtitle, role }) => {
 	return (

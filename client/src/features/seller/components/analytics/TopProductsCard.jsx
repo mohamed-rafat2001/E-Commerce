@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FiStar } from 'react-icons/fi';
+import { ProductIcon } from '../../../../shared/constants/icons.jsx';
 
 const TopProductsCard = ({ products }) => (
 	<motion.div
@@ -21,9 +22,13 @@ const TopProductsCard = ({ products }) => (
 					className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
 				>
 					<span className="text-lg font-bold text-gray-400 w-6">#{index + 1}</span>
-					<span className="text-2xl">{product.image}</span>
+					{product.image?.startsWith('http') ? (
+						<img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover" crossOrigin="anonymous" />
+					) : (
+						<span className="text-2xl w-10 h-10 flex items-center justify-center">{product.image}</span>
+					)}
 					<div className="flex-1">
-						<h4 className="font-medium text-gray-900">{product.name}</h4>
+						<h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
 						<p className="text-sm text-gray-500">{product.sales} sales</p>
 					</div>
 					<div className="text-right">
@@ -31,6 +36,12 @@ const TopProductsCard = ({ products }) => (
 					</div>
 				</motion.div>
 			))}
+			{products.length === 0 && (
+				<div className="text-center py-6 text-gray-400">
+					<ProductIcon className="w-10 h-10 mx-auto mb-2" />
+					<p className="text-sm">No product data available yet</p>
+				</div>
+			)}
 		</div>
 	</motion.div>
 );

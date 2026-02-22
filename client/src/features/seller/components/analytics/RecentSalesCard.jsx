@@ -27,6 +27,11 @@ const RecentSalesCard = ({ sales }) => (
 					<span className="font-bold text-gray-900">+${sale.amount.toFixed(2)}</span>
 				</motion.div>
 			))}
+			{sales.length === 0 && (
+				<div className="text-center py-6 text-gray-400">
+					<p className="text-sm">No recent sales data</p>
+				</div>
+			)}
 		</div>
 	</motion.div>
 );

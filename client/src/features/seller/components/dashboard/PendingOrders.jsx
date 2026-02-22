@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card, Badge } from '../../../shared/ui/index.js';
+import { Card, Badge } from '../../../../shared/ui/index.js';
 import { FiShoppingBag, FiCalendar, FiDollarSign } from 'react-icons/fi';
 
 const PendingOrders = ({ orders = [] }) => {

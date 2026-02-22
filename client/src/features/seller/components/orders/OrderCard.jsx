@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Badge, LoadingSpinner } from '../../../shared/ui/index.js';
+import { Button, Badge, LoadingSpinner } from '../../../../shared/ui/index.js';
 import { FiEye, FiPackage, FiTruck, FiCheck, FiX, FiClock, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 // Status configuration
@@ -50,7 +50,7 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 			>
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div className="flex items-center gap-4">
-						<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${statusConfig[order.status]?.gradient} flex items-center justify-center`}>
+						<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${statusConfig[order.status]?.gradient} flex items-center justify-center`}>
 							<StatusIcon className="w-6 h-6 text-white" />
 						</div>
 						<div>
@@ -98,62 +98,58 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 								<h4 className="font-semibold text-gray-900 mb-3">Order Items</h4>
 								<div className="space-y-3">
 									{order.items.map((item, index) => (
-										<div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+										<div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
 											<div className="flex items-center gap-3">
-												<span className="text-2xl">{item.image}</span>
+												<div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+													<FiPackage className="w-5 h-5 text-gray-400" />
+												</div>
 												<div>
 													<p className="font-medium text-gray-900">{item.name}</p>
 													<p className="text-sm text-gray-500">Qty: {item.quantity}</p>
 												</div>
 											</div>
-											<span className="font-semibold text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
+											<span className="font-semibold text-gray-900">${item.price.toFixed(2)}</span>
 										</div>
 									))}
 								</div>
 							</div>
 
-							<div className="flex flex-wrap gap-3">
-								{order.status === 'Pending' && (
+							<div className="flex justify-end gap-3">
+								{order.status !== 'Delivered' && order.status !== 'Cancelled' && (
 									<>
+										{order.status === 'Pending' && (
+											<Button 
+												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Processing'); }}
+												className="bg-blue-600 hover:bg-blue-700 text-white"
+											>
+												Mark as Processing
+											</Button>
+										)}
+										{order.status === 'Processing' && (
+											<Button 
+												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Shipped'); }}
+												className="bg-purple-600 hover:bg-purple-700 text-white"
+											>
+												Mark as Shipped
+											</Button>
+										)}
+										{order.status === 'Shipped' && (
+											<Button 
+												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Delivered'); }}
+												className="bg-emerald-600 hover:bg-emerald-700 text-white"
+											>
+												Mark as Delivered
+											</Button>
+										)}
 										<Button 
-											size="sm" 
-											onClick={() => onUpdateStatus(order.id, 'Processing')}
-											icon={<FiPackage className="w-4 h-4" />}
-										>
-											Start Processing
-										</Button>
-										<Button 
-											variant="danger" 
-											size="sm" 
-											onClick={() => onUpdateStatus(order.id, 'Cancelled')}
-											icon={<FiX className="w-4 h-4" />}
+											onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Cancelled'); }}
+											variant="outline"
+											className="text-rose-600 border-rose-200 hover:bg-rose-50"
 										>
 											Cancel Order
 										</Button>
 									</>
 								)}
-								{order.status === 'Processing' && (
-									<Button 
-										size="sm" 
-										onClick={() => onUpdateStatus(order.id, 'Shipped')}
-										icon={<FiTruck className="w-4 h-4" />}
-									>
-										Mark as Shipped
-									</Button>
-								)}
-								{order.status === 'Shipped' && (
-									<Button 
-										variant="success" 
-										size="sm" 
-										onClick={() => onUpdateStatus(order.id, 'Delivered')}
-										icon={<FiCheck className="w-4 h-4" />}
-									>
-										Mark as Delivered
-									</Button>
-								)}
-								<Button variant="secondary" size="sm" icon={<FiEye className="w-4 h-4" />}>
-									View Full Details
-								</Button>
 							</div>
 						</div>
 					</motion.div>

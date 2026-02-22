@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card, Badge } from '../../../shared/ui/index.js';
+import { Card, Badge } from '../../../../shared/ui/index.js';
 
 const StatCard = ({ stat, index }) => {
 	const Icon = stat.icon;

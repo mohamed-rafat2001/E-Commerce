@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Card } from '../../../shared/ui/index.js';
+import { Card } from '../../../../shared/ui/index.js';
 import { 
 	FiUserPlus, 
 	FiPlus, 

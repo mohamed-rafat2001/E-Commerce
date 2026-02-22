@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getSellerDashboardStats } from "../services/seller.js";
+import { ProductIcon, OrderIcon, AnalyticsIcon, InventoryIcon } from '../../../shared/constants/icons.jsx';
 
 const useSellerDashboardPage = () => {
   // Get seller-specific dashboard stats with enhanced error handling
@@ -69,7 +70,7 @@ const useSellerDashboardPage = () => {
       value: stats.totalProducts,
       change: "+12%",
       changeType: "positive",
-      icon: "ProductIcon",
+      icon: ProductIcon,
       gradient: "from-blue-500 to-cyan-600"
     },
     {
@@ -78,7 +79,7 @@ const useSellerDashboardPage = () => {
       value: stats.totalOrders,
       change: "+8%",
       changeType: "positive",
-      icon: "OrderIcon",
+      icon: OrderIcon,
       gradient: "from-emerald-500 to-teal-600"
     },
     {
@@ -87,7 +88,7 @@ const useSellerDashboardPage = () => {
       value: `$${stats.totalRevenue.toLocaleString()}`,
       change: "+15%",
       changeType: "positive",
-      icon: "AnalyticsIcon",
+      icon: AnalyticsIcon,
       gradient: "from-purple-500 to-indigo-600"
     },
     {
@@ -96,7 +97,7 @@ const useSellerDashboardPage = () => {
       value: stats.lowStockItems,
       change: "-2",
       changeType: "negative",
-      icon: "InventoryIcon",
+      icon: InventoryIcon,
       gradient: "from-amber-500 to-orange-600"
     }
   ];

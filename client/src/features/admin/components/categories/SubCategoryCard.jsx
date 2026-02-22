@@ -61,10 +61,10 @@ const SubCategoryCard = ({ subCategory, onToggleStatus, onEdit, onDelete, isDele
 							className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
 							crossOrigin="anonymous"
 						/>
-						<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+						<div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
 					</div>
 				) : (
-					<div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl h-32 flex items-center justify-center">
+					<div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-xl h-32 flex items-center justify-center">
 						<span className="text-4xl font-black text-indigo-300 select-none">
 							{subCategory.name?.[0]?.toUpperCase() || 'S'}
 						</span>

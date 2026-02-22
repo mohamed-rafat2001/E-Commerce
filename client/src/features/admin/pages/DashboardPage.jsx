@@ -1,29 +1,14 @@
-import StatCard from '../components/StatCard.jsx';
-import RecentOrders from '../components/RecentOrders.jsx';
-import QuickActions from '../components/QuickActions.jsx';
-import DashboardHeader from '../components/DashboardHeader.jsx';
-import RevenueChart from '../components/RevenueChart.jsx';
-import {
-	UsersIcon,
-	ProductIcon,
-	OrderIcon,
-	AnalyticsIcon,
-	TagIcon,
-} from '../../../shared/constants/icons.jsx';
+import RecentOrders from '../components/dashboard/RecentOrders.jsx';
+import QuickActions from '../components/dashboard/QuickActions.jsx';
+import DashboardHeader from '../components/dashboard/DashboardHeader.jsx';
+import RevenueChart from '../components/dashboard/RevenueChart.jsx';
+import StatsGrid from '../components/dashboard/StatsGrid.jsx';
 
-import { useDashboardStats } from '../hooks/useDashboardStats.js';
+import { useDashboardPage } from '../hooks/index.js';
 import LoadingSpinner from '../../../shared/ui/LoadingSpinner.jsx';
 
-const iconMap = {
-	UsersIcon,
-	ProductIcon,
-	OrderIcon,
-	AnalyticsIcon,
-	TagIcon,
-};
-
 const AdminDashboardPage = () => {
-	const { stats, recentOrders, isLoading, error } = useDashboardStats();
+	const { stats, recentOrders, isLoading, error } = useDashboardPage();
 
 	if (isLoading) {
 		return (
@@ -41,25 +26,6 @@ const AdminDashboardPage = () => {
 		);
 	}
 
-	// Map icons for display
-	const displayStats = stats.map(stat => ({
-		...stat,
-		icon: iconMap[stat.icon] || AnalyticsIcon
-	}));
-
-	// Format orders for the component
-	const formattedOrders = recentOrders.map(order => ({
-		id: order._id.substring(0, 8),
-		customer: order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : 'Guest Customer',
-		product: 'Review items', // Simplified for list
-		amount: `$${order.totalPrice.amount.toLocaleString()}`,
-		status: order.status,
-		statusColor: 
-			order.status === 'Delivered' ? 'success' : 
-			order.status === 'Pending' ? 'warning' : 
-			order.status === 'Cancelled' ? 'danger' : 'info'
-	}));
-
 	return (
 		<div className="space-y-8">
 			{/* Page Header */}
@@ -70,11 +36,7 @@ const AdminDashboardPage = () => {
 			/>
 
 			{/* Stats Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-				{displayStats.map((stat, index) => (
-					<StatCard key={stat.id} stat={stat} index={index} />
-				))}
-			</div>
+			<StatsGrid stats={stats} />
 
 			{/* Main Content Grid */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -87,7 +49,7 @@ const AdminDashboardPage = () => {
 
 			<div className="grid grid-cols-1 gap-6">
 				{/* Recent Orders */}
-				<RecentOrders orders={formattedOrders} />
+				<RecentOrders orders={recentOrders} />
 			</div>
 		</div>
 	);

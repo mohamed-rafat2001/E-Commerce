@@ -1,7 +1,16 @@
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 
 const MiniBarChart = ({ data, color = 'indigo' }) => {
+	if (!data || data.length === 0) {
+		return (
+			<div className="flex items-end gap-1 h-16 opacity-30">
+				{[...Array(12)].map((_, i) => (
+					<div key={i} className="flex-1 h-2 rounded-t bg-gray-200" />
+				))}
+			</div>
+		);
+	}
+	
 	const max = Math.max(...data);
 	const colorClasses = {
 		indigo: 'from-indigo-500 to-purple-600',
@@ -18,7 +27,7 @@ const MiniBarChart = ({ data, color = 'indigo' }) => {
 					initial={{ height: 0 }}
 					animate={{ height: `${(value / max) * 100}%` }}
 					transition={{ delay: index * 0.05 }}
-					className={`flex-1 rounded-t bg-gradient-to-t ${colorClasses[color]} opacity-80 hover:opacity-100 transition-opacity`}
+					className={`flex-1 rounded-t bg-linear-to-t ${colorClasses[color]} opacity-80 hover:opacity-100 transition-opacity min-h-[2px]`}
 				/>
 			))}
 		</div>

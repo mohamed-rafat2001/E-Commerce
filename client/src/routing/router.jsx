@@ -27,7 +27,6 @@ import {
 	InventoryPage as SellerInventoryPage,
 	OrdersPage as SellerOrdersPage,
 	AnalyticsPage as SellerAnalyticsPage,
-	StoreSettingsPage as SellerStoreSettingsPage,
 	BrandsManagementPage
 } from "../features/seller/pages/index.js";
 

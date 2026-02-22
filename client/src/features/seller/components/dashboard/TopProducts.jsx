@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card, Badge } from '../../../shared/ui/index.js';
+import { Card, Badge } from '../../../../shared/ui/index.js';
 import { FiBox, FiStar, FiTrendingUp } from 'react-icons/fi';
 
 const TopProducts = ({ products = [] }) => {
@@ -29,7 +29,7 @@ const TopProducts = ({ products = [] }) => {
 							{products.map((product, index) => (
 								<motion.div
 									key={product._id || product.id}
-									className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-white to-gray-50 
+									className="flex items-center gap-4 p-4 rounded-xl bg-linear-to-r from-white to-gray-50 
 										border border-gray-100 hover:border-emerald-200 hover:shadow-sm 
 										transition-all duration-200 group"
 									initial={{ opacity: 0, x: -20 }}
@@ -37,7 +37,7 @@ const TopProducts = ({ products = [] }) => {
 									transition={{ delay: 0.5 + index * 0.05 }}
 								>
 									<div className="relative">
-										<span className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 
+										<span className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 
 											flex items-center justify-center text-white font-bold text-lg shadow-md">
 											{product.name?.charAt(0) || 'P'}
 										</span>
