@@ -99,7 +99,7 @@ const RegisterStepTwo = ({
 					Gender
 				</label>
 				<div className="flex space-x-3">
-					{["male", "female", "other"].map((g) => (
+					{["male", "female"].map((g) => (
 						<label
 							key={g}
 							className={`flex-1 flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50 ${

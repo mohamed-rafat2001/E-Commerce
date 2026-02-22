@@ -3,8 +3,6 @@ import {
 	LockIcon, 
 	EyeIcon, 
 	EyeOffIcon, 
-	OrderIcon, 
-	StoreIcon,
 	ChevronRightIcon
 } from "../../../shared/constants/icons.jsx";
 import SocialLogin from "./SocialLogin.jsx";
@@ -110,13 +108,6 @@ const RegisterStepOne = ({
 								value === getValues("password") || "No match",
 						})}
 					/>
-					<button
-						type="button"
-						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-						className="absolute inset-y-0 right-0 pr-3 flex items-center p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-					>
-						{showConfirmPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-					</button>
 				</div>
 				{errors.confirmPassword && (
 					<p className="mt-1 text-xs text-red-500 font-medium">{errors.confirmPassword.message}</p>

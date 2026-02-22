@@ -8,6 +8,7 @@ import RegisterStepOne from "../components/RegisterStepOne.jsx";
 import RegisterStepTwo from "../components/RegisterStepTwo.jsx";
 import RegisterStepThreeSeller from "../components/RegisterStepThreeSeller.jsx";
 import RegisterStepThreeCustomer from "../components/RegisterStepThreeCustomer.jsx";
+import { OrderIcon, StoreIcon, ChevronRightIcon } from "../../../shared/constants/icons.jsx";
 
 function RegisterPage() {
 	const { registerUser, isRegistering } = useRegister();
@@ -21,7 +22,6 @@ function RegisterPage() {
 		getValues,
 		trigger,
 		watch,
-		reset,
 		formState: { errors },
 	} = useForm({
 		mode: "onChange",

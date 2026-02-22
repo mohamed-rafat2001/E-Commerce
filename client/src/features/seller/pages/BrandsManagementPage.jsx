@@ -29,7 +29,7 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit, onSelect, isSelected }
 						crossOrigin="anonymous"
 					/>
 				) : (
-					<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-black shadow-lg">
+					<div className="w-16 h-16 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-black shadow-lg">
 						{brand.name?.[0]?.toUpperCase() || 'B'}
 					</div>
 				)}
@@ -129,7 +129,6 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		primaryCategory: '',
 		subCategories: []
 	});
-	const fileInputRef = useRef(null);
 	
 	useEffect(() => {
 		if (brand) {
@@ -194,6 +193,30 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 						rows={3}
 						className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
 						required
+					/>
+				</div>
+				
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-1">Business Email *</label>
+					<Input 
+						name="businessEmail" 
+						value={formData.businessEmail} 
+						onChange={handleChange} 
+						placeholder="contact@brand.com" 
+						type="email"
+						required 
+					/>
+				</div>
+
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-1">Business Phone *</label>
+					<Input 
+						name="businessPhone" 
+						value={formData.businessPhone} 
+						onChange={handleChange} 
+						placeholder="+1 (555) 000-0000" 
+						type="tel"
+						required 
 					/>
 				</div>
 				
@@ -297,7 +320,7 @@ const LogoEditModal = ({ isOpen, onClose, onUpload, brand, isUploading }) => {
 							crossOrigin="anonymous"
 						/>
 					) : (
-						<div className="w-24 h-24 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-black mx-auto mb-4">
+						<div className="w-24 h-24 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-black mx-auto mb-4">
 							{brand?.name?.[0]?.toUpperCase() || 'B'}
 						</div>
 					)}
@@ -316,8 +339,10 @@ const LogoEditModal = ({ isOpen, onClose, onUpload, brand, isUploading }) => {
 						variant="secondary" 
 						fullWidth
 						onClick={() => fileInputRef.current?.click()}
+						loading={isUploading}
+						disabled={isUploading}
 					>
-						Choose New Logo
+						{isUploading ? 'Uploading...' : 'Choose New Logo'}
 					</Button>
 					<Button 
 						variant="secondary" 

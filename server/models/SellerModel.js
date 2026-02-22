@@ -49,21 +49,6 @@ const SellerSchema = new mongoose.Schema(
 			ref: "UserModel",
 		},
 
-		businessEmail: {
-			type: String,
-			required: [true, "email is required"],
-			unique: true,
-			trim: true,
-			validate: [validator.isEmail, "please enter the valid email"],
-		},
-		businessPhone: {
-			type: String,
-			required: [true, "phone number is required"],
-			trim: true,
-			validate: [validator.isMobilePhone, "please enter valid phone number"],
-		},
-
-
 		addresses: [addressSchema],
 		preferredCategories: [
 			{

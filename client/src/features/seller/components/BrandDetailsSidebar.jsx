@@ -122,6 +122,22 @@ const BrandDetailsSidebar = ({ brand, isOpen, onClose }) => {
 										</a>
 									</div>
 								)}
+								{brand.businessEmail && (
+									<div>
+										<span className="text-gray-500">Email:</span>
+										<a href={`mailto:${brand.businessEmail}`} className="text-gray-900 ml-2 hover:text-indigo-600">
+											{brand.businessEmail}
+										</a>
+									</div>
+								)}
+								{brand.businessPhone && (
+									<div>
+										<span className="text-gray-500">Phone:</span>
+										<a href={`tel:${brand.businessPhone}`} className="text-gray-900 ml-2 hover:text-indigo-600">
+											{brand.businessPhone}
+										</a>
+									</div>
+								)}
 								<div>
 									<span className="text-gray-500">Products:</span>
 									<span className="ml-2 font-medium">{products.length}</span>
