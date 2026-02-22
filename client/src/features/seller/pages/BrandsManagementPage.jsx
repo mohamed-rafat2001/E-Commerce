@@ -126,6 +126,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		name: '',
 		description: '',
 		website: '',
+		businessEmail: '',
+		businessPhone: '',
 		primaryCategory: '',
 		subCategories: []
 	});
@@ -136,6 +138,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				name: brand.name || '',
 				description: brand.description || '',
 				website: brand.website || '',
+				businessEmail: brand.businessEmail || '',
+				businessPhone: brand.businessPhone || '',
 				primaryCategory: brand.primaryCategory?._id || '',
 				subCategories: brand.subCategories?.map(cat => cat._id) || []
 			});
@@ -144,6 +148,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				name: '',
 				description: '',
 				website: '',
+				businessEmail: '',
+				businessPhone: '',
 				primaryCategory: '',
 				subCategories: []
 			});

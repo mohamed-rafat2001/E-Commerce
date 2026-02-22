@@ -89,6 +89,12 @@ const roleNavigationConfig = {
 			description: 'Your seller profile',
 		},
 		{
+			label: 'Brands',
+			path: 'brands',
+			icon: StoreIcon,
+			description: 'Manage your brands',
+		},
+		{
 			label: 'My Products',
 			path: 'products',
 			icon: ProductIcon,
@@ -112,18 +118,7 @@ const roleNavigationConfig = {
 			icon: AnalyticsIcon,
 			description: 'Sales performance',
 		},
-		{
-			label: 'Store Settings',
-			path: 'store-settings',
-			icon: SettingsIcon,
-			description: 'Brand & payouts',
-		},
-		{
-			label: 'Brands',
-			path: 'brands',
-			icon: StoreIcon,
-			description: 'Manage your brands',
-		},
+		
 	],
 	Customer: [
 		{

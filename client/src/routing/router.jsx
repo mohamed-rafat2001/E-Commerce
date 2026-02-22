@@ -116,9 +116,9 @@ const router = createBrowserRouter([
 					{ path: "products", element: <SellerProductsPage /> },
 					{ path: "inventory", element: <SellerInventoryPage /> },
 					{ path: "orders", element: <SellerOrdersPage /> },
-					{ path: "analytics", element: <SellerAnalyticsPage /> },
-					{ path: "store-settings", element: <SellerStoreSettingsPage /> },
 					{ path: "brands", element: <BrandsManagementPage /> },
+					{ path: "analytics", element: <SellerAnalyticsPage /> },
+					
 				],
 			},
 		],
