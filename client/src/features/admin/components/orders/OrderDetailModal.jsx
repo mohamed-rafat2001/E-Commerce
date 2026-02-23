@@ -1,16 +1,12 @@
 import { useMemo } from 'react';
 import { Modal, Button } from '../../../../shared/ui/index.js';
 import { FiUser, FiMail, FiPhone, FiCalendar, FiDollarSign, FiCheck, FiMapPin, FiBox, FiCreditCard } from 'react-icons/fi';
-import { statusConfig, paymentMethodLabels } from './orderConstants.js';
+import { paymentMethodLabels } from './orderConstants.js';
 import OrderStatusSelector from './OrderStatusSelector.jsx';
 
 const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus, isUpdating }) => {
-	if (!order) return null;
-
-	const addr = order.shippingAddress;
-
 	const allItems = useMemo(() => {
-		if (!order.items?.length) return [];
+		if (!order?.items?.length) return [];
 		return order.items.flatMap(orderItem => {
 			if (orderItem.items && Array.isArray(orderItem.items)) {
 				return orderItem.items.map(i => ({
@@ -29,7 +25,11 @@ const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus, isUpdating }
 				image: orderItem.product?.coverImage?.secure_url,
 			}];
 		});
-	}, [order.items]);
+	}, [order?.items]);
+
+	if (!order) return null;
+
+	const addr = order.shippingAddress;
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title="Order Details" size="lg">

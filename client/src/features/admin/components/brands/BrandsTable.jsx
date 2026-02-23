@@ -2,7 +2,7 @@ import { FiTag, FiExternalLink, FiUser } from 'react-icons/fi';
 import { LoadingSpinner } from '../../../../shared/ui/index.js';
 import Pagination from '../Pagination.jsx';
 
-const BrandsTable = ({ brands, loading, total, page, limit, totalPages, handlePageChange }) => {
+const BrandsTable = ({ brands, loading, total, page, totalPages, handlePageChange }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">

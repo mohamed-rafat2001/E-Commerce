@@ -8,7 +8,6 @@ import useCategories from "../../category/hooks/useCategories.js";
 
 const RegisterStepThreeSeller = ({ 
 	register, 
-	errors, 
 	onPrevStep, 
 	isRegistering,
 	variants,

@@ -35,7 +35,7 @@ const OrdersStats = ({ orderStats }) => {
 
 	return (
 		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-			{statsConfig.map((stat, index) => (
+			{statsConfig.map((stat) => (
 				<motion.div
 					key={stat.label}
 					initial={{ opacity: 0, y: 20 }}

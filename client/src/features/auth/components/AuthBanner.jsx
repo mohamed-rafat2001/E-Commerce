@@ -6,7 +6,7 @@ const AuthBanner = ({ image, title, subtitle, accentColor = "blue" }) => {
 		indigo: "bg-indigo-500 text-indigo-400",
 	};
 
-	const [bgClass, textClass] = accentColors[accentColor].split(" ");
+	const [bgClass] = accentColors[accentColor].split(" ");
 
 	return (
 		<div className="hidden lg:flex w-1/2 h-full items-center justify-center">

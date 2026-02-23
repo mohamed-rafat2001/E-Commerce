@@ -8,7 +8,6 @@ const useAnalyticsPage = () => {
     revenueData,
     topProducts,
     topSellers,
-    userGrowthData,
     isLoading,
     error
   } = useAdminAnalytics(timeRange);
@@ -67,7 +66,7 @@ const useAnalyticsPage = () => {
       })),
       recentActivity: []
     };
-  }, [stats, revenueData, topProducts, topSellers, userGrowthData]);
+  }, [stats, revenueData, topProducts, topSellers]);
 
   return {
     timeRange,

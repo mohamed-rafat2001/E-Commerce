@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion';
 
-const SmallStatCard = ({ title, value, subtitle, icon: Icon, gradient }) => (
+const SmallStatCard = ({ title, value, subtitle, icon, gradient }) => {
+	const Icon = icon;
+	return (
 	<motion.div
 		initial={{ opacity: 0, scale: 0.95 }}
 		animate={{ opacity: 1, scale: 1 }}
 		className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300"
 	>
 		<div className="flex items-center gap-4">
-			<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+			<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${gradient} flex items-center justify-center`}>
 				<Icon className="w-6 h-6 text-white" />
 			</div>
 			<div>
@@ -18,5 +20,6 @@ const SmallStatCard = ({ title, value, subtitle, icon: Icon, gradient }) => (
 		</div>
 	</motion.div>
 );
+};
 
 export default SmallStatCard;

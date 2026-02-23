@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 const WishlistPage = () => {
 	const { wishlist, isLoading } = useWishlist();
-	const { deleteFromWishlist, isLoading: isDeleting } = useDeleteFromWishlist();
+	const { deleteFromWishlist } = useDeleteFromWishlist();
 	const { addToCart, isLoading: isAddingToCart } = useAddToCart();
 
 	const wishlistItems = wishlist?.items || [];
@@ -19,7 +19,7 @@ const WishlistPage = () => {
 			await addToCart({ itemId: product._id, quantity: 1 });
 			await deleteFromWishlist(product._id);
 			toast.success(`${product.name} moved to cart!`);
-		} catch (error) {
+		} catch {
 			toast.error("Failed to move item to cart");
 		}
 	};

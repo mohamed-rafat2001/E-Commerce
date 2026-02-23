@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import useAdminProducts from './useAdminProducts.js';
 import { useUpdateProduct, useDeleteProduct } from './useProductMutations.js';
 import useAdminCategories from '../categories/useAdminCategories.js';
@@ -17,8 +17,8 @@ const useProductsPage = () => {
   const { updateProduct, isUpdating } = useUpdateProduct();
   const { deleteProduct, isDeleting } = useDeleteProduct();
 
-  const products = fetchedProducts || [];
-  const categories = fetchedCategories || [];
+  const products = useMemo(() => fetchedProducts || [], [fetchedProducts]);
+  const categories = useMemo(() => fetchedCategories || [], [fetchedCategories]);
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
@@ -38,7 +38,7 @@ const useProductsPage = () => {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  useMemo(() => { setCurrentPage(1); }, [searchQuery, statusFilter, categoryFilter]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, categoryFilter]);
 
   const stats = useMemo(() => ({
     total: products.length,

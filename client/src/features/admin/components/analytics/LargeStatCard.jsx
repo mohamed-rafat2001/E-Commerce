@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
 import MiniBarChart from './MiniBarChart.jsx';
 
-const LargeStatCard = ({ title, value, change, icon: Icon, chartData, color, prefix = '' }) => {
+const LargeStatCard = ({ title, value, change, icon, chartData, color, prefix = '' }) => {
+	const Icon = icon;
 	const isPositive = change >= 0;
 
 	return (
@@ -20,7 +21,7 @@ const LargeStatCard = ({ title, value, change, icon: Icon, chartData, color, pre
 						<span>{isPositive ? '+' : ''}{change}% from last month</span>
 					</div>
 				</div>
-				<div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${color}-500 to-${color}-600 flex items-center justify-center`}>
+				<div className={`w-12 h-12 rounded-xl bg-linear-to-br from-${color}-500 to-${color}-600 flex items-center justify-center`}>
 					<Icon className="w-6 h-6 text-white" />
 				</div>
 			</div>

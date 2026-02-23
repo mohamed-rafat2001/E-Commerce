@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import useAdminOrders from './useAdminOrders.js';
 import { useUpdateOrder } from './useOrderMutations.js';
 import { ITEMS_PER_PAGE } from '../../components/orders/orderConstants.js';
@@ -12,7 +12,7 @@ const useOrdersPage = () => {
 
   const { orders: allOrders, isLoading } = useAdminOrders();
   const { updateOrder, isUpdating } = useUpdateOrder();
-  const orders = allOrders || [];
+  const orders = useMemo(() => allOrders || [], [allOrders]);
 
   const filteredOrders = useMemo(() => {
     return orders.filter(o => {
@@ -34,7 +34,7 @@ const useOrdersPage = () => {
     return filteredOrders.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredOrders, currentPage]);
 
-  useMemo(() => { setCurrentPage(1); }, [searchQuery, statusFilter, paymentFilter]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, paymentFilter]);
 
   const stats = useMemo(() => ({
     total: orders.length,

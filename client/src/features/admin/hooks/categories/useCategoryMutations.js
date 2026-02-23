@@ -34,7 +34,7 @@ export function useUpdateCategory() {
 
 	const { mutate: editCategory, isLoading: isUpdating } = useMutation({
 		mutationFn: ({ id, data }) => updateCategory(id, data),
-		onSuccess: (response) => {
+		onSuccess: () => {
 			toast.success("Category updated successfully! ✨");
 			queryClient.invalidateQueries(["admin-categories"]);
 		},

@@ -5,11 +5,10 @@ import useUpdateProduct from '../products/useUpdateProduct.js';
 const useSellerInventoryPage = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [stockFilter, setStockFilter] = useState('all');
-	const [updatingId, setUpdatingId] = useState(null);
 
 	const { products: allProducts, isLoading, refetch } = useSellerProducts();
-	const { updateProduct, isUpdating } = useUpdateProduct();
-	const products = allProducts || [];
+	const { updateProduct } = useUpdateProduct();
+	const products = useMemo(() => allProducts || [], [allProducts]);
 
 	const filteredProducts = useMemo(() => {
 		return products.filter(p => {
@@ -44,7 +43,6 @@ const useSellerInventoryPage = () => {
 		setSearchQuery,
 		stockFilter,
 		setStockFilter,
-		updatingId,
 
 		// Data
 		filteredProducts,

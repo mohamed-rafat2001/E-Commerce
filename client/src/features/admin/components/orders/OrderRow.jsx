@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { FiEye } from 'react-icons/fi';
-import { statusConfig } from './orderConstants.js';
 import OrderStatusSelector from './OrderStatusSelector.jsx';
 
 const OrderRow = ({ order, onView, onUpdateStatus, isUpdating }) => {

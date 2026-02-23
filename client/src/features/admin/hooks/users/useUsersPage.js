@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAdminUsers from './useAdminUsers.js';
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUserMutations.js';
@@ -21,7 +21,7 @@ const useUsersPage = () => {
   const { updateUser, isUpdating } = useUpdateUser();
   const { deleteUser, isDeleting } = useDeleteUser();
 
-  const users = allUsers || [];
+  const users = useMemo(() => allUsers || [], [allUsers]);
 
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
@@ -40,7 +40,7 @@ const useUsersPage = () => {
     return filteredUsers.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredUsers, currentPage]);
 
-  useMemo(() => { setCurrentPage(1); }, [searchQuery, roleFilter, statusFilter]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, roleFilter, statusFilter]);
 
   const stats = useMemo(() => ({
     total: users.length,

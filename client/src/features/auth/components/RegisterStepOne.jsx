@@ -13,11 +13,9 @@ import { motion } from "framer-motion";
 const RegisterStepOne = ({ 
 	register, 
 	errors, 
-	selectedRole, 
 	showPassword, 
 	setShowPassword, 
 	showConfirmPassword, 
-	setShowConfirmPassword, 
 	onNextStep, 
 	getValues,
 	variants 

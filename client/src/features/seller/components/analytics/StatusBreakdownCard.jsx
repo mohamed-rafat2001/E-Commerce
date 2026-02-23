@@ -21,7 +21,8 @@ const StatusBreakdownCard = ({ statusBreakdown }) => {
 				Order Breakdown
 			</h3>
 			<div className="space-y-4">
-				{statusConfig.map(({ key, color, icon: StatusIcon, label }) => {
+				{statusConfig.map(({ key, color, icon, label }) => {
+					const StatusIconComponent = icon;
 					const count = statusBreakdown[key] || 0;
 					const percentage = ((count / total) * 100).toFixed(0);
 
@@ -29,7 +30,7 @@ const StatusBreakdownCard = ({ statusBreakdown }) => {
 						<div key={key} className="space-y-2">
 							<div className="flex items-center justify-between text-sm">
 								<div className="flex items-center gap-2">
-									<StatusIcon className="w-4 h-4 text-gray-400" />
+									<StatusIconComponent className="w-4 h-4 text-gray-400" />
 									<span className="font-medium text-gray-700">{label}</span>
 								</div>
 								<div className="flex items-center gap-2">

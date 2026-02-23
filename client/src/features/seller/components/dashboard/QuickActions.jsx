@@ -2,7 +2,9 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiPlus, FiShoppingBag, FiArchive, FiArrowRight } from 'react-icons/fi';
 
-const QuickActionCard = ({ icon: Icon, title, to, gradient, description }) => (
+const QuickActionCard = ({ icon, title, to, gradient, description }) => {
+	const IconComponent = icon;
+	return (
 	<Link to={to} className="group">
 		<motion.div 
 			whileHover={{ y: -4, scale: 1.02 }}
@@ -11,7 +13,7 @@ const QuickActionCard = ({ icon: Icon, title, to, gradient, description }) => (
 				transition-all duration-300 relative overflow-hidden group"
 		>
 			<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
-				<Icon className="w-6 h-6 text-white" />
+				<IconComponent className="w-6 h-6 text-white" />
 			</div>
 			<h4 className="font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">{title}</h4>
 			<p className="text-sm text-gray-500 leading-relaxed">{description}</p>
@@ -23,6 +25,7 @@ const QuickActionCard = ({ icon: Icon, title, to, gradient, description }) => (
 		</motion.div>
 	</Link>
 );
+};
 
 const QuickActions = () => {
 	return (

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiImage, FiTag, FiBox, FiLayers, FiStar, FiEye, FiTrash2, FiActivity, FiX } from 'react-icons/fi';
 import ProductStatusSelector from './ProductStatusSelector.jsx';
 
-const ProductRow = ({ product, onView, onDelete, onUpdateField, isUpdating }) => {
+const ProductRow = ({ product, onView, onDelete, onUpdateField }) => {
 	const [isEditingStock, setIsEditingStock] = useState(false);
 	const [stockVal, setStockVal] = useState(product.countInStock);
 
@@ -23,7 +23,7 @@ const ProductRow = ({ product, onView, onDelete, onUpdateField, isUpdating }) =>
 			{/* Product */}
 			<td className="py-3.5 px-4 whitespace-nowrap">
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 flex-shrink-0">
+					<div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 shrink-0">
 						{product.coverImage?.secure_url ? (
 							<img src={product.coverImage.secure_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
 						) : (

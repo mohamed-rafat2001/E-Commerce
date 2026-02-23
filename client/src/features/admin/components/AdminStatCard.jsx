@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
-const AdminStatCard = ({ label, value, icon: Icon, color }) => (
+const AdminStatCard = ({ label, value, icon, color }) => {
+	const Icon = icon;
+	return (
 	<motion.div 
 		whileHover={{ y: -4, scale: 1.01 }}
 		className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-slate-100/50 flex items-center justify-between"
@@ -14,5 +16,6 @@ const AdminStatCard = ({ label, value, icon: Icon, color }) => (
 		</div>
 	</motion.div>
 );
+};
 
 export default AdminStatCard;
