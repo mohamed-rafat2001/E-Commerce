@@ -1,9 +1,26 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Button, Modal } from '../../../../shared/ui/index.js';
 
 const LogoEditModal = ({ isOpen, onClose, onUpload, brand, isUploading }) => {
 	const fileInputRef = useRef(null);
+	const [progress, setProgress] = useState(0);
 	
+	useEffect(() => {
+		let interval;
+		if (isUploading) {
+			setProgress(0);
+			interval = setInterval(() => {
+				setProgress(prev => {
+					if (prev >= 90) return 90;
+					return prev + 5;
+				});
+			}, 200);
+		} else {
+			setProgress(0);
+		}
+		return () => clearInterval(interval);
+	}, [isUploading]);
+
 	const handleFileChange = (e) => {
 		const file = e.target.files[0];
 		if (!file) return;
@@ -42,6 +59,16 @@ const LogoEditModal = ({ isOpen, onClose, onUpload, brand, isUploading }) => {
 					<p className="text-sm text-gray-600">Current logo</p>
 				</div>
 				
+				{isUploading && (
+					<div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 overflow-hidden">
+						<div 
+							className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out" 
+							style={{ width: `${progress}%` }}
+						></div>
+						<p className="text-xs text-center mt-1 text-gray-500">Uploading... {progress}%</p>
+					</div>
+				)}
+
 				<div className="flex gap-3">
 					<input
 						type="file"

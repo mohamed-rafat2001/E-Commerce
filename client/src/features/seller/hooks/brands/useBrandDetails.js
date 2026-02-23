@@ -49,6 +49,7 @@ const useBrandDetails = () => {
     return {
         brand,
         products: filteredProducts,
+        allProducts,
         allProductsCount: allProducts.length,
         subCategories,
         selectedSubCategory,

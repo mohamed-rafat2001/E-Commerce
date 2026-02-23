@@ -1,8 +1,8 @@
 import mainApi from "../../app/api/mainApi";
 
 // add func
-export const addFunc = async (url, data) => {
-	const res = await mainApi.post(url, data);
+export const addFunc = async (url, data, config = {}) => {
+	const res = await mainApi.post(url, data, config);
 	return res;
 };
 
@@ -18,7 +18,7 @@ export const deleteFunc = async (url) => {
 };
 
 // update func
-export const updateFunc = async (url, data) => {
-	const res = await mainApi.patch(url, data);
+export const updateFunc = async (url, data, config = {}) => {
+	const res = await mainApi.patch(url, data, config);
 	return res;
 };

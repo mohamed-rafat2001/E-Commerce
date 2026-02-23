@@ -13,12 +13,19 @@ export default function useCurrentUser() {
 		queryKey: ["user"],
 		queryFn: getMeFunc,
 		retry: (failureCount, error) => {
-			// Immediately stop retrying for auth errors (401, 403)
-			if (error.response?.status === 401 || error.response?.status === 403) return false;
+			// Immediately stop retrying for auth errors (401, 403) or rate limiting (429)
+			if (
+				error.response?.status === 401 || 
+				error.response?.status === 403 || 
+				error.response?.status === 429
+			) return false;
 			// For other errors, retry only once to speed up failure detection
 			return failureCount < 1;
 		},
 		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
 		// Ensure error state is caught immediately
 		throwOnError: false,
 	});

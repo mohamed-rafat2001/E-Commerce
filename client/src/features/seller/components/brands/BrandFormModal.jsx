@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, Select, Modal } from '../../../../shared/ui/index.js';
-import { FiSave } from 'react-icons/fi';
+import { FiSave, FiImage, FiX } from 'react-icons/fi';
 
 const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmitting }) => {
+	const fileInputRef = useRef(null);
+	const [imagePreview, setImagePreview] = useState(null);
+	const [logoFile, setLogoFile] = useState(null);
 	const [formData, setFormData] = useState({
 		name: '',
 		description: '',
@@ -24,6 +27,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				primaryCategory: brand.primaryCategory?._id || '',
 				subCategories: brand.subCategories?.map(cat => cat._id) || []
 			});
+			setImagePreview(brand.logo?.secure_url || null);
+			setLogoFile(null);
 		} else {
 			setFormData({
 				name: '',
@@ -34,12 +39,34 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				primaryCategory: '',
 				subCategories: []
 			});
+			setImagePreview(null);
+			setLogoFile(null);
 		}
 	}, [brand, isOpen]);
 	
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
+	};
+
+	const handleImageChange = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			setLogoFile(file);
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setImagePreview(reader.result);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const handleRemoveImage = () => {
+		setLogoFile(null);
+		setImagePreview(null);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
 	};
 	
 	const handleSubCategoryToggle = (categoryId) => {
@@ -53,12 +80,68 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 	
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		onSubmit(formData, brand?._id);
+		
+		// Create FormData for file upload
+		const data = new FormData();
+		data.append('name', formData.name);
+		data.append('description', formData.description);
+		data.append('website', formData.website);
+		data.append('businessEmail', formData.businessEmail);
+		data.append('businessPhone', formData.businessPhone);
+		data.append('primaryCategory', formData.primaryCategory);
+		
+		formData.subCategories.forEach(cat => {
+			data.append('subCategories', cat);
+		});
+
+		if (logoFile) {
+			data.append('logo', logoFile);
+		}
+
+		onSubmit(data, brand?._id);
 	};
 	
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title={brand ? "Edit Brand" : "Create New Brand"} size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
+				{/* Image Upload Section */}
+				<div className="flex flex-col items-center justify-center mb-6">
+					<div className="relative w-32 h-32 mb-2">
+						{imagePreview ? (
+							<div className="relative w-full h-full">
+								<img 
+									src={imagePreview} 
+									alt="Preview" 
+									className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
+								/>
+								<button
+									type="button"
+									onClick={handleRemoveImage}
+									className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
+								>
+									<FiX className="w-4 h-4" />
+								</button>
+							</div>
+						) : (
+							<div 
+								onClick={() => fileInputRef.current?.click()}
+								className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+							>
+								<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
+								<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Logo</span>
+							</div>
+						)}
+						<input 
+							type="file" 
+							ref={fileInputRef}
+							onChange={handleImageChange}
+							accept="image/*"
+							className="hidden"
+						/>
+					</div>
+					<p className="text-xs text-gray-400">Recommended: 500x500px, Max 5MB</p>
+				</div>
+
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Brand Name *</label>
 					<Input 

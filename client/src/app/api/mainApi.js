@@ -4,9 +4,6 @@ import axios from "axios";
 const mainApi = axios.create({
 	baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1/",
 	withCredentials: true, // Required for httpOnly cookies
-	headers: {
-		"Content-Type": "application/json",
-	},
 });
 
 // No request interceptor needed - cookies are sent automatically

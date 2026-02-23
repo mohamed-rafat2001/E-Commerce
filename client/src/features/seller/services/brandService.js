@@ -18,3 +18,6 @@ export const deleteBrand = (id) => deleteFunc(`brands/${id}`);
 
 // Update brand logo
 export const updateBrandLogo = (id, formData) => updateFunc(`brands/${id}/logo`, formData);
+
+// Delete brand logo
+export const deleteBrandLogo = (id) => deleteFunc(`brands/${id}/logo`);

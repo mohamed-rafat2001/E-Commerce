@@ -16,6 +16,7 @@ const BrandsManagementPage = () => {
 		brands, 
 		totalPages,
 		loading, 
+		isFetching,
 		isSubmitting, 
 		isUploading, 
 		categories,
@@ -70,7 +71,12 @@ const BrandsManagementPage = () => {
 			/>
 			
 			{brands.length > 0 ? (
-				<>
+				<div className="relative">
+					{isFetching && (
+						<div className="absolute inset-0 bg-white/60 z-10 flex justify-center items-start pt-20 rounded-lg transition-all duration-200 backdrop-blur-[1px]">
+							<LoadingSpinner />
+						</div>
+					)}
 					<BrandsList 
 						brands={brands}
 						onEdit={handleEditBrand}
@@ -79,8 +85,10 @@ const BrandsManagementPage = () => {
 						onSelect={handleSelectBrand}
 						selectedBrandId={currentlySelectedBrand?._id}
 					/>
-					<Pagination totalPages={totalPages} />
-				</>
+					<div className="mt-6">
+						<Pagination totalPages={totalPages} />
+					</div>
+				</div>
 			) : isFiltering ? (
 				<div className="text-center py-20 bg-white rounded-lg border border-gray-200">
 					<p className="text-gray-500 mb-4">No brands found matching your criteria.</p>

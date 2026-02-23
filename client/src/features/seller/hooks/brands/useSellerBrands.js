@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { 
     getSellerBrands, 
@@ -16,7 +16,7 @@ const useSellerBrands = () => {
 
     // Get pagination params from URL
     const page = parseInt(searchParams.get("page")) || 1;
-    const limit = parseInt(searchParams.get("limit")) || 10;
+    const limit = parseInt(searchParams.get("limit")) || 2;
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "-createdAt";
 
@@ -24,12 +24,13 @@ const useSellerBrands = () => {
     const { 
         data: response, 
         isLoading, 
+        isFetching,
         error, 
         refetch 
     } = useQuery({
         queryKey: ['seller-brands', page, limit, search, sort],
         queryFn: () => getSellerBrands({ page, limit, search, sort }),
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
     });
 
     const brands = response?.data?.data || [];
@@ -133,6 +134,7 @@ const useSellerBrands = () => {
         total,
         totalPages,
         isLoading,
+        isFetching,
         isSubmitting: createBrandMutation.isPending || updateBrandMutation.isPending || deleteBrandMutation.isPending,
         isUploading: uploadLogoMutation.isPending,
         error,
