@@ -4,7 +4,7 @@ import {
 	OrderIcon,
 } from "../../../shared/constants/icons.jsx";
 import { motion } from "framer-motion";
-import useCategories from "../../category/hooks/useCategories.js";
+import useCategories from "../../admin/hooks/categories/useCategories.js";
 
 const RegisterStepThreeSeller = ({ 
 	register, 

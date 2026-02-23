@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategories } from "../../services/admin.js";
+import { getCategories } from "../../services/category.js";
 
 /**
- * Hook to fetch all categories (admin only)
+ * Get current user query
  */
-export default function useAdminCategories(params) {
+export default function useCategories(params = {}) {
 	const {
 		data: response,
 		isLoading,
 		error,
 		refetch,
 	} = useQuery({
-		queryKey: ["admin-categories", params],
-		queryFn: () => getAllCategories(params),
+		queryKey: ["categories", params],
+		queryFn: () => getCategories(params),
 	});
 
 	const categories = response?.data?.data || [];

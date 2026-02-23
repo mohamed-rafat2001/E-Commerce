@@ -8,13 +8,15 @@ export { default as useAdminBrands } from './brands/useAdminBrands.js';
 export { default as useSellerBrands } from './brands/useSellerBrands.js';
 
 // Categories
-export { default as useAdminCategories } from './categories/useAdminCategories.js';
 export { default as useCategoriesPage } from './categories/useCategoriesPage.js';
-export { 
-	useCreateCategory, 
-	useUpdateCategory, 
-	useDeleteCategory 
-} from './categories/useCategoryMutations.js';
+export { default as useCategories } from './categories/useCategories.js';
+export { default as useAddCategory } from './categories/useAddCategory.js';
+export { default as useUpdateCategory } from './categories/useUpdateCategory.js';
+export { default as useDeleteCategory } from './categories/useDeleteCategory.js';
+export { default as useDeleteCategories } from './categories/useDeleteCategories.js';
+
+// SubCategories
+export * from './subCategories/index.js';
 
 // Dashboard
 export { default as useDashboardPage } from './dashboard/useDashboardPage.js';

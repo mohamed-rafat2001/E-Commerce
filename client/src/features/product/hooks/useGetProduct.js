@@ -1,11 +1,26 @@
-import { getProduct } from "../services/product.js";
-import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
-export default function useGetProduct() {
-	const { error, data, mutate, isLoading } = useMutationFactory(
-		getProduct,
-		"products",
-		{ title: "Product not found", message: "Something wrong,please try again" },
-		{ title: "", message: "" }
-	);
-	return { error, data, getProduct: mutate, isLoading };
+import { useQuery } from "@tanstack/react-query";
+import { getProduct as getProductService } from "../services/product.js";
+
+/**
+ * Hook to fetch a single product by ID
+ * @param {string} id - Product ID
+ */
+export default function useGetProduct(id) {
+	const {
+		data: response,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ["product", id],
+		queryFn: () => getProductService(id),
+		enabled: !!id,
+	});
+
+	const product = response?.data?.data;
+
+	return {
+		product,
+		isLoading,
+		error,
+	};
 }

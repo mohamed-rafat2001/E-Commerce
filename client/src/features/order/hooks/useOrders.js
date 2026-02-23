@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllProducts } from "../services/product.js";
+import { getOrdersForCustomer } from "../services/order.js";
 
 /**
- * Hook to fetch products
+ * Hook to fetch orders
  * @param {Object} options - Custom options
- * @param {Function} options.queryFn - Function to fetch products
+ * @param {Function} options.queryFn - Function to fetch orders
  * @param {string[]} options.queryKey - Query key
  */
-export default function useProducts({ queryFn = getAllProducts, queryKey = ["products"] } = {}) {
+export default function useOrders({ 
+    queryFn = getOrdersForCustomer, 
+    queryKey = ["orders"] 
+} = {}) {
 	const {
 		data: response,
 		isLoading,
@@ -18,10 +21,10 @@ export default function useProducts({ queryFn = getAllProducts, queryKey = ["pro
 		queryFn: queryFn,
 	});
 
-	const products = response?.data?.data || [];
+	const orders = response?.data?.data || [];
 
 	return {
-		products,
+		orders,
 		isLoading,
 		error,
 		refetch,

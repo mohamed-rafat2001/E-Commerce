@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import useAdminCategories from './useAdminCategories.js';
-import { useCreateCategory, useUpdateCategory, useDeleteCategory } from './useCategoryMutations.js';
-import { useAdminSubCategories, useCreateSubCategory, useUpdateSubCategory, useDeleteSubCategory } from '../../../subCategory/hooks/index.js';
+import useCategories from './useCategories.js';
+import useAddCategory from './useAddCategory.js';
+import useUpdateCategory from './useUpdateCategory.js';
+import useDeleteCategory from './useDeleteCategory.js';
+import { useAdminSubCategories, useCreateSubCategory, useUpdateSubCategory, useDeleteSubCategory } from '../subCategories/index.js';
 
 const useCategoriesPage = () => {
 	// State for filters and pagination
@@ -28,7 +30,7 @@ const useCategoriesPage = () => {
 	}, [searchQuery]);
 
 	// Fetch Data
-	const { categories, total, isLoading: isCategoriesLoading } = useAdminCategories({
+	const { categories, total, isLoading: isCategoriesLoading } = useCategories({
 		page,
 		limit,
 		search: debouncedSearch,
@@ -37,7 +39,7 @@ const useCategoriesPage = () => {
 	});
 
 	// Fetch all categories for the dropdown in subcategory modal
-	const { categories: allCategories } = useAdminCategories({
+	const { categories: allCategories } = useCategories({
 		limit: 1000,
 		sort: 'name'
 	});
@@ -45,9 +47,9 @@ const useCategoriesPage = () => {
 	// Fetch total subcategories count for stats
 	const { total: totalSubCategories, isLoading: isSubCategoriesLoading } = useAdminSubCategories({ limit: 1 });
 	
-	const { addCategory, isCreating: isCreatingCategory } = useCreateCategory();
-	const { editCategory, isUpdating: isUpdatingCategory } = useUpdateCategory();
-	const { removeCategory, isDeleting: isDeletingCategory } = useDeleteCategory();
+	const { addCategory, isLoading: isCreatingCategory } = useAddCategory();
+	const { updateCategory: editCategory, isLoading: isUpdatingCategory } = useUpdateCategory();
+	const { deleteCategory: removeCategory, isLoading: isDeletingCategory } = useDeleteCategory();
 	
 	const { addSubCategory, isLoading: isCreatingSubCategory, uploadProgress: createProgress } = useCreateSubCategory();
 	const { editSubCategory, isLoading: isUpdatingSubCategory, uploadProgress: updateProgress } = useUpdateSubCategory();

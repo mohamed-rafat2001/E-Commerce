@@ -55,12 +55,6 @@ export const getAllBrands = (params) => getFunc("admin/brands", { params });
 export const updateBrand = (id, data) => updateAdminData("brands", id, data);
 export const deleteBrand = (id) => deleteAdminDataById("brands", id);
 
-// Categories
-export const getAllCategories = (params) => getFunc("categories", { params });
-export const createCategory = (data) => addFunc("categories", data);
-export const updateCategory = (id, data) => updateFunc(`categories/${id}`, data);
-export const deleteCategory = (id) => deleteFunc(`categories/${id}`);
-
 // Reviews
 export const getAllReviews = () => getAdminData("reviews");
 export const deleteReview = (id) => deleteAdminDataById("reviews", id);

@@ -1,27 +1,18 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateOrder } from "../../services/admin.js";
-import toast from "react-hot-toast";
+import useUpdateOrderGlobal from "../../../order/hooks/useUpdateOrder.js";
+import { updateOrder as updateOrderService } from "../../services/admin.js";
 
 /**
  * Hook to update an order (status, payment, etc.)
  */
 export function useUpdateOrder() {
-	const queryClient = useQueryClient();
-
-	const { mutate, isPending, error } = useMutation({
-		mutationFn: ({ id, data }) => updateOrder(id, data),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
-			toast.success("Order updated successfully!");
-		},
-		onError: (err) => {
-			toast.error(err?.response?.data?.message || "Failed to update order");
-		},
+	const { updateOrder, isUpdating, error } = useUpdateOrderGlobal({
+		updateFn: ({ id, data }) => updateOrderService(id, data),
+		invalidateKeys: ["admin-orders"],
 	});
 
 	return {
-		updateOrder: mutate,
-		isUpdating: isPending,
+		updateOrder,
+		isUpdating,
 		error,
 	};
 }

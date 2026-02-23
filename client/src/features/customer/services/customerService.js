@@ -1,29 +1,4 @@
-import { getFunc, updateFunc, deleteFunc } from "../../../shared/services/handlerFactory.js";
-
-// Get customer profile
-export const getCustomerProfileFunc = () => getFunc("customers/profile");
-
-// Add address
-export const addAddressFunc = (addressData) => updateFunc("customers/addresses", { addresses: addressData });
-
-// Update address
-export const updateAddressFunc = ({ addressId, addressData }) => updateFunc(`customers/addresses/${addressId}`, addressData);
-
-// Delete address
-export const deleteAddressFunc = (addressId) => deleteFunc(`customers/addresses/${addressId}`);
-
-// Set default address
-export const setDefaultAddressFunc = (addressId) => updateFunc(`customers/addresses/${addressId}/default`);
-
-// Add payment method
-export const addPaymentMethodFunc = (paymentMethodData) => updateFunc("customers/payment-methods", { paymentMethod: paymentMethodData });
-
-// Delete payment method
-export const deletePaymentMethodFunc = (paymentMethodId) => deleteFunc(`customers/payment-methods/${paymentMethodId}`);
-
-// Set default payment method
-export const setDefaultPaymentMethodFunc = (paymentMethodId) => updateFunc(`customers/payment-methods/${paymentMethodId}/default`);
-
-// Update payment method
-export const updatePaymentMethodFunc = ({ paymentMethodId, paymentMethodData }) => 
-    updateFunc(`customers/payment-methods/${paymentMethodId}`, paymentMethodData);
+export * from './orderService.js';
+export * from './profileService.js';
+export * from './addressService.js';
+export * from './paymentMethodService.js';

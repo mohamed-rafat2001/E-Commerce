@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSubCategories } from "../services/subCategory.js";
+import { getSubCategories } from "../../services/subCategory.js";
 
 export function useAdminSubCategories(params) {
 	const { data, isLoading, error } = useQuery({

@@ -6,6 +6,9 @@ export const addProduct = (product) => addFunc("products", product);
 // get all products
 export const getAllProducts = () => getFunc("products");
 
+// get seller's own products
+export const getMyProducts = () => getFunc("products/myproducts");
+
 // delete all products
 export const deleteProducts = () => deleteFunc("products");
 
@@ -13,7 +16,7 @@ export const deleteProducts = () => deleteFunc("products");
 export const deletProduct = (id) => deleteFunc(`products/${id}`);
 
 // update product
-export const updateProduct = (product, id) =>
+export const updateProduct = (id, product) =>
 	updateFunc(`products/${id}`, product);
 
 // get single product

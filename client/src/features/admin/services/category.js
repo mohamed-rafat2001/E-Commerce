@@ -4,7 +4,7 @@ import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/servic
 export const addCategory = (category) => addFunc("admin/categories", category);
 
 // get all categories
-export const getCategories = () => getFunc("categories");
+export const getCategories = (params) => getFunc("categories", { params });
 
 // delete all categories
 export const deleteCategories = () => deleteFunc("admin/categories");
@@ -13,5 +13,5 @@ export const deleteCategories = () => deleteFunc("admin/categories");
 export const deleteCategory = (id) => deleteFunc(`admin/categories/${id}`);
 
 // update category
-export const updateCategory = (category, id) =>
-	updateFunc(`admin/categories/${id}`, category);
+export const updateCategory = ({ id, data }) =>
+	updateFunc(`admin/categories/${id}`, data);

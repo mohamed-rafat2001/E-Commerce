@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import useSellerProducts from './useSellerProducts.js';
-import useAddProduct from './useAddProduct.js';
-import useUpdateProduct from './useUpdateProduct.js';
-import useDeleteProduct from './useDeleteProduct.js';
+import useProducts from '../../../product/hooks/useProducts.js';
+import { getMyProducts } from '../../../product/services/product.js';
+import useAddProduct from '../../../product/hooks/useAddProduct.js';
+import useUpdateProduct from '../../../product/hooks/useUpdateProduct.js';
+import useDeleteProduct from '../../../product/hooks/useDeleteProduct.js';
 
 const statusOptions = [
 	{ value: 'draft', label: 'Draft' },
@@ -18,10 +19,21 @@ const useSellerProductsPage = () => {
 	const [statusFilter, setStatusFilter] = useState('all');
 	const [deletingId, setDeletingId] = useState(null);
 
-	const { products, isLoading, error, refetch } = useSellerProducts();
-	const { addProduct, isAdding } = useAddProduct();
-	const { updateProduct, isUpdating } = useUpdateProduct();
-	const { deleteProduct, isDeleting } = useDeleteProduct();
+	const { products, isLoading, error, refetch } = useProducts({
+		queryFn: getMyProducts,
+		queryKey: ['seller-products']
+	});
+
+	// Configure hooks to invalidate seller-products
+	const { addProduct, isAdding } = useAddProduct({
+		invalidateKeys: ['seller-products']
+	});
+	const { updateProduct, isUpdating } = useUpdateProduct({
+		invalidateKeys: ['seller-products']
+	});
+	const { deleteProduct, isDeleting } = useDeleteProduct({
+		invalidateKeys: ['seller-products']
+	});
 
 	const filteredProducts = useMemo(() => {
 		if (!products) return [];

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import useAdminProducts from './useAdminProducts.js';
 import { useUpdateProduct, useDeleteProduct } from './useProductMutations.js';
-import useAdminCategories from '../categories/useAdminCategories.js';
+import useCategories from '../categories/useCategories.js';
 import { ITEMS_PER_PAGE } from '../../components/products/productConstants.js';
 
 const useProductsPage = () => {
@@ -13,7 +13,7 @@ const useProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { products: fetchedProducts, isLoading } = useAdminProducts();
-  const { categories: fetchedCategories } = useAdminCategories();
+  const { categories: fetchedCategories } = useCategories();
   const { updateProduct, isUpdating } = useUpdateProduct();
   const { deleteProduct, isDeleting } = useDeleteProduct();
 

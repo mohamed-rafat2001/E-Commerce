@@ -1,21 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { getAllOrders } from "../../services/admin.js";
+import useOrders from "../../../order/hooks/useOrders.js";
+import { getAllOrdersForAdmin } from "../../../order/services/order.js";
 
 /**
  * Hook to fetch all orders (admin only)
  */
 export default function useAdminOrders() {
 	const {
-		data: response,
+		orders,
 		isLoading,
 		error,
 		refetch,
-	} = useQuery({
+	} = useOrders({
+		queryFn: getAllOrdersForAdmin,
 		queryKey: ["admin-orders"],
-		queryFn: getAllOrders,
 	});
-
-	const orders = response?.data?.data || [];
 
 	return {
 		orders,

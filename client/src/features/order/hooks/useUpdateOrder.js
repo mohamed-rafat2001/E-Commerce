@@ -1,32 +1,32 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deletProduct as deleteProductService } from "../services/product.js";
 import useToast from "../../../shared/hooks/useToast.js";
 
 /**
- * Hook to delete a product
+ * Hook to update order status
+ * @param {Function} updateFn - Function to update order
  * @param {Object} options - Custom options
  * @param {string[]} options.invalidateKeys - Query keys to invalidate on success
  */
-export default function useDeleteProduct({ invalidateKeys = ["products"] } = {}) {
+export default function useUpdateOrder({ updateFn, invalidateKeys = ["orders"] } = {}) {
 	const queryClient = useQueryClient();
 	const { showSuccess, showError } = useToast();
 
 	const { mutate, isPending, error } = useMutation({
-		mutationFn: deleteProductService,
+		mutationFn: updateFn,
 		onSuccess: () => {
 			invalidateKeys.forEach(key => {
 				queryClient.invalidateQueries({ queryKey: [key] });
 			});
-			showSuccess("Product deleted successfully!");
+			showSuccess("Order status updated successfully!");
 		},
 		onError: (err) => {
-			showError(err?.response?.data?.message || "Failed to delete product");
+			showError(err?.response?.data?.message || "Failed to update order status");
 		},
 	});
 
 	return {
-		deleteProduct: mutate,
-		isDeleting: isPending,
+		updateOrder: mutate,
+		isUpdating: isPending,
 		error,
 	};
 }

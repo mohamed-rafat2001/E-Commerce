@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addSubCategory } from "../services/subCategory.js";
+import { updateSubCategory } from "../../services/subCategory.js";
 import { toast } from "react-hot-toast";
 
-export default function useCreateSubCategory() {
+export default function useUpdateSubCategory() {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const queryClient = useQueryClient();
 
 	const { mutate, isPending: isLoading, error, data } = useMutation({
-		mutationFn: (subCategoryData) => {
+		mutationFn: ({ id, data }) => {
 			setUploadProgress(0);
-			return addSubCategory(subCategoryData, (progress) => {
+			return updateSubCategory({ id, data }, (progress) => {
 				setUploadProgress(progress);
 			});
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["subcategories"] });
-			toast.success("Subcategory added successfully");
+			toast.success("Subcategory updated successfully");
 			setUploadProgress(0);
 		},
 		onError: (err) => {
@@ -25,5 +25,5 @@ export default function useCreateSubCategory() {
 		},
 	});
 	
-	return { error, data, addSubCategory: mutate, isLoading, uploadProgress };
+	return { error, data, updateSubCategory: mutate, isLoading, uploadProgress };
 }

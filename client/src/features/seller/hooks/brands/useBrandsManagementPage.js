@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useCategories from '../../../category/hooks/useCategories.js';
+import useCategories from '../../../admin/hooks/categories/useCategories.js';
 import useSellerBrands from './useSellerBrands.js';
 
 const useBrandsManagementPage = () => {

@@ -5,7 +5,7 @@ import {
 	CategoryIcon, ChevronDownIcon, ChevronRightIcon, 
 	EditIcon, TrashIcon 
 } from '../../../../shared/constants/icons.jsx';
-import { useAdminSubCategories } from '../../../subCategory/hooks/useAdminSubCategories.js';
+import { useAdminSubCategories } from '../../hooks/subCategories/useAdminSubCategories.js';
 import SubCategoriesTable from './SubCategoriesTable.jsx';
 
 const CategoryRow = ({ 
