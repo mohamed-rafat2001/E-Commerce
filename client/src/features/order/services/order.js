@@ -27,7 +27,7 @@ export const updateCustomerOrderStatus = (id, status) =>
 
 // ===== SELLER SERVICES =====
 // Get seller's orders (orders containing seller's products)
-export const getSellerOrders = () => getFunc("orders/seller");
+export const getSellerOrders = (params) => getFunc("orders/seller", { params });
 
 // Update order status from seller panel
 export const updateSellerOrderStatus = (orderId, status) => 

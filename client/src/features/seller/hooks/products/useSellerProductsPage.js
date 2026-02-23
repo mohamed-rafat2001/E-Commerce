@@ -1,28 +1,15 @@
-import { useState, useMemo } from 'react';
-import useProducts from '../../../product/hooks/useProducts.js';
-import { getMyProducts } from '../../../product/services/product.js';
+import { useState } from 'react';
+import useSellerProducts from './useSellerProducts.js';
 import useAddProduct from '../../../product/hooks/useAddProduct.js';
 import useUpdateProduct from '../../../product/hooks/useUpdateProduct.js';
 import useDeleteProduct from '../../../product/hooks/useDeleteProduct.js';
 
-const statusOptions = [
-	{ value: 'draft', label: 'Draft' },
-	{ value: 'active', label: 'Active' },
-	{ value: 'inactive', label: 'Inactive' },
-	{ value: 'archived', label: 'Archived' },
-];
-
 const useSellerProductsPage = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingProduct, setEditingProduct] = useState(null);
-	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
 	const [deletingId, setDeletingId] = useState(null);
 
-	const { products, isLoading, error, refetch } = useProducts({
-		queryFn: getMyProducts,
-		queryKey: ['seller-products']
-	});
+	const { products, total, totalPages, isLoading, refetch } = useSellerProducts();
 
 	// Configure hooks to invalidate seller-products
 	const { addProduct, isAdding } = useAddProduct({
@@ -34,16 +21,6 @@ const useSellerProductsPage = () => {
 	const { deleteProduct, isDeleting } = useDeleteProduct({
 		invalidateKeys: ['seller-products']
 	});
-
-	const filteredProducts = useMemo(() => {
-		if (!products) return [];
-		return products.filter(product => {
-			const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-			const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
-			return matchesSearch && matchesStatus;
-		});
-	}, [products, searchQuery, statusFilter]);
 
 	const handleAddProduct = (data) => {
 		addProduct(data, {
@@ -103,42 +80,20 @@ const useSellerProductsPage = () => {
 	};
 
 	return {
-		// State
 		isModalOpen,
-		setIsModalOpen,
-		searchQuery,
-		setSearchQuery,
-		statusFilter,
-		setStatusFilter,
-		deletingId,
 		editingProduct,
-		setEditingProduct,
-		
-		// Data
 		products,
-		filteredProducts,
-		allProducts: products,
+        total,
+        totalPages,
 		isLoading,
-		error,
-		
-		// Loading states
-		isAdding,
-		isCreating: isAdding,
-		isUpdating,
-		isDeleting,
-		
-		// Options
-		statusOptions,
-		
-		// Handlers
-		handleAddProduct,
-		handleCreateProduct: handleAddProduct,
-		handleUpdateProduct,
 		handleDeleteProduct,
+		handleCreate,
 		handleEdit,
 		handleCloseModal,
-		handleCreate,
 		handleSubmit,
+		isCreating: isAdding,
+		isUpdating,
+        isDeleting
 	};
 };
 

@@ -18,6 +18,8 @@ const useBrandsManagementPage = () => {
     
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [brandToDelete, setBrandToDelete] = useState(null);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [currentlySelectedBrand, setCurrentlySelectedBrand] = useState(null);
@@ -48,9 +50,16 @@ const useBrandsManagementPage = () => {
         setIsFormModalOpen(true);
     };
     
-    const handleDeleteBrand = async (brandId) => {
-        if (!window.confirm('Are you sure you want to delete this brand?')) return;
-        await deleteBrand(brandId);
+    const handleDeleteBrand = (brandId) => {
+        setBrandToDelete(brandId);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDeleteBrand = async () => {
+        if (!brandToDelete) return;
+        await deleteBrand(brandToDelete);
+        setIsDeleteModalOpen(false);
+        setBrandToDelete(null);
     };
     
     const handleSubmitBrand = async (formData, brandId) => {
@@ -98,6 +107,10 @@ const useBrandsManagementPage = () => {
         handleCreateBrand,
         handleEditBrand,
         handleDeleteBrand,
+        confirmDeleteBrand,
+        isDeleteModalOpen,
+        setIsDeleteModalOpen,
+        brandToDelete,
         handleSubmitBrand,
         handleLogoEdit,
         handleUploadLogo

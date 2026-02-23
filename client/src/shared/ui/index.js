@@ -18,3 +18,4 @@ export {
 	CardSkeleton 
 } from './Spinner/Spinner.jsx';
 export { default as Pagination } from './Pagination/Pagination.jsx';
+export { default as DataHeader } from './DataHeader/DataHeader.jsx';

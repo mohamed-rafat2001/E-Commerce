@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiFilter, FiMail, FiPhone, FiGlobe, FiCalendar, FiBox, FiTag } from 'react-icons/fi';
+import { FiFilter, FiMail, FiPhone, FiGlobe, FiCalendar, FiBox, FiTag, FiArrowLeft } from 'react-icons/fi';
 import useBrandDetails from '../hooks/brands/useBrandDetails';
 
 const BrandDetailsPage = () => {
@@ -42,6 +42,13 @@ const BrandDetailsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12">
+            {/* Back Button */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <Link to="/seller/brands" className="inline-flex items-center text-gray-600 hover:text-indigo-600 transition-colors">
+                    <FiArrowLeft className="mr-2" /> Back to Brands
+                </Link>
+            </div>
+
             {/* Hero Section */}
             <div className="relative bg-white shadow-sm">
                 <div className="h-48 bg-linear-to-r from-indigo-500 to-purple-600 w-full object-cover"></div>
@@ -107,43 +114,6 @@ const BrandDetailsPage = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar - Subcategories */}
-                    <div className="w-full md:w-64 shrink-0">
-                        <div className="bg-white rounded-lg shadow-sm p-4 sticky top-24">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <FiFilter className="mr-2" /> Categories
-                            </h3>
-                            <div className="space-y-1">
-                                <button
-                                    onClick={() => setSelectedSubCategory('all')}
-                                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                        selectedSubCategory === 'all' 
-                                            ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500' 
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                    }`}
-                                >
-                                    All Products
-                                    <span className="float-right text-xs bg-gray-100 text-gray-500 py-0.5 px-2 rounded-full">
-                                        {allProductsCount}
-                                    </span>
-                                </button>
-                                {subCategories?.map((sub) => (
-                                    <button
-                                        key={sub._id}
-                                        onClick={() => setSelectedSubCategory(sub._id)}
-                                        className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                            selectedSubCategory === sub._id 
-                                                ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500' 
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        {sub.name}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Main Content - Product Grid */}
                     <div className="flex-1">
                         <div className="flex justify-between items-center mb-6">
@@ -205,6 +175,43 @@ const BrandDetailsPage = () => {
                                 </p>
                             </div>
                         )}
+                    </div>
+
+                    {/* Sidebar - Subcategories */}
+                    <div className="w-full md:w-64 shrink-0">
+                        <div className="bg-white rounded-lg shadow-sm p-4 sticky top-24">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                <FiFilter className="mr-2" /> Categories
+                            </h3>
+                            <div className="space-y-1">
+                                <button
+                                    onClick={() => setSelectedSubCategory('all')}
+                                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                        selectedSubCategory === 'all' 
+                                            ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500' 
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    }`}
+                                >
+                                    All Products
+                                    <span className="float-right text-xs bg-gray-100 text-gray-500 py-0.5 px-2 rounded-full">
+                                        {allProductsCount}
+                                    </span>
+                                </button>
+                                {subCategories?.map((sub) => (
+                                    <button
+                                        key={sub._id}
+                                        onClick={() => setSelectedSubCategory(sub._id)}
+                                        className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            selectedSubCategory === sub._id 
+                                                ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500' 
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        }`}
+                                    >
+                                        {sub.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

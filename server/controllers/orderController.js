@@ -4,6 +4,7 @@ import OrderItemsModel from "../models/OrderItemsModel.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
+import APIFeatures from "../utils/apiFeatures.js";
 import {
 	createDoc,
 	getAllByOwner,
@@ -36,13 +37,38 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 		return next(new appError("Seller profile not found", 404));
 	}
 
-	const orderItems = await OrderItemsModel.find({ sellerId: seller._id })
+	// Handle Status Filter (complex because it's on OrderModel)
+	let filter = { sellerId: seller._id };
+	const queryObj = { ...req.query };
+
+	if (queryObj.status) {
+		const matchingOrders = await OrderModel.find({ status: queryObj.status }).select('_id');
+		const matchingOrderIds = matchingOrders.map(o => o._id);
+		filter.orderId = { $in: matchingOrderIds };
+		delete queryObj.status; // Remove so APIFeatures doesn't apply it to OrderItemsModel
+	}
+
+	// Initialize APIFeatures
+	const features = new APIFeatures(OrderItemsModel.find(filter), queryObj)
+		.filter()
+		.sort()
+		.paginate();
+
+	// Populate necessary fields
+	features.query = features.query
 		.populate({
 			path: "orderId",
 			populate: { path: "userId", select: "name email" },
 		})
-		.populate("items.item", "name coverImage brand price")
-		.sort("-createdAt");
+		.populate("items.item", "name coverImage brand price");
+
+	// Execute query
+	const orderItems = await features.query;
+
+	// Get total count for pagination
+	const countFeatures = new APIFeatures(OrderItemsModel.find(filter), queryObj)
+		.filter();
+	const total = await countFeatures.query.countDocuments();
 
 	const transformedOrders = orderItems.map((oi) => ({
 		id: oi.orderId?._id || oi._id,
@@ -61,7 +87,15 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 		})),
 	}));
 
-	sendResponse(res, 200, transformedOrders);
+	// Send response with total count
+	res.status(200).json({
+		status: "success",
+		results: transformedOrders.length,
+		data: {
+			data: transformedOrders,
+			total
+		}
+	});
 });
 
 // @desc    Update order status

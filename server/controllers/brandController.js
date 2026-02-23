@@ -1,5 +1,6 @@
 import BrandModel from "../models/BrandModel.js";
 import SellerModel from "../models/SellerModel.js";
+import ProductModel from "../models/ProductModel.js";
 import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 import cloudinary from "../utils/cloudinary.js";
 import catchAsync from "../middlewares/catchAsync.js";
@@ -28,7 +29,10 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 		.search(BrandModel.schema)
 		.paginate();
 
-	const brands = await features.query.populate("products", "_id");
+	const brands = await features.query.populate({
+		path: "products",
+		select: "_id"
+	});
 	
 	// Get total count for pagination
 	const totalFeatures = new APIFeatures(BrandModel.find({ sellerId: seller._id }), req.query)
@@ -55,7 +59,10 @@ export const getBrand = catchAsync(async (req, res, next) => {
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
 		sellerId: seller._id
-	}).populate("products", "_id");
+	}).populate({
+		path: "products",
+		select: "_id"
+	});
 	
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
@@ -135,7 +142,8 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 				
 				await brand.populate([
 					{ path: "primaryCategory", select: "name description" },
-					{ path: "subCategories", select: "name description" }
+					{ path: "subCategories", select: "name description" },
+					{ path: "products", select: "_id" }
 				]);
 				
 				sendResponse(res, 200, brand);
@@ -148,7 +156,8 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		
 		await brand.populate([
 			{ path: "primaryCategory", select: "name description" },
-			{ path: "subCategories", select: "name description" }
+			{ path: "subCategories", select: "name description" },
+			{ path: "products", select: "_id" }
 		]);
 		
 		sendResponse(res, 200, brand);
