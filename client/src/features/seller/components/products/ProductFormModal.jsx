@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Modal, Input, Select } from '../../../../shared/ui/index.js';
 import { FiImage, FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import useCategories from '../../../category/hooks/useCategories.js';
-import useSellerBrands from '../../hooks/useSellerBrands.js';
+import { useSellerBrands } from '../../hooks/index.js';
 import mainApi from '../../../../api/mainApi.js';
 
 const statusOptions = [
@@ -198,7 +198,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				};
 				return newImages;
 			});
-		} catch (err) {
+		} catch {
 			setAdditionalImages(prev => {
 				const newImages = [...prev];
 				newImages[index] = { ...newImages[index], isUploading: false, uploadProgress: 0 };
@@ -260,7 +260,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				
 				coverImage = response.data?.data;
 				setIsUploading(false);
-			} catch (err) {
+			} catch {
 				setIsUploading(false);
 				setFormErrors(prev => ({ ...prev, image: 'Failed to upload cover image. Try again.' }));
 				return;

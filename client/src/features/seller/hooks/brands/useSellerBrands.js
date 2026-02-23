@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import mainApi from '../../../../../api/mainApi.js';
-import useToast from '../../../../../shared/hooks/useToast.js';
+import mainApi from '../../../../api/mainApi.js';
+import useToast from '../../../../shared/hooks/useToast.js';
 
 const useSellerBrands = () => {
 	const [brands, setBrands] = useState([]);
