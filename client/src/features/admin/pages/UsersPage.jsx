@@ -1,14 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Select, LoadingSpinner } from '../../../shared/ui/index.js';
-import { FiSearch, FiPlus, FiUsers, FiUser, FiShoppingBag, FiShield, FiUserX, FiExternalLink } from 'react-icons/fi';
-import useUsersPage from '../hooks/useUsersPage.js';
-import { roleOptions, statusOptions } from '../components/users/userConstants.js';
-import AdminStatCard from '../components/AdminStatCard.jsx';
-import Pagination from '../components/Pagination.jsx';
+import { Button, LoadingSpinner } from '../../../shared/ui/index.js';
+import { FiPlus } from 'react-icons/fi';
+import { useUsersPage } from '../hooks/index.js';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
-import EmptyState from '../components/EmptyState.jsx';
 import UserFormModal from '../components/users/UserFormModal.jsx';
-import UserRow from '../components/users/UserRow.jsx';
+import UsersStats from '../components/users/UsersStats.jsx';
+import UsersFilter from '../components/users/UsersFilter.jsx';
+import UsersTable from '../components/users/UsersTable.jsx';
 
 const UsersPage = () => {
   const {
@@ -29,7 +26,6 @@ const UsersPage = () => {
     setCurrentPage,
     
     // Data
-    users,
     filteredUsers,
     paginatedUsers,
     totalPages,
@@ -72,87 +68,33 @@ const UsersPage = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <AdminStatCard label="Total Users" value={stats.total} icon={FiUsers} color="bg-gray-900" />
-        <AdminStatCard label="Customers" value={stats.customers} icon={FiUser} color="bg-blue-600" />
-        <AdminStatCard label="Sellers" value={stats.sellers} icon={FiShoppingBag} color="bg-emerald-600" />
-        <AdminStatCard label="Admins" value={stats.admins} icon={FiShield} color="bg-purple-600" />
-        <AdminStatCard label="Suspended" value={stats.suspended} icon={FiUserX} color="bg-rose-500" />
-      </div>
+      <UsersStats stats={stats} />
 
       {/* Table Card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-slate-100/50 overflow-hidden">
-        {/* Filters */}
-        <div className="p-5 border-b border-gray-100">
-          <div className="flex flex-col lg:flex-row gap-4 items-end">
-            <div className="relative flex-1 w-full">
-              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search by name, email, or phone..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-50 transition-all outline-none text-sm font-medium"
-              />
-            </div>
-            <div className="flex gap-3 w-full lg:w-auto">
-              <Select containerClassName="min-w-[160px] flex-1 lg:flex-none" label="Role" value={roleFilter} onChange={setRoleFilter} options={[{ value: 'all', label: 'All Roles' }, ...roleOptions]} />
-              <Select containerClassName="min-w-[160px] flex-1 lg:flex-none" label="Status" value={statusFilter} onChange={setStatusFilter} options={[{ value: 'all', label: 'All Statuses' }, ...statusOptions]} />
-            </div>
-          </div>
-        </div>
+        <UsersFilter 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          roleFilter={roleFilter}
+          setRoleFilter={setRoleFilter}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+        />
 
-        {/* Table */}
-        {filteredUsers.length > 0 ? (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-gray-50/80 border-b border-gray-100">
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">User</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Phone</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Role</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Status</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap">Joined</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-400 uppercase text-[11px] tracking-wider whitespace-nowrap text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence>
-                    {paginatedUsers.map(u => (
-                      <UserRow 
-                        key={u._id} 
-                        user={u} 
-                        onUpdateField={handleUpdateField} 
-                        onEdit={handleEditUser}
-                        onView={handleViewUser}
-                        onDelete={setUserToDelete} 
-                        currentUserId={currUser?.userId?._id} 
-                      />
-                    ))}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={filteredUsers.length}
-              itemsPerPage={10}
-              onPageChange={setCurrentPage}
-              itemLabel="users"
-            />
-          </>
-        ) : (
-          <EmptyState
-            icon={FiUsers}
-            title={searchQuery ? 'No users found' : 'No users yet'}
-            subtitle={searchQuery ? `No users match "${searchQuery}". Try a different search.` : 'Create your first user to get started.'}
-            searchQuery={searchQuery}
-            onClear={() => setSearchQuery('')}
-          />
-        )}
+        <UsersTable 
+          filteredUsers={filteredUsers}
+          paginatedUsers={paginatedUsers}
+          handleUpdateField={handleUpdateField}
+          handleEditUser={handleEditUser}
+          handleViewUser={handleViewUser}
+          setUserToDelete={setUserToDelete}
+          currUser={currUser}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
       </div>
 
       <UserFormModal 

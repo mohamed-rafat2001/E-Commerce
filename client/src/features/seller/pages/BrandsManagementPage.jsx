@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { LoadingSpinner } from '../../../shared/ui/index.js';
-import useCategories from '../../category/hooks/useCategories.js';
-import useSellerBrands from '../hooks/useSellerBrands.js';
+import { useBrandsManagementPage } from '../hooks/index.js';
 import BrandDetailsSidebar from '../components/brands/BrandDetailsSidebar.jsx';
 import BrandFormModal from '../components/brands/BrandFormModal.jsx';
 import LogoEditModal from '../components/brands/LogoEditModal.jsx';
@@ -12,76 +10,26 @@ import BrandsList from '../components/brands/BrandsList.jsx';
 const BrandsManagementPage = () => {
 	const { 
 		brands, 
-		isLoading: loading, 
+		loading, 
 		isSubmitting, 
 		isUploading, 
-		createBrand, 
-		updateBrand, 
-		deleteBrand, 
-		uploadLogo 
-	} = useSellerBrands();
-	
-	const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-	const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
-	const [selectedBrand, setSelectedBrand] = useState(null);
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [currentlySelectedBrand, setCurrentlySelectedBrand] = useState(null);
-	const { categories } = useCategories();
-	
-	const handleSelectBrand = (brand) => {
-		if (currentlySelectedBrand?._id === brand._id) {
-			setCurrentlySelectedBrand(null);
-			setIsSidebarOpen(false);
-		} else {
-			setCurrentlySelectedBrand(brand);
-			setIsSidebarOpen(true);
-		}
-	};
-	
-	const handleCloseSidebar = () => {
-		setIsSidebarOpen(false);
-		setCurrentlySelectedBrand(null);
-	};
-	
-	const handleCreateBrand = () => {
-		setSelectedBrand(null);
-		setIsFormModalOpen(true);
-	};
-	
-	const handleEditBrand = (brand) => {
-		setSelectedBrand(brand);
-		setIsFormModalOpen(true);
-	};
-	
-	const handleDeleteBrand = async (brandId) => {
-		if (!window.confirm('Are you sure you want to delete this brand?')) return;
-		await deleteBrand(brandId);
-	};
-	
-	const handleSubmitBrand = async (formData, brandId) => {
-		let success;
-		if (brandId) {
-			success = await updateBrand(brandId, formData);
-		} else {
-			success = await createBrand(formData);
-		}
-		
-		if (success) {
-			setIsFormModalOpen(false);
-		}
-	};
-	
-	const handleLogoEdit = (brand) => {
-		setSelectedBrand(brand);
-		setIsLogoModalOpen(true);
-	};
-	
-	const handleUploadLogo = async (file, brandId) => {
-		const success = await uploadLogo(brandId, file);
-		if (success) {
-			setIsLogoModalOpen(false);
-		}
-	};
+		categories,
+		isFormModalOpen,
+		setIsFormModalOpen,
+		isLogoModalOpen,
+		setIsLogoModalOpen,
+		selectedBrand,
+		isSidebarOpen,
+		currentlySelectedBrand,
+		handleSelectBrand,
+		handleCloseSidebar,
+		handleCreateBrand,
+		handleEditBrand,
+		handleDeleteBrand,
+		handleSubmitBrand,
+		handleLogoEdit,
+		handleUploadLogo
+	} = useBrandsManagementPage();
 	
 	if (loading) {
 		return (

@@ -66,7 +66,7 @@ const QuickActions = () => {
 									transition={{ delay: 0.6 + index * 0.05 }}
 								>
 									<div
-										className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} 
+										className={`w-12 h-12 rounded-xl bg-linear-to-br ${action.color} 
 											flex items-center justify-center text-white text-xl shadow-sm`}
 									>
 										<Icon className="w-6 h-6" />

@@ -9,9 +9,7 @@ const ProductsPage = () => {
 	const {
 		// Modal state
 		isModalOpen,
-		setIsModalOpen,
 		editingProduct,
-		setEditingProduct,
 
 		// Search & Filter
 		searchQuery,
@@ -25,31 +23,14 @@ const ProductsPage = () => {
 		isLoading,
 
 		// Handlers
-		handleCreateProduct,
-		handleUpdateProduct,
 		handleDeleteProduct,
+		handleCreate,
+		handleEdit,
+		handleCloseModal,
+		handleSubmit,
 		isCreating,
 		isUpdating,
-		isDeleting,
 	} = useSellerProductsPage();
-
-	const openAddModal = () => {
-		setEditingProduct(null);
-		setIsModalOpen(true);
-	};
-
-	const openEditModal = (product) => {
-		setEditingProduct(product);
-		setIsModalOpen(true);
-	};
-
-	const handleSubmit = (data) => {
-		if (editingProduct) {
-			handleUpdateProduct(data);
-		} else {
-			handleCreateProduct(data);
-		}
-	};
 
 	return (
 		<div className="space-y-6 pb-10">
@@ -66,7 +47,7 @@ const ProductsPage = () => {
 					</p>
 				</div>
 				<Button 
-					onClick={openAddModal}
+					onClick={handleCreate}
 					icon={<FiPlus className="w-5 h-5" />}
 					className="bg-linear-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-200 transition-all"
 				>
@@ -116,7 +97,7 @@ const ProductsPage = () => {
 							<ProductCard
 								key={product._id}
 								product={product}
-								onEdit={() => openEditModal(product)}
+								onEdit={() => handleEdit(product)}
 								onDelete={() => handleDeleteProduct(product._id)}
 							/>
 						))}
@@ -136,7 +117,7 @@ const ProductsPage = () => {
 							: 'Start building your catalog by adding your first product'}
 					</p>
 					{!searchQuery && statusFilter === 'all' && (
-						<Button onClick={openAddModal} icon={<FiPlus className="w-4 h-4" />}>
+						<Button onClick={handleCreate} icon={<FiPlus className="w-4 h-4" />}>
 							Add Your First Product
 						</Button>
 					)}
@@ -146,7 +127,7 @@ const ProductsPage = () => {
 			{/* Product Form Modal */}
 			<ProductFormModal
 				isOpen={isModalOpen}
-				onClose={() => { setIsModalOpen(false); setEditingProduct(null); }}
+				onClose={handleCloseModal}
 				product={editingProduct}
 				onSubmit={handleSubmit}
 				isLoading={isCreating || isUpdating}

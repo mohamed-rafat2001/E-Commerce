@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
 	ProductIcon
@@ -68,11 +67,12 @@ const fallbackAnalytics = {
 
 // Main Analytics Page
 const AnalyticsPage = () => {
-	const [timeRange, setTimeRange] = useState('month');
 	const {
 		analytics,
-		isLoading
-	} = useSellerAnalyticsPage(timeRange);
+		isLoading,
+		timeRange,
+		setTimeRange
+	} = useSellerAnalyticsPage();
 
 	const safeAnalytics = analytics || fallbackAnalytics;
 

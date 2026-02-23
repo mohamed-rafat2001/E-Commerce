@@ -11,7 +11,7 @@ import {
   PurchaseHistory, 
   Addresses, 
   SellerInformation 
-} from '../components/users/UserDetailsComponents.jsx';
+} from '../components/users/details/index.js';
 
 const UserDetailsPage = () => {
   const {

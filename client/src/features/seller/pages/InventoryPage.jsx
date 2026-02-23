@@ -13,13 +13,8 @@ const InventoryPage = () => {
 		filteredProducts,
 		isLoading,
 		handleUpdateStock,
+		stats,
 	} = useSellerInventoryPage();
-
-	// Calculate summary stats
-	const totalProducts = filteredProducts?.length || 0;
-	const lowStockCount = filteredProducts?.filter(p => p.countInStock > 0 && p.countInStock <= 10).length || 0;
-	const outOfStockCount = filteredProducts?.filter(p => p.countInStock === 0).length || 0;
-	const inStockCount = filteredProducts?.filter(p => p.countInStock > 10).length || 0;
 
 	return (
 		<div className="space-y-6 pb-10">
@@ -28,10 +23,10 @@ const InventoryPage = () => {
 
 			{/* Summary Stats */}
 			<InventoryStats 
-				totalProducts={totalProducts}
-				inStockCount={inStockCount}
-				lowStockCount={lowStockCount}
-				outOfStockCount={outOfStockCount}
+				totalProducts={stats.totalProducts}
+				inStockCount={stats.inStockCount}
+				lowStockCount={stats.lowStockCount}
+				outOfStockCount={stats.outOfStockCount}
 			/>
 
 			{/* Search & Filter */}
