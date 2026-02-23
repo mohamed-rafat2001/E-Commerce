@@ -2,7 +2,10 @@ import { getFunc, addFunc, updateFunc, deleteFunc } from "../../../shared/servic
 
 // ===== BRAND SERVICES =====
 // Get seller's brands
-export const getSellerBrands = () => getFunc("brands?sort=-createdAt&limit=1000");
+export const getSellerBrands = (params) => getFunc("brands", { params });
+
+// Get single brand
+export const getBrand = (id) => getFunc(`brands/${id}`);
 
 // Add brand
 export const addBrand = (brand) => addFunc("brands", brand);

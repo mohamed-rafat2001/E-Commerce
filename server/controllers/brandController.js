@@ -6,6 +6,8 @@ import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 
+import APIFeatures from "../utils/apiFeatures.js";
+
 // @desc    Get all brands for current seller
 // @route   GET /api/v1/brands
 // @access  Private/Seller
@@ -14,8 +16,32 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
-	const brands = await BrandModel.find({ sellerId: seller._id });
-	sendResponse(res, 200, brands);
+	
+	// Initialize query with seller filter
+	const query = BrandModel.find({ sellerId: seller._id });
+	
+	// Apply API features
+	const features = new APIFeatures(query, req.query)
+		.filter()
+		.sort()
+		.limitFields()
+		.search(BrandModel.schema)
+		.paginate();
+
+	const brands = await features.query.populate("products", "_id");
+	
+	// Get total count for pagination
+	const totalFeatures = new APIFeatures(BrandModel.find({ sellerId: seller._id }), req.query)
+		.filter()
+		.search(BrandModel.schema);
+	const total = await totalFeatures.query.countDocuments();
+
+	res.status(200).json({
+		status: "success",
+		results: brands.length,
+		total,
+		data: brands
+	});
 });
 
 // @desc    Get single brand by ID
@@ -29,7 +55,7 @@ export const getBrand = catchAsync(async (req, res, next) => {
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
 		sellerId: seller._id
-	});
+	}).populate("products", "_id");
 	
 	if (!brand) {
 		return next(new appError("Brand not found", 404));

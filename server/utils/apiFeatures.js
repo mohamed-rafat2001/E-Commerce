@@ -52,7 +52,7 @@ class APIFeatures {
 			const searchConditions = [{ name: searchRegex }];
 			
 			// If schema is provided, check for description
-			if (modelSchema && modelSchema.paths.description) {
+			if (modelSchema && modelSchema.paths && modelSchema.paths.description) {
 				searchConditions.push({ description: searchRegex });
 			}
 			

@@ -5,6 +5,8 @@ import useSellerBrands from './useSellerBrands.js';
 const useBrandsManagementPage = () => {
     const { 
         brands, 
+        total,
+        totalPages,
         isLoading: loading, 
         isSubmitting, 
         isUploading, 
@@ -78,6 +80,8 @@ const useBrandsManagementPage = () => {
 
     return {
         brands,
+        total,
+        totalPages,
         loading,
         isSubmitting,
         isUploading,

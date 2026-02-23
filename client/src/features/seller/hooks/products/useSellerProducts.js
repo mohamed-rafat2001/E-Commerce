@@ -1,9 +1,9 @@
 import useProducts from '../../../product/hooks/useProducts.js';
 import { getMyProducts } from '../../../product/services/product.js';
 
-export default function useSellerProducts() {
+export default function useSellerProducts(params = {}) {
     return useProducts({
-        queryFn: getMyProducts,
-        queryKey: ['seller-products']
+        queryFn: () => getMyProducts(params),
+        queryKey: ['seller-products', params]
     });
 }

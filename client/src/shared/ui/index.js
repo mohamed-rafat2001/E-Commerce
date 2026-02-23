@@ -17,3 +17,4 @@ export {
 	SkeletonLoader, 
 	CardSkeleton 
 } from './Spinner/Spinner.jsx';
+export { default as Pagination } from './Pagination/Pagination.jsx';

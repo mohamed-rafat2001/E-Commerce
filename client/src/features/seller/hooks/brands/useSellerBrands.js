@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { 
     getSellerBrands, 
     addBrand, 
@@ -11,6 +12,13 @@ import useToast from '../../../../shared/hooks/useToast.js';
 const useSellerBrands = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useToast();
+    const [searchParams] = useSearchParams();
+
+    // Get pagination params from URL
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort") || "-createdAt";
 
     // Fetch brands
     const { 
@@ -19,12 +27,14 @@ const useSellerBrands = () => {
         error, 
         refetch 
     } = useQuery({
-        queryKey: ['seller-brands'],
-        queryFn: getSellerBrands,
-        // The service already includes ?sort=-createdAt&limit=1000
+        queryKey: ['seller-brands', page, limit, search, sort],
+        queryFn: () => getSellerBrands({ page, limit, search, sort }),
+        keepPreviousData: true,
     });
 
     const brands = response?.data?.data || [];
+    const total = response?.data?.total || 0;
+    const totalPages = Math.ceil(total / limit);
 
     // Create Brand Mutation
     const createBrandMutation = useMutation({
@@ -120,6 +130,8 @@ const useSellerBrands = () => {
 
     return {
         brands,
+        total,
+        totalPages,
         isLoading,
         isSubmitting: createBrandMutation.isPending || updateBrandMutation.isPending || deleteBrandMutation.isPending,
         isUploading: uploadLogoMutation.isPending,

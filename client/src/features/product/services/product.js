@@ -7,7 +7,7 @@ export const addProduct = (product) => addFunc("products", product);
 export const getAllProducts = () => getFunc("products");
 
 // get seller's own products
-export const getMyProducts = () => getFunc("products/myproducts");
+export const getMyProducts = (params) => getFunc("products/myproducts", { params });
 
 // delete all products
 export const deleteProducts = () => deleteFunc("products");
@@ -21,3 +21,6 @@ export const updateProduct = (id, product) =>
 
 // get single product
 export const getProduct = (id) => getFunc(`products/${id}`);
+
+// get products by brand
+export const getProductsByBrand = (brandId) => getFunc(`products/brand/${brandId}`);

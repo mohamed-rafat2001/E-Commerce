@@ -325,21 +325,39 @@ export const getOneByOwner = (Model) =>
 export const getAllByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const userId = req.user._id;
-		let docs;
+		let filter = {};
 
 		if (Model.modelName === "OrderItemsModel") {
-			docs = await Model.find({
-				sellerId: userId,
-			});
+			filter = { sellerId: userId };
 		} else {
-			docs = await Model.find({
-				userId,
-			});
+			filter = { userId };
 		}
+
+		// Execute query using APIFeatures
+		const features = new APIFeatures(Model.find(filter), req.query)
+			.filter()
+			.search(Model.schema)
+			.sort()
+			.limitFields()
+			.paginate();
+
+		const docs = await features.query;
+
+		// Count total documents for pagination
+		const countFeatures = new APIFeatures(Model.find(filter), req.query)
+			.filter()
+			.search(Model.schema);
+		
+		const totalDocs = await countFeatures.query.countDocuments();
 
 		if (!docs) return next(new appError("docs not Found", 404));
 
-		sendResponse(res, 200, docs);
+		res.status(200).json({
+			status: "success",
+			results: docs.length,
+			total: totalDocs,
+			data: docs,
+		});
 	});
 
 // get doc by id

@@ -1,4 +1,4 @@
-import { LoadingSpinner } from '../../../shared/ui/index.js';
+import { LoadingSpinner, Pagination } from '../../../shared/ui/index.js';
 import { useBrandsManagementPage } from '../hooks/index.js';
 import BrandDetailsSidebar from '../components/brands/BrandDetailsSidebar.jsx';
 import BrandFormModal from '../components/brands/BrandFormModal.jsx';
@@ -10,6 +10,7 @@ import BrandsList from '../components/brands/BrandsList.jsx';
 const BrandsManagementPage = () => {
 	const { 
 		brands, 
+		totalPages,
 		loading, 
 		isSubmitting, 
 		isUploading, 
@@ -44,14 +45,17 @@ const BrandsManagementPage = () => {
 			<BrandPageHeader onCreate={handleCreateBrand} />
 			
 			{brands.length > 0 ? (
-				<BrandsList 
-					brands={brands}
-					onEdit={handleEditBrand}
-					onDelete={handleDeleteBrand}
-					onLogoEdit={handleLogoEdit}
-					onSelect={handleSelectBrand}
-					selectedBrandId={currentlySelectedBrand?._id}
-				/>
+				<>
+					<BrandsList 
+						brands={brands}
+						onEdit={handleEditBrand}
+						onDelete={handleDeleteBrand}
+						onLogoEdit={handleLogoEdit}
+						onSelect={handleSelectBrand}
+						selectedBrandId={currentlySelectedBrand?._id}
+					/>
+					<Pagination totalPages={totalPages} />
+				</>
 			) : (
 				<BrandEmptyState onCreate={handleCreateBrand} />
 			)}

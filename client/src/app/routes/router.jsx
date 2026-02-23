@@ -27,7 +27,8 @@ import {
 	InventoryPage as SellerInventoryPage,
 	OrdersPage as SellerOrdersPage,
 	AnalyticsPage as SellerAnalyticsPage,
-	BrandsManagementPage
+	BrandsManagementPage,
+	BrandDetailsPage,
 } from "../../features/seller/pages/index.js";
 
 import { 
@@ -114,6 +115,7 @@ const router = createBrowserRouter([
 					{ path: "inventory", element: <SellerInventoryPage /> },
 					{ path: "orders", element: <SellerOrdersPage /> },
 					{ path: "brands", element: <BrandsManagementPage /> },
+					{ path: "brands/:id", element: <BrandDetailsPage /> },
 					{ path: "analytics", element: <SellerAnalyticsPage /> },
 					
 				],
