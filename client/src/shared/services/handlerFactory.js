@@ -1,4 +1,4 @@
-import mainApi from "../../api/mainApi";
+import mainApi from "../../app/api/mainApi";
 
 // add func
 export const addFunc = async (url, data) => {

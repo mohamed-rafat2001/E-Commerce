@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import mainApi from '../../../api/mainApi';
+import mainApi from '../../../app/api/mainApi';
 import { toast } from 'react-hot-toast';
 import { ToastSuccess, ToastError } from '../../../shared/ui';
 

@@ -2,12 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 
 // Layouts
-import DashboardLayout from "../layouts/DashboardLayout.jsx";
+import DashboardLayout from "../../layouts/DashboardLayout.jsx";
 
 // Pages - Public
-import { HomePage } from "../features/home/pages/index.js";
-import { LoginPage, RegisterPage } from "../features/auth/pages/index.js";
-import { PublicCartPage, PublicWishlistPage } from "../features/public/pages/index.js";
+import { HomePage } from "../../features/home/pages/index.js";
+import { LoginPage, RegisterPage } from "../../features/auth/pages/index.js";
+import { PublicCartPage, PublicWishlistPage } from "../../features/public/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
 import { 
@@ -19,7 +19,7 @@ import {
 	AnalyticsPage as AdminAnalyticsPage,
 	CategoriesAndSubCategoriesPage,
 	BrandsPage
-} from "../features/admin/pages/index.js";
+} from "../../features/admin/pages/index.js";
 
 import { 
 	SellerDashboardPage,
@@ -28,7 +28,7 @@ import {
 	OrdersPage as SellerOrdersPage,
 	AnalyticsPage as SellerAnalyticsPage,
 	BrandsManagementPage
-} from "../features/seller/pages/index.js";
+} from "../../features/seller/pages/index.js";
 
 import { 
 	CustomerDashboardPage, 
@@ -37,17 +37,15 @@ import {
 	OrderHistoryPage,
 	CartPage,
 	WishlistPage 
-} from "../features/customer/pages/index.js";
-
-import { EmployeeDashboardPage } from "../features/employee/pages/index.js";
+} from "../../features/customer/pages/index.js";
 
 // Pages - Shared
-import { PersonalDetailsPage } from "../features/user/pages/index.js";
-import { SettingsPage } from "../features/settings/pages/index.js";
-import { PlaceholderPage } from "../shared/pages/index.js";
+import { PersonalDetailsPage } from "../../features/user/pages/index.js";
+import { SettingsPage } from "../../features/settings/pages/index.js";
+import { PlaceholderPage } from "../../shared/pages/index.js";
 
 // UI Components
-import PageNotFound from "../shared/ui/PageNotFound.jsx";
+import PageNotFound from "../../shared/ui/PageNotFound.jsx";
 
 // Create app routing
 const router = createBrowserRouter([

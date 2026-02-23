@@ -1,4 +1,4 @@
-import mainApi from "../../api/mainApi";
+import mainApi from "../../app/api/mainApi";
 
 /**
  * Upload a single image to the server

@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "react-router-dom";
-import router from "./routing/router.jsx";
+import router from "./app/routes/router.jsx";
 import queryClient from "./shared/utils/queryClient.js";
 import { Toaster } from "react-hot-toast";
 

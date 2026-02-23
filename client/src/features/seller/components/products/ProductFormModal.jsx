@@ -4,7 +4,7 @@ import { Button, Modal, Input, Select } from '../../../../shared/ui/index.js';
 import { FiImage, FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import useCategories from '../../../admin/hooks/categories/useCategories.js';
 import { useSellerBrands } from '../../hooks/index.js';
-import mainApi from '../../../../api/mainApi.js';
+import mainApi from '../../../../app/api/mainApi.js';
 
 const statusOptions = [
 	{ value: 'draft', label: 'Draft' },

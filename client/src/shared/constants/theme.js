@@ -60,7 +60,6 @@ export const gradients = {
 	admin: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 	seller: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
 	customer: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-	employee: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
 };
 
 export const shadows = {
@@ -130,14 +129,6 @@ export const roleThemes = {
 		bgColor: '#f0f9ff',
 		icon: '🛒',
 		title: 'My Account',
-	},
-	Employee: {
-		gradient: gradients.employee,
-		primaryColor: '#fa709a',
-		accentColor: '#fee140',
-		bgColor: '#fff7ed',
-		icon: '💼',
-		title: 'Employee Portal',
 	},
 };
 

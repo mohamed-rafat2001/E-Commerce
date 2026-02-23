@@ -23,8 +23,6 @@ export default function useLogin() {
 				navigate("/customer/dashboard");
 			} else if (userRole === "Seller") {
 				navigate("/seller/dashboard");
-			} else if (userRole === "Employee") {
-				navigate("/employee/dashboard");
 			} else if (userRole === "Admin") {
 				navigate("/admin/dashboard");
 			} else {

@@ -1,4 +1,4 @@
-import mainApi from "../../../api/mainApi.js";
+import mainApi from "../../../app/api/mainApi.js";
 
 export const getSubCategories = (params) => {
 	return mainApi.get("/subcategories", { params });

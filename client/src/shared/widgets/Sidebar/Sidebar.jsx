@@ -164,32 +164,6 @@ const roleNavigationConfig = {
 			description: 'Your saved items',
 		},
 	],
-	Employee: [
-		{
-			label: 'Dashboard',
-			path: 'dashboard',
-			icon: DashboardIcon,
-			description: 'Work overview',
-		},
-		{
-			label: 'Personal Details',
-			path: 'personalDetails',
-			icon: UserIcon,
-			description: 'Your profile',
-		},
-		{
-			label: 'Orders',
-			path: 'orders',
-			icon: OrderIcon,
-			description: 'Process orders',
-		},
-		{
-			label: 'Inventory',
-			path: 'inventory',
-			icon: InventoryIcon,
-			description: 'Stock levels',
-		},
-	],
 };
 
 // Single navigation link component
