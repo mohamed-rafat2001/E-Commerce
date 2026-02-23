@@ -10,7 +10,11 @@ import appError from "../utils/appError.js";
 // @route   GET /api/v1/brands
 // @access  Private/Seller
 export const getMyBrands = catchAsync(async (req, res, next) => {
-	const brands = await BrandModel.find({ sellerId: req.user._id });
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
+	const brands = await BrandModel.find({ sellerId: seller._id });
 	sendResponse(res, 200, brands);
 });
 
@@ -18,9 +22,13 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 // @route   GET /api/v1/brands/:id
 // @access  Private/Seller
 export const getBrand = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: req.user._id
+		sellerId: seller._id
 	});
 	
 	if (!brand) {
@@ -65,9 +73,13 @@ export const createBrand = catchAsync(async (req, res, next) => {
 // @route   PATCH /api/v1/brands/:id
 // @access  Private/Seller
 export const updateBrand = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: req.user._id
+		sellerId: seller._id
 	});
 	
 	if (!brand) {
@@ -121,9 +133,13 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 // @route   DELETE /api/v1/brands/:id
 // @access  Private/Seller
 export const deleteBrand = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: req.user._id
+		sellerId: seller._id
 	});
 	
 	if (!brand) {
@@ -147,9 +163,13 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 // @route   PATCH /api/v1/brands/:id/logo
 // @access  Private/Seller
 export const updateBrandLogo = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: req.user._id
+		sellerId: seller._id
 	});
 	
 	if (!brand) {
@@ -187,9 +207,13 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 // @route   DELETE /api/v1/brands/:id/logo
 // @access  Private/Seller
 export const deleteBrandLogo = catchAsync(async (req, res, next) => {
+	const seller = await SellerModel.findOne({ userId: req.user._id });
+	if (!seller) {
+		return next(new appError("Seller profile not found", 404));
+	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: req.user._id
+		sellerId: seller._id
 	});
 	
 	if (!brand) {

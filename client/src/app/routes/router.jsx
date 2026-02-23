@@ -167,33 +167,7 @@ const router = createBrowserRouter([
 		],
 	},
 
-	// Employee Routes
-	{
-		element: <ProtectedRoute allowedRoles={["Employee"]} />,
-		children: [
-			{
-				path: "/employee",
-				element: <DashboardLayout />,
-				children: [
-					{
-						index: true,
-						element: <EmployeeDashboardPage />,
-					},
-					{
-						path: "dashboard",
-						element: <EmployeeDashboardPage />,
-					},
-					{
-						path: "personalDetails",
-						element: <PersonalDetailsPage />,
-					},
-					{ path: "settings", element: <SettingsPage /> },
-					{ path: "orders", element: <PlaceholderPage title="Process Orders" /> },
-					{ path: "inventory", element: <PlaceholderPage title="Inventory Management" /> },
-				],
-			},
-		],
-	},
+	
 
 	// Page Not Found Route (Catch-all)
 	{
