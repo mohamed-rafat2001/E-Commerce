@@ -28,7 +28,9 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				subCategories: brand.subCategories?.map(cat => cat._id) || []
 			});
 			setImagePreview(brand.logo?.secure_url || null);
+			setCoverPreview(brand.coverImage?.secure_url || null);
 			setLogoFile(null);
+			setCoverFile(null);
 		} else {
 			setFormData({
 				name: '',
@@ -40,7 +42,9 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				subCategories: []
 			});
 			setImagePreview(null);
+			setCoverPreview(null);
 			setLogoFile(null);
+			setCoverFile(null);
 		}
 	}, [brand, isOpen]);
 	
@@ -98,6 +102,10 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 			data.append('logo', logoFile);
 		}
 
+		if (coverFile) {
+			data.append('coverImage', coverFile);
+		}
+
 		onSubmit(data, brand?._id);
 	};
 	
@@ -105,41 +113,84 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		<Modal isOpen={isOpen} onClose={onClose} title={brand ? "Edit Brand" : "Create New Brand"} size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
 				{/* Image Upload Section */}
-				<div className="flex flex-col items-center justify-center mb-6">
-					<div className="relative w-32 h-32 mb-2">
-						{imagePreview ? (
-							<div className="relative w-full h-full">
-								<img 
-									src={imagePreview} 
-									alt="Preview" 
-									className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
-								/>
-								<button
-									type="button"
-									onClick={handleRemoveImage}
-									className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
+				<div className="flex gap-4 mb-6">
+					{/* Logo Upload */}
+					<div className="flex flex-col items-center flex-1">
+						<label className="text-sm font-medium text-gray-700 mb-2">Brand Logo</label>
+						<div className="relative w-32 h-32 mb-2">
+							{imagePreview ? (
+								<div className="relative w-full h-full">
+									<img 
+										src={imagePreview} 
+										alt="Preview" 
+										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
+									/>
+									<button
+										type="button"
+										onClick={handleRemoveImage}
+										className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
+									>
+										<FiX className="w-4 h-4" />
+									</button>
+								</div>
+							) : (
+								<div 
+									onClick={() => fileInputRef.current?.click()}
+									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
 								>
-									<FiX className="w-4 h-4" />
-								</button>
-							</div>
-						) : (
-							<div 
-								onClick={() => fileInputRef.current?.click()}
-								className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
-							>
-								<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
-								<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Logo</span>
-							</div>
-						)}
-						<input 
-							type="file" 
-							ref={fileInputRef}
-							onChange={handleImageChange}
-							accept="image/*"
-							className="hidden"
-						/>
+									<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
+									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Logo</span>
+								</div>
+							)}
+							<input 
+								type="file" 
+								ref={fileInputRef}
+								onChange={handleImageChange}
+								accept="image/*"
+								className="hidden"
+							/>
+						</div>
+						<p className="text-xs text-gray-400">500x500px, Max 5MB</p>
 					</div>
-					<p className="text-xs text-gray-400">Recommended: 500x500px, Max 5MB</p>
+
+					{/* Cover Image Upload */}
+					<div className="flex flex-col items-center flex-1">
+						<label className="text-sm font-medium text-gray-700 mb-2">Cover Image (Optional)</label>
+						<div className="relative w-full h-32 mb-2">
+							{coverPreview ? (
+								<div className="relative w-full h-full">
+									<img 
+										src={coverPreview} 
+										alt="Cover Preview" 
+										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
+									/>
+									<button
+										type="button"
+										onClick={handleRemoveCoverImage}
+										className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
+									>
+										<FiX className="w-4 h-4" />
+									</button>
+								</div>
+							) : (
+								<div 
+									onClick={() => coverInputRef.current?.click()}
+									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+								>
+									<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
+									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Cover</span>
+								</div>
+							)}
+							<input 
+								type="file" 
+								ref={coverInputRef}
+								onChange={handleCoverImageChange}
+								accept="image/*"
+								className="hidden"
+							/>
+						</div>
+						<p className="text-xs text-gray-400">1200x400px, Max 5MB</p>
+					</div>
 				</div>
 
 				<div>

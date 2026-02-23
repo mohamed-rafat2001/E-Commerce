@@ -9,6 +9,9 @@ import LogoEditModal from '../components/brands/LogoEditModal.jsx';
 import { Modal, Button } from '../../../shared/ui/index.js';
 import useToast from '../../../shared/hooks/useToast.js';
 
+const DEFAULT_BRAND_LOGO = "https://placehold.co/400x400?text=No+Logo";
+const DEFAULT_PRODUCT_IMAGE = "https://placehold.co/400x400?text=No+Image";
+
 const BrandDetailsPage = () => {
     const { id } = useParams();
     const queryClient = useQueryClient();
@@ -34,12 +37,16 @@ const BrandDetailsPage = () => {
         products, 
         allProducts,
         allProductsCount, 
-        subCategories, 
         selectedSubCategory, 
         setSelectedSubCategory, 
         isLoading, 
         error 
     } = useBrandDetails();
+
+    const getBrandInitialLogo = (name) => {
+        const initial = name ? name.charAt(0).toUpperCase() : 'B';
+        return `https://placehold.co/400x400?text=${initial}`;
+    };
 
     const displayedProducts = useMemo(() => {
         let result = [...(products || [])];
@@ -78,11 +85,13 @@ const BrandDetailsPage = () => {
         const tree = {};
         const productsData = allProducts || [];
         
+        // 1. Build tree from Products
         productsData.forEach(product => {
             const cat = product.primaryCategory;
             const sub = product.subCategory;
             
-            if (!cat) return;
+            // Skip if category is not populated or invalid
+            if (!cat || typeof cat !== 'object' || !cat._id) return;
 
             if (!tree[cat._id]) {
                 tree[cat._id] = {
@@ -91,18 +100,69 @@ const BrandDetailsPage = () => {
                 };
             }
 
-            if (sub && sub._id) {
+            // Only add subcategory if populated and valid
+            if (sub && typeof sub === 'object' && sub._id) {
                 if (!tree[cat._id].subCategories[sub._id]) {
                     tree[cat._id].subCategories[sub._id] = sub;
                 }
             }
         });
 
+        // 2. Augment tree from Brand's defined SubCategories (if available)
+        if (brand) {
+            // Add Primary Category first
+            if (brand.primaryCategory && brand.primaryCategory._id) {
+                const pCat = brand.primaryCategory;
+                if (!tree[pCat._id]) {
+                    tree[pCat._id] = {
+                        _id: pCat._id,
+                        name: pCat.name,
+                        subCategories: {}
+                    };
+                }
+            }
+
+            // Add SubCategories
+            if (brand.subCategories && Array.isArray(brand.subCategories)) {
+                brand.subCategories.forEach(sub => {
+                    if (!sub || typeof sub !== 'object') return;
+
+                    let parentId, parentName;
+
+                    if (sub.categoryId && typeof sub.categoryId === 'object' && sub.categoryId._id) {
+                        // Fully populated
+                        parentId = sub.categoryId._id;
+                        parentName = sub.categoryId.name;
+                    } else if (brand.primaryCategory && brand.primaryCategory._id) {
+                        // Fallback to primary category if subcategory has no parent but brand has primary
+                        parentId = brand.primaryCategory._id;
+                        parentName = brand.primaryCategory.name;
+                    } else {
+                        // Skip if we can't determine a parent category
+                        return;
+                    }
+
+                    if (!tree[parentId]) {
+                        tree[parentId] = {
+                            _id: parentId,
+                            name: parentName,
+                            subCategories: {}
+                        };
+                    }
+
+                    // Add subcategory if not already present
+                    if (!tree[parentId].subCategories[sub._id]) {
+                        tree[parentId].subCategories[sub._id] = sub;
+                    }
+                });
+            }
+        }
+
         return Object.values(tree).map(cat => ({
             ...cat,
             subCategories: Object.values(cat.subCategories)
         }));
-    }, [allProducts]);
+    }, [allProducts, brand]);
 
     // Reset pagination when filters change
     React.useEffect(() => {
@@ -191,124 +251,133 @@ const BrandDetailsPage = () => {
     return (
         <div className="min-h-screen bg-slate-50 pb-12">
             {/* Hero Section */}
-            <div className="relative bg-white shadow-sm overflow-visible">
-                {/* Background Gradient */}
-                <div className="absolute inset-0 h-[340px] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900">
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                </div>
-                
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-0">
-                    {/* Back Button */}
-                    <Link to="/seller/brands" className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-8 py-2">
-                        <FiArrowLeft className="mr-2" /> Back to Brands
-                    </Link>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                <div className={`relative rounded-3xl overflow-hidden shadow-xl ${brand.coverImage?.secure_url ? '' : 'bg-linear-to-br from-indigo-900 via-purple-900 to-slate-900'}`}>
+                    {brand.coverImage?.secure_url && (
+                        <img 
+                            src={brand.coverImage.secure_url} 
+                            alt="Cover" 
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
+                    )}
+                    {/* Background Effects */}
+                    <div className={`absolute inset-0 ${brand.coverImage?.secure_url ? 'bg-black/40' : ''}`}></div>
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/10"></div>
+                    
+                    <div className="relative px-6 py-8 md:px-10 md:py-10">
+                        {/* Back Button */}
+                        <Link to="/seller/brands" className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-8 py-2 font-medium">
+                            <FiArrowLeft className="mr-2" /> Back to Brands
+                        </Link>
 
-                    <div className="flex flex-col md:flex-row items-start md:items-end gap-8 pt-4 pb-8">
-                        
-                        {/* Brand Logo with Actions */}
-                        <div 
-                            className="relative group cursor-pointer shrink-0 z-10"
-                            onMouseLeave={() => setIsDropdownOpen(false)}
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        >
-                            <div className="relative rounded-2xl p-1.5 bg-white shadow-2xl ring-1 ring-black/5">
-                                <img 
-                                    src={brand.logo?.secure_url || "https://via.placeholder.com/150"} 
-                                    alt={brand.name} 
-                                    className="w-32 h-32 md:w-40 md:h-40 rounded-xl object-cover bg-gray-50 border border-gray-100"
-                                />
-                                {/* Hover Overlay */}
-                                <div className="absolute inset-1.5 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                    <div className="bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-colors transform group-hover:scale-110 duration-200">
-                                        <FiEdit2 className="w-5 h-5 text-gray-900" />
+                        <div className="flex flex-col md:flex-row items-start md:items-end gap-8">
+                            
+                            {/* Brand Logo with Actions */}
+                            <div 
+                                className="relative group cursor-pointer shrink-0 z-10"
+                                onMouseLeave={() => setIsDropdownOpen(false)}
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            >
+                                <div className="relative rounded-2xl p-1.5 bg-white shadow-2xl ring-1 ring-black/5">
+                                    <img 
+                                        src={brand.logo?.secure_url || getBrandInitialLogo(brand.name)} 
+                                        alt={brand.name} 
+                                        onError={(e) => { e.target.src = getBrandInitialLogo(brand.name); }}
+                                        className="w-32 h-32 md:w-40 md:h-40 rounded-xl object-cover bg-gray-50 border border-gray-100"
+                                    />
+                                    {/* Hover Overlay */}
+                                    <div className="absolute inset-1.5 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                                        <div className="bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-colors transform group-hover:scale-110 duration-200">
+                                            <FiEdit2 className="w-5 h-5 text-gray-900" />
+                                        </div>
                                     </div>
                                 </div>
+
+                                {/* Dropdown Menu */}
+                                <AnimatePresence>
+                                    {isDropdownOpen && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute top-full left-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden ring-1 ring-black/5"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <div className="p-1">
+                                                <button 
+                                                    onClick={() => {
+                                                        setIsShowModalOpen(true);
+                                                        setIsDropdownOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-3 transition-colors"
+                                                >
+                                                    <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-md"><FiEye className="w-4 h-4" /></div>
+                                                    View Logo
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        setIsEditModalOpen(true);
+                                                        setIsDropdownOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-3 transition-colors"
+                                                >
+                                                    <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"><FiEdit2 className="w-4 h-4" /></div>
+                                                    Change Logo
+                                                </button>
+                                                {brand.logo?.secure_url && (
+                                                    <div className="border-t border-gray-100 my-1 pt-1">
+                                                        <button 
+                                                            onClick={() => {
+                                                                setIsDeleteModalOpen(true);
+                                                                setIsDropdownOpen(false);
+                                                            }}
+                                                            className="w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3 transition-colors"
+                                                        >
+                                                            <div className="p-1.5 bg-red-50 text-red-600 rounded-md"><FiTrash2 className="w-4 h-4" /></div>
+                                                            Delete Logo
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
-                            {/* Dropdown Menu */}
-                            <AnimatePresence>
-                                {isDropdownOpen && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute top-full left-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden ring-1 ring-black/5"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div className="p-1">
-                                            <button 
-                                                onClick={() => {
-                                                    setIsShowModalOpen(true);
-                                                    setIsDropdownOpen(false);
-                                                }}
-                                                className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-3 transition-colors"
-                                            >
-                                                <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-md"><FiEye className="w-4 h-4" /></div>
-                                                View Logo
-                                            </button>
-                                            <button 
-                                                onClick={() => {
-                                                    setIsEditModalOpen(true);
-                                                    setIsDropdownOpen(false);
-                                                }}
-                                                className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-3 transition-colors"
-                                            >
-                                                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"><FiEdit2 className="w-4 h-4" /></div>
-                                                Change Logo
-                                            </button>
-                                            {brand.logo?.secure_url && (
-                                                <div className="border-t border-gray-100 my-1 pt-1">
-                                                    <button 
-                                                        onClick={() => {
-                                                            setIsDeleteModalOpen(true);
-                                                            setIsDropdownOpen(false);
-                                                        }}
-                                                        className="w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3 transition-colors"
-                                                    >
-                                                        <div className="p-1.5 bg-red-50 text-red-600 rounded-md"><FiTrash2 className="w-4 h-4" /></div>
-                                                        Delete Logo
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-
-                        <div className="flex-1 text-white pb-2 min-w-0">
-                            <div className="flex flex-wrap items-center gap-3 mb-3">
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-indigo-100">
-                                    <FiTag className="mr-1.5 w-3 h-3" /> 
-                                    {brand.primaryCategory?.name || "Uncategorized"}
-                                </span>
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-100">
-                                    <FiStar className="mr-1.5 w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 
-                                    <span className="font-bold mr-1 text-white">{brand.ratingAverage || 0}</span>
-                                    <span className="text-white/60">({brand.ratingCount || 0} reviews)</span>
-                                </span>
-                            </div>
-                            
-                            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-sm">{brand.name}</h1>
-                            
-                            <div className="flex flex-wrap gap-4 text-sm font-medium text-indigo-100/90">
-                                {brand.website && (
-                                    <a href={brand.website} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
-                                        <FiGlobe className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Website
-                                        <FiExternalLink className="ml-1.5 w-3 h-3 opacity-50" />
-                                    </a>
-                                )}
-                                {brand.email && (
-                                    <a href={`mailto:${brand.email}`} className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
-                                        <FiMail className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Email
-                                    </a>
-                                )}
-                                {brand.phone && (
-                                    <a href={`tel:${brand.phone}`} className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
-                                        <FiPhone className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Phone
-                                    </a>
-                                )}
+                            <div className="flex-1 text-white pb-2 min-w-0">
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-indigo-100">
+                                        <FiTag className="mr-1.5 w-3 h-3" /> 
+                                        {brand.primaryCategory?.name || "Uncategorized"}
+                                    </span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-100">
+                                        <FiStar className="mr-1.5 w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 
+                                        <span className="font-bold mr-1 text-white">{brand.ratingAverage || 0}</span>
+                                        <span className="text-white/60">({brand.ratingCount || 0} reviews)</span>
+                                    </span>
+                                </div>
+                                
+                                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-sm">{brand.name}</h1>
+                                
+                                <div className="flex flex-wrap gap-4 text-sm font-medium text-indigo-100/90">
+                                    {brand.website && (
+                                        <a href={brand.website} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
+                                            <FiGlobe className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Website
+                                            <FiExternalLink className="ml-1.5 w-3 h-3 opacity-50" />
+                                        </a>
+                                    )}
+                                    {brand.email && (
+                                        <a href={`mailto:${brand.email}`} className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
+                                            <FiMail className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Email
+                                        </a>
+                                    )}
+                                    {brand.phone && (
+                                        <a href={`tel:${brand.phone}`} className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
+                                            <FiPhone className="mr-2 w-4 h-4 text-indigo-300 group-hover:text-white transition-colors" /> Phone
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -321,79 +390,82 @@ const BrandDetailsPage = () => {
                     {/* Main Content - Product Grid */}
                     <div className="lg:col-span-3">
                         {/* Header & Controls */}
-                        <div className="mb-8 space-y-6">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <h2 className="text-2xl font-bold text-gray-900">
-                                    {selectedSubCategory === 'all' 
-                                        ? 'All Products' 
-                                        : products.find(p => p.subCategory?._id === selectedSubCategory)?.subCategory?.name || 'Products'}
-                                </h2>
-                                <span className="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-                                    Showing <span className="text-gray-900 font-bold">{displayedProducts.length}</span> results
-                                </span>
-                            </div>
-
-                            {/* Toolbar */}
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                {/* Search */}
-                                <div className="relative flex-1">
-                                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search products..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                                    />
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-8">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <h2 className="text-xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
+                                        {selectedSubCategory === 'all' 
+                                            ? 'All Products' 
+                                            : products.find(p => p.subCategory?._id === selectedSubCategory)?.subCategory?.name || 'Products'}
+                                    </h2>
+                                    <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                        {displayedProducts.length}
+                                    </span>
                                 </div>
-                                
-                                {/* Sort */}
-                                <div className="relative min-w-[180px]">
-                                    <button
-                                        onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                                        className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                                    >
-                                        <span className="text-sm font-medium text-gray-700">
-                                            Sort: {
-                                                sortBy === 'newest' ? 'Newest' :
-                                                sortBy === 'price-asc' ? 'Price: Low to High' :
-                                                sortBy === 'price-desc' ? 'Price: High to Low' :
-                                                'Name'
-                                            }
-                                        </span>
-                                        <FiChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
-                                    </button>
+
+                                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                    {/* Search */}
+                                    <div className="relative grow sm:grow-0 sm:w-64">
+                                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search products..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-sm"
+                                        />
+                                    </div>
                                     
-                                    <AnimatePresence>
-                                        {isSortDropdownOpen && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: 10 }}
-                                                className="absolute right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-20 overflow-hidden"
-                                            >
-                                                {[
-                                                    { label: 'Newest', value: 'newest' },
-                                                    { label: 'Price: Low to High', value: 'price-asc' },
-                                                    { label: 'Price: High to Low', value: 'price-desc' },
-                                                    { label: 'Name', value: 'name-asc' }
-                                                ].map((option) => (
-                                                    <button
-                                                        key={option.value}
-                                                        onClick={() => {
-                                                            setSortBy(option.value);
-                                                            setIsSortDropdownOpen(false);
-                                                        }}
-                                                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
-                                                            sortBy === option.value ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
-                                                        }`}
-                                                    >
-                                                        {option.label}
-                                                    </button>
-                                                ))}
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                    {/* Sort */}
+                                    <div className="relative sm:w-48">
+                                        <button
+                                            onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                                            className="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm group"
+                                        >
+                                            <span className="text-gray-600 truncate mr-2">
+                                                Sort: <span className="text-gray-900 font-medium">{
+                                                    sortBy === 'newest' ? 'Newest' :
+                                                    sortBy === 'price-asc' ? 'Price: Low to High' :
+                                                    sortBy === 'price-desc' ? 'Price: High to Low' :
+                                                    'Name'
+                                                }</span>
+                                            </span>
+                                            <FiChevronDown className={`w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-transform duration-200 shrink-0 ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        
+                                        <AnimatePresence>
+                                            {isSortDropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="absolute right-0 mt-2 w-full min-w-[180px] bg-white border border-gray-100 rounded-lg shadow-lg shadow-gray-200/50 z-20 overflow-hidden py-1"
+                                                >
+                                                    {[
+                                                        { label: 'Newest', value: 'newest' },
+                                                        { label: 'Price: Low to High', value: 'price-asc' },
+                                                        { label: 'Price: High to Low', value: 'price-desc' },
+                                                        { label: 'Name', value: 'name-asc' }
+                                                    ].map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            onClick={() => {
+                                                                setSortBy(option.value);
+                                                                setIsSortDropdownOpen(false);
+                                                            }}
+                                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                                                                sortBy === option.value ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
+                                                            }`}
+                                                        >
+                                                            {option.label}
+                                                            {sortBy === option.value && <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0 ml-2"></div>}
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -411,11 +483,12 @@ const BrandDetailsPage = () => {
                                         >
                                             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 relative h-56">
                                                 <img
-                                                    src={product.coverImage?.secure_url || "https://via.placeholder.com/300"}
+                                                    src={product.coverImage?.secure_url || DEFAULT_PRODUCT_IMAGE}
                                                     alt={product.name}
+                                                    onError={(e) => { e.target.src = DEFAULT_PRODUCT_IMAGE; }}
                                                     className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                                     <Link 
                                                         to={`/seller/products/${product._id}`}
                                                         className="w-full py-2 bg-white text-gray-900 font-bold rounded-lg text-center hover:bg-indigo-50 transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300"
@@ -500,58 +573,63 @@ const BrandDetailsPage = () => {
                     {/* Sidebar - Brand Info & Filters */}
                     <div className="lg:col-span-1 space-y-6">
                         
-                        {/* Actions Card */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
-                            <a href={`mailto:${brand.email}`} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
-                                <FiMail className="w-4 h-4" /> Contact Seller
-                            </a>
-                            <button 
-                                onClick={() => {
-                                    navigator.clipboard.writeText(window.location.href);
-                                    showSuccess('Link copied to clipboard!');
-                                }}
-                                className="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
-                            >
-                                <FiShare2 className="w-4 h-4" /> Share Brand
-                            </button>
-                        </div>
-
-                        {/* Stats Card */}
+                        {/* Contact & Info Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="p-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Performance</h3>
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Brand Information</h3>
                             </div>
-                            <div className="p-2">
-                                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                    <div className="flex items-center text-gray-600">
-                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg mr-3">
-                                            <FiBox className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm font-medium">Products</span>
+                            <div className="p-4 space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0">
+                                        <FiMail className="w-4 h-4" />
                                     </div>
-                                    <span className="text-sm font-bold text-gray-900">{allProductsCount}</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                    <div className="flex items-center text-gray-600">
-                                        <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg mr-3">
-                                            <FiCalendar className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm font-medium">Joined</span>
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-medium mb-0.5">Business Email</p>
+                                        <a href={`mailto:${brand.businessEmail || brand.email}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors break-all">
+                                            {brand.businessEmail || brand.email || 'N/A'}
+                                        </a>
                                     </div>
-                                    <span className="text-sm font-bold text-gray-900">{new Date(brand.createdAt).toLocaleDateString()}</span>
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* About Card */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="p-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">About Brand</h3>
-                            </div>
-                            <div className="p-5">
-                                <p className="text-sm text-gray-600 leading-relaxed">
-                                    {brand.description || "No description provided."}
-                                </p>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0">
+                                        <FiPhone className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-medium mb-0.5">Phone Number</p>
+                                        <a href={`tel:${brand.businessPhone || brand.phone}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+                                            {brand.businessPhone || brand.phone || 'N/A'}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0">
+                                        <FiCalendar className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-medium mb-0.5">Joined Date</p>
+                                        <p className="text-sm font-medium text-gray-900">
+                                            {new Date(brand.createdAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-2">
+                                    <button 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            showSuccess('Link copied to clipboard!');
+                                        }}
+                                        className="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+                                    >
+                                        <FiShare2 className="w-4 h-4" /> Share Brand
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -581,54 +659,72 @@ const BrandDetailsPage = () => {
                                     </span>
                                 </button>
                                 
-                                {categoriesTree.map((cat) => (
-                                    <div key={cat._id} className="rounded-xl overflow-hidden">
-                                        <button
-                                            onClick={() => toggleCategory(cat._id)}
-                                            className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
-                                        >
-                                            <span className="flex items-center">
-                                                {cat.name}
-                                            </span>
-                                            <FiChevronDown 
-                                                className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                                                    expandedCategories[cat._id] ? 'rotate-180' : ''
-                                                }`} 
-                                            />
-                                        </button>
-                                        
-                                        <AnimatePresence>
-                                            {expandedCategories[cat._id] && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className="overflow-hidden bg-gray-50/50"
-                                                >
-                                                    {cat.subCategories.map((sub) => (
-                                                        <button
-                                                            key={sub._id}
-                                                            onClick={() => {
-                                                                setSelectedSubCategory(sub._id);
-                                                                setCurrentPage(1); // Reset pagination
-                                                            }}
-                                                            className={`w-full text-left pl-8 pr-3 py-2 text-sm transition-colors flex items-center gap-2 ${
-                                                                selectedSubCategory === sub._id 
-                                                                    ? 'text-indigo-600 font-semibold bg-indigo-50' 
-                                                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                                                            }`}
-                                                        >
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${
-                                                                selectedSubCategory === sub._id ? 'bg-indigo-600' : 'bg-gray-300'
-                                                            }`} />
-                                                            {sub.name}
-                                                        </button>
-                                                    ))}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                {categoriesTree.length > 0 ? (
+                                    categoriesTree.map((cat) => (
+                                        <div key={cat._id} className="rounded-xl overflow-hidden">
+                                            <button
+                                                onClick={() => toggleCategory(cat._id)}
+                                                className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
+                                            >
+                                                <span className="flex items-center">
+                                                    {cat.name}
+                                                </span>
+                                                <FiChevronDown 
+                                                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                                                        expandedCategories[cat._id] ? 'rotate-180' : ''
+                                                    }`} 
+                                                />
+                                            </button>
+                                            
+                                            <AnimatePresence>
+                                                {expandedCategories[cat._id] && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="overflow-hidden bg-gray-50/50"
+                                                    >
+                                                        {cat.subCategories.map((sub) => (
+                                                            <button
+                                                                key={sub._id}
+                                                                onClick={() => {
+                                                                    setSelectedSubCategory(sub._id);
+                                                                    setCurrentPage(1); // Reset pagination
+                                                                }}
+                                                                className={`w-full text-left pl-8 pr-3 py-2 text-sm transition-colors flex items-center gap-2 ${
+                                                                    selectedSubCategory === sub._id 
+                                                                        ? 'text-indigo-600 font-semibold bg-indigo-50' 
+                                                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                                                                }`}
+                                                            >
+                                                                <div className={`w-1.5 h-1.5 rounded-full ${
+                                                                    selectedSubCategory === sub._id ? 'bg-indigo-600' : 'bg-gray-300'
+                                                                }`} />
+                                                                {sub.name}
+                                                            </button>
+                                                        ))}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="px-3 py-4 text-center text-gray-400 text-xs">
+                                        No categories found
                                     </div>
-                                ))}
+                                )}
+                            </div>
+                        </div>
+
+                        {/* About Card */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="p-4 border-b border-gray-50 bg-gray-50/50">
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">About Brand</h3>
+                            </div>
+                            <div className="p-5">
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    {brand.description || "No description provided."}
+                                </p>
                             </div>
                         </div>
                     </div>

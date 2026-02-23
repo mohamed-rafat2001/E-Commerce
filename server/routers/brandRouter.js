@@ -31,6 +31,12 @@ router.use(Protect, restrictTo("Seller"));
  *     responses:
  *       200:
  *         description: List of brands retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Brand'
  *   post:
  *     summary: Create a new brand
  *     tags: [Brands]
@@ -61,6 +67,9 @@ router.use(Protect, restrictTo("Seller"));
  *               logo:
  *                 type: string
  *                 format: binary
+ *               coverImage:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Brand created successfully
@@ -86,6 +95,10 @@ router.route("/")
  *     responses:
  *       200:
  *         description: Brand retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Brand'
  *   patch:
  *     summary: Update a brand
  *     tags: [Brands]
@@ -100,7 +113,7 @@ router.route("/")
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -118,9 +131,19 @@ router.route("/")
  *                   type: string
  *               isActive:
  *                 type: boolean
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *               coverImage:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Brand updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Brand'
  *   delete:
  *     summary: Delete a brand
  *     tags: [Brands]

@@ -1,7 +1,7 @@
 import BrandModel from "../models/BrandModel.js";
 import SellerModel from "../models/SellerModel.js";
 import ProductModel from "../models/ProductModel.js";
-import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
+import { uploadSingleImage, uploadBrandImages, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 import cloudinary from "../utils/cloudinary.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -84,10 +84,10 @@ export const createBrand = catchAsync(async (req, res, next) => {
 	// Add sellerId to request body
 	req.body.sellerId = seller._id;
 	
-	// Handle file upload for logo
-	uploadSingleImage("logo")(req, res, async (err) => {
+	// Handle file upload for logo and cover image
+	uploadBrandImages(req, res, async (err) => {
 		if (err) {
-			return next(new appError("Error uploading logo", 400));
+			return next(new appError("Error uploading images", 400));
 		}
 		
 		setCloudinaryBody(req, res, async () => {
@@ -119,49 +119,43 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		return next(new appError("Brand not found", 404));
 	}
 	
-	// Handle logo update if provided
-	if (req.files && req.files.logo) {
-		// Delete old logo if exists
-		if (brand.logo?.public_id) {
-			try {
-				await cloudinary.uploader.destroy(brand.logo.public_id);
-			} catch (error) {
-				console.log("Error deleting old logo:", error);
-			}
+	// Handle image updates
+	uploadBrandImages(req, res, async (err) => {
+		if (err) {
+			return next(new appError("Error uploading images", 400));
 		}
 		
-		uploadSingleImage("logo")(req, res, async (err) => {
-			if (err) {
-				return next(new appError("Error uploading logo", 400));
+		setCloudinaryBody(req, res, async () => {
+			// Delete old logo if new one provided
+			if (req.body.logo && brand.logo?.public_id) {
+				try {
+					await cloudinary.uploader.destroy(brand.logo.public_id);
+				} catch (error) {
+					console.log("Error deleting old logo:", error);
+				}
 			}
+
+			// Delete old cover image if new one provided
+			if (req.body.coverImage && brand.coverImage?.public_id) {
+				try {
+					await cloudinary.uploader.destroy(brand.coverImage.public_id);
+				} catch (error) {
+					console.log("Error deleting old cover image:", error);
+				}
+			}
+
+			Object.assign(brand, req.body);
+			await brand.save();
 			
-			setCloudinaryBody(req, res, async () => {
-				Object.assign(brand, req.body);
-				brand.logo = req.body.logo;
-				await brand.save();
-				
-				await brand.populate([
-					{ path: "primaryCategory", select: "name description" },
-					{ path: "subCategories", select: "name description" },
-					{ path: "products", select: "_id" }
-				]);
-				
-				sendResponse(res, 200, brand);
-			});
+			await brand.populate([
+				{ path: "primaryCategory", select: "name description" },
+				{ path: "subCategories", select: "name description" },
+				{ path: "products", select: "_id" }
+			]);
+			
+			sendResponse(res, 200, brand);
 		});
-	} else {
-		// Update without logo
-		Object.assign(brand, req.body);
-		await brand.save();
-		
-		await brand.populate([
-			{ path: "primaryCategory", select: "name description" },
-			{ path: "subCategories", select: "name description" },
-			{ path: "products", select: "_id" }
-		]);
-		
-		sendResponse(res, 200, brand);
-	}
+	});
 });
 
 // @desc    Delete brand

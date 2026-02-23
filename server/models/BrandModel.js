@@ -22,6 +22,10 @@ const BrandSchema = new mongoose.Schema(
 			public_id: String,
 			secure_url: String,
 		},
+		coverImage: {
+			public_id: String,
+			secure_url: String,
+		},
 		website: {
 			type: String,
 			trim: true,
@@ -50,7 +54,7 @@ const BrandSchema = new mongoose.Schema(
 		},
 		subCategories: [{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "CategoryModel",
+			ref: "SubCategoryModel",
 		}],
 		ratingAverage: {
 			type: Number,
@@ -87,7 +91,11 @@ BrandSchema.index({ primaryCategory: 1 });
 // Populate middleware
 BrandSchema.pre(/^find/, function () {
 	this.populate("primaryCategory", "name description");
-	this.populate("subCategories", "name description");
+	this.populate({
+		path: "subCategories",
+		select: "name description categoryId",
+		populate: { path: "categoryId", select: "name" }
+	});
 });
 
 export default mongoose.model("BrandModel", BrandSchema);
