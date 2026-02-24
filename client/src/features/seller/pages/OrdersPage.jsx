@@ -17,7 +17,6 @@ const OrdersPage = () => {
 		orderStats,
 		error,
 		isLoading,
-		isUpdating,
 		handleUpdateStatus
 	} = useSellerOrdersPage();
 

@@ -28,6 +28,8 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		subCategory: '',
 		countInStock: 0,
 		status: 'draft',
+		visibility: 'public',
+		sizes: [],
 	});
 
 	const [coverImagePreview, setCoverImagePreview] = useState(null);
@@ -49,6 +51,8 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				subCategory: product?.subCategory?._id || product?.subCategory || '',
 				countInStock: product?.countInStock || 0,
 				status: product?.status || 'draft',
+				visibility: product?.visibility || 'public',
+				sizes: product?.sizes || [],
 			});
 			setCoverImagePreview(product?.coverImage?.secure_url || null);
 			setCoverImageFile(null);
@@ -82,6 +86,18 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		if (formErrors[name]) {
 			setFormErrors(prev => ({ ...prev, [name]: null }));
 		}
+	};
+
+	const [sizeInput, setSizeInput] = useState('');
+	const addSize = () => {
+		const val = (sizeInput || '').trim().toUpperCase();
+		if (!val) return;
+		if (formData.sizes.includes(val)) return;
+		setFormData(prev => ({ ...prev, sizes: [...prev.sizes, val] }));
+		setSizeInput('');
+	};
+	const removeSize = (value) => {
+		setFormData(prev => ({ ...prev, sizes: prev.sizes.filter(s => s !== value) }));
 	};
 
 	const handleImageSelect = (e) => {
@@ -600,12 +616,61 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				</div>
 
 				{/* Status */}
-				<Select
-					label="Product Status"
-					value={formData.status}
-					onChange={(val) => handleSelectChange('status', val)}
-					options={statusOptions}
-				/>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<Select
+						label="Product Status"
+						value={formData.status}
+						onChange={(val) => handleSelectChange('status', val)}
+						options={statusOptions}
+					/>
+					<Select
+						label="Visibility"
+						value={formData.visibility}
+						onChange={(val) => handleSelectChange('visibility', val)}
+						options={[
+							{ value: 'public', label: 'Public' },
+							{ value: 'private', label: 'Private' },
+						]}
+					/>
+				</div>
+
+				{/* Sizes */}
+				<div>
+					<label className="block text-sm font-semibold text-gray-700 mb-2">Sizes</label>
+					<div className="flex gap-2">
+						<Input
+							placeholder="e.g., S, M, L, XL"
+							value={sizeInput}
+							onChange={(e) => setSizeInput(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									addSize();
+								}
+							}}
+						/>
+						<Button type="button" variant="secondary" onClick={addSize}>
+							Add
+						</Button>
+					</div>
+					{formData.sizes.length > 0 && (
+						<div className="flex flex-wrap gap-2 mt-2">
+							{formData.sizes.map((s) => (
+								<span key={s} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+									{s}
+									<button
+										type="button"
+										onClick={() => removeSize(s)}
+										className="text-gray-400 hover:text-rose-600"
+										aria-label={`Remove ${s}`}
+									>
+										<FiX className="w-3 h-3" />
+									</button>
+								</span>
+							))}
+						</div>
+					)}
+				</div>
 
 				{/* Actions */}
 				<div className="flex gap-3 pt-4 border-t border-gray-100">

@@ -23,7 +23,7 @@ export default function useSellerProducts() {
     
     // Ensure defaults
     if (!params.page) params.page = 1;
-    if (!params.limit) params.limit = 10;
+    if (!params.limit) params.limit = 6;
     if (!params.sort) params.sort = "-createdAt";
 
     const { 

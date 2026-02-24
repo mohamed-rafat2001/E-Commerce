@@ -1,10 +1,10 @@
 import { LoadingSpinner } from '../../../shared/ui/index.js';
+import { useNavigate } from 'react-router-dom';
 import { useProductsPage } from '../hooks/index.js';
 import ProductsStats from '../components/products/ProductsStats.jsx';
 import ProductsFilter from '../components/products/ProductsFilter.jsx';
 import ProductsTable from '../components/products/ProductsTable.jsx';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
-import ProductDetailModal from '../components/products/ProductDetailModal.jsx';
 
 const ProductsPage = () => {
   const {
@@ -15,8 +15,6 @@ const ProductsPage = () => {
     setStatusFilter,
     categoryFilter,
     setCategoryFilter,
-    viewingProduct,
-    setViewingProduct,
     productToDelete,
     setProductToDelete,
     currentPage,
@@ -38,6 +36,8 @@ const ProductsPage = () => {
     handleUpdateField,
     handleConfirmDelete
   } = useProductsPage();
+
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -72,10 +72,10 @@ const ProductsPage = () => {
           categoryOptions={categoryOptions}
         />
 
-        <ProductsTable 
+      <ProductsTable 
           filteredProducts={filteredProducts}
           paginatedProducts={paginatedProducts}
-          setViewingProduct={setViewingProduct}
+        setViewingProduct={(p) => navigate(`/admin/products/${p._id}`)}
           handleUpdateField={handleUpdateField}
           setProductToDelete={setProductToDelete}
           isUpdating={isUpdating}
@@ -86,12 +86,6 @@ const ProductsPage = () => {
           setSearchQuery={setSearchQuery}
         />
       </div>
-
-      <ProductDetailModal 
-        product={viewingProduct} 
-        isOpen={!!viewingProduct} 
-        onClose={() => setViewingProduct(null)} 
-      />
 
       <DeleteConfirmModal 
         isOpen={!!productToDelete}

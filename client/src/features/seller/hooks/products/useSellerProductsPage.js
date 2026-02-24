@@ -7,7 +7,7 @@ import useDeleteProduct from '../../../product/hooks/useDeleteProduct.js';
 const useSellerProductsPage = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingProduct, setEditingProduct] = useState(null);
-	const [deletingId, setDeletingId] = useState(null);
+	const [, setDeletingId] = useState(null);
 
 	const { products, total, totalPages, isLoading, refetch } = useSellerProducts();
 
@@ -21,6 +21,14 @@ const useSellerProductsPage = () => {
 	const { deleteProduct, isDeleting } = useDeleteProduct({
 		invalidateKeys: ['seller-products']
 	});
+
+	const handleUpdateStock = (id, stock) => {
+		updateProduct({ id, product: { countInStock: stock } }, {
+			onSuccess: () => {
+				refetch();
+			}
+		});
+	};
 
 	const handleAddProduct = (data) => {
 		addProduct(data, {
@@ -91,6 +99,7 @@ const useSellerProductsPage = () => {
 		handleEdit,
 		handleCloseModal,
 		handleSubmit,
+		handleUpdateStock,
 		isCreating: isAdding,
 		isUpdating,
         isDeleting

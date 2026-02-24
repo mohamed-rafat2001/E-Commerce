@@ -101,12 +101,6 @@ const roleNavigationConfig = {
 			description: 'Manage listings',
 		},
 		{
-			label: 'Inventory',
-			path: 'inventory',
-			icon: InventoryIcon,
-			description: 'Stock management',
-		},
-		{
 			label: 'Orders',
 			path: 'orders',
 			icon: OrderIcon,

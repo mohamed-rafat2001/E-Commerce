@@ -25,6 +25,7 @@ export const addProduct = createDoc(ProductModel, [
 	"description",
 	"coverImage",
 	"images",
+	"sizes",
 ]);
 // @desc   get all products
 // @Route  GET /api/v1/products

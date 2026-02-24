@@ -4,8 +4,11 @@ import { FiSave, FiImage, FiX } from 'react-icons/fi';
 
 const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmitting }) => {
 	const fileInputRef = useRef(null);
+	const coverInputRef = useRef(null);
 	const [imagePreview, setImagePreview] = useState(null);
+	const [coverPreview, setCoverPreview] = useState(null);
 	const [logoFile, setLogoFile] = useState(null);
+	const [coverFile, setCoverFile] = useState(null);
 	const [formData, setFormData] = useState({
 		name: '',
 		description: '',
@@ -70,6 +73,26 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		setImagePreview(null);
 		if (fileInputRef.current) {
 			fileInputRef.current.value = '';
+		}
+	};
+	
+	const handleCoverImageChange = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			setCoverFile(file);
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setCoverPreview(reader.result);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const handleRemoveCoverImage = () => {
+		setCoverFile(null);
+		setCoverPreview(null);
+		if (coverInputRef.current) {
+			coverInputRef.current.value = '';
 		}
 	};
 	

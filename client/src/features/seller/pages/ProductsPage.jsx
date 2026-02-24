@@ -4,8 +4,11 @@ import { FiPlus } from 'react-icons/fi';
 import ProductFormModal from '../components/products/ProductFormModal.jsx';
 import ProductCard from '../components/products/ProductCard.jsx';
 import { useSellerProductsPage } from '../hooks/index.js';
+import StockFilterCards from '../components/products/StockFilterCards.jsx';
+import useStockFilter from '../hooks/products/useStockFilter.js';
 
 const ProductsPage = () => {
+	const { stockFilter, setStockFilter } = useStockFilter(6);
 	const {
 		// Modal state
 		isModalOpen,
@@ -23,6 +26,7 @@ const ProductsPage = () => {
 		handleEdit,
 		handleCloseModal,
 		handleSubmit,
+		handleUpdateStock,
 		isCreating,
 		isUpdating,
 	} = useSellerProductsPage();
@@ -52,6 +56,8 @@ const ProductsPage = () => {
 				}
 			/>
 
+			<StockFilterCards stockFilter={stockFilter} total={total} onFilterChange={setStockFilter} />
+
 			{/* Product Grid */}
 			{isLoading ? (
 				<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100">
@@ -66,6 +72,8 @@ const ProductsPage = () => {
 								<ProductCard
 									key={product._id}
 									product={product}
+									onUpdateStock={(id, stock) => handleUpdateStock(id, stock)}
+									isUpdating={isUpdating}
 									onEdit={() => handleEdit(product)}
 									onDelete={() => handleDeleteProduct(product._id)}
 								/>

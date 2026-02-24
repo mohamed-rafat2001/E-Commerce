@@ -8,9 +8,6 @@ export { default as useSellerBrands } from './brands/useSellerBrands.js';
 // Dashboard
 export { default as useSellerDashboardPage } from './dashboard/useSellerDashboardPage.js';
 
-// Inventory
-export { default as useSellerInventoryPage } from './inventory/useSellerInventoryPage.js';
-
 // Orders
 export { default as useSellerOrders } from './orders/useSellerOrders.js';
 export { default as useSellerOrdersPage } from './orders/useSellerOrdersPage.js';

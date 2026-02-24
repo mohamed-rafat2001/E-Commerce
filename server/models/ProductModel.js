@@ -78,6 +78,10 @@ const productSchema = new mongoose.Schema(
 			enum: ["public", "private"],
 			default: "public",
 		},
+		sizes: {
+			type: [String],
+			default: [],
+		},
 	},
 	{
 		toJSON: { virtuals: true },

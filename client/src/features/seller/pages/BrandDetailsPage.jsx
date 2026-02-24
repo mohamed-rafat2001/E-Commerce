@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiMail, FiPhone, FiGlobe, FiCalendar, FiBox, FiTag, FiArrowLeft, FiEdit2, FiTrash2, FiEye, FiMoreVertical, FiStar, FiExternalLink, FiSearch, FiShare2, FiChevronDown, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useBrandDetails from '../hooks/brands/useBrandDetails';
-import { updateBrandLogo, deleteBrandLogo } from '../services/seller.js';
+import { updateBrandLogo, deleteBrandLogo, updateBrand } from '../services/seller.js';
 import LogoEditModal from '../components/brands/LogoEditModal.jsx';
+import CoverImageEditModal from '../components/brands/CoverImageEditModal.jsx';
 import { Modal, Button } from '../../../shared/ui/index.js';
 import useToast from '../../../shared/hooks/useToast.js';
 
@@ -18,6 +19,7 @@ const BrandDetailsPage = () => {
     const { showSuccess, showError } = useToast();
     
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isCoverEditModalOpen, setIsCoverEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isShowModalOpen, setIsShowModalOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -190,6 +192,18 @@ const BrandDetailsPage = () => {
     };
 
     // Mutations
+    const uploadCoverMutation = useMutation({
+        mutationFn: ({ id, formData }) => updateBrand(id, formData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['brand', id] });
+            showSuccess('Cover image updated successfully!');
+            setIsCoverEditModalOpen(false);
+        },
+        onError: (err) => {
+            showError(err.response?.data?.message || 'Failed to update cover image');
+        }
+    });
+
     const uploadLogoMutation = useMutation({
         mutationFn: ({ id, formData }) => updateBrandLogo(id, formData),
         onSuccess: () => {
@@ -214,10 +228,16 @@ const BrandDetailsPage = () => {
         }
     });
 
-    const handleUploadLogo = (file, brandId) => {
+    const handleLogoUpload = (file, brandId) => {
         const formData = new FormData();
         formData.append('logo', file);
         uploadLogoMutation.mutate({ id: brandId, formData });
+    };
+ 
+    const handleCoverUpload = (file, brandId) => {
+        const formData = new FormData();
+        formData.append('coverImage', file);
+        uploadCoverMutation.mutate({ id: brandId, formData });
     };
 
     const handleDeleteLogo = () => {
@@ -264,6 +284,16 @@ const BrandDetailsPage = () => {
                     <div className={`absolute inset-0 ${brand.coverImage?.secure_url ? 'bg-black/40' : ''}`}></div>
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/10"></div>
+                    
+                    <div className="absolute top-4 right-4 z-20">
+                         <button
+                            onClick={() => setIsCoverEditModalOpen(true)}
+                            className="p-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all duration-200 group cursor-pointer"
+                            title="Change Cover Image"
+                         >
+                            <FiEdit2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                         </button>
+                    </div>
                     
                     <div className="relative px-6 py-8 md:px-10 md:py-10">
                         {/* Back Button */}
@@ -735,9 +765,17 @@ const BrandDetailsPage = () => {
             <LogoEditModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                onUpload={handleUploadLogo}
+                onUpload={handleLogoUpload}
                 brand={brand}
                 isUploading={uploadLogoMutation.isPending}
+            />
+
+            <CoverImageEditModal 
+                isOpen={isCoverEditModalOpen} 
+                onClose={() => setIsCoverEditModalOpen(false)} 
+                onUpload={handleCoverUpload}
+                brand={brand}
+                isUploading={uploadCoverMutation.isPending}
             />
 
             <Modal
