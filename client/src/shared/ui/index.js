@@ -19,3 +19,4 @@ export {
 } from './Spinner/Spinner.jsx';
 export { default as Pagination } from './Pagination/Pagination.jsx';
 export { default as DataHeader } from './DataHeader/DataHeader.jsx';
+export { default as Slider } from './Slider/Slider.jsx';

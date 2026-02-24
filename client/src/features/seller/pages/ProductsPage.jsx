@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button, LoadingSpinner, DataHeader, Pagination } from '../../../shared/ui/index.js';
 import { FiPlus } from 'react-icons/fi';
 import ProductFormModal from '../components/products/ProductFormModal.jsx';
-import ProductCard from '../components/products/ProductCard.jsx';
+import ProductCard from '../../product/components/ProductCard.jsx';
 import { useSellerProductsPage } from '../hooks/index.js';
 import StockFilterCards from '../components/products/StockFilterCards.jsx';
 import useStockFilter from '../hooks/products/useStockFilter.js';
@@ -72,6 +72,7 @@ const ProductsPage = () => {
 								<ProductCard
 									key={product._id}
 									product={product}
+									basePath="/seller"
 									onUpdateStock={(id, stock) => handleUpdateStock(id, stock)}
 									isUpdating={isUpdating}
 									onEdit={() => handleEdit(product)}
