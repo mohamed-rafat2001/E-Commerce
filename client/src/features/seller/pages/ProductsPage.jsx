@@ -6,9 +6,11 @@ import ProductCard from '../../product/components/ProductCard.jsx';
 import { useSellerProductsPage } from '../hooks/index.js';
 import StockFilterCards from '../components/products/StockFilterCards.jsx';
 import useStockFilter from '../hooks/products/useStockFilter.js';
+import { useStockCounts } from '../hooks/products/useStockCounts.js';
 
 const ProductsPage = () => {
 	const { stockFilter, setStockFilter } = useStockFilter(6);
+	const { stockCounts, isLoading: countsLoading } = useStockCounts();
 	const {
 		// Modal state
 		isModalOpen,
@@ -34,7 +36,7 @@ const ProductsPage = () => {
 	return (
 		<div className="space-y-6 pb-10">
 			<DataHeader 
-				title="Product Catalog 📦"
+				title="Inventory 📦"
 				description={`${total || 0} total products`}
 				searchPlaceholder="Search products by name..."
 				sortOptions={[
@@ -56,10 +58,15 @@ const ProductsPage = () => {
 				}
 			/>
 
-			<StockFilterCards stockFilter={stockFilter} total={total} onFilterChange={setStockFilter} />
+			<StockFilterCards 
+				stockFilter={stockFilter} 
+				total={total} 
+				onFilterChange={setStockFilter} 
+				stockCounts={stockCounts}
+			/>
 
 			{/* Product Grid */}
-			{isLoading ? (
+			{isLoading || countsLoading ? (
 				<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100">
 					<LoadingSpinner size="lg" color="indigo" />
 					<p className="mt-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Loading Products...</p>
@@ -72,7 +79,7 @@ const ProductsPage = () => {
 								<ProductCard
 									key={product._id}
 									product={product}
-									basePath="/seller"
+									basePath="/seller/inventory"
 									onUpdateStock={(id, stock) => handleUpdateStock(id, stock)}
 									isUpdating={isUpdating}
 									onEdit={() => handleEdit(product)}

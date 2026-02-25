@@ -26,6 +26,7 @@ export const addProduct = createDoc(ProductModel, [
 	"coverImage",
 	"images",
 	"sizes",
+	"colors",
 ]);
 // @desc   get all products
 // @Route  GET /api/v1/products
@@ -60,6 +61,10 @@ export const updateProduct = updateByOwner(ProductModel, [
 	"description",
 	"coverImage",
 	"images",
+	"sizes",
+	"colors",
+	"status",
+	"visibility",
 ]);
 
 //  @desc  delete all products

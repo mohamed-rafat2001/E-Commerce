@@ -1,6 +1,6 @@
 import { FiPackage, FiCheck, FiAlertTriangle, FiX } from 'react-icons/fi';
 
-const StockFilterCards = ({ stockFilter, total, onFilterChange }) => {
+const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) => {
 	return (
 		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 			<button
@@ -32,7 +32,7 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange }) => {
 				<div className="flex items-center justify-between">
 					<div>
 						<p className="text-sm text-gray-500 font-medium">In Stock</p>
-						<h3 className="text-2xl font-black text-gray-900 mt-1">—</h3>
+						<h3 className="text-2xl font-black text-gray-900 mt-1">{stockCounts?.in_stock || 0}</h3>
 					</div>
 					<div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
 						<FiCheck className="w-5 h-5 text-white" />
@@ -50,7 +50,7 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange }) => {
 				<div className="flex items-center justify-between">
 					<div>
 						<p className="text-sm text-gray-500 font-medium">Low Stock</p>
-						<h3 className="text-2xl font-black text-gray-900 mt-1">—</h3>
+						<h3 className="text-2xl font-black text-gray-900 mt-1">{stockCounts?.low_stock || 0}</h3>
 					</div>
 					<div className="w-10 h-10 rounded-xl bg-linear-to-br from-amber-500 to-orange-500 flex items-center justify-center">
 						<FiAlertTriangle className="w-5 h-5 text-white" />
@@ -68,7 +68,7 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange }) => {
 				<div className="flex items-center justify-between">
 					<div>
 						<p className="text-sm text-gray-500 font-medium">Out of Stock</p>
-						<h3 className="text-2xl font-black text-gray-900 mt-1">—</h3>
+						<h3 className="text-2xl font-black text-gray-900 mt-1">{stockCounts?.out_of_stock || 0}</h3>
 					</div>
 					<div className="w-10 h-10 rounded-xl bg-linear-to-br from-rose-500 to-red-500 flex items-center justify-center">
 						<FiX className="w-5 h-5 text-white" />

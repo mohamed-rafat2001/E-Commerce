@@ -19,6 +19,7 @@ export { default as useDeleteProduct } from './products/useDeleteProduct.js';
 export { default as useSellerProducts } from './products/useSellerProducts.js';
 export { default as useSellerProductsPage } from './products/useSellerProductsPage.js';
 export { default as useUpdateProduct } from './products/useUpdateProduct.js';
+export {  useStockCounts } from './products/useStockCounts.js';
 
 // Profile
 export { default as useAddPayoutMethod } from './profile/useAddPayoutMethod.js';

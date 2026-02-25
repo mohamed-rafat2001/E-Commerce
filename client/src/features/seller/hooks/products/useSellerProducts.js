@@ -16,7 +16,7 @@ export default function useSellerProducts() {
             params['countInStock[gt]'] = 0;
             params['countInStock[lte]'] = 10;
         } else if (params.stock === 'in_stock') {
-            params['countInStock[gt]'] = 10;
+            params['countInStock[gt]'] = 0; // Changed from 10 to 0 to include products with 1+ stock
         }
         delete params.stock;
     }

@@ -7,7 +7,7 @@ import useToast from "../../../shared/hooks/useToast.js";
  * @param {Object} options - Custom options
  * @param {string[]} options.invalidateKeys - Query keys to invalidate on success
  */
-export default function useAddProduct({ invalidateKeys = ["products"] } = {}) {
+export default function useAddProduct({ invalidateKeys = ["seller-products"] } = {}) {
 	const queryClient = useQueryClient();
 	const { showSuccess, showError } = useToast();
 

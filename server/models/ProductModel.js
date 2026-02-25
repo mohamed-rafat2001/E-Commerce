@@ -82,6 +82,10 @@ const productSchema = new mongoose.Schema(
 			type: [String],
 			default: [],
 		},
+		colors: {
+			type: [String],
+			default: [],
+		},
 	},
 	{
 		toJSON: { virtuals: true },

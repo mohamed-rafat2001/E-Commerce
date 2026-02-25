@@ -25,11 +25,12 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		price: '',
 		brandId: '',
 		primaryCategory: '',
-		subCategory: '',
+		subCategory: null,
 		countInStock: 0,
 		status: 'draft',
 		visibility: 'public',
 		sizes: [],
+		colors: [],
 	});
 
 	const [coverImagePreview, setCoverImagePreview] = useState(null);
@@ -48,11 +49,12 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 				price: product?.price?.amount || '',
 				brandId: product?.brandId?._id || product?.brandId || '',
 				primaryCategory: product?.primaryCategory?._id || product?.primaryCategory || '',
-				subCategory: product?.subCategory?._id || product?.subCategory || '',
+				subCategory: product?.subCategory?._id || product?.subCategory || null,
 				countInStock: product?.countInStock || 0,
 				status: product?.status || 'draft',
 				visibility: product?.visibility || 'public',
 				sizes: product?.sizes || [],
+				colors: product?.colors || [],
 			});
 			setCoverImagePreview(product?.coverImage?.secure_url || null);
 			setCoverImageFile(null);
@@ -72,6 +74,16 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		}
 	}, [product, isOpen]);
 
+	// Automatically upload all new images when they're added
+	useEffect(() => {
+		additionalImages.forEach((image, index) => {
+			// If image is not uploaded and not currently uploading, start upload
+			if (!image.uploaded && !image.isUploading && image.file) {
+				uploadAdditionalImage(index);
+			}
+		});
+	}, [additionalImages]);
+
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
@@ -82,7 +94,9 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	};
 
 	const handleSelectChange = (name, value) => {
-		setFormData(prev => ({ ...prev, [name]: value }));
+		// Convert empty string to null for subCategory
+		const processedValue = (name === 'subCategory' && value === '') ? null : value;
+		setFormData(prev => ({ ...prev, [name]: processedValue }));
 		if (formErrors[name]) {
 			setFormErrors(prev => ({ ...prev, [name]: null }));
 		}
@@ -98,6 +112,26 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	};
 	const removeSize = (value) => {
 		setFormData(prev => ({ ...prev, sizes: prev.sizes.filter(s => s !== value) }));
+	};
+
+	const [colorInput, setColorInput] = useState('');
+	const addColor = () => {
+		const val = (colorInput || '').trim();
+		if (!val) return;
+		// Validate color format (hex code or named color)
+		const isValidColor = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(val) || /^[a-zA-Z]+$/.test(val);
+		if (!isValidColor) {
+			setFormErrors(prev => ({ ...prev, colors: 'Please enter a valid color (hex code or name)' }));
+			return;
+		}
+		const normalizedColor = val.startsWith('#') ? val.toUpperCase() : val.toLowerCase();
+		if (formData.colors.includes(normalizedColor)) return;
+		setFormData(prev => ({ ...prev, colors: [...prev.colors, normalizedColor] }));
+		setColorInput('');
+		setFormErrors(prev => ({ ...prev, colors: null }));
+	};
+	const removeColor = (value) => {
+		setFormData(prev => ({ ...prev, colors: prev.colors.filter(c => c !== value) }));
 	};
 
 	const handleImageSelect = (e) => {
@@ -177,13 +211,17 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	};
 
 	const uploadAdditionalImage = async (index) => {
+		// Prevent uploading if already uploaded or currently uploading
+		const imageToUpload = additionalImages[index];
+		if (imageToUpload.uploaded || imageToUpload.isUploading || !imageToUpload.file) {
+			return;
+		}
+
 		setAdditionalImages(prev => {
 			const newImages = [...prev];
 			newImages[index] = { ...newImages[index], isUploading: true, uploadProgress: 0 };
 			return newImages;
 		});
-
-		const imageToUpload = additionalImages[index];
 		
 		try {
 			const formDataUpload = new FormData();
@@ -240,12 +278,12 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		
 		// Check if all additional images are uploaded
 		const uploadingImages = additionalImages.filter(img => img.isUploading);
-		const unuploadedImages = additionalImages.filter(img => !img.uploaded && !img.isUploading);
+		const unuploadedImages = additionalImages.filter(img => !img.uploaded && !img.isUploading && img.file);
 		
 		if (uploadingImages.length > 0) {
 			errors.additionalImages = 'Please wait for all images to finish uploading';
 		} else if (unuploadedImages.length > 0) {
-			errors.additionalImages = 'Please upload all selected images or remove them';
+			errors.additionalImages = 'Some images failed to upload. Please remove and re-add them.';
 		}
 		
 		setFormErrors(errors);
@@ -443,20 +481,6 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 												</div>
 											)}
 											
-											{/* Upload Button Overlay */}
-											{!image.isUploading && !image.uploaded && (
-												<div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-													<Button 
-														size="sm" 
-														variant="secondary"
-														onClick={() => uploadAdditionalImage(index)}
-														className="text-xs px-2 py-1"
-													>
-														Upload
-													</Button>
-												</div>
-											)}
-											
 											{/* Success Checkmark */}
 											{image.uploaded && (
 												<div className="absolute top-1 right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
@@ -572,16 +596,43 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 
 				{/* Brand Selection */}
 				<div>
-					<Select
-						label="Brand *"
-						value={formData.brandId}
-						onChange={(val) => handleSelectChange('brandId', val)}
-						options={[
-							{ value: '', label: 'Select brand...' },
-							...brandOptions
-						]}
-						loading={brandsLoading}
-					/>
+					{brands && brands.length === 0 ? (
+						<div className="border-2 border-dashed border-amber-200 rounded-xl p-6 text-center bg-amber-50">
+							<div className="flex flex-col items-center gap-3">
+								<div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+									<FiAlertCircle className="w-6 h-6 text-amber-600" />
+								</div>
+								<div>
+									<h3 className="font-semibold text-amber-800">No Brands Available</h3>
+									<p className="text-sm text-amber-600 mt-1">
+										You need to create a brand before adding products.
+									</p>
+								</div>
+								<Button 
+									variant="secondary" 
+									onClick={() => {
+										// Close current modal and open brands management
+										onClose();
+										// Navigate to brands page - you'll need to implement this navigation
+										window.location.href = '/seller/brands';
+									}}
+								>
+									Create Your First Brand
+								</Button>
+							</div>
+						</div>
+					) : (
+						<Select
+							label="Brand *"
+							value={formData.brandId}
+							onChange={(val) => handleSelectChange('brandId', val)}
+							options={[
+								{ value: '', label: 'Select brand...' },
+								...brandOptions
+							]}
+							loading={brandsLoading}
+						/>
+					)}
 					{formErrors.brandId && <p className="text-xs text-rose-500 mt-1">{formErrors.brandId}</p>}
 				</div>
 
@@ -672,20 +723,50 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 					)}
 				</div>
 
-				{/* Actions */}
-				<div className="flex gap-3 pt-4 border-t border-gray-100">
-					<Button variant="secondary" type="button" onClick={onClose} fullWidth>
-						Cancel
-					</Button>
-					<Button 
-						type="submit" 
-						loading={isLoading || isUploading} 
-						fullWidth
-						icon={isEditing ? <FiCheck className="w-4 h-4" /> : <FiImage className="w-4 h-4" />}
-					>
-						{isEditing ? 'Update Product' : 'Add Product'}
-					</Button>
+				{/* Colors */}
+				<div>
+					<label className="block text-sm font-semibold text-gray-700 mb-2">Colors</label>
+					<div className="flex gap-2">
+						<Input
+							placeholder="e.g., #FF0000 or red"
+							value={colorInput}
+							onChange={(e) => setColorInput(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									addColor();
+								}
+							}}
+						/>
+						<Button type="button" variant="secondary" onClick={addColor}>
+							Add
+						</Button>
+					</div>
+					{formErrors.colors && <p className="text-xs text-rose-500 mt-1">{formErrors.colors}</p>}
+					{formData.colors.length > 0 && (
+						<div className="flex flex-wrap gap-2 mt-2">
+							{formData.colors.map((color) => (
+								<span 
+									key={color} 
+									className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
+									style={color.startsWith('#') ? { backgroundColor: color, color: '#fff' } : undefined}
+								>
+									{color}
+									<button
+										type="button"
+										onClick={() => removeColor(color)}
+										className="text-gray-400 hover:text-rose-600"
+										aria-label={`Remove ${color}`}
+									>
+										<FiX className="w-3 h-3" />
+									</button>
+								</span>
+							))}
+						</div>
+					)}
 				</div>
+
+
 			</form>
 		</Modal>
 	);

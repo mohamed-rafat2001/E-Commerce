@@ -24,7 +24,9 @@ export default function useProductDetailPage(id) {
   }, [product]);
 
   const [thumbs, setThumbs] = useState(null);
-  const { updateProduct, isUpdating } = useUpdateProduct({ invalidateKeys: ['products', 'product'] });
+  const { updateProduct, isUpdating } = useUpdateProduct({ 
+    invalidateKeys: isSeller ? ['seller-products', 'product'] : ['products', 'product'] 
+  });
 
   const onChangeStatus = (status) => {
     if (!product?._id) return;

@@ -19,14 +19,31 @@ export const createDoc = (Model, Fields = []) =>
 				);
 		}
 		
+		// Clean up empty string values for ObjectId fields
+		if (Model.modelName === "ProductModel" && object) {
+			// Convert empty strings to null/undefined for reference fields
+			if (object.brandId === "") delete object.brandId;
+			if (object.primaryCategory === "") delete object.primaryCategory;
+			if (object.subCategory === "") delete object.subCategory;
+		}
+		
 		// Additional validation for ProductModel references
 		if (Model.modelName === "ProductModel") {
 			// Validate brand exists and belongs to seller
 			if (object.brandId) {
 				const BrandModel = mongoose.model("BrandModel");
+				const SellerModel = mongoose.model("SellerModel");
+				
+				// First find the seller associated with current user
+				const seller = await SellerModel.findOne({ userId: req.user._id });
+				if (!seller) {
+					return next(new appError("Seller profile not found", 404));
+				}
+				
+				// Then check if the brand belongs to this seller
 				const brand = await BrandModel.findOne({
 					_id: object.brandId,
-					sellerId: req.user._id
+					sellerId: seller._id
 				});
 				if (!brand) {
 					return next(new appError("Brand not found or doesn't belong to you", 404));
@@ -136,10 +153,17 @@ export const createDoc = (Model, Fields = []) =>
 
 			default:
 				const userId = req.user._id;
-				doc = await Model.create({
+				let createData = {
 					userId,
 					...object,
-				});
+				};
+				
+				// For ProductModel, we need to set the correct userId
+				if (Model.modelName === "ProductModel") {
+					createData.userId = userId;
+				}
+				
+				doc = await Model.create(createData);
 				break;
 		}
 		// check if doc created
@@ -158,14 +182,31 @@ export const updateByOwner = (Model, Fields = []) =>
 				return next(new appError("please provide valid fields to update", 400));
 		}
 		
+		// Clean up empty string values for ObjectId fields
+		if (Model.modelName === "ProductModel" && object) {
+			// Convert empty strings to null/undefined for reference fields
+			if (object.brandId === "") delete object.brandId;
+			if (object.primaryCategory === "") delete object.primaryCategory;
+			if (object.subCategory === "") delete object.subCategory;
+		}
+		
 		// Additional validation for ProductModel references on update
 		if (Model.modelName === "ProductModel" && object) {
 			// Validate brand exists and belongs to seller
 			if (object.brandId) {
 				const BrandModel = mongoose.model("BrandModel");
+				const SellerModel = mongoose.model("SellerModel");
+				
+				// First find the seller associated with current user
+				const seller = await SellerModel.findOne({ userId: req.user._id });
+				if (!seller) {
+					return next(new appError("Seller profile not found", 404));
+				}
+				
+				// Then check if the brand belongs to this seller
 				const brand = await BrandModel.findOne({
 					_id: object.brandId,
-					sellerId: req.user._id
+					sellerId: seller._id
 				});
 				if (!brand) {
 					return next(new appError("Brand not found or doesn't belong to you", 404));
@@ -329,6 +370,9 @@ export const getAllByOwner = (Model) =>
 
 		if (Model.modelName === "OrderItemsModel") {
 			filter = { sellerId: userId };
+		} else if (Model.modelName === "ProductModel") {
+			// For ProductModel, filter by userId directly
+			filter = { userId };
 		} else {
 			filter = { userId };
 		}

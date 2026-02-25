@@ -95,8 +95,8 @@ const roleNavigationConfig = {
 			description: 'Manage your brands',
 		},
 		{
-			label: 'My Products',
-			path: 'products',
+			label: 'Inventory',
+			path: 'inventory',
 			icon: ProductIcon,
 			description: 'Manage listings',
 		},

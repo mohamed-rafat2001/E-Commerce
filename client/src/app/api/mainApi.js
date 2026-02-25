@@ -32,9 +32,9 @@ mainApi.interceptors.response.use(
 				// Retry the original request
 				return mainApi(originalRequest);
 			} catch (refreshError) {
-				// If refresh also fails, clear state and redirect to login
-				// This part depends on your auth state management, 
-				// but at minimum we should reject the promise
+				if (typeof window !== "undefined") {
+					window.location.href = "/login";
+				}
 				return Promise.reject(refreshError);
 			}
 		}
