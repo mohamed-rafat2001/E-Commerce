@@ -246,24 +246,33 @@ const BrandDetailsPage = () => {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center min-h-[60vh]"
+            >
+                <div className="relative">
+                    <LoadingSpinner size="lg" color="indigo" />
+                    <div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
+                </div>
+                <p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Brand Details...</p>
+            </motion.div>
         );
     }
 
-    if (error) {
+    if (error || !brand) {
         return (
-            <div className="flex justify-center items-center h-screen text-red-500">
-                Error loading brand details: {error.message}
-            </div>
-        );
-    }
-
-    if (!brand) {
-        return (
-            <div className="flex justify-center items-center h-screen text-gray-500">
-                Brand not found
+            <div className="flex flex-col justify-center items-center min-h-[60vh] text-center px-4">
+                <div className="w-24 h-24 bg-rose-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-rose-100">
+                    <FiEye className="w-10 h-10 text-rose-400" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Brand Not Found</h3>
+                <p className="text-gray-500 font-medium max-w-sm mb-6">
+                    {error?.message || "The brand you are looking for doesn't exist or you don't have access to it."}
+                </p>
+                <Link to="/seller/brands" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 font-bold rounded-xl transition-all shadow-sm">
+                    <FiArrowLeft className="w-4 h-4" /> Back to Brands
+                </Link>
             </div>
         );
     }
@@ -272,7 +281,7 @@ const BrandDetailsPage = () => {
         <div className="min-h-screen bg-slate-50 pb-12">
             {/* Hero Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                <div className={`relative rounded-3xl overflow-hidden shadow-xl ${brand.coverImage?.secure_url ? '' : 'bg-linear-to-br from-indigo-900 via-purple-900 to-slate-900'}`}>
+                <div className={`relative rounded-3xl overflow-hidden shadow-xl ${brand.coverImage?.secure_url ? '' : 'bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900'}`}>
                     {brand.coverImage?.secure_url && (
                         <img 
                             src={brand.coverImage.secure_url} 
@@ -283,7 +292,7 @@ const BrandDetailsPage = () => {
                     {/* Background Effects */}
                     <div className={`absolute inset-0 ${brand.coverImage?.secure_url ? 'bg-black/40' : ''}`}></div>
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
                     
                     <div className="absolute top-4 right-4 z-20">
                          <button
@@ -509,7 +518,8 @@ const BrandDetailsPage = () => {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.3 }}
-                                            className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full"
+                                            className="bg-white rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full"
+                                            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)' }}
                                         >
                                             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 relative h-56">
                                                 <img
@@ -518,7 +528,7 @@ const BrandDetailsPage = () => {
                                                     onError={(e) => { e.target.src = DEFAULT_PRODUCT_IMAGE; }}
                                                     className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                                                 />
-                                                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                                     <Link 
                                                         to={`/seller/products/${product._id}`}
                                                         className="w-full py-2 bg-white text-gray-900 font-bold rounded-lg text-center hover:bg-indigo-50 transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300"

@@ -21,7 +21,8 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 	<motion.div
 		initial={{ opacity: 0, y: 20 }}
 		animate={{ opacity: 1, y: 0 }}
-		className="bg-white rounded-2xl border border-gray-100 hover:shadow-xl hover:border-indigo-100 transition-all duration-300 overflow-hidden group/card"
+		className="bg-white rounded-3xl border border-gray-100 transition-all duration-300 overflow-hidden group/card hover:shadow-lg"
+		style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)' }}
 	>
 		<div className="p-4">
 			<div className="flex items-start justify-between mb-3">
@@ -35,7 +36,7 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 								crossOrigin="anonymous"
 							/>
 						) : (
-							<div className="w-14 h-14 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-md group-hover:scale-105 transition-transform duration-300">
+							<div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-indigo-200/50 group-hover:scale-105 transition-transform duration-300">
 								{brand.name?.[0]?.toUpperCase() || 'B'}
 							</div>
 						)}
@@ -132,31 +133,28 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 			<Link to={`/seller/brands/${brand._id}`} className="flex-1">
 				<Button 
 					variant="outline" 
-					className="w-full justify-center text-sm"
-					size="sm"
+					className="w-full justify-center text-sm font-bold shadow-sm"
 					icon={<FiExternalLink className="w-4 h-4" />}
 				>
-					View Details
+					Details
 				</Button>
 			</Link>
 			<div className="flex gap-2">
 				<Button 
 					variant="ghost" 
-					size="sm"
-					className="w-10 h-10 p-0 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50"
+					className="w-10 h-10 p-0 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-indigo-50"
 					onClick={() => onEdit(brand)}
 					title="Edit Brand"
 				>
-					<FiEdit2 className="w-6 h-6" />
+					<FiEdit2 className="w-5 h-5 mx-auto" />
 				</Button>
 				<Button 
 					variant="ghost" 
-					size="sm"
-					className="w-10 h-10 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50"
+					className="w-10 h-10 p-0 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50"
 					onClick={() => onDelete(brand._id)}
 					title="Delete Brand"
 				>
-					<FiTrash2 className="w-6 h-6" />
+					<FiTrash2 className="w-5 h-5 mx-auto" />
 				</Button>
 			</div>
 		</div>

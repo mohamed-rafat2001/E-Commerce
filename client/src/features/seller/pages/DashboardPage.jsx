@@ -1,4 +1,5 @@
-import { Card, LoadingSpinner } from '../../../shared/ui/index.js';
+import { motion } from 'framer-motion';
+import { LoadingSpinner } from '../../../shared/ui/index.js';
 import WelcomeHeader from '../components/dashboard/WelcomeHeader.jsx';
 import AlertsBanner from '../components/dashboard/AlertsBanner.jsx';
 import StatsGrid from '../components/dashboard/StatsGrid.jsx';
@@ -17,17 +18,24 @@ const DashboardPage = () => {
 	} = useSellerDashboardPage();
 
 	return (
-		<div className="space-y-8 pb-12">
+		<div className="space-y-6 pb-10">
 			{/* Welcome Header */}
 			<WelcomeHeader />
 
 			{/* Stats/Quick Overview */}
 			{isLoading ? (
-				<Card variant="elevated" className="py-16">
-					<div className="flex flex-col items-center justify-center">
-						<LoadingSpinner size="lg" message="Loading your dashboard..." />
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100"
+					style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+				>
+					<div className="relative">
+						<LoadingSpinner size="lg" color="indigo" />
+						<div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
 					</div>
-				</Card>
+					<p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Dashboard...</p>
+				</motion.div>
 			) : (
 				<>
 					{/* Alerts Banner */}

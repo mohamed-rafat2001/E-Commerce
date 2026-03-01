@@ -99,10 +99,18 @@ const AnalyticsPage = () => {
 			</div>
 
 			{isLoading ? (
-				<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100">
-					<LoadingSpinner size="lg" color="indigo" />
-					<p className="mt-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Loading Analytics...</p>
-				</div>
+				<motion.div 
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100"
+					style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+				>
+					<div className="relative">
+						<LoadingSpinner size="lg" color="indigo" />
+						<div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
+					</div>
+					<p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Analytics...</p>
+				</motion.div>
 			) : (
 				<>
 					{/* Main Stats Grid */}

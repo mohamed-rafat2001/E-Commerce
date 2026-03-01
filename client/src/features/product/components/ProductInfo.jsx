@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Badge, Button, Select, Input } from '../../../shared/ui/index.js';
-import { FiTag, FiLayers, FiBox, FiStar, FiSave, FiGlobe, FiMail, FiPhone, FiAward, FiShield } from 'react-icons/fi';
+import { FiLayers, FiStar, FiSave, FiGlobe, FiMail, FiPhone, FiShield, FiTag, FiShoppingBag } from 'react-icons/fi';
 
 const statusOptions = [
   { value: 'draft', label: 'Draft' },
@@ -29,250 +29,217 @@ const ProductInfo = ({
   const showLimitedCount = (basePath === '/customer' || basePath === '/') && (product.countInStock > 0 && product.countInStock < 6);
 
   return (
-    <div className="space-y-8">
-      {/* Product Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-        <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">{product.name}</h1>
-        
-        <div className="flex flex-wrap items-center gap-3 mb-6">
+    <div className="space-y-8 lg:max-w-xl">
+      {/* Product Headline */}
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100/80">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           {product.brandId?.name && (
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold">
+            <Badge variant="secondary" className="px-3 py-1 font-bold tracking-wide uppercase text-[10px]">
               {product.brandId.name}
             </Badge>
           )}
           {product.primaryCategory?.name && (
-            <Badge variant="info" className="px-4 py-2 text-sm font-semibold">
+            <Badge variant="info" className="px-3 py-1 font-bold tracking-wide uppercase text-[10px]">
               {product.primaryCategory.name}
             </Badge>
           )}
-          {product.subCategory?.name && (
-            <Badge variant="warning" className="px-4 py-2 text-sm font-semibold">
-              {product.subCategory.name}
-            </Badge>
+          {isSeller && (
+            <>
+              <Badge 
+                variant={product.status === 'active' ? 'success' : product.status === 'draft' ? 'warning' : 'secondary'}
+                className="px-3 py-1 font-bold tracking-wide uppercase text-[10px]"
+              >
+                {product.status}
+              </Badge>
+              <Badge variant="outline" className="px-3 py-1 font-bold tracking-wide uppercase text-[10px]">
+                {product.visibility}
+              </Badge>
+            </>
           )}
-          <Badge 
-            variant={product.status === 'active' ? 'success' : product.status === 'draft' ? 'warning' : 'secondary'}
-            className="px-4 py-2 text-sm font-semibold"
-          >
-            {product.status}
-          </Badge>
-          <Badge className="px-4 py-2 text-sm font-semibold">
-            {product.visibility}
-          </Badge>
         </div>
 
-        <div className="flex flex-wrap items-baseline gap-6">
+        <h1 className="text-3xl lg:text-4xl font-black text-gray-900 mb-6 leading-tight tracking-tight">
+          {product.name}
+        </h1>
+
+        {product.ratingAverage > 0 && (
+          <div className="flex items-center gap-3 mb-6 bg-amber-50/50 w-fit px-4 py-2 rounded-xl border border-amber-100">
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <FiStar 
+                  key={i} 
+                  className={`w-4 h-4 ${i < Math.floor(product.ratingAverage) ? 'fill-amber-400 text-amber-400' : 'fill-transparent text-gray-300'}`} 
+                />
+              ))}
+            </div>
+            <span className="font-bold text-gray-900 text-sm">
+              {product.ratingAverage.toFixed(1)}
+              <span className="text-gray-500 font-medium ml-1">({product.ratingCount} reviews)</span>
+            </span>
+          </div>
+        )}
+
+        {/* Price & Stock Container */}
+        <div className="flex items-end justify-between border-t border-gray-100 pt-6">
           <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-black text-indigo-600">
+            <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
               ${product.price?.amount?.toFixed(2) || '0.00'}
             </span>
             {product.price?.oldAmount && (
-              <span className="text-xl text-gray-400 line-through">
+              <span className="text-lg font-bold text-gray-400 line-through decoration-gray-300">
                 ${product.price.oldAmount.toFixed(2)}
               </span>
             )}
           </div>
           
-          <div className="flex items-center gap-4">
-            <span className={`text-lg font-bold px-4 py-2 rounded-full ${
-              product.countInStock > 0 
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                : 'bg-rose-50 text-rose-700 border border-rose-200'
-            }`}>
+          <div className={`px-4 py-2 rounded-xl flex items-center gap-2 border shadow-sm ${
+            product.countInStock > 0 
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-100/50' 
+              : 'bg-rose-50 text-rose-700 border-rose-200 shadow-rose-100/50'
+          }`}>
+            <FiShoppingBag className="w-4 h-4" />
+            <span className="text-sm font-bold">
               {product.countInStock > 0
                 ? (isPrivileged
                     ? `${product.countInStock} in stock`
-                    : (showLimitedCount ? `Only ${product.countInStock} left` : 'Available'))
+                    : (showLimitedCount ? `Only ${product.countInStock} left` : 'In Stock'))
                 : (isPrivileged ? 'Out of stock' : 'Not available')}
             </span>
-            
-            {product.ratingAverage > 0 && (
-              <div className="flex items-center gap-2">
-                <div className="flex text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <svg 
-                      key={i} 
-                      className={`w-5 h-5 ${i < Math.floor(product.ratingAverage) ? 'fill-current' : 'fill-gray-300'}`} 
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-gray-600 font-medium">
-                  {product.ratingAverage.toFixed(1)} ({product.ratingCount})
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Product Features */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Array.isArray(product.sizes) && product.sizes.length > 0 && (
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiLayers className="w-5 h-5 text-indigo-500" />
-              Available Sizes
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {product.sizes.map(s => (
-                <span key={s} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-800 text-sm font-semibold rounded-full border border-gray-200 transition-colors">
-                  {s}
-                </span>
-              ))}
+      {/* Product Variants (Sizes/Colors) */}
+      {((Array.isArray(product.sizes) && product.sizes.length > 0) || (Array.isArray(product.colors) && product.colors.length > 0)) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Array.isArray(product.sizes) && product.sizes.length > 0 && (
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-sm font-black text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <FiLayers className="w-4 h-4 text-indigo-400" />
+                Select Size
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map(s => (
+                  <button key={s} className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 font-bold rounded-xl border-2 border-gray-200 hover:border-indigo-400 hover:text-indigo-600 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500">
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {Array.isArray(product.colors) && product.colors.length > 0 && (
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiAward className="w-5 h-5 text-indigo-500" />
-              Available Colors
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {product.colors.map(color => (
-                <div key={color} className="flex items-center gap-2">
-                  <div 
-                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-110 transition-transform"
+          {Array.isArray(product.colors) && product.colors.length > 0 && (
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-sm font-black text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <FiTag className="w-4 h-4 text-rose-400" />
+                Select Color
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {product.colors.map(color => (
+                  <button 
+                    key={color} 
+                    className="w-10 h-10 rounded-full border-[3px] border-white shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
                     style={{ backgroundColor: color }}
                     title={color}
+                    aria-label={`Select color ${color}`}
                   />
-                  <span className="text-sm font-medium text-gray-700">{color}</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
-      {/* Brand Section */}
-      {product.brandId && (
-        <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
-            Brand Information
-          </h3>
-          <div className="flex flex-col lg:flex-row gap-8">
-            {product.brandId.logo?.secure_url && (
-              <div className="flex-shrink-0">
-                <img 
-                  src={product.brandId.logo.secure_url} 
-                  alt={product.brandId.name}
-                  className="w-24 h-24 rounded-2xl object-contain border border-gray-200 shadow-md"
-                  crossOrigin="anonymous"
+      {/* Seller Controls */}
+      {isSeller && (
+        <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-3xl p-1 overflow-hidden shadow-2xl">
+          <div className="bg-white rounded-[1.4rem] p-6 lg:p-8">
+            <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-6 flex items-center gap-3 tracking-tight">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center border border-indigo-100">
+                <FiShield className="w-4 h-4 text-indigo-600" />
+              </div>
+              Seller Management
+            </h3>
+            
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  label="Listing Status"
+                  value={product.status}
+                  onChange={(val) => onChangeStatus && onChangeStatus(val)}
+                  options={statusOptions}
+                />
+                <Select
+                  label="Visibility"
+                  value={product.visibility}
+                  onChange={(val) => onChangeVisibility && onChangeVisibility(val)}
+                  options={visibilityOptions}
                 />
               </div>
-            )}
-            <div className="flex-1">
-              <h4 className="text-2xl font-bold text-gray-900 mb-3">{product.brandId.name}</h4>
-              {product.brandId.description && (
-                <p className="text-gray-600 mb-6 leading-relaxed">{product.brandId.description}</p>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                {product.brandId.website && (
-                  <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-xl">
-                    <FiGlobe className="w-5 h-5 text-indigo-500" />
-                    <a 
-                      href={product.brandId.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
-                    >
-                      Visit Website
-                    </a>
-                  </div>
-                )}
-                {product.brandId.businessEmail && (
-                  <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-xl">
-                    <FiMail className="w-5 h-5 text-indigo-500" />
-                    <a 
-                      href={`mailto:${product.brandId.businessEmail}`}
-                      className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
-                    >
-                      {product.brandId.businessEmail}
-                    </a>
-                  </div>
-                )}
-                {product.brandId.businessPhone && (
-                  <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-xl">
-                    <FiPhone className="w-5 h-5 text-indigo-500" />
-                    <span className="font-medium">{product.brandId.businessPhone}</span>
-                  </div>
-                )}
-              </div>
-              {product.brandId.ratingAverage > 0 && (
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <svg 
-                          key={i} 
-                          className={`w-5 h-5 ${i < Math.floor(product.brandId.ratingAverage) ? 'text-amber-400' : 'text-gray-300'}`} 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-lg font-bold text-gray-800">
-                      {product.brandId.ratingAverage.toFixed(1)} 
-                      <span className="text-gray-500 font-normal"> ({product.brandId.ratingCount} reviews)</span>
-                    </span>
-                  </div>
+              
+              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Inventory Adjust</label>
+                <div className="flex gap-3">
+                  <Input 
+                    type="number" 
+                    value={stockVal} 
+                    onChange={(e) => setStockVal(e.target.value)} 
+                    min="0"
+                    className="flex-1 !bg-white"
+                  />
+                  <Button 
+                    onClick={() => onUpdateStock && onUpdateStock(parseInt(stockVal) || 0)}
+                    loading={isUpdating}
+                    icon={<FiSave className="w-4 h-4" />}
+                    className="px-6 bg-gradient-to-r from-indigo-600 to-purple-600"
+                  >
+                    Update
+                  </Button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Seller Actions */}
-      {isSeller && (
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 border border-indigo-100">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <FiShield className="w-6 h-6 text-indigo-600" />
-            Seller Controls
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <Select
-                label="Status"
-                value={product.status}
-                onChange={(val) => onChangeStatus && onChangeStatus(val)}
-                options={statusOptions}
+      {/* Brand Section */}
+      {product.brandId && (
+        <div className="bg-gray-50 rounded-3xl p-6 border border-gray-200/60">
+          <div className="flex gap-5">
+            {product.brandId.logo?.secure_url ? (
+              <img 
+                src={product.brandId.logo.secure_url} 
+                alt={product.brandId.name}
+                className="w-20 h-20 rounded-2xl object-cover bg-white border border-gray-200 shadow-sm shrink-0"
+                crossOrigin="anonymous"
               />
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <Select
-                label="Visibility"
-                value={product.visibility}
-                onChange={(val) => onChangeVisibility && onChangeVisibility(val)}
-                options={visibilityOptions}
-              />
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Stock Management</label>
-              <div className="flex gap-3">
-                <Input 
-                  type="number" 
-                  value={stockVal} 
-                  onChange={(e) => setStockVal(e.target.value)} 
-                  min="0"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={() => onUpdateStock && onUpdateStock(parseInt(stockVal) || 0)}
-                  loading={isUpdating}
-                  icon={<FiSave className="w-4 h-4" />}
-                  className="px-4"
-                >
-                  Save
-                </Button>
+            ) : (
+              <div className="w-20 h-20 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0">
+                <span className="text-2xl font-black text-gray-300 select-none">B</span>
+              </div>
+            )}
+            <div className="flex-1">
+              <h4 className="text-lg font-black text-gray-900 mb-1 tracking-tight">{product.brandId.name}</h4>
+              <p className="text-sm text-gray-500 font-medium line-clamp-2 leading-relaxed mb-3">
+                {product.brandId.description || "Official brand store."}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                {product.brandId.website && (
+                  <a href={product.brandId.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <FiGlobe className="w-3.5 h-3.5" /> Website
+                  </a>
+                )}
+                {product.brandId.businessEmail && (
+                  <a href={`mailto:${product.brandId.businessEmail}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-indigo-600 transition-colors">
+                    <FiMail className="w-3.5 h-3.5" /> Email Contact
+                  </a>
+                )}
+                {product.brandId.businessPhone && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600">
+                    <FiPhone className="w-3.5 h-3.5" /> {product.brandId.businessPhone}
+                  </span>
+                )}
               </div>
             </div>
           </div>

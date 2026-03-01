@@ -14,13 +14,15 @@ const StatusBreakdownCard = ({ statusBreakdown }) => {
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="bg-white rounded-2xl p-6 border border-gray-100"
+			className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm"
 		>
-			<h3 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-				<FiShoppingBag className="w-5 h-5 text-indigo-500" />
+			<h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3 tracking-tight">
+				<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-200/50">
+					<FiShoppingBag className="w-5 h-5 text-white" />
+				</div>
 				Order Breakdown
 			</h3>
-			<div className="space-y-4">
+			<div className="space-y-5">
 				{statusConfig.map(({ key, color, icon, label }) => {
 					const StatusIconComponent = icon;
 					const count = statusBreakdown[key] || 0;

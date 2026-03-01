@@ -42,8 +42,12 @@ const BrandsManagementPage = () => {
 	
 	if (loading) {
 		return (
-			<div className="flex justify-center items-center py-20">
-				<LoadingSpinner />
+			<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100 max-w-7xl mx-auto my-8" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+				<div className="relative">
+					<LoadingSpinner size="lg" color="indigo" />
+					<div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
+				</div>
+				<p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Brands...</p>
 			</div>
 		);
 	}

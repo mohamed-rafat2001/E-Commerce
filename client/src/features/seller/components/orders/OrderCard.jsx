@@ -42,34 +42,35 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: -20 }}
-			className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+			className="bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300"
+			style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)' }}
 		>
 			<div 
-				className="p-6 cursor-pointer"
+				className="p-6 cursor-pointer group hover:bg-gray-50/50 transition-colors"
 				onClick={() => setIsExpanded(!isExpanded)}
 			>
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div className="flex items-center gap-4">
-						<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${statusConfig[order.status]?.gradient} flex items-center justify-center`}>
-							<StatusIcon className="w-6 h-6 text-white" />
+						<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${statusConfig[order.status]?.gradient} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform`}>
+							<StatusIcon className="w-5 h-5 text-white" />
 						</div>
 						<div>
-							<h3 className="font-bold text-gray-900">{order.id}</h3>
-							<p className="text-sm text-gray-500">{order.customer.name} • {new Date(order.date).toLocaleDateString()}</p>
+							<h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors tracking-tight">#{order.id?.slice(-8).toUpperCase()}</h3>
+							<p className="text-sm text-gray-500 font-medium">{order.customer.name} • {new Date(order.date).toLocaleDateString()}</p>
 						</div>
 					</div>
 					
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-6">
 						<div className="text-right">
-							<p className="text-2xl font-bold text-gray-900">${order.total.toFixed(2)}</p>
-							<p className="text-sm text-gray-500">{order.items.length} item{order.items.length > 1 ? 's' : ''}</p>
+							<p className="text-2xl font-black text-gray-900 tabular-nums">${order.total.toFixed(2)}</p>
+							<p className="text-xs font-bold text-gray-400 tracking-wider uppercase">{order.items.length} item{order.items.length > 1 ? 's' : ''}</p>
 						</div>
-						<span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border ${statusConfig[order.status]?.color}`}>
-							<StatusIcon className="w-4 h-4" />
+						<span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${statusConfig[order.status]?.color}`}>
+							<StatusIcon className="w-3.5 h-3.5" />
 							{order.status}
 						</span>
-						<button className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-							{isExpanded ? <FiChevronUp className="w-5 h-5 text-gray-400" /> : <FiChevronDown className="w-5 h-5 text-gray-400" />}
+						<button className="p-2.5 hover:bg-white border hover:border-gray-200 border-transparent rounded-xl transition-all shadow-sm hover:shadow-md">
+							{isExpanded ? <FiChevronUp className="w-5 h-5 text-gray-500" /> : <FiChevronDown className="w-5 h-5 text-gray-400" />}
 						</button>
 					</div>
 				</div>
@@ -114,13 +115,13 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 								</div>
 							</div>
 
-							<div className="flex justify-end gap-3">
+							<div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
 								{order.status !== 'Delivered' && order.status !== 'Cancelled' && (
 									<>
 										{order.status === 'Pending' && (
 											<Button 
 												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Processing'); }}
-												className="bg-blue-600 hover:bg-blue-700 text-white"
+												className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-lg shadow-blue-200"
 											>
 												Mark as Processing
 											</Button>
@@ -128,7 +129,7 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 										{order.status === 'Processing' && (
 											<Button 
 												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Shipped'); }}
-												className="bg-purple-600 hover:bg-purple-700 text-white"
+												className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-200"
 											>
 												Mark as Shipped
 											</Button>
@@ -136,7 +137,7 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 										{order.status === 'Shipped' && (
 											<Button 
 												onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'Delivered'); }}
-												className="bg-emerald-600 hover:bg-emerald-700 text-white"
+												className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-200"
 											>
 												Mark as Delivered
 											</Button>
