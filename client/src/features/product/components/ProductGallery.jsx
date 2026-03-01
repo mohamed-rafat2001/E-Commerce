@@ -20,7 +20,7 @@ const ProductGallery = ({ gallery, enableZoom = true }) => {
       />
       
       {/* Floating Image Count Badge */}
-      <div className="absolute top-6 left-6 z-10">
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
         <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/50 shadow-lg shadow-black/5 flex items-center gap-2 group/badge hover:bg-white transition-all duration-300">
           <FiCamera className="w-3.5 h-3.5 text-indigo-600 group-hover/badge:scale-110 transition-transform" />
           <span className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-900">

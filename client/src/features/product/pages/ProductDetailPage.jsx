@@ -59,8 +59,8 @@ export default function ProductDetailPage() {
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-50/20 rounded-full blur-[100px] -ml-72 -mb-72 pointer-events-none" />
 
       <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 relative z-10">
-        {/* Minimal Navigation */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16">
+        {/* Responsive Navigation */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16">
           <button 
             onClick={() => navigate(isSeller ? '/seller/inventory' : basePath)}
             className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors"
@@ -69,11 +69,11 @@ export default function ProductDetailPage() {
             Go Back
           </button>
           
-          <div className="hidden md:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest text-gray-300">
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 text-[10px] font-black uppercase tracking-widest text-gray-300">
             <span className="text-indigo-600">Product Detail</span>
-            <div className="w-8 h-px bg-gray-100" />
+            <div className="w-6 lg:w-8 h-px bg-gray-100" />
             <span>Specifications</span>
-            <div className="w-8 h-px bg-gray-100" />
+            <div className="w-6 lg:w-8 h-px bg-gray-100" />
             <span>Review Matrix</span>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-50 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-gray-100/50 shadow-sm"
+              className="bg-gray-50 rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-gray-100/50 shadow-sm"
             >
               <ProductGallery gallery={gallery} enableZoom={true} />
             </motion.div>
@@ -110,16 +110,16 @@ export default function ProductDetailPage() {
               />
               
               {!isSeller && (
-                <div className="flex flex-col sm:flex-row gap-4 pt-12 border-t border-gray-100">
-                  <button className="flex-[3] bg-gray-900 text-white font-black py-5 md:py-6 rounded-2xl hover:bg-indigo-600 transition-all active:scale-[0.98] shadow-xl shadow-gray-200">
+                <div className="flex flex-col xs:flex-row gap-3 md:gap-4 pt-8 md:pt-12 border-t border-gray-100">
+                  <button className="flex-[3] bg-gray-900 text-white font-black py-4 md:py-6 rounded-xl md:rounded-2xl hover:bg-indigo-600 transition-all active:scale-[0.98] shadow-xl shadow-gray-200 uppercase tracking-widest text-[11px] md:text-sm">
                     INITIALIZE PURCHASE
                   </button>
-                  <div className="flex gap-4">
-                    <button className="flex-1 sm:w-20 h-16 md:h-20 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
-                      <FiHeart className="w-6 h-6" />
+                  <div className="flex gap-3 md:gap-4">
+                    <button className="flex-1 xs:w-16 md:w-20 h-14 md:h-20 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
+                      <FiHeart className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
-                    <button className="flex-1 sm:w-20 h-16 md:h-20 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all sm:hidden">
-                      <FiShare2 className="w-6 h-6" />
+                    <button className="flex-1 xs:w-16 md:w-20 h-14 md:h-20 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all xs:hidden sm:flex">
+                      <FiShare2 className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                   </div>
                 </div>

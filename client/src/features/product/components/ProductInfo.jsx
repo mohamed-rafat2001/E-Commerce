@@ -56,7 +56,7 @@ const ProductInfo = ({
           <span className="text-gray-400">{product.primaryCategory?.name}</span>
         </div>
         
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight tracking-tight">
+        <h1 className="text-2xl xs:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight tracking-tight">
           {product.name}
         </h1>
         
@@ -74,12 +74,12 @@ const ProductInfo = ({
 
       {/* Price & Badge */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-baseline gap-3 md:gap-4">
-          <span className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
+        <div className="flex items-baseline flex-wrap gap-2 md:gap-4">
+          <span className="text-2xl xs:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
             ${product.price?.amount?.toFixed(2)}
           </span>
           {product.price?.oldAmount && (
-            <span className="text-base md:text-lg font-bold text-gray-300 line-through decoration-rose-500/20">
+            <span className="text-sm md:text-lg font-bold text-gray-300 line-through decoration-rose-500/20">
               ${product.price.oldAmount.toFixed(2)}
             </span>
           )}
@@ -94,7 +94,7 @@ const ProductInfo = ({
 
       {/* Integrated Tabs */}
       <div className="border-t border-gray-100 pt-8 md:pt-10">
-        <div className="flex gap-6 md:gap-8 border-b border-gray-50 mb-8 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-6 md:gap-8 border-b border-gray-50 mb-8 overflow-x-auto no-scrollbar">
            {tabs.map(tab => (
              <button
                key={tab.id}
@@ -131,7 +131,7 @@ const ProductInfo = ({
                  initial={{ opacity: 0, y: 10 }}
                  animate={{ opacity: 1, y: 0 }}
                  exit={{ opacity: 0, y: -10 }}
-                 className="grid grid-cols-2 gap-y-6 md:gap-y-8 gap-x-8 md:gap-x-12"
+                 className="grid grid-cols-1 xs:grid-cols-2 gap-y-6 md:gap-y-8 gap-x-8 md:gap-x-12"
                >
                  <SpecItem label="Asset ID" value={product._id?.slice(-8).toUpperCase()} />
                  <SpecItem label="Category" value={product.primaryCategory?.name} />
