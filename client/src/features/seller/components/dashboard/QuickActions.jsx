@@ -4,15 +4,6 @@ import { FiPlus, FiShoppingBag, FiArchive, FiArrowRight } from 'react-icons/fi';
 
 const quickActions = [
 	{
-		icon: FiPlus,
-		title: 'Add Product',
-		to: '/seller/products',
-		gradient: 'from-indigo-500 to-purple-600',
-		shadow: 'shadow-indigo-200/50',
-		hoverBorder: 'hover:border-indigo-200',
-		description: 'Create a new product listing',
-	},
-	{
 		icon: FiShoppingBag,
 		title: 'View Orders',
 		to: '/seller/orders',
