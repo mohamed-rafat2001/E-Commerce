@@ -53,10 +53,14 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-50/30 rounded-full blur-[120px] -mr-96 -mt-96 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-50/20 rounded-full blur-[100px] -ml-72 -mb-72 pointer-events-none" />
+
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 relative z-10">
         {/* Minimal Navigation */}
-        <div className="flex items-center justify-between mb-16">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16">
           <button 
             onClick={() => navigate(isSeller ? '/seller/inventory' : basePath)}
             className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors"
@@ -65,7 +69,7 @@ export default function ProductDetailPage() {
             Go Back
           </button>
           
-          <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-widest text-gray-300">
+          <div className="hidden md:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest text-gray-300">
             <span className="text-indigo-600">Product Detail</span>
             <div className="w-8 h-px bg-gray-100" />
             <span>Specifications</span>
@@ -74,19 +78,19 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24">
           {/* Visual Column */}
-          <div className="lg:col-span-7 space-y-12">
+          <div className="lg:col-span-7 space-y-8 md:space-y-12">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-50 rounded-[3rem] overflow-hidden border border-gray-100/50"
+              className="bg-gray-50 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-gray-100/50 shadow-sm"
             >
               <ProductGallery gallery={gallery} enableZoom={true} />
             </motion.div>
             
             {/* Minimal Trust Line */}
-            <div className="flex items-center justify-center gap-12 py-8 border-y border-gray-50">
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 py-6 md:py-8 border-y border-gray-50">
                <TrustNode icon={FiShield} label="Secured" />
                <TrustNode icon={FiRefreshCw} label="Exchangeable" />
                <TrustNode icon={FiZap} label="Express" />
@@ -94,11 +98,10 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Info Column */}
-          <div className="lg:col-span-12 xl:col-span-5">
-            <div className="lg:sticky lg:top-12">
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-12 space-y-12">
               <ProductInfo 
                 product={product} 
-                basePath={basePath} 
                 isSeller={isSeller}
                 isUpdating={isUpdating}
                 onChangeStatus={onChangeStatus}
@@ -107,13 +110,18 @@ export default function ProductDetailPage() {
               />
               
               {!isSeller && (
-                <div className="flex gap-4 mt-12 pt-12 border-t border-gray-100">
-                  <button className="flex-1 bg-gray-900 text-white font-black py-6 rounded-2xl hover:bg-indigo-600 transition-all active:scale-[0.98]">
+                <div className="flex flex-col sm:flex-row gap-4 pt-12 border-t border-gray-100">
+                  <button className="flex-[3] bg-gray-900 text-white font-black py-5 md:py-6 rounded-2xl hover:bg-indigo-600 transition-all active:scale-[0.98] shadow-xl shadow-gray-200">
                     INITIALIZE PURCHASE
                   </button>
-                  <button className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
-                    <FiHeart className="w-6 h-6" />
-                  </button>
+                  <div className="flex gap-4">
+                    <button className="flex-1 sm:w-20 h-16 md:h-20 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
+                      <FiHeart className="w-6 h-6" />
+                    </button>
+                    <button className="flex-1 sm:w-20 h-16 md:h-20 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all sm:hidden">
+                      <FiShare2 className="w-6 h-6" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
