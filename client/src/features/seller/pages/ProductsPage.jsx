@@ -31,6 +31,7 @@ const ProductsPage = () => {
 		handleUpdateStock,
 		isCreating,
 		isUpdating,
+		isDeleting
 	} = useSellerProductsPage();
 
 	return (
@@ -97,6 +98,7 @@ const ProductsPage = () => {
 										isUpdating={isUpdating}
 										onEdit={() => handleEdit(product)}
 										onDelete={() => handleDeleteProduct(product._id)}
+										isDeleting={isDeleting}
 									/>
 								</motion.div>
 							))}

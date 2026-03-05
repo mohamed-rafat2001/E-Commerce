@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner, Badge, Button } from '../../../shared/ui/index.js';
+import toast from 'react-hot-toast';
 import {
     FiArrowLeft,
     FiActivity,
@@ -14,7 +15,9 @@ import {
     FiCheckCircle,
     FiClock,
     FiPackage,
-    FiMoreHorizontal
+    FiMoreHorizontal,
+    FiShare2,
+    FiCopy
 } from 'react-icons/fi';
 import ProductGallery from '../../product/components/ProductGallery.jsx';
 import useProductDetailPage from '../../product/hooks/useProductDetailPage.js';
@@ -125,45 +128,57 @@ export default function SellerProductDetailPage() {
                                     <ProductGallery gallery={gallery} />
                                 </div>
 
-                                <div className="p-10 md:p-14 lg:p-16 flex flex-col justify-center">
+                                <div className="p-10 md:p-14 lg:p-16 flex flex-col justify-center bg-linear-to-br from-white to-indigo-50/20">
                                     <div className="mb-auto space-y-6">
                                         <div className="flex flex-wrap items-center gap-2.5">
-                                            <Badge className="bg-indigo-50 text-indigo-600 border-none px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-full">
+                                            <Badge className="bg-indigo-600 text-white border-none px-4 py-1.5 font-black text-[9px] uppercase tracking-[0.15em] rounded-lg shadow-lg shadow-indigo-200">
                                                 {product.brandId?.name || "Premium Brand"}
                                             </Badge>
-                                            <Badge className="bg-emerald-50 text-emerald-600 border-none px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-full">
+                                            <Badge className={`border-none px-4 py-1.5 font-black text-[9px] uppercase tracking-[0.15em] rounded-lg shadow-sm ${product.status === 'active' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+                                                }`}>
                                                 {product.status}
                                             </Badge>
                                         </div>
 
-                                        <h2 className="text-4xl lg:text-5xl font-black text-gray-900 leading-[1.1] tracking-tighter">
+                                        <h2 className="text-4xl lg:text-6xl font-black text-gray-900 leading-[0.95] tracking-tighter">
                                             {product.name}
                                         </h2>
 
-                                        <div className="p-6 rounded-3xl bg-gray-50/50 border border-gray-100/50 italic text-gray-500 leading-relaxed font-medium text-lg relative group/desc">
-                                            <span className="absolute -top-3 left-6 px-3 bg-white text-[10px] font-black text-gray-300 uppercase tracking-widest border border-gray-100 rounded-full">Vision</span>
-                                            "{product.description}"
+                                        <div className="p-8 rounded-[2rem] bg-indigo-950 text-indigo-100/80 leading-relaxed font-medium text-lg relative group/desc shadow-2xl overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full" />
+                                            <span className="absolute -top-3 left-8 px-4 py-1 bg-indigo-600 text-[9px] font-black text-white uppercase tracking-[0.2em] rounded-full shadow-lg">Vision Narrative</span>
+                                            <p className="relative z-10 italic">
+                                                "{product.description}"
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div className="mt-14 pt-10 border-t border-gray-100">
                                         <div className="flex items-center justify-between">
-                                            <div className="space-y-1">
-                                                <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.25em]">Market Value</p>
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-5xl font-black text-gray-900 tracking-tighter italic">
-                                                        ${product.price?.amount?.toFixed(2)}
+                                            <div className="space-y-1.5">
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Retail Valuation</p>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter flex items-center">
+                                                        <span className="text-2xl text-indigo-500 mr-1">$</span>
+                                                        {product.price?.amount?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </span>
-                                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">USD</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">USD</span>
+                                                        <span className="text-[10px] font-black text-emerald-500 uppercase">Gross Profit Ratio</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className="text-right space-y-2">
-                                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-2xl">
-                                                    <FiPackage className="w-4 h-4 text-indigo-400" />
-                                                    <span className="text-2xl font-black tracking-tighter leading-none">{product.countInStock}</span>
+                                            <div className="text-right">
+                                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gray-900 text-white rounded-2xl shadow-xl shadow-gray-200">
+                                                    <div className="w-8 h-8 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                                                        <FiPackage className="w-4 h-4 text-indigo-400" />
+                                                    </div>
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-2xl font-black tracking-tighter leading-none">{product.countInStock}</span>
+                                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Available Assets</span>
+                                                    </div>
                                                 </div>
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-1">Units In Warehouse</p>
                                             </div>
                                         </div>
                                     </div>
@@ -212,31 +227,54 @@ export default function SellerProductDetailPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-white p-1 pb-1 rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-                                <div className="grid grid-cols-2 md:grid-cols-3 divide-x divide-y divide-gray-50">
+                            <div className="bg-white p-1 pb-1 rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden group/blueprint">
+                                <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y divide-gray-50">
                                     <DataPoint label="Product UUID" value={product._id} />
                                     <DataPoint label="Global Slug" value={product.slug} copyable />
                                     <DataPoint label="Brand Partner" value={product.brandId?.name} link={`/seller/brands/${product.brandId?._id}`} />
-                                    <DataPoint label="Base Category" value={product.primaryCategory?.name} />
+                                    <DataPoint label="Primary Vert." value={product.primaryCategory?.name} />
                                     <DataPoint label="Sub Hierarchy" value={product.subCategory?.name || 'Unassigned'} />
                                     <DataPoint label="Visibility" value={product.visibility} uppercase />
-                                    <DataPoint label="Color Range" value={`${product.colors?.length || 0} variations`} />
-                                    <DataPoint label="Size Options" value={`${product.sizes?.length || 0} variations`} />
-                                    <DataPoint label="Price Currency" value="USD / Universal" />
+                                    <DataPoint label="Color Palette" value={product.colors?.length > 0 ? `${product.colors.length} Variants` : 'N/A'} />
+                                    <DataPoint label="Size Matrix" value={product.sizes?.length > 0 ? `${product.sizes.length} Variants` : 'N/A'} />
                                 </div>
                             </div>
                         </section>
 
                         {/* Description & Story */}
-                        <section className="bg-white p-12 rounded-[3.5rem] border border-gray-100">
-                            <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                                <div className="w-2 h-8 bg-indigo-600 rounded-full" />
-                                Long-form Description
-                            </h3>
-                            <div className="prose prose-indigo max-w-none">
-                                <p className="text-gray-500 text-lg leading-relaxed font-medium">
+                        <section className="bg-white p-16 rounded-[4rem] border border-gray-100 shadow-sm relative overflow-hidden group/story">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+                            <div className="flex items-center justify-between mb-10">
+                                <h3 className="text-3xl font-black text-gray-900 flex items-center gap-4 tracking-tighter">
+                                    <div className="w-1.5 h-10 bg-indigo-600 rounded-full shadow-lg shadow-indigo-100" />
+                                    The Narrative
+                                </h3>
+                                <Badge className="bg-gray-50 text-gray-400 border-gray-100 px-4 py-2 font-black text-[9px] uppercase tracking-widest rounded-xl">
+                                    Public Copy
+                                </Badge>
+                            </div>
+
+                            <div className="prose prose-indigo prose-lg max-w-none">
+                                <p className="text-gray-500 text-xl leading-relaxed font-medium first-letter:text-6xl first-letter:font-black first-letter:text-indigo-600 first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]">
                                     {product.description}
                                 </p>
+                            </div>
+
+                            <div className="mt-12 pt-8 border-t border-gray-50 flex items-center justify-between">
+                                <div className="flex items-center gap-8">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Character Count</span>
+                                        <span className="font-bold text-gray-900">{product.description?.length || 0}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tone Analysis</span>
+                                        <span className="font-bold text-emerald-600">Professional</span>
+                                    </div>
+                                </div>
+                                <button className="text-[11px] font-black text-indigo-600 uppercase tracking-widest hover:translate-x-1 transition-transform flex items-center gap-2">
+                                    Edit Narrative <FiChevronRight />
+                                </button>
                             </div>
                         </section>
                     </div>
@@ -252,12 +290,30 @@ export default function SellerProductDetailPage() {
                         />
 
                         {/* Quick Actions Panel */}
-                        <div className="bg-white p-10 rounded-[2.75rem] border border-gray-100 shadow-sm space-y-6">
-                            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Quick Actions</h4>
-                            <div className="space-y-3">
-                                <ActionBtn icon={FiEye} label="View as Customer" onClick={() => window.open(`/products/${product._id}`, '_blank')} />
-                                <ActionBtn icon={FiExternalLink} label="Share Asset Publicly" />
-                                <ActionBtn icon={FiActivity} label="Analyze Sales Data" />
+                        <div className="bg-indigo-950 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group/actions">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full" />
+                            <h4 className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.3em] mb-8 px-1">Engagement Hub</h4>
+                            <div className="space-y-3 relative z-10">
+                                <ActionBtn
+                                    icon={FiEye}
+                                    label="View Public Listing"
+                                    onClick={() => window.open(`/products/${product._id}`, '_blank')}
+                                    className="!bg-white/5 !text-white hover:!bg-white hover:!text-indigo-950 !border-white/5"
+                                />
+                                <ActionBtn
+                                    icon={FiShare2}
+                                    label="Share Asset Link"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${window.location.origin}/products/${product._id}`);
+                                        toast.success('Public link copied!');
+                                    }}
+                                    className="!bg-white/5 !text-white hover:!bg-white hover:!text-indigo-950 !border-white/5"
+                                />
+                                <ActionBtn
+                                    icon={FiActivity}
+                                    label="Real-time Metrics"
+                                    className="!bg-indigo-600 !text-white hover:!bg-indigo-500 !border-none !shadow-lg shadow-indigo-900/50"
+                                />
                             </div>
                         </div>
                     </aside>
@@ -276,45 +332,74 @@ const PerformanceStat = ({ title, value, subtitle, icon: Icon, color, trend }) =
     };
 
     return (
-        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:border-gray-200 transition-all group relative overflow-hidden">
+        <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all group relative overflow-hidden"
+        >
             <div className={`w-14 h-14 rounded-2xl ${colors[color]} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                 <Icon className="w-6 h-6" />
             </div>
             <div>
                 <div className="flex items-center justify-between mb-1">
                     <p className="text-3xl font-black text-gray-900 tracking-tighter leading-none">{value}</p>
-                    {trend && <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">{trend}</span>}
+                    {trend && (
+                        <span className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                            <FiTrendingUp className="w-3 h-3" />
+                            {trend}
+                        </span>
+                    )}
                 </div>
                 <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest mb-1">{title}</p>
                 <p className="text-xs font-bold text-gray-400">{subtitle}</p>
             </div>
-        </div>
+            <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500/5 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity`} />
+        </motion.div>
     );
 };
 
 const DataPoint = ({ label, value, copyable, uppercase, link }) => {
     const navigate = useNavigate();
     return (
-        <div className="p-8 hover:bg-gray-50/50 transition-colors">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{label}</p>
-            <div className="flex items-center gap-2">
-                <p className={`text-sm font-black text-gray-900 leading-tight ${uppercase ? 'uppercase' : ''} ${link ? 'text-indigo-600 hover:underline cursor-pointer' : ''}`} onClick={() => link && navigate(link)}>
-                    {value || 'N/A'}
+        <div className="p-8 hover:bg-indigo-50/50 transition-all duration-300 group/point border-b border-r last:border-b-0 last:border-r-0 border-gray-50">
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 group-hover/point:text-indigo-500 transition-colors">
+                {label}
+            </p>
+            <div className="flex items-center justify-between gap-3">
+                <p
+                    className={`text-sm font-black text-gray-900 leading-tight truncate ${uppercase ? 'uppercase' : ''} ${link ? 'text-indigo-600 hover:text-indigo-700 cursor-pointer decoration-indigo-200 underline-offset-4 hover:underline' : ''
+                        }`}
+                    onClick={() => link && navigate(link)}
+                    title={value}
+                >
+                    {value || 'Not Specified'}
                 </p>
-                {copyable && <button className="text-gray-300 hover:text-indigo-600 transition-colors"><FiMoreHorizontal /></button>}
+                {copyable && value && (
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(value);
+                            toast.success('Copied to clipboard');
+                        }}
+                        className="p-1.5 rounded-lg text-gray-300 hover:text-indigo-600 hover:bg-white hover:shadow-lg hover:shadow-indigo-100 transition-all opacity-0 group-hover/point:opacity-100 cursor-pointer"
+                        title="Copy to clipboard"
+                    >
+                        <FiCopy className="w-3.5 h-3.5" />
+                    </button>
+                )}
             </div>
         </div>
     );
 };
 
-const ActionBtn = ({ icon: Icon, label, onClick }) => (
+const ActionBtn = ({ icon: Icon, label, onClick, className }) => (
     <button
         onClick={onClick}
-        className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-indigo-600 hover:text-white group transition-all"
+        className={`w-full flex items-center justify-between p-5 rounded-2xl bg-gray-50 hover:bg-indigo-600 hover:text-white group transition-all border border-transparent ${className}`}
     >
-        <div className="flex items-center gap-3">
-            <Icon className="w-4 h-4 text-gray-400 group-hover:text-white" />
-            <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
+        <div className="flex items-center gap-4">
+            <div className="w-8 h-8 rounded-lg bg-current/10 flex items-center justify-center">
+                <Icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+            </div>
+            <span className="text-[11px] font-black uppercase tracking-[0.15em]">{label}</span>
         </div>
         <FiChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
     </button>

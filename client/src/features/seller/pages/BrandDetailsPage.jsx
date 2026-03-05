@@ -8,7 +8,10 @@ import { updateBrandLogo, deleteBrandLogo, updateBrand } from '../services/selle
 import LogoEditModal from '../components/brands/LogoEditModal.jsx';
 import CoverImageEditModal from '../components/brands/CoverImageEditModal.jsx';
 import { Modal, Button, LoadingSpinner } from '../../../shared/ui/index.js';
+import ProductCard from '../../product/components/ProductCard.jsx';
 import useToast from '../../../shared/hooks/useToast.js';
+import { useUpdateProduct, useDeleteProduct } from '../hooks/index.js';
+import ProductFormModal from '../components/products/ProductFormModal.jsx';
 
 const DEFAULT_BRAND_LOGO = "https://placehold.co/400x400?text=No+Logo";
 const DEFAULT_PRODUCT_IMAGE = "https://placehold.co/400x400?text=No+Image";
@@ -26,6 +29,8 @@ const BrandDetailsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('newest');
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+    const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +53,40 @@ const BrandDetailsPage = () => {
     const getBrandInitialLogo = (name) => {
         const initial = name ? name.charAt(0).toUpperCase() : 'B';
         return `https://placehold.co/400x400?text=${initial}`;
+    };
+
+    // Product Actions
+    const { updateProduct, isUpdating } = useUpdateProduct({
+        invalidateKeys: ['brand', id, 'products']
+    });
+    const { deleteProduct, isDeleting } = useDeleteProduct({
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['brand', id] });
+            showSuccess('Product deleted successfully');
+        }
+    });
+
+    const handleUpdateStock = (productId, stock) => {
+        updateProduct({ id: productId, product: { countInStock: stock } });
+    };
+
+    const handleEditProduct = (product) => {
+        setEditingProduct(product);
+        setIsEditProductModalOpen(true);
+    };
+
+    const handleUpdateProduct = (data) => {
+        updateProduct({ id: editingProduct._id, product: data }, {
+            onSuccess: () => {
+                showSuccess('Product updated successfully!');
+                setIsEditProductModalOpen(false);
+                setEditingProduct(null);
+                queryClient.invalidateQueries({ queryKey: ['brand', id] });
+            },
+            onError: (err) => {
+                showError(err.response?.data?.message || 'Failed to update product');
+            }
+        });
     };
 
     const displayedProducts = useMemo(() => {
@@ -510,56 +549,28 @@ const BrandDetailsPage = () => {
 
                         {paginatedProducts.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {paginatedProducts.map((product) => (
-                                        <motion.div
-                                            key={product._id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="bg-white rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full"
-                                            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)' }}
-                                        >
-                                            <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 relative h-56">
-                                                <img
-                                                    src={product.coverImage?.secure_url || DEFAULT_PRODUCT_IMAGE}
-                                                    alt={product.name}
-                                                    onError={(e) => { e.target.src = DEFAULT_PRODUCT_IMAGE; }}
-                                                    className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                                <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <AnimatePresence mode="popLayout">
+                                        {paginatedProducts.map((product, i) => (
+                                            <motion.div
+                                                key={product._id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.3, delay: i * 0.05 }}
+                                            >
+                                                <ProductCard
+                                                    product={product}
+                                                    basePath="/seller/inventory"
+                                                    onUpdateStock={handleUpdateStock}
+                                                    isUpdating={isUpdating}
+                                                    onEdit={handleEditProduct}
+                                                    onDelete={(id) => deleteProduct(id)}
+                                                    isDeleting={isDeleting}
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                                    <Link
-                                                        to={`/seller/products/${product._id}`}
-                                                        className="w-full py-2 bg-white text-gray-900 font-bold rounded-lg text-center hover:bg-indigo-50 transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300"
-                                                    >
-                                                        View Details
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                            <div className="p-5 flex flex-col flex-1">
-                                                <div className="flex-1">
-                                                    <p className="text-xs font-semibold text-indigo-600 mb-2 uppercase tracking-wide">
-                                                        {product.subCategory?.name}
-                                                    </p>
-                                                    <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
-                                                        <Link to={`/seller/products/${product._id}`}>
-                                                            {product.name}
-                                                        </Link>
-                                                    </h3>
-                                                </div>
-                                                <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-                                                    <p className="text-xl font-extrabold text-gray-900">
-                                                        ${product.price?.amount || 0}
-                                                    </p>
-                                                    <div className="flex items-center text-xs text-gray-500 font-medium">
-                                                        <FiStar className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
-                                                        4.5
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </motion.div>
 
                                 {/* Pagination Controls */}
                                 {totalPages > 1 && (
@@ -577,8 +588,8 @@ const BrandDetailsPage = () => {
                                                 key={page}
                                                 onClick={() => handlePageChange(page)}
                                                 className={`w-10 h-10 rounded-lg font-medium transition-colors ${currentPage === page
-                                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                                                        : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                                                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 {page}
@@ -682,14 +693,14 @@ const BrandDetailsPage = () => {
                                 <button
                                     onClick={() => setSelectedSubCategory('all')}
                                     className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between group ${selectedSubCategory === 'all'
-                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                         }`}
                                 >
                                     <span>All Products</span>
                                     <span className={`text-xs py-0.5 px-2 rounded-full ${selectedSubCategory === 'all'
-                                            ? 'bg-white/20 text-white'
-                                            : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
                                         }`}>
                                         {allProductsCount}
                                     </span>
@@ -727,8 +738,8 @@ const BrandDetailsPage = () => {
                                                                     setCurrentPage(1); // Reset pagination
                                                                 }}
                                                                 className={`w-full text-left pl-8 pr-3 py-2 text-sm transition-colors flex items-center gap-2 ${selectedSubCategory === sub._id
-                                                                        ? 'text-indigo-600 font-semibold bg-indigo-50'
-                                                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                                                                    ? 'text-indigo-600 font-semibold bg-indigo-50'
+                                                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                                                                     }`}
                                                             >
                                                                 <div className={`w-1.5 h-1.5 rounded-full ${selectedSubCategory === sub._id ? 'bg-indigo-600' : 'bg-gray-300'
@@ -765,6 +776,16 @@ const BrandDetailsPage = () => {
             </div>
 
             {/* Modals */}
+            <ProductFormModal
+                isOpen={isEditProductModalOpen}
+                onClose={() => {
+                    setIsEditProductModalOpen(false);
+                    setEditingProduct(null);
+                }}
+                onSubmit={handleUpdateProduct}
+                product={editingProduct}
+                isLoading={isUpdating}
+            />
             <LogoEditModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}

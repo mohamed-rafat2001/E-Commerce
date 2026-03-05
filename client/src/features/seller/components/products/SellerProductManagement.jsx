@@ -45,24 +45,24 @@ export default function SellerProductManagement({
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-[#0b0c10] rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden group"
+                className="bg-gray-900 rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden group border border-gray-800"
             >
                 {/* Dynamic Glow Background */}
                 <div className="absolute top-[-20%] left-[-20%] w-[150%] h-[150%] bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/10 opacity-40 blur-[100px] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
 
                 <div className="flex items-center justify-between mb-12 relative z-10">
                     <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-[1.5rem] bg-gradient-to-tr from-indigo-600 to-indigo-400 p-px">
-                            <div className="w-full h-full bg-[#0b0c10] rounded-[1.4rem] flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-[1.5rem] bg-gradient-to-tr from-indigo-600 to-indigo-400 p-px shadow-lg shadow-indigo-500/20">
+                            <div className="w-full h-full bg-gray-900 rounded-[1.4rem] flex items-center justify-center">
                                 <FiLayers className="w-6 h-6 text-indigo-400" />
                             </div>
                         </div>
                         <div>
-                            <h3 className="font-black text-2xl tracking-tight leading-none">Operations</h3>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1.5 opacity-60 italic">Cloud Synchronized</p>
+                            <h3 className="font-black text-2xl tracking-tight leading-none text-white">Operations</h3>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 px-1 border-l-2 border-indigo-500/50">Live Syncing</p>
                         </div>
                     </div>
-                    <div className="relative">
+                    <div className="relative group/ping">
                         <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping absolute inset-0 opacity-40" />
                         <div className="w-3 h-3 bg-emerald-500 rounded-full relative" />
                     </div>
@@ -70,57 +70,69 @@ export default function SellerProductManagement({
 
                 <div className="space-y-10 relative z-10">
                     <div className="grid grid-cols-1 gap-8">
-                        <ControlGroup label="Asset Status">
+                        <ControlGroup label="Status Pipeline">
                             <Select
                                 value={product.status}
                                 onChange={onChangeStatus}
                                 options={statusOptions}
-                                className="!bg-white/5 !border-white/10 !h-16 !text-sm font-black rounded-2xl focus:!border-indigo-500/50 transition-all !px-6"
+                                className="!bg-white/5 !border-white/10 !h-16 !text-sm font-black rounded-2xl focus:!border-indigo-500 transition-all !px-6 hover:bg-white/10"
                             />
                         </ControlGroup>
 
-                        <ControlGroup label="Consumer Reach">
+                        <ControlGroup label="Visibility Mode">
                             <Select
                                 value={product.visibility}
                                 onChange={onChangeVisibility}
                                 options={visibilityOptions}
-                                className="!bg-white/5 !border-white/10 !h-16 !text-sm font-black rounded-2xl focus:!border-indigo-500/50 transition-all !px-6"
+                                className="!bg-white/5 !border-white/10 !h-16 !text-sm font-black rounded-2xl focus:!border-indigo-500 transition-all !px-6 hover:bg-white/10"
                             />
                         </ControlGroup>
                     </div>
 
                     <div className="pt-6 border-t border-white/5">
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             <div className="flex justify-between items-end px-1">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Live Stock</label>
-                                    <p className="text-sm font-black text-indigo-400 tracking-tight leading-none">Inventory Vault</p>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Stock Reservoir</label>
+                                    <p className="text-sm font-black text-indigo-400 tracking-tight leading-none">Global Availability</p>
                                 </div>
-                                {stockVal < 10 && (
+                                {stockVal < 6 ? (
                                     <motion.span
-                                        animate={{ opacity: [1, 0.5, 1] }}
+                                        animate={{ opacity: [1, 0.5, 1], scale: [1, 0.95, 1] }}
                                         transition={{ repeat: Infinity, duration: 2 }}
-                                        className="flex items-center gap-2 text-rose-400 text-[10px] font-black uppercase tracking-widest bg-rose-500/10 px-3 py-1.5 rounded-full border border-rose-500/20"
+                                        className="flex items-center gap-2 text-rose-400 text-[9px] font-black uppercase tracking-widest bg-rose-500/10 px-3 py-1.5 rounded-full border border-rose-500/20"
                                     >
-                                        <FiAlertCircle className="w-3.5 h-3.5" /> Depleted
+                                        <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" /> Critical Alert
                                     </motion.span>
+                                ) : (
+                                    <span className="flex items-center gap-2 text-emerald-400 text-[9px] font-black uppercase tracking-widest bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
+                                        <FiCheck className="w-3.5 h-3.5" /> Optimal
+                                    </span>
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5 shadow-inner">
+                            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5 shadow-inner group/stock">
                                 <Input
                                     type="number"
                                     value={stockVal}
                                     onChange={(e) => setStockVal(e.target.value)}
-                                    className="!bg-transparent !border-none !text-white text-center font-black !text-4xl !h-16 !rounded-xl flex-1 focus:!ring-0"
+                                    className="!bg-transparent !border-none !text-white text-center font-black !text-4xl !h-16 !rounded-xl flex-1 focus:!ring-0 transition-transform group-hover/stock:scale-105"
                                 />
                                 <div className="w-px h-12 bg-white/10" />
                                 <button
-                                    onClick={() => onUpdateStock(parseInt(stockVal))}
-                                    disabled={isUpdating}
-                                    className="bg-indigo-600 text-white font-black px-8 h-12 rounded-xl text-[11px] uppercase tracking-widest hover:bg-indigo-500 transition-all active:scale-95 disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/20"
+                                    onClick={() => {
+                                        const val = parseInt(stockVal);
+                                        if (!isNaN(val)) onUpdateStock(val);
+                                    }}
+                                    disabled={isUpdating || stockVal === ''}
+                                    className="bg-indigo-600 text-white font-black px-8 h-12 rounded-xl text-[11px] uppercase tracking-widest hover:bg-indigo-500 transition-all active:scale-95 disabled:opacity-50 hover:shadow-2xl hover:shadow-indigo-500/40 relative overflow-hidden group/sync"
                                 >
-                                    {isUpdating ? <LoadingSpinner size="sm" color="white" /> : 'Sync'}
+                                    {isUpdating ? <LoadingSpinner size="sm" color="white" /> : (
+                                        <div className="flex items-center gap-2">
+                                            <FiSave className="w-4 h-4 group-hover/sync:scale-110 transition-transform" />
+                                            Update
+                                        </div>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -141,7 +153,12 @@ export default function SellerProductManagement({
                         <button className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:tracking-widest transition-all">Details</button>
                     </h4>
                     <div className="space-y-8">
-                        <StatRow label="Active Variations" value={`${product.colors?.length + product.sizes?.length} Options`} icon={FiLayers} color="text-purple-600" />
+                        <StatRow
+                            label="Active Variations"
+                            value={`${(product.colors?.length || 0) + (product.sizes?.length || 0)} Options`}
+                            icon={FiLayers}
+                            color="text-purple-600"
+                        />
                         <StatRow label="Store Performance" value={`${product.ratingAverage || '5.0'} Grade`} icon={FiGlobe} color="text-indigo-600" />
                         <StatRow label="Fulfillment Velocity" value="Real-time" icon={FiActivity} color="text-emerald-600" />
                     </div>
