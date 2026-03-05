@@ -4,3 +4,8 @@ export const getDashboardStats = async () => {
     const response = await mainApi.get('admin/stats');
     return response.data;
 };
+
+export const getAnalytics = async (timeRange = 'month') => {
+    const response = await mainApi.get(`admin/analytics?timeRange=${timeRange}`);
+    return response.data;
+};

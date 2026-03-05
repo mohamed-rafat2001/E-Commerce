@@ -24,10 +24,11 @@ export function useStockCounts() {
             const stock = product.countInStock || 0;
             if (stock === 0) {
                 counts.out_of_stock++;
-            } else if (stock > 0 && stock <= 10) {
-                counts.low_stock++;
-            } else if (stock > 10) {
-                counts.in_stock++;
+            } else {
+                counts.in_stock++; // Everything > 0 is in stock
+                if (stock <= 10) {
+                    counts.low_stock++; // It can be both in stock and low stock
+                }
             }
         });
 

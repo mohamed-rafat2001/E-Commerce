@@ -8,7 +8,7 @@ import { useDashboardPage } from '../hooks/index.js';
 import LoadingSpinner from '../../../shared/ui/LoadingSpinner.jsx';
 
 const AdminDashboardPage = () => {
-	const { stats, recentOrders, isLoading, error } = useDashboardPage();
+	const { stats, recentOrders, revenueTrend, isLoading, error } = useDashboardPage();
 
 	if (isLoading) {
 		return (
@@ -29,7 +29,7 @@ const AdminDashboardPage = () => {
 	return (
 		<div className="space-y-8">
 			{/* Page Header */}
-			<DashboardHeader 
+			<DashboardHeader
 				title="Welcome back, Admin! 👋"
 				subtitle="Here's what's happening with your store today."
 				role="Super Admin"
@@ -41,7 +41,7 @@ const AdminDashboardPage = () => {
 			{/* Main Content Grid */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				{/* Sales Chart */}
-				<RevenueChart />
+				<RevenueChart trend={revenueTrend} />
 
 				{/* Quick Actions */}
 				<QuickActions />

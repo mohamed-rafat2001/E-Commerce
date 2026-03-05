@@ -54,7 +54,7 @@ const PendingOrders = ({ orders = [] }) => {
 								<div className="flex items-center gap-1.5">
 									<FiDollarSign className="w-3.5 h-3.5 text-emerald-500" />
 									<span className="font-bold text-gray-800">
-										${order.totalPrice?.toFixed(2) || order.amount?.toFixed(2) || '0.00'}
+										${(order.amount || order.totalPrice?.amount || 0).toFixed(2)}
 									</span>
 								</div>
 								<div className="flex items-center gap-1.5">
@@ -79,7 +79,7 @@ const PendingOrders = ({ orders = [] }) => {
 
 			{/* Footer */}
 			<div className="px-4 pb-4">
-				<Link 
+				<Link
 					to="/seller/orders"
 					className="flex items-center justify-center gap-2 w-full py-3 text-center text-indigo-600 font-bold text-xs
 						rounded-xl border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300

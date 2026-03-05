@@ -16,7 +16,7 @@ const iconMap = {
 };
 
 const useDashboardPage = () => {
-  const { stats, recentOrders, isLoading, error } = useDashboardStats();
+  const { stats, recentOrders, revenueTrend, isLoading, error } = useDashboardStats();
 
   // Map icons for display
   const displayStats = stats ? stats.map(stat => ({
@@ -31,15 +31,16 @@ const useDashboardPage = () => {
     product: 'Review items', // Simplified for list
     amount: `$${order.totalPrice.amount.toLocaleString()}`,
     status: order.status,
-    statusColor: 
-      order.status === 'Delivered' ? 'success' : 
-      order.status === 'Pending' ? 'warning' : 
-      order.status === 'Cancelled' ? 'danger' : 'info'
+    statusColor:
+      order.status === 'Delivered' ? 'success' :
+        order.status === 'Pending' ? 'warning' :
+          order.status === 'Cancelled' ? 'danger' : 'info'
   })) : [];
 
   return {
     stats: displayStats,
     recentOrders: formattedOrders,
+    revenueTrend,
     isLoading,
     error
   };

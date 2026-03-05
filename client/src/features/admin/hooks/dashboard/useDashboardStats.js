@@ -1,17 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
-import { getDashboardStats } from "../../services/adminService.js";
+import { getDashboardStats, getAnalytics } from "../../services/adminService.js";
 
 export const useDashboardStats = () => {
-    const { data, isLoading, error } = useQuery({
+    const { data: statsData, isLoading: statsLoading, error: statsError } = useQuery({
         queryKey: ["dashboardStats"],
         queryFn: getDashboardStats,
-        refetchInterval: 60000, // Refetch every minute
+        refetchInterval: 60000,
+    });
+
+    const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+        queryKey: ["adminAnalytics"],
+        queryFn: getAnalytics,
+        refetchInterval: 300000, // 5 minutes
     });
 
     return {
-        stats: data?.data?.stats || [],
-        recentOrders: data?.data?.recentOrders || [],
-        isLoading,
-        error
+        stats: statsData?.data?.stats || [],
+        recentOrders: statsData?.data?.recentOrders || [],
+        revenueTrend: analyticsData?.data?.revenueData || [],
+        analyticsStats: analyticsData?.data?.stats || {},
+        isLoading: statsLoading || analyticsLoading,
+        error: statsError
     };
 };

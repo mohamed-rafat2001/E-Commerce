@@ -1,10 +1,23 @@
 import { motion } from 'framer-motion';
 import { Card } from '../../../../shared/ui/index.js';
 
-const RevenueChart = () => {
-	// Dummy data for visual representation
-	const data = [45, 60, 52, 75, 60, 85, 95];
-	const months = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const RevenueChart = ({ trend = [] }) => {
+	// Use real data if available, otherwise fallback to placeholder logic or empty
+	const hasData = trend && trend.length > 0;
+
+	const displayData = hasData
+		? trend.map(item => item.revenue)
+		: [45, 60, 52, 75, 60, 85, 95];
+
+	const labels = hasData
+		? trend.map(item => {
+			const date = new Date(item.date);
+			return date.toLocaleDateString('en-US', { weekday: 'short' });
+		})
+		: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+	// Calculate max for normalization
+	const maxVal = Math.max(...displayData, 100);
 
 	return (
 		<motion.div
@@ -38,21 +51,21 @@ const RevenueChart = () => {
 						</div>
 
 						{/* Bars */}
-						{data.map((value, index) => (
+						{displayData.map((value, index) => (
 							<div key={index} className="relative flex-1 flex flex-col items-center group">
 								<motion.div
 									className="w-full max-w-[40px] bg-linear-to-t from-indigo-600 to-purple-500 rounded-t-lg relative"
 									initial={{ height: 0 }}
-									animate={{ height: `${value}%` }}
+									animate={{ height: `${(value / maxVal) * 100}%` }}
 									transition={{ delay: 0.6 + index * 0.1, duration: 1, ease: "easeOut" }}
 								>
 									{/* Tooltip */}
 									<div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-										${(value * 120).toLocaleString()}
+										${value.toLocaleString()}
 									</div>
 								</motion.div>
 								<span className="text-[10px] font-medium text-gray-400 mt-3 uppercase tracking-wider">
-									{months[index]}
+									{labels[index]}
 								</span>
 							</div>
 						))}

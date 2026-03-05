@@ -66,7 +66,7 @@ const TopProducts = ({ products = [] }) => {
 							</div>
 							<div className="text-right shrink-0">
 								<p className="font-black text-emerald-600 tabular-nums">
-									${product.price?.toFixed(2) || '0.00'}
+									${product.price?.amount?.toFixed(2) || (typeof product.price === 'number' ? product.price.toFixed(2) : '0.00')}
 								</p>
 								<div className="flex items-center justify-end gap-1 mt-0.5">
 									<FiTrendingUp className="w-3 h-3 text-emerald-500" />
