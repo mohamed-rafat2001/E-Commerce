@@ -32,8 +32,12 @@ mainApi.interceptors.response.use(
 				// Retry the original request
 				return mainApi(originalRequest);
 			} catch (refreshError) {
-				if (typeof window !== "undefined" && window.location.pathname !== "/login" && window.location.pathname !== "/register") {
-					window.location.href = "/login";
+				if (typeof window !== "undefined") {
+					const path = window.location.pathname;
+					const inPanel = path.startsWith("/admin") || path.startsWith("/seller") || path.startsWith("/customer");
+					if (inPanel) {
+						window.location.href = "/login";
+					}
 				}
 				return Promise.reject(refreshError);
 			}
