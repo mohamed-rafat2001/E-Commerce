@@ -9,6 +9,19 @@ class APIFeatures {
 		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'populate'];
 		excludedFields.forEach(el => delete queryObj[el]);
 
+		// Support for both nested and flattened bracket syntax (e.g., price[gt])
+		Object.keys(queryObj).forEach(key => {
+			const match = key.match(/^(.+)\[(gt|gte|lt|lte)\]$/);
+			if (match) {
+				const [_, field, op] = match;
+				if (typeof queryObj[field] !== 'object' || queryObj[field] === null) {
+					queryObj[field] = {};
+				}
+				queryObj[field][op] = queryObj[key];
+				delete queryObj[key];
+			}
+		});
+
 		// Advanced filtering (gte, lte, etc.)
 		let queryStr = JSON.stringify(queryObj);
 		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
@@ -50,12 +63,12 @@ class APIFeatures {
 		if (this.queryString.search) {
 			const searchRegex = new RegExp(this.queryString.search, 'i');
 			const searchConditions = [{ name: searchRegex }];
-			
+
 			// If schema is provided, check for description
 			if (modelSchema && modelSchema.paths && modelSchema.paths.description) {
 				searchConditions.push({ description: searchRegex });
 			}
-			
+
 			this.query = this.query.find({ $or: searchConditions });
 		}
 		return this;
