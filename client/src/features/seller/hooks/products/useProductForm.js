@@ -51,7 +51,18 @@ const useProductForm = ({ product, isOpen }) => {
 
 	const handleSelectChange = (name, value) => {
 		const processedValue = (name === 'subCategory' && value === '') ? null : value;
-		setFormData(prev => ({ ...prev, [name]: processedValue }));
+
+		setFormData(prev => {
+			const newData = { ...prev, [name]: processedValue };
+
+			// Reset subCategory if primaryCategory changes
+			if (name === 'primaryCategory') {
+				newData.subCategory = null;
+			}
+
+			return newData;
+		});
+
 		if (formErrors[name]) {
 			setFormErrors(prev => ({ ...prev, [name]: null }));
 		}

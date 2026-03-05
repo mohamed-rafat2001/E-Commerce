@@ -18,7 +18,7 @@ export const createDoc = (Model, Fields = []) =>
 					new appError("please provide  val id fiel ds to update", 400)
 				);
 		}
-		
+
 		// Clean up empty string values for ObjectId fields
 		if (Model.modelName === "ProductModel" && object) {
 			// Convert empty strings to null/undefined for reference fields
@@ -26,20 +26,20 @@ export const createDoc = (Model, Fields = []) =>
 			if (object.primaryCategory === "") delete object.primaryCategory;
 			if (object.subCategory === "") delete object.subCategory;
 		}
-		
+
 		// Additional validation for ProductModel references
 		if (Model.modelName === "ProductModel") {
 			// Validate brand exists and belongs to seller
 			if (object.brandId) {
 				const BrandModel = mongoose.model("BrandModel");
 				const SellerModel = mongoose.model("SellerModel");
-				
+
 				// First find the seller associated with current user
 				const seller = await SellerModel.findOne({ userId: req.user._id });
 				if (!seller) {
 					return next(new appError("Seller profile not found", 404));
 				}
-				
+
 				// Then check if the brand belongs to this seller
 				const brand = await BrandModel.findOne({
 					_id: object.brandId,
@@ -49,7 +49,7 @@ export const createDoc = (Model, Fields = []) =>
 					return next(new appError("Brand not found or doesn't belong to you", 404));
 				}
 			}
-			
+
 			// Validate categories exist
 			if (object.primaryCategory) {
 				const CategoryModel = mongoose.model("CategoryModel");
@@ -58,7 +58,7 @@ export const createDoc = (Model, Fields = []) =>
 					return next(new appError("Primary category not found", 404));
 				}
 			}
-			
+
 			if (object.subCategory) {
 				const SubCategoryModel = mongoose.model("SubCategoryModel");
 				const subCategory = await SubCategoryModel.findById(object.subCategory);
@@ -66,11 +66,12 @@ export const createDoc = (Model, Fields = []) =>
 					return next(new appError("Sub category not found", 404));
 				}
 				// Validate that subcategory belongs to the primary category
-				if (object.primaryCategory && subCategory.categoryId.toString() !== object.primaryCategory) {
+				const subCategoryParentId = subCategory.categoryId._id || subCategory.categoryId;
+				if (object.primaryCategory && subCategoryParentId.toString() !== object.primaryCategory.toString()) {
 					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
 				}
 			}
-			
+
 			// Validate images array length
 			if (object.images && object.images.length > 10) {
 				return next(new appError("Maximum 10 additional images allowed", 400));
@@ -157,12 +158,12 @@ export const createDoc = (Model, Fields = []) =>
 					userId,
 					...object,
 				};
-				
+
 				// For ProductModel, we need to set the correct userId
 				if (Model.modelName === "ProductModel") {
 					createData.userId = userId;
 				}
-				
+
 				doc = await Model.create(createData);
 				break;
 		}
@@ -181,7 +182,7 @@ export const updateByOwner = (Model, Fields = []) =>
 			if (!object || Object.keys(object).length === 0)
 				return next(new appError("please provide valid fields to update", 400));
 		}
-		
+
 		// Clean up empty string values for ObjectId fields
 		if (Model.modelName === "ProductModel" && object) {
 			// Convert empty strings to null/undefined for reference fields
@@ -189,20 +190,20 @@ export const updateByOwner = (Model, Fields = []) =>
 			if (object.primaryCategory === "") delete object.primaryCategory;
 			if (object.subCategory === "") delete object.subCategory;
 		}
-		
+
 		// Additional validation for ProductModel references on update
 		if (Model.modelName === "ProductModel" && object) {
 			// Validate brand exists and belongs to seller
 			if (object.brandId) {
 				const BrandModel = mongoose.model("BrandModel");
 				const SellerModel = mongoose.model("SellerModel");
-				
+
 				// First find the seller associated with current user
 				const seller = await SellerModel.findOne({ userId: req.user._id });
 				if (!seller) {
 					return next(new appError("Seller profile not found", 404));
 				}
-				
+
 				// Then check if the brand belongs to this seller
 				const brand = await BrandModel.findOne({
 					_id: object.brandId,
@@ -212,7 +213,7 @@ export const updateByOwner = (Model, Fields = []) =>
 					return next(new appError("Brand not found or doesn't belong to you", 404));
 				}
 			}
-			
+
 			// Validate categories exist
 			if (object.primaryCategory) {
 				const CategoryModel = mongoose.model("CategoryModel");
@@ -221,19 +222,27 @@ export const updateByOwner = (Model, Fields = []) =>
 					return next(new appError("Primary category not found", 404));
 				}
 			}
-			
+
 			if (object.subCategory) {
 				const SubCategoryModel = mongoose.model("SubCategoryModel");
 				const subCategory = await SubCategoryModel.findById(object.subCategory);
 				if (!subCategory) {
 					return next(new appError("Sub category not found", 404));
 				}
-				// Validate that subcategory belongs to the primary category
-				if (object.primaryCategory && subCategory.categoryId.toString() !== object.primaryCategory) {
+
+				// Get the relevant primary category (either from payload or existing doc)
+				let targetCategoryId = object.primaryCategory;
+				if (!targetCategoryId) {
+					const existingDoc = await Model.findById(req.params.id);
+					targetCategoryId = existingDoc?.primaryCategory;
+				}
+
+				const subCategoryParentId = subCategory.categoryId._id || subCategory.categoryId;
+				if (targetCategoryId && subCategoryParentId.toString() !== targetCategoryId.toString()) {
 					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
 				}
 			}
-			
+
 			// Validate images array length
 			if (object.images && object.images.length > 10) {
 				return next(new appError("Maximum 10 additional images allowed", 400));
@@ -391,7 +400,7 @@ export const getAllByOwner = (Model) =>
 		const countFeatures = new APIFeatures(Model.find(filter), req.query)
 			.filter()
 			.search(Model.schema);
-		
+
 		const totalDocs = await countFeatures.query.countDocuments();
 
 		if (!docs) return next(new appError("docs not Found", 404));
@@ -449,7 +458,7 @@ export const getAll = (Model) =>
 		const countFeatures = new APIFeatures(Model.find(), req.query)
 			.filter()
 			.search(Model.schema);
-		
+
 		const totalDocs = await countFeatures.query.countDocuments();
 
 		if (!docs) return next(new appError("docs not Found", 400));

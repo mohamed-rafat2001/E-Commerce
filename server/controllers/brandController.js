@@ -17,10 +17,10 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
-	
+
 	// Initialize query with seller filter
 	const query = BrandModel.find({ sellerId: seller._id });
-	
+
 	// Apply API features
 	const features = new APIFeatures(query, req.query)
 		.filter()
@@ -33,7 +33,7 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 		path: "products",
 		select: "_id"
 	});
-	
+
 	// Get total count for pagination
 	const totalFeatures = new APIFeatures(BrandModel.find({ sellerId: seller._id }), req.query)
 		.filter()
@@ -63,11 +63,11 @@ export const getBrand = catchAsync(async (req, res, next) => {
 		path: "products",
 		select: "_id"
 	});
-	
+
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
 	}
-	
+
 	sendResponse(res, 200, brand);
 });
 
@@ -80,26 +80,17 @@ export const createBrand = catchAsync(async (req, res, next) => {
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
-	
+
 	// Add sellerId to request body
 	req.body.sellerId = seller._id;
-	
-	// Handle file upload for logo and cover image
-	uploadBrandImages(req, res, async (err) => {
-		if (err) {
-			return next(new appError("Error uploading images", 400));
-		}
-		
-		setCloudinaryBody(req, res, async () => {
-			const brand = await BrandModel.create(req.body);
-			await brand.populate([
-				{ path: "primaryCategory", select: "name description" },
-				{ path: "subCategories", select: "name description" }
-			]);
-			
-			sendResponse(res, 201, brand);
-		});
-	});
+
+	const brand = await BrandModel.create(req.body);
+	await brand.populate([
+		{ path: "primaryCategory", select: "name description" },
+		{ path: "subCategories", select: "name description" }
+	]);
+
+	sendResponse(res, 201, brand);
 });
 
 // @desc    Update brand
@@ -114,48 +105,39 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		_id: req.params.id,
 		sellerId: seller._id
 	});
-	
+
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
 	}
-	
-	// Handle image updates
-	uploadBrandImages(req, res, async (err) => {
-		if (err) {
-			return next(new appError("Error uploading images", 400));
+
+	// Delete old logo if new one provided
+	if (req.body.logo && brand.logo?.public_id) {
+		try {
+			await cloudinary.uploader.destroy(brand.logo.public_id);
+		} catch (error) {
+			console.log("Error deleting old logo:", error);
 		}
-		
-		setCloudinaryBody(req, res, async () => {
-			// Delete old logo if new one provided
-			if (req.body.logo && brand.logo?.public_id) {
-				try {
-					await cloudinary.uploader.destroy(brand.logo.public_id);
-				} catch (error) {
-					console.log("Error deleting old logo:", error);
-				}
-			}
+	}
 
-			// Delete old cover image if new one provided
-			if (req.body.coverImage && brand.coverImage?.public_id) {
-				try {
-					await cloudinary.uploader.destroy(brand.coverImage.public_id);
-				} catch (error) {
-					console.log("Error deleting old cover image:", error);
-				}
-			}
+	// Delete old cover image if new one provided
+	if (req.body.coverImage && brand.coverImage?.public_id) {
+		try {
+			await cloudinary.uploader.destroy(brand.coverImage.public_id);
+		} catch (error) {
+			console.log("Error deleting old cover image:", error);
+		}
+	}
 
-			Object.assign(brand, req.body);
-			await brand.save();
-			
-			await brand.populate([
-				{ path: "primaryCategory", select: "name description" },
-				{ path: "subCategories", select: "name description" },
-				{ path: "products", select: "_id" }
-			]);
-			
-			sendResponse(res, 200, brand);
-		});
-	});
+	Object.assign(brand, req.body);
+	await brand.save();
+
+	await brand.populate([
+		{ path: "primaryCategory", select: "name description" },
+		{ path: "subCategories", select: "name description" },
+		{ path: "products", select: "_id" }
+	]);
+
+	sendResponse(res, 200, brand);
 });
 
 // @desc    Delete brand
@@ -170,11 +152,11 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 		_id: req.params.id,
 		sellerId: seller._id
 	});
-	
+
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
 	}
-	
+
 	// Delete logo from Cloudinary if exists
 	if (brand.logo?.public_id) {
 		try {
@@ -183,8 +165,8 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 			console.log("Error deleting logo:", error);
 		}
 	}
-	
-	await brand.remove();
+
+	await BrandModel.deleteOne({ _id: brand._id });
 	sendResponse(res, 204, null);
 });
 
@@ -200,11 +182,11 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 		_id: req.params.id,
 		sellerId: seller._id
 	});
-	
+
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
 	}
-	
+
 	// Delete old logo if exists
 	if (brand.logo?.public_id) {
 		try {
@@ -213,22 +195,13 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 			console.log("Error deleting old logo:", error);
 		}
 	}
-	
-	// Handle file upload
-	uploadSingleImage("logo")(req, res, async (err) => {
-		if (err) {
-			return next(new appError("Error uploading logo", 400));
-		}
-		
-		setCloudinaryBody(req, res, async () => {
-			brand.logo = req.body.logo;
-			await brand.save();
-			
-			sendResponse(res, 200, {
-				message: "Logo updated successfully",
-				logo: brand.logo
-			});
-		});
+
+	brand.logo = req.body.logo;
+	await brand.save();
+
+	sendResponse(res, 200, {
+		message: "Logo updated successfully",
+		logo: brand.logo
 	});
 });
 
@@ -244,11 +217,11 @@ export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 		_id: req.params.id,
 		sellerId: seller._id
 	});
-	
+
 	if (!brand) {
 		return next(new appError("Brand not found", 404));
 	}
-	
+
 	if (brand.logo?.public_id) {
 		try {
 			await cloudinary.uploader.destroy(brand.logo.public_id);
@@ -256,10 +229,10 @@ export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 			console.log("Error deleting logo:", error);
 		}
 	}
-	
+
 	brand.logo = undefined;
 	await brand.save();
-	
+
 	sendResponse(res, 200, {
 		message: "Logo deleted successfully"
 	});

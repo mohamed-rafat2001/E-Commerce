@@ -22,6 +22,8 @@ const STEPS = [
 	{ id: 'settings', label: 'Settings', icon: FiSettings, description: 'Status & visibility' },
 ];
 
+import { useAdminSubCategories } from '../../../admin/hooks/subCategories/useAdminSubCategories.js';
+
 const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading }) => {
 	const { categories, isLoading: categoriesLoading } = useCategories();
 	const { brands, isLoading: brandsLoading } = useSellerBrands();
@@ -29,11 +31,16 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	const form = useProductForm({ product, isOpen });
 	const images = useImageUpload({ product, isOpen });
 
+	// Fetch related subcategories whenever a valid primaryCategory is selected
+	const { subCategories: subCategoriesList, isLoading: subCategoriesLoading } = useAdminSubCategories(
+		{ categoryId: form.formData.primaryCategory },
+		{ enabled: !!form.formData.primaryCategory }
+	);
+
 	// Derived options
 	const categoryOptions = (categories || []).map(c => ({ value: c._id, label: c.name }));
 	const brandOptions = (brands || []).map(b => ({ value: b._id, label: b.name }));
-	const subCategoryOptions = (categories || [])
-		.filter(c => c._id !== form.formData.primaryCategory)
+	const subCategoryOptions = (subCategoriesList || [])
 		.map(c => ({ value: c._id, label: c.name }));
 
 	// Submit handler
@@ -157,7 +164,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 											brandsLoading={brandsLoading}
 											categoryOptions={categoryOptions}
 											subCategoryOptions={subCategoryOptions}
-											categoriesLoading={categoriesLoading}
+											categoriesLoading={categoriesLoading || subCategoriesLoading}
 											onClose={onClose}
 											sizeInput={form.sizeInput}
 											onSizeInputChange={form.setSizeInput}
@@ -214,8 +221,8 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 										Next
 									</Button>
 								) : (
-									<Button 
-										type="submit" 
+									<Button
+										type="submit"
 										form="product-form"
 										loading={isLoading || images.isUploading}
 										icon={form.isEditing ? <FiCheck className="w-4 h-4" /> : <FiImage className="w-4 h-4" />}

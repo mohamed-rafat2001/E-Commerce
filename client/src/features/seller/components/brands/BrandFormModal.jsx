@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, Select, Modal } from '../../../../shared/ui/index.js';
 import { FiSave, FiImage, FiX } from 'react-icons/fi';
+import { useAdminSubCategories } from '../../../admin/hooks/subCategories/useAdminSubCategories.js';
 
 const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmitting }) => {
 	const fileInputRef = useRef(null);
@@ -18,7 +19,13 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		primaryCategory: '',
 		subCategories: []
 	});
-	
+
+	// Fetch related subcategories whenever a valid primaryCategory is selected
+	const { subCategories: subCategoriesList } = useAdminSubCategories(
+		{ categoryId: formData.primaryCategory },
+		{ enabled: !!formData.primaryCategory }
+	);
+
 	useEffect(() => {
 		if (brand) {
 			setFormData({
@@ -50,7 +57,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 			setCoverFile(null);
 		}
 	}, [brand, isOpen]);
-	
+
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
@@ -75,7 +82,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 			fileInputRef.current.value = '';
 		}
 	};
-	
+
 	const handleCoverImageChange = (e) => {
 		const file = e.target.files[0];
 		if (file) {
@@ -95,7 +102,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 			coverInputRef.current.value = '';
 		}
 	};
-	
+
 	const handleSubCategoryToggle = (categoryId) => {
 		setFormData(prev => ({
 			...prev,
@@ -104,10 +111,10 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 				: [...prev.subCategories, categoryId]
 		}));
 	};
-	
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		
+
 		// Create FormData for file upload
 		const data = new FormData();
 		data.append('name', formData.name);
@@ -116,7 +123,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 		data.append('businessEmail', formData.businessEmail);
 		data.append('businessPhone', formData.businessPhone);
 		data.append('primaryCategory', formData.primaryCategory);
-		
+
 		formData.subCategories.forEach(cat => {
 			data.append('subCategories', cat);
 		});
@@ -131,7 +138,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 
 		onSubmit(data, brand?._id);
 	};
-	
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title={brand ? "Edit Brand" : "Create New Brand"} size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
@@ -143,9 +150,9 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 						<div className="relative w-32 h-32 mb-2">
 							{imagePreview ? (
 								<div className="relative w-full h-full">
-									<img 
-										src={imagePreview} 
-										alt="Preview" 
+									<img
+										src={imagePreview}
+										alt="Preview"
 										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
 									/>
 									<button
@@ -157,7 +164,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 									</button>
 								</div>
 							) : (
-								<div 
+								<div
 									onClick={() => fileInputRef.current?.click()}
 									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
 								>
@@ -165,8 +172,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Logo</span>
 								</div>
 							)}
-							<input 
-								type="file" 
+							<input
+								type="file"
 								ref={fileInputRef}
 								onChange={handleImageChange}
 								accept="image/*"
@@ -182,9 +189,9 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 						<div className="relative w-full h-32 mb-2">
 							{coverPreview ? (
 								<div className="relative w-full h-full">
-									<img 
-										src={coverPreview} 
-										alt="Cover Preview" 
+									<img
+										src={coverPreview}
+										alt="Cover Preview"
 										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
 									/>
 									<button
@@ -196,7 +203,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 									</button>
 								</div>
 							) : (
-								<div 
+								<div
 									onClick={() => coverInputRef.current?.click()}
 									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
 								>
@@ -204,8 +211,8 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Cover</span>
 								</div>
 							)}
-							<input 
-								type="file" 
+							<input
+								type="file"
 								ref={coverInputRef}
 								onChange={handleCoverImageChange}
 								accept="image/*"
@@ -218,15 +225,15 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Brand Name *</label>
-					<Input 
-						name="name" 
-						value={formData.name} 
-						onChange={handleChange} 
-						placeholder="Enter brand name" 
-						required 
+					<Input
+						name="name"
+						value={formData.name}
+						onChange={handleChange}
+						placeholder="Enter brand name"
+						required
 					/>
 				</div>
-				
+
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
 					<textarea
@@ -239,75 +246,76 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 						required
 					/>
 				</div>
-				
+
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Business Email *</label>
-					<Input 
-						name="businessEmail" 
-						value={formData.businessEmail} 
-						onChange={handleChange} 
-						placeholder="contact@brand.com" 
+					<Input
+						name="businessEmail"
+						value={formData.businessEmail}
+						onChange={handleChange}
+						placeholder="contact@brand.com"
 						type="email"
-						required 
+						required
 					/>
 				</div>
 
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Business Phone *</label>
-					<Input 
-						name="businessPhone" 
-						value={formData.businessPhone} 
-						onChange={handleChange} 
-						placeholder="+1 (555) 000-0000" 
+					<Input
+						name="businessPhone"
+						value={formData.businessPhone}
+						onChange={handleChange}
+						placeholder="+1 (555) 000-0000"
 						type="tel"
-						required 
+						required
 					/>
 				</div>
-				
+
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-					<Input 
-						name="website" 
-						value={formData.website} 
-						onChange={handleChange} 
-						placeholder="https://yourbrand.com" 
+					<Input
+						name="website"
+						value={formData.website}
+						onChange={handleChange}
+						placeholder="https://yourbrand.com"
 						type="url"
 					/>
 				</div>
-				
+
 				{categories && (
 					<Select
 						label="Primary Category"
 						value={formData.primaryCategory}
-						onChange={(val) => setFormData(prev => ({ ...prev, primaryCategory: val }))}
+						onChange={(val) => setFormData(prev => ({
+							...prev,
+							primaryCategory: val,
+							subCategories: [] // Clear subcategories when category changes
+						}))}
 						options={categories.map(c => ({ value: c._id, label: c.name }))}
 					/>
 				)}
-				
-				{categories && (
+
+				{formData.primaryCategory && subCategoriesList && subCategoriesList.length > 0 && (
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Sub Categories <span className="text-gray-400 font-normal">(Select multiple)</span>
 						</label>
 						<div className="border border-gray-300 rounded-xl p-3 bg-white">
 							<div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-								{categories
-									.filter(cat => cat._id !== formData.primaryCategory)
-									.map(category => (
-										<label 
-											key={category._id} 
-											className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-										>
-											<input
-												type="checkbox"
-												checked={formData.subCategories.includes(category._id)}
-												onChange={() => handleSubCategoryToggle(category._id)}
-												className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-											/>
-											<span className="text-sm text-gray-700">{category.name}</span>
-										</label>
-									))
-								}
+								{subCategoriesList.map(category => (
+									<label
+										key={category._id}
+										className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+									>
+										<input
+											type="checkbox"
+											checked={formData.subCategories.includes(category._id)}
+											onChange={() => handleSubCategoryToggle(category._id)}
+											className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+										/>
+										<span className="text-sm text-gray-700">{category.name}</span>
+									</label>
+								))}
 							</div>
 							{formData.subCategories.length === 0 && (
 								<p className="text-sm text-gray-400 text-center py-2">
@@ -317,7 +325,7 @@ const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmit
 						</div>
 					</div>
 				)}
-				
+
 				<div className="flex gap-3 pt-4">
 					<Button variant="secondary" type="button" onClick={onClose} fullWidth>Cancel</Button>
 					<Button type="submit" loading={isSubmitting} fullWidth icon={<FiSave className="w-4 h-4" />}>

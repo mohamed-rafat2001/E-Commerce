@@ -10,6 +10,7 @@ import {
 	updateBrandLogo,
 	deleteBrandLogo,
 } from "../controllers/brandController.js";
+import { uploadBrandImages, uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 
 /**
  * @swagger
@@ -76,7 +77,7 @@ router.use(Protect, restrictTo("Seller"));
  */
 router.route("/")
 	.get(getMyBrands)
-	.post(createBrand);
+	.post(uploadBrandImages, setCloudinaryBody, createBrand);
 
 /**
  * @swagger
@@ -161,7 +162,7 @@ router.route("/")
  */
 router.route("/:id")
 	.get(getBrand)
-	.patch(updateBrand)
+	.patch(uploadBrandImages, setCloudinaryBody, updateBrand)
 	.delete(deleteBrand);
 
 /**
@@ -207,7 +208,7 @@ router.route("/:id")
  *         description: Logo deleted successfully
  */
 router.route("/:id/logo")
-	.patch(updateBrandLogo)
+	.patch(uploadSingleImage("logo"), setCloudinaryBody, updateBrandLogo)
 	.delete(deleteBrandLogo);
 
 export default router;
