@@ -77,12 +77,12 @@ export const deleteAllProducts = deleteManyByOwner(ProductModel);
 // @access  Private/Seller
 export const getProductsByBrand = catchAsync(async (req, res, next) => {
 	const { brandId } = req.params;
-	
-	const products = await ProductModel.find({ 
-		brandId, 
-		isActive: true 
+
+	const products = await ProductModel.find({
+		brandId,
+		status: "active"
 	}).populate("subCategory", "name categoryId")
-	  .populate("primaryCategory", "name");
-	
+		.populate("primaryCategory", "name");
+
 	sendResponse(res, 200, products);
 });

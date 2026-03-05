@@ -32,7 +32,7 @@ mainApi.interceptors.response.use(
 				// Retry the original request
 				return mainApi(originalRequest);
 			} catch (refreshError) {
-				if (typeof window !== "undefined") {
+				if (typeof window !== "undefined" && window.location.pathname !== "/login" && window.location.pathname !== "/register") {
 					window.location.href = "/login";
 				}
 				return Promise.reject(refreshError);

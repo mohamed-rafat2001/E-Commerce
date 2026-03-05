@@ -1,15 +1,13 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { LoadingSpinner } from '../../../shared/ui/index.js';
-import { 
-  FiArrowLeft, 
-  FiShoppingCart, 
-  FiHeart, 
-  FiShare2, 
-  FiShield, 
-  FiRefreshCw, 
-  FiChevronRight,
-  FiZap
+import {
+  FiArrowLeft,
+  FiShield,
+  FiRefreshCw,
+  FiZap,
+  FiAward,
+  FiCheckCircle
 } from 'react-icons/fi';
 import ProductGallery from '../components/ProductGallery.jsx';
 import ProductInfo from '../components/ProductInfo.jsx';
@@ -31,12 +29,17 @@ export default function ProductDetailPage() {
     onUpdateStock
   } = useProductDetailPage(id);
 
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity1 = useTransform(scrollY, [0, 300], [1, 0.3]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center">
-          <LoadingSpinner size="lg" color="indigo" />
-          <p className="mt-6 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Loading Perspective</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="flex flex-col items-center relative">
+          <LoadingSpinner size="xl" color="white" />
+          <p className="mt-8 text-xs font-bold uppercase tracking-[0.4em] text-white/70 animate-pulse">Loading Experience</p>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/20 rounded-full blur-[60px]" />
         </div>
       </div>
     );
@@ -44,86 +47,98 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h2 className="text-4xl font-black text-gray-900 mb-6">Identifier Unknown</h2>
-        <p className="text-gray-500 mb-12">The requested asset is not available in our current repository.</p>
-        <Link to="/" className="inline-block px-8 py-4 bg-gray-900 text-white font-black rounded-2xl">Return Home</Link>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-center px-4">
+        <div className="max-w-2xl relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/10 rounded-full blur-[80px]" />
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-6 relative z-10 tracking-tighter">Not Found</h2>
+          <p className="text-gray-400 mb-12 text-lg relative z-10">The piece you are looking for has been archived or does not exist.</p>
+          <button onClick={() => navigate(-1)} className="relative z-10 inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-sm rounded-full hover:scale-105 transition-transform">
+            <FiArrowLeft /> Go Back
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-50/30 rounded-full blur-[120px] -mr-96 -mt-96 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-50/20 rounded-full blur-[100px] -ml-72 -mb-72 pointer-events-none" />
+    <div className="min-h-screen bg-[#fafafa] relative selection:bg-indigo-500/30 selection:text-indigo-900">
+      {/* Dynamic Backgrounds */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden h-screen z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-indigo-200/40 rounded-full blur-[120px] mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply" />
+      </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 relative z-10">
-        {/* Responsive Navigation */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16">
-          <button 
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 pt-6 pb-24 relative z-10">
+        {/* Top Navigation */}
+        <motion.nav
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-8 md:mb-12 sticky top-4 z-40 bg-white/50 backdrop-blur-xl border border-white/50 px-6 py-4 rounded-3xl shadow-sm"
+        >
+          <button
             onClick={() => navigate(isSeller ? '/seller/inventory' : basePath)}
-            className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors"
+            className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-gray-900 transition-colors"
           >
-            <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Go Back
+            <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:-translate-x-1 transition-transform">
+              <FiArrowLeft className="w-4 h-4" />
+            </div>
+            Back to Collection
           </button>
-          
-          <div className="hidden md:flex items-center gap-6 lg:gap-8 text-[10px] font-black uppercase tracking-widest text-gray-300">
-            <span className="text-indigo-600">Product Detail</span>
-            <div className="w-6 lg:w-8 h-px bg-gray-100" />
-            <span>Specifications</span>
-            <div className="w-6 lg:w-8 h-px bg-gray-100" />
-            <span>Review Matrix</span>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24">
+          <div className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">
+            <span className="text-indigo-600 px-3 py-1 bg-indigo-50 rounded-full">Overview</span>
+            <FiChevronRight className="w-3 h-3 text-gray-300" />
+            <span>Details</span>
+            <FiChevronRight className="w-3 h-3 text-gray-300" />
+            <span>Reviews</span>
+          </div>
+        </motion.nav>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-20 relative">
+
           {/* Visual Column */}
-          <div className="lg:col-span-7 space-y-8 md:space-y-12">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-50 rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-gray-100/50 shadow-sm"
+          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+            <motion.div
+              style={{ y: y1, opacity: opacity1 }}
+              className="sticky top-28 hidden lg:block text-5xl xl:text-[7rem] font-black text-gray-900/5 leading-none tracking-tighter absolute -left-10 z-0 whitespace-nowrap overflow-hidden"
+            >
+              {product.brandId?.name || "PREMIUM"}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-white rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white shadow-2xl relative z-10 shadow-gray-200/50"
             >
               <ProductGallery gallery={gallery} enableZoom={true} />
             </motion.div>
-            
-            {/* Minimal Trust Line */}
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 py-6 md:py-8 border-y border-gray-50">
-               <TrustNode icon={FiShield} label="Secured" />
-               <TrustNode icon={FiRefreshCw} label="Exchangeable" />
-               <TrustNode icon={FiZap} label="Express" />
-            </div>
+
+            {/* Features Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"
+            >
+              <FeatureCard icon={FiShield} title="Authentic" subtitle="Verified Item" />
+              <FeatureCard icon={FiRefreshCw} title="Returns" subtitle="30-Day Policy" />
+              <FeatureCard icon={FiZap} title="Fast Delivery" subtitle="Express Shipping" />
+              <FeatureCard icon={FiAward} title="Warranty" subtitle="2-Year Cover" />
+            </motion.div>
           </div>
 
           {/* Info Column */}
-          <div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-12 space-y-12">
-              <ProductInfo 
-                product={product} 
+          <div className="lg:col-span-5 xl:col-span-4 relative z-20">
+            <div className="lg:sticky lg:top-28">
+              <ProductInfo
+                product={product}
                 isSeller={isSeller}
                 isUpdating={isUpdating}
                 onChangeStatus={onChangeStatus}
                 onChangeVisibility={onChangeVisibility}
                 onUpdateStock={onUpdateStock}
               />
-              
-              {!isSeller && (
-                <div className="flex flex-col xs:flex-row gap-3 md:gap-4 pt-8 md:pt-12 border-t border-gray-100">
-                  <button className="flex-[3] bg-gray-900 text-white font-black py-4 md:py-6 rounded-xl md:rounded-2xl hover:bg-indigo-600 transition-all active:scale-[0.98] shadow-xl shadow-gray-200 uppercase tracking-widest text-[11px] md:text-sm">
-                    INITIALIZE PURCHASE
-                  </button>
-                  <div className="flex gap-3 md:gap-4">
-                    <button className="flex-1 xs:w-16 md:w-20 h-14 md:h-20 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
-                      <FiHeart className="w-5 h-5 md:w-6 md:h-6" />
-                    </button>
-                    <button className="flex-1 xs:w-16 md:w-20 h-14 md:h-20 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all xs:hidden sm:flex">
-                      <FiShare2 className="w-5 h-5 md:w-6 md:h-6" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -132,15 +147,20 @@ export default function ProductDetailPage() {
   );
 }
 
-const TrustNode = ({ icon: _Icon, label }) => {
-  const Icon = _Icon;
-  return (
-    <div className="flex items-center gap-3 group">
-      <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all">
-        <Icon className="w-4 h-4" />
-      </div>
-      <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900 transition-colors">{label}</span>
+const FeatureCard = ({ icon: Icon, title, subtitle }) => (
+  <div className="bg-white p-4 rounded-3xl border border-gray-100 flex items-center gap-4 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/50 transition-all group cursor-default">
+    <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+      <Icon className="w-5 h-5" />
     </div>
-  );
-};
+    <div>
+      <p className="text-xs font-black text-gray-900">{title}</p>
+      <p className="text-[10px] font-bold text-gray-400 mt-0.5">{subtitle}</p>
+    </div>
+  </div>
+);
 
+const FiChevronRight = ({ className }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+);

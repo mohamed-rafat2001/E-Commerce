@@ -57,7 +57,7 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) =
 		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 			{cards.map((card, i) => {
 				const isActive = stockFilter === card.key;
-				const count = card.countKey ? (stockCounts?.[card.countKey] || 0) : (total || 0);
+				const count = card.countKey ? (stockCounts?.[card.countKey] || 0) : (stockCounts?.total || 0);
 				const Icon = card.icon;
 
 				return (
@@ -69,11 +69,10 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) =
 						transition={{ duration: 0.4, delay: i * 0.08, type: 'spring', bounce: 0.3 }}
 						whileHover={{ y: -4, transition: { duration: 0.2 } }}
 						whileTap={{ scale: 0.97 }}
-						className={`relative rounded-2xl p-5 border overflow-hidden transition-all duration-300 text-left cursor-pointer group ${
-							isActive
+						className={`relative rounded-2xl p-5 border overflow-hidden transition-all duration-300 text-left cursor-pointer group ${isActive
 								? `${card.border} ring-2 ${card.ring} bg-white shadow-lg ${card.shadow}`
 								: 'border-gray-100 bg-white hover:shadow-md hover:border-gray-200'
-						}`}
+							}`}
 					>
 						{/* Active indicator bar */}
 						<motion.div
@@ -90,9 +89,8 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) =
 
 						<div className="relative flex items-start justify-between">
 							<div className="space-y-2">
-								<p className={`text-xs font-bold uppercase tracking-wider ${
-									isActive ? card.lightText : 'text-gray-400'
-								} transition-colors`}>
+								<p className={`text-xs font-bold uppercase tracking-wider ${isActive ? card.lightText : 'text-gray-400'
+									} transition-colors`}>
 									{card.label}
 								</p>
 								<div className="flex items-baseline gap-2">
@@ -117,14 +115,12 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) =
 								</div>
 							</div>
 
-							<div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
-								isActive
+							<div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive
 									? `bg-gradient-to-br ${card.gradient} shadow-lg ${card.shadow}`
 									: `${card.lightBg} group-hover:scale-110`
-							}`}>
-								<Icon className={`w-5 h-5 ${
-									isActive ? 'text-white' : card.lightText
-								} transition-colors`} />
+								}`}>
+								<Icon className={`w-5 h-5 ${isActive ? 'text-white' : card.lightText
+									} transition-colors`} />
 							</div>
 						</div>
 
@@ -139,9 +135,8 @@ const StockFilterCards = ({ stockFilter, total, onFilterChange, stockCounts }) =
 										className={`h-full rounded-full bg-gradient-to-r ${card.gradient}`}
 									/>
 								</div>
-								<p className={`text-[10px] font-semibold mt-1.5 ${
-									isActive ? card.lightText : 'text-gray-400'
-								} transition-colors`}>
+								<p className={`text-[10px] font-semibold mt-1.5 ${isActive ? card.lightText : 'text-gray-400'
+									} transition-colors`}>
 									{total > 0 ? Math.round((count / total) * 100) : 0}% of total
 								</p>
 							</div>

@@ -4,21 +4,22 @@ import { getFunc } from '../../../../shared/services/handlerFactory';
 export function useStockCounts() {
     const fetchStockCounts = async () => {
         // Fetch all products to calculate counts
-        const response = await getFunc('products/myproducts', { 
-            params: { 
+        const response = await getFunc('products/myproducts', {
+            params: {
                 limit: 1000, // Fetch all products
                 sort: '-createdAt'
-            } 
+            }
         });
-        
+
         const products = response?.data?.data || [];
-        
+
         const counts = {
             in_stock: 0,
             low_stock: 0,
-            out_of_stock: 0
+            out_of_stock: 0,
+            total: products.length
         };
-        
+
         products.forEach(product => {
             const stock = product.countInStock || 0;
             if (stock === 0) {
@@ -29,15 +30,15 @@ export function useStockCounts() {
                 counts.in_stock++;
             }
         });
-        
+
         return counts;
     };
 
-    const { 
-        data: stockCounts, 
-        isLoading, 
+    const {
+        data: stockCounts,
+        isLoading,
         error,
-        refetch 
+        refetch
     } = useQuery({
         queryKey: ['stock-counts'],
         queryFn: fetchStockCounts,

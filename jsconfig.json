@@ -1,16 +1,13 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
-        "moduleResolution": "Bundler",
-        "target": "ES2024",
-        "jsx": "react-jsx",
-        "allowImportingTsExtensions": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strict": true
+        "target": "es2020",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "jsx": "react-jsx"
     },
     "exclude": [
         "node_modules",
-        "**/node_modules/*"
+        "dist",
+        "server/test_qs.js"
     ]
 }

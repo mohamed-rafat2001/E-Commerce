@@ -155,55 +155,55 @@ const useImageUpload = ({ product, isOpen }) => {
     });
   };
 
-	// --- Upload cover image on submit ---
-	const uploadCoverImage = async () => {
-		if (!coverImageFile) return { coverImage: undefined };
+  // --- Upload cover image on submit ---
+  const uploadCoverImage = async () => {
+    if (!coverImageFile) return { coverImage: undefined };
 
-		try {
-			setIsUploading(true);
-			const formData = new FormData();
-			formData.append('image', coverImageFile);
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('image', coverImageFile);
 
-			const response = await mainApi.post('upload', formData, {
-				headers: { 'Content-Type': 'multipart/form-data' },
-				onUploadProgress: (progressEvent) => {
-					const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-					setUploadProgress(percent);
-				},
-			});
+      const response = await mainApi.post('upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percent);
+        },
+      });
 
-			setIsUploading(false);
-			return { coverImage: response.data?.data };
-		} catch {
-			setIsUploading(false);
-			return { error: 'Failed to upload cover image. Try again.' };
-		}
-	};
+      setIsUploading(false);
+      return { coverImage: response.data?.data };
+    } catch {
+      setIsUploading(false);
+      return { error: 'Failed to upload cover image. Try again.' };
+    }
+  };
 
-	const getUploadedAdditionalImages = () => {
-		return additionalImages
-			.filter(img => img.uploaded)
-			.map(img => ({
-				public_id: img.public_id,
-				secure_url: img.preview,
-			}));
-	};
+  const getUploadedAdditionalImages = () => {
+    return additionalImages
+      .filter(img => img.uploaded)
+      .map(img => ({
+        public_id: img.public_id,
+        secure_url: img.preview,
+      }));
+  };
 
-	return {
-		fileInputRef,
-		coverImagePreview,
-		coverImageFile,
-		additionalImages,
-		isUploading,
-		uploadProgress,
+  return {
+    fileInputRef,
+    coverImagePreview,
+    coverImageFile,
+    additionalImages,
+    isUploading,
+    uploadProgress,
 
-		handleCoverImageSelect,
-		removeCoverImage,
-		handleAdditionalImagesSelect,
-		removeAdditionalImage,
-		uploadCoverImage,
-		getUploadedAdditionalImages,
-	};
+    handleCoverImageSelect,
+    removeCoverImage,
+    handleAdditionalImagesSelect,
+    removeAdditionalImage,
+    uploadCoverImage,
+    getUploadedAdditionalImages,
+  };
 };
 
 export default useImageUpload;

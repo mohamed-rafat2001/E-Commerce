@@ -7,7 +7,7 @@ import useBrandDetails from '../hooks/brands/useBrandDetails';
 import { updateBrandLogo, deleteBrandLogo, updateBrand } from '../services/seller.js';
 import LogoEditModal from '../components/brands/LogoEditModal.jsx';
 import CoverImageEditModal from '../components/brands/CoverImageEditModal.jsx';
-import { Modal, Button } from '../../../shared/ui/index.js';
+import { Modal, Button, LoadingSpinner } from '../../../shared/ui/index.js';
 import useToast from '../../../shared/hooks/useToast.js';
 
 const DEFAULT_BRAND_LOGO = "https://placehold.co/400x400?text=No+Logo";
@@ -17,7 +17,7 @@ const BrandDetailsPage = () => {
     const { id } = useParams();
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useToast();
-    
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCoverEditModalOpen, setIsCoverEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,7 +26,7 @@ const BrandDetailsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('newest');
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-    
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
@@ -34,15 +34,15 @@ const BrandDetailsPage = () => {
     // Category Accordion State
     const [expandedCategories, setExpandedCategories] = useState({});
 
-    const { 
-        brand, 
-        products, 
+    const {
+        brand,
+        products,
         allProducts,
-        allProductsCount, 
-        selectedSubCategory, 
-        setSelectedSubCategory, 
-        isLoading, 
-        error 
+        allProductsCount,
+        selectedSubCategory,
+        setSelectedSubCategory,
+        isLoading,
+        error
     } = useBrandDetails();
 
     const getBrandInitialLogo = (name) => {
@@ -56,8 +56,8 @@ const BrandDetailsPage = () => {
         // Search
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
-            result = result.filter(p => 
-                p.name.toLowerCase().includes(query) || 
+            result = result.filter(p =>
+                p.name.toLowerCase().includes(query) ||
                 (p.description && p.description.toLowerCase().includes(query))
             );
         }
@@ -86,12 +86,12 @@ const BrandDetailsPage = () => {
     const categoriesTree = useMemo(() => {
         const tree = {};
         const productsData = allProducts || [];
-        
+
         // 1. Build tree from Products
         productsData.forEach(product => {
             const cat = product.primaryCategory;
             const sub = product.subCategory;
-            
+
             // Skip if category is not populated or invalid
             if (!cat || typeof cat !== 'object' || !cat._id) return;
 
@@ -233,7 +233,7 @@ const BrandDetailsPage = () => {
         formData.append('logo', file);
         uploadLogoMutation.mutate({ id: brandId, formData });
     };
- 
+
     const handleCoverUpload = (file, brandId) => {
         const formData = new FormData();
         formData.append('coverImage', file);
@@ -283,9 +283,9 @@ const BrandDetailsPage = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                 <div className={`relative rounded-3xl overflow-hidden shadow-xl ${brand.coverImage?.secure_url ? '' : 'bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900'}`}>
                     {brand.coverImage?.secure_url && (
-                        <img 
-                            src={brand.coverImage.secure_url} 
-                            alt="Cover" 
+                        <img
+                            src={brand.coverImage.secure_url}
+                            alt="Cover"
                             className="absolute inset-0 w-full h-full object-cover"
                         />
                     )}
@@ -293,17 +293,17 @@ const BrandDetailsPage = () => {
                     <div className={`absolute inset-0 ${brand.coverImage?.secure_url ? 'bg-black/40' : ''}`}></div>
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
-                    
+
                     <div className="absolute top-4 right-4 z-20">
-                         <button
+                        <button
                             onClick={() => setIsCoverEditModalOpen(true)}
                             className="p-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all duration-200 group cursor-pointer"
                             title="Change Cover Image"
-                         >
+                        >
                             <FiEdit2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                         </button>
+                        </button>
                     </div>
-                    
+
                     <div className="relative px-6 py-8 md:px-10 md:py-10">
                         {/* Back Button */}
                         <Link to="/seller/brands" className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-8 py-2 font-medium">
@@ -311,17 +311,17 @@ const BrandDetailsPage = () => {
                         </Link>
 
                         <div className="flex flex-col md:flex-row items-start md:items-end gap-8">
-                            
+
                             {/* Brand Logo with Actions */}
-                            <div 
+                            <div
                                 className="relative group cursor-pointer shrink-0 z-10"
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             >
                                 <div className="relative rounded-2xl p-1.5 bg-white shadow-2xl ring-1 ring-black/5">
-                                    <img 
-                                        src={brand.logo?.secure_url || getBrandInitialLogo(brand.name)} 
-                                        alt={brand.name} 
+                                    <img
+                                        src={brand.logo?.secure_url || getBrandInitialLogo(brand.name)}
+                                        alt={brand.name}
                                         onError={(e) => { e.target.src = getBrandInitialLogo(brand.name); }}
                                         className="w-32 h-32 md:w-40 md:h-40 rounded-xl object-cover bg-gray-50 border border-gray-100"
                                     />
@@ -336,7 +336,7 @@ const BrandDetailsPage = () => {
                                 {/* Dropdown Menu */}
                                 <AnimatePresence>
                                     {isDropdownOpen && (
-                                        <motion.div 
+                                        <motion.div
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -344,7 +344,7 @@ const BrandDetailsPage = () => {
                                             onClick={(e) => e.stopPropagation()}
                                         >
                                             <div className="p-1">
-                                                <button 
+                                                <button
                                                     onClick={() => {
                                                         setIsShowModalOpen(true);
                                                         setIsDropdownOpen(false);
@@ -354,7 +354,7 @@ const BrandDetailsPage = () => {
                                                     <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-md"><FiEye className="w-4 h-4" /></div>
                                                     View Logo
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => {
                                                         setIsEditModalOpen(true);
                                                         setIsDropdownOpen(false);
@@ -366,7 +366,7 @@ const BrandDetailsPage = () => {
                                                 </button>
                                                 {brand.logo?.secure_url && (
                                                     <div className="border-t border-gray-100 my-1 pt-1">
-                                                        <button 
+                                                        <button
                                                             onClick={() => {
                                                                 setIsDeleteModalOpen(true);
                                                                 setIsDropdownOpen(false);
@@ -387,18 +387,18 @@ const BrandDetailsPage = () => {
                             <div className="flex-1 text-white pb-2 min-w-0">
                                 <div className="flex flex-wrap items-center gap-3 mb-3">
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-indigo-100">
-                                        <FiTag className="mr-1.5 w-3 h-3" /> 
+                                        <FiTag className="mr-1.5 w-3 h-3" />
                                         {brand.primaryCategory?.name || "Uncategorized"}
                                     </span>
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-100">
-                                        <FiStar className="mr-1.5 w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 
+                                        <FiStar className="mr-1.5 w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                         <span className="font-bold mr-1 text-white">{brand.ratingAverage || 0}</span>
                                         <span className="text-white/60">({brand.ratingCount || 0} reviews)</span>
                                     </span>
                                 </div>
-                                
+
                                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-sm">{brand.name}</h1>
-                                
+
                                 <div className="flex flex-wrap gap-4 text-sm font-medium text-indigo-100/90">
                                     {brand.website && (
                                         <a href={brand.website} target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-white transition-colors group bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 border border-white/5 hover:border-white/20">
@@ -425,7 +425,7 @@ const BrandDetailsPage = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    
+
                     {/* Main Content - Product Grid */}
                     <div className="lg:col-span-3">
                         {/* Header & Controls */}
@@ -433,8 +433,8 @@ const BrandDetailsPage = () => {
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <h2 className="text-xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
-                                        {selectedSubCategory === 'all' 
-                                            ? 'All Products' 
+                                        {selectedSubCategory === 'all'
+                                            ? 'All Products'
                                             : products.find(p => p.subCategory?._id === selectedSubCategory)?.subCategory?.name || 'Products'}
                                     </h2>
                                     <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
@@ -454,7 +454,7 @@ const BrandDetailsPage = () => {
                                             className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-sm"
                                         />
                                     </div>
-                                    
+
                                     {/* Sort */}
                                     <div className="relative sm:w-48">
                                         <button
@@ -464,14 +464,14 @@ const BrandDetailsPage = () => {
                                             <span className="text-gray-600 truncate mr-2">
                                                 Sort: <span className="text-gray-900 font-medium">{
                                                     sortBy === 'newest' ? 'Newest' :
-                                                    sortBy === 'price-asc' ? 'Price: Low to High' :
-                                                    sortBy === 'price-desc' ? 'Price: High to Low' :
-                                                    'Name'
+                                                        sortBy === 'price-asc' ? 'Price: Low to High' :
+                                                            sortBy === 'price-desc' ? 'Price: High to Low' :
+                                                                'Name'
                                                 }</span>
                                             </span>
                                             <FiChevronDown className={`w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-transform duration-200 shrink-0 ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
                                         </button>
-                                        
+
                                         <AnimatePresence>
                                             {isSortDropdownOpen && (
                                                 <motion.div
@@ -493,9 +493,8 @@ const BrandDetailsPage = () => {
                                                                 setSortBy(option.value);
                                                                 setIsSortDropdownOpen(false);
                                                             }}
-                                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                                                                sortBy === option.value ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
-                                                            }`}
+                                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${sortBy === option.value ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
+                                                                }`}
                                                         >
                                                             {option.label}
                                                             {sortBy === option.value && <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0 ml-2"></div>}
@@ -529,7 +528,7 @@ const BrandDetailsPage = () => {
                                                     className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                                    <Link 
+                                                    <Link
                                                         to={`/seller/products/${product._id}`}
                                                         className="w-full py-2 bg-white text-gray-900 font-bold rounded-lg text-center hover:bg-indigo-50 transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300"
                                                     >
@@ -572,16 +571,15 @@ const BrandDetailsPage = () => {
                                         >
                                             <FiChevronLeft className="w-5 h-5 text-gray-600" />
                                         </button>
-                                        
+
                                         {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                                             <button
                                                 key={page}
                                                 onClick={() => handlePageChange(page)}
-                                                className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                                                    currentPage === page
+                                                className={`w-10 h-10 rounded-lg font-medium transition-colors ${currentPage === page
                                                         ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
                                                         : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                }`}
+                                                    }`}
                                             >
                                                 {page}
                                             </button>
@@ -612,7 +610,7 @@ const BrandDetailsPage = () => {
 
                     {/* Sidebar - Brand Info & Filters */}
                     <div className="lg:col-span-1 space-y-6">
-                        
+
                         {/* Contact & Info Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="p-4 border-b border-gray-50 bg-gray-50/50">
@@ -660,7 +658,7 @@ const BrandDetailsPage = () => {
                                 </div>
 
                                 <div className="pt-2">
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             navigator.clipboard.writeText(window.location.href);
                                             showSuccess('Link copied to clipboard!');
@@ -683,22 +681,20 @@ const BrandDetailsPage = () => {
                             <div className="p-2 space-y-1">
                                 <button
                                     onClick={() => setSelectedSubCategory('all')}
-                                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between group ${
-                                        selectedSubCategory === 'all' 
-                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+                                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between group ${selectedSubCategory === 'all'
+                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
                                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                    }`}
+                                        }`}
                                 >
                                     <span>All Products</span>
-                                    <span className={`text-xs py-0.5 px-2 rounded-full ${
-                                        selectedSubCategory === 'all'
+                                    <span className={`text-xs py-0.5 px-2 rounded-full ${selectedSubCategory === 'all'
                                             ? 'bg-white/20 text-white'
                                             : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
-                                    }`}>
+                                        }`}>
                                         {allProductsCount}
                                     </span>
                                 </button>
-                                
+
                                 {categoriesTree.length > 0 ? (
                                     categoriesTree.map((cat) => (
                                         <div key={cat._id} className="rounded-xl overflow-hidden">
@@ -709,13 +705,12 @@ const BrandDetailsPage = () => {
                                                 <span className="flex items-center">
                                                     {cat.name}
                                                 </span>
-                                                <FiChevronDown 
-                                                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                                                        expandedCategories[cat._id] ? 'rotate-180' : ''
-                                                    }`} 
+                                                <FiChevronDown
+                                                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${expandedCategories[cat._id] ? 'rotate-180' : ''
+                                                        }`}
                                                 />
                                             </button>
-                                            
+
                                             <AnimatePresence>
                                                 {expandedCategories[cat._id] && (
                                                     <motion.div
@@ -731,15 +726,13 @@ const BrandDetailsPage = () => {
                                                                     setSelectedSubCategory(sub._id);
                                                                     setCurrentPage(1); // Reset pagination
                                                                 }}
-                                                                className={`w-full text-left pl-8 pr-3 py-2 text-sm transition-colors flex items-center gap-2 ${
-                                                                    selectedSubCategory === sub._id 
-                                                                        ? 'text-indigo-600 font-semibold bg-indigo-50' 
+                                                                className={`w-full text-left pl-8 pr-3 py-2 text-sm transition-colors flex items-center gap-2 ${selectedSubCategory === sub._id
+                                                                        ? 'text-indigo-600 font-semibold bg-indigo-50'
                                                                         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                                                                }`}
+                                                                    }`}
                                                             >
-                                                                <div className={`w-1.5 h-1.5 rounded-full ${
-                                                                    selectedSubCategory === sub._id ? 'bg-indigo-600' : 'bg-gray-300'
-                                                                }`} />
+                                                                <div className={`w-1.5 h-1.5 rounded-full ${selectedSubCategory === sub._id ? 'bg-indigo-600' : 'bg-gray-300'
+                                                                    }`} />
                                                                 {sub.name}
                                                             </button>
                                                         ))}
@@ -780,9 +773,9 @@ const BrandDetailsPage = () => {
                 isUploading={uploadLogoMutation.isPending}
             />
 
-            <CoverImageEditModal 
-                isOpen={isCoverEditModalOpen} 
-                onClose={() => setIsCoverEditModalOpen(false)} 
+            <CoverImageEditModal
+                isOpen={isCoverEditModalOpen}
+                onClose={() => setIsCoverEditModalOpen(false)}
                 onUpload={handleCoverUpload}
                 brand={brand}
                 isUploading={uploadCoverMutation.isPending}

@@ -35,7 +35,7 @@ const ProductsPage = () => {
 
 	return (
 		<div className="space-y-6 pb-10">
-			<DataHeader 
+			<DataHeader
 				title="Inventory 📦"
 				description={`${total || 0} total products`}
 				searchPlaceholder="Search products by name..."
@@ -48,7 +48,7 @@ const ProductsPage = () => {
 					{ label: 'Name (Z-A)', value: '-name' }
 				]}
 				actions={
-					<Button 
+					<Button
 						onClick={handleCreate}
 						icon={<FiPlus className="w-5 h-5" />}
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-200/50 transition-all !rounded-xl"
@@ -58,17 +58,17 @@ const ProductsPage = () => {
 				}
 			/>
 
-			<StockFilterCards 
-				stockFilter={stockFilter} 
-				total={total} 
-				onFilterChange={setStockFilter} 
+			<StockFilterCards
+				stockFilter={stockFilter}
+				total={total}
+				onFilterChange={setStockFilter}
 				stockCounts={stockCounts}
 			/>
 
 			{/* Product Grid */}
 			{isLoading || countsLoading ? (
 				<motion.div
-					initial={{ opacity: 0 }} 
+					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100"
 					style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
@@ -105,7 +105,7 @@ const ProductsPage = () => {
 					<Pagination totalPages={totalPages} />
 				</>
 			) : (
-				<motion.div 
+				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, type: 'spring' }}
@@ -119,7 +119,7 @@ const ProductsPage = () => {
 					</div>
 
 					<div className="relative space-y-6">
-						<motion.div 
+						<motion.div
 							initial={{ scale: 0.8 }}
 							animate={{ scale: 1 }}
 							transition={{ type: 'spring', bounce: 0.4, delay: 0.2 }}
@@ -127,7 +127,7 @@ const ProductsPage = () => {
 						>
 							<FiPackage className="w-10 h-10 text-indigo-400" />
 						</motion.div>
-						
+
 						<div className="space-y-2">
 							<h3 className="text-xl font-bold text-gray-900">No products yet</h3>
 							<p className="text-gray-400 text-sm max-w-sm mx-auto leading-relaxed">
@@ -135,7 +135,7 @@ const ProductsPage = () => {
 							</p>
 						</div>
 
-						<Button 
+						<Button
 							onClick={handleCreate}
 							icon={<FiPlus className="w-5 h-5" />}
 							className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-200/50 transition-all !rounded-xl"
@@ -152,7 +152,7 @@ const ProductsPage = () => {
 				onClose={handleCloseModal}
 				onSubmit={handleSubmit}
 				product={editingProduct}
-				isSubmitting={isCreating || isUpdating}
+				isLoading={isCreating || isUpdating}
 			/>
 		</div>
 	);
