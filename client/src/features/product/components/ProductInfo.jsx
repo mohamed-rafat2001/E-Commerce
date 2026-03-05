@@ -26,12 +26,7 @@ const visibilityOptions = [
 ];
 
 const ProductInfo = ({
-  product,
-  isSeller = false,
-  isUpdating = false,
-  onChangeStatus,
-  onChangeVisibility,
-  onUpdateStock
+  product
 }) => {
   const [activeTab, setActiveTab] = useState('story');
   const [stockVal, setStockVal] = useState(product.countInStock || 0);
@@ -126,8 +121,8 @@ const ProductInfo = ({
                   key={s}
                   onClick={() => setSelectedSize(s)}
                   className={`min-w-[4rem] h-12 px-4 rounded-xl text-sm font-black transition-all border-2 ${selectedSize === s
-                      ? 'bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-900/20'
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'
+                    ? 'bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-900/20'
+                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'
                     }`}
                 >
                   {s}
@@ -205,57 +200,15 @@ const ProductInfo = ({
       </div>
 
       <div className="mt-auto">
-        {!isSeller ? (
-          <div className="flex items-stretch gap-4">
-            <button className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 group">
-              <FiShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span className="uppercase tracking-widest text-sm">Add to Bag</span>
-            </button>
-            <button className="w-16 h-[60px] bg-rose-50 rounded-2xl border border-rose-100 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all">
-              <FiHeart className="w-6 h-6" />
-            </button>
-          </div>
-        ) : (
-          <motion.div className="p-6 bg-[#0a0a0a] rounded-3xl text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent opacity-50 pointer-events-none" />
-            <div className="flex items-center justify-between mb-6 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <FiSave className="w-4 h-4 text-indigo-400" />
-                </div>
-                <h3 className="font-black text-lg">Seller Ops</h3>
-              </div>
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-none text-[9px] uppercase tracking-widest px-3 py-1">Synced</Badge>
-            </div>
-
-            <div className="space-y-5 relative z-10">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest ml-1">Lifecycle</span>
-                  <Select value={product.status} onChange={onChangeStatus} options={statusOptions} className="!bg-white/5 !border-white/10 !text-sm !py-3" />
-                </div>
-                <div className="space-y-1.5">
-                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest ml-1">Scope</span>
-                  <Select value={product.visibility} onChange={onChangeVisibility} options={visibilityOptions} className="!bg-white/5 !border-white/10 !text-sm !py-3" />
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-end">
-                <div className="space-y-1.5 flex-1">
-                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest ml-1">Inventory</span>
-                  <Input type="number" value={stockVal} onChange={(e) => setStockVal(e.target.value)} className="!bg-white/5 !border-white/10 !text-white text-center font-bold !text-lg !py-2.5" />
-                </div>
-                <button
-                  onClick={() => onUpdateStock(parseInt(stockVal))}
-                  disabled={isUpdating}
-                  className="bg-white text-black font-black px-6 h-[52px] rounded-xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-colors flex items-center"
-                >
-                  {isUpdating ? <LoadingSpinner size="sm" color="black" /> : 'Update'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        <div className="flex items-stretch gap-4">
+          <button className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 group">
+            <FiShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="uppercase tracking-widest text-sm">Add to Bag</span>
+          </button>
+          <button className="w-16 h-[60px] bg-rose-50 rounded-2xl border border-rose-100 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all">
+            <FiHeart className="w-6 h-6" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );

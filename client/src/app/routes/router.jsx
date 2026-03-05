@@ -10,7 +10,7 @@ import { LoginPage, RegisterPage } from "../../features/auth/pages/index.js";
 import { PublicCartPage, PublicWishlistPage } from "../../features/public/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
-import { 
+import {
 	AdminDashboardPage,
 	UsersPage as AdminUsersPage,
 	UserDetailsPage,
@@ -21,22 +21,23 @@ import {
 	BrandsPage
 } from "../../features/admin/pages/index.js";
 
-import { 
+import {
 	SellerDashboardPage,
 	ProductsPage as SellerProductsPage,
 	OrdersPage as SellerOrdersPage,
 	AnalyticsPage as SellerAnalyticsPage,
 	BrandsManagementPage,
 	BrandDetailsPage,
+	SellerProductDetailPage,
 } from "../../features/seller/pages/index.js";
 
-import { 
-	CustomerDashboardPage, 
-	ShippingAddressesPage, 
-	PaymentMethodsPage, 
+import {
+	CustomerDashboardPage,
+	ShippingAddressesPage,
+	PaymentMethodsPage,
 	OrderHistoryPage,
 	CartPage,
-	WishlistPage 
+	WishlistPage
 } from "../../features/customer/pages/index.js";
 
 // Pages - Shared
@@ -113,12 +114,12 @@ const router = createBrowserRouter([
 					},
 					{ path: "settings", element: <SettingsPage /> },
 					{ path: "inventory", element: <SellerProductsPage /> },
-					{ path: "inventory/:id", element: <ProductDetailPage /> },
+					{ path: "inventory/:id", element: <SellerProductDetailPage /> },
 					{ path: "orders", element: <SellerOrdersPage /> },
 					{ path: "brands", element: <BrandsManagementPage /> },
 					{ path: "brands/:id", element: <BrandDetailsPage /> },
 					{ path: "analytics", element: <SellerAnalyticsPage /> },
-					
+
 				],
 			},
 		],
@@ -157,13 +158,13 @@ const router = createBrowserRouter([
 						element: <OrderHistoryPage />,
 					},
 					{ path: "products/:id", element: <ProductDetailPage /> },
-					{ 
-						path: "cart", 
-						element: <CartPage /> 
+					{
+						path: "cart",
+						element: <CartPage />
 					},
-					{ 
-						path: "wishlist", 
-						element: <WishlistPage /> 
+					{
+						path: "wishlist",
+						element: <WishlistPage />
 					},
 					{ path: "settings", element: <SettingsPage /> },
 				],
@@ -171,7 +172,7 @@ const router = createBrowserRouter([
 		],
 	},
 
-	
+
 
 	// Page Not Found Route (Catch-all)
 	{

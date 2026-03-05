@@ -21,12 +21,7 @@ export default function ProductDetailPage() {
     isLoading,
     error,
     basePath,
-    isSeller,
-    gallery,
-    isUpdating,
-    onChangeStatus,
-    onChangeVisibility,
-    onUpdateStock
+    gallery
   } = useProductDetailPage(id);
 
   const { scrollY } = useScroll();
@@ -76,7 +71,7 @@ export default function ProductDetailPage() {
           className="flex items-center justify-between mb-8 md:mb-12 sticky top-4 z-40 bg-white/50 backdrop-blur-xl border border-white/50 px-6 py-4 rounded-3xl shadow-sm"
         >
           <button
-            onClick={() => navigate(isSeller ? '/seller/inventory' : basePath)}
+            onClick={() => navigate(basePath)}
             className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-gray-900 transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:-translate-x-1 transition-transform">
@@ -131,14 +126,7 @@ export default function ProductDetailPage() {
           {/* Info Column */}
           <div className="lg:col-span-5 xl:col-span-4 relative z-20">
             <div className="lg:sticky lg:top-28">
-              <ProductInfo
-                product={product}
-                isSeller={isSeller}
-                isUpdating={isUpdating}
-                onChangeStatus={onChangeStatus}
-                onChangeVisibility={onChangeVisibility}
-                onUpdateStock={onUpdateStock}
-              />
+              <ProductInfo product={product} />
             </div>
           </div>
         </div>

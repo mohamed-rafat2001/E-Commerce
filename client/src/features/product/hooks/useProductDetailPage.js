@@ -5,10 +5,8 @@ import useUpdateProduct from './useUpdateProduct.js';
 
 const DEFAULT_IMG = 'https://placehold.co/600x600?text=No+Image';
 
-export default function useProductDetailPage(id) {
+export default function useProductDetailPage(id, options = {}) {
   const basePath = useBasePath();
-
-  const isSeller = basePath === '/seller';
 
   const { product, isLoading, error } = useGetProduct(id);
 
@@ -23,9 +21,10 @@ export default function useProductDetailPage(id) {
     return list.length ? list : [DEFAULT_IMG];
   }, [product]);
 
+  const isSeller = options.isSeller || basePath === '/seller';
   const [thumbs, setThumbs] = useState(null);
-  const { updateProduct, isUpdating } = useUpdateProduct({ 
-    invalidateKeys: isSeller ? ['seller-products', 'product'] : ['products', 'product'] 
+  const { updateProduct, isUpdating } = useUpdateProduct({
+    invalidateKeys: isSeller ? ['seller-products', 'product'] : ['products', 'product']
   });
 
   const onChangeStatus = (status) => {
@@ -48,7 +47,6 @@ export default function useProductDetailPage(id) {
     isLoading,
     error,
     basePath,
-    isSeller,
     gallery,
     thumbs,
     setThumbs,

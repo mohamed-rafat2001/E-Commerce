@@ -33,13 +33,13 @@ const userSchema = new mongoose.Schema(
 		},
 		gender: {
 			type: String,
-			enum: ["male", "female", "other"],
-			default: "other",
+			enum: ["male", "female"],
+			default: "male",
 		},
 		profileImg: {
-				public_id: String,
-				secure_url: String,
-			},
+			public_id: String,
+			secure_url: String,
+		},
 		password: {
 			type: String,
 			required: [true, "password is required"],

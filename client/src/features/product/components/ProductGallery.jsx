@@ -26,7 +26,7 @@ const ProductGallery = ({ gallery, enableZoom = true }) => {
   };
 
   return (
-    <div className="relative group w-full bg-[#f8f9fa] h-full min-h-[500px] lg:min-h-[700px] flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden">
+    <div className="relative group w-full bg-[#f8f9fa] h-full min-h-[400px] flex flex-col items-center justify-center p-6 md:p-8 overflow-hidden">
 
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 mix-blend-multiply opacity-50" />
