@@ -70,10 +70,10 @@ const ProductCard = ({
     >
       {/* Image Section */}
       <Link to={detailUrl} className="block relative">
-        <div className="relative h-52 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
+        <div className="relative h-52 sm:h-60 lg:h-64 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
           {product.coverImage?.secure_url ? (
-            <img 
-              src={product.coverImage.secure_url} 
+            <img
+              src={product.coverImage.secure_url}
               alt={product.name}
               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               crossOrigin="anonymous"
@@ -89,7 +89,7 @@ const ProductCard = ({
 
           {/* Gradient overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
+
           {/* Status Badge - Top Left */}
           <div className="absolute top-3 left-3 z-10">
             <Badge variant={config.variant} className="shadow-md backdrop-blur-sm border border-white/20" size="sm">
@@ -98,7 +98,7 @@ const ProductCard = ({
           </div>
 
           {/* Quick View button on hover */}
-          <motion.div 
+          <motion.div
             initial={false}
             animate={{ opacity: showActions ? 1 : 0, y: showActions ? 0 : 8 }}
             transition={{ duration: 0.2 }}
@@ -119,7 +119,7 @@ const ProductCard = ({
               </span>
             </div>
           )}
-          
+
           {/* Rating badge */}
           {product.ratingAverage > 0 && (
             <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 bg-white/95 backdrop-blur-md px-2 py-1 rounded-lg text-[11px] font-bold shadow-md border border-white/50">
@@ -133,17 +133,17 @@ const ProductCard = ({
       </Link>
 
       {/* Content Section */}
-      <div className="p-5 space-y-4">
+      <div className="p-6 md:p-7 lg:p-8 space-y-5">
         {/* Title & Description */}
         <div>
-          <h3 className="font-bold text-base text-gray-900 truncate leading-tight mb-1.5">
+          <h3 className="font-extrabold text-lg md:text-xl text-gray-900 truncate leading-tight mb-2">
             <Link to={detailUrl} className="hover:text-indigo-600 transition-colors duration-200">
               {product.name}
             </Link>
           </h3>
-          <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">{product.description}</p>
+          <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed h-10">{product.description}</p>
         </div>
-        
+
         {/* Tags Row */}
         <div className="flex flex-wrap items-center gap-1.5">
           {product.brandId && (
@@ -188,8 +188,8 @@ const ProductCard = ({
                 <span className="text-[9px] font-bold text-gray-400 uppercase">Colors:</span>
                 <div className="flex -space-x-1">
                   {product.colors.slice(0, 5).map(color => (
-                    <span 
-                      key={color} 
+                    <span
+                      key={color}
                       className="w-5 h-5 rounded-full border-2 border-white shadow-sm ring-1 ring-gray-200/50"
                       style={{ backgroundColor: color }}
                       title={color}
@@ -218,7 +218,7 @@ const ProductCard = ({
               </span>
             )}
           </div>
-          
+
           {/* Stock Section */}
           <div className="flex items-center">
             {canEditStock && isEditingStock ? (
@@ -264,9 +264,9 @@ const ProductCard = ({
               <div className="flex items-center gap-1.5">
                 <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-lg ${stockStatus.bg} ${stockStatus.color} ${stockStatus.border} border`}>
                   <stockStatus.icon className="w-3 h-3" />
-                  {isPrivileged 
+                  {isPrivileged
                     ? stockStatus.label
-                    : (product.countInStock > 0 
+                    : (product.countInStock > 0
                       ? (showLimitedCount ? `Only ${product.countInStock} left` : 'Available')
                       : 'Not available'
                     )
@@ -289,9 +289,9 @@ const ProductCard = ({
         {hasActions && (
           <div className="flex gap-2 pt-1">
             {onEdit && (
-              <Button 
-                variant="secondary" 
-                size="sm" 
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => onEdit(product)}
                 icon={<FiEdit2 className="w-3.5 h-3.5" />}
                 className="flex-1 !text-xs !font-bold !rounded-xl !py-2 hover:!bg-indigo-50 hover:!text-indigo-600 hover:!border-indigo-200 transition-all"
@@ -300,9 +300,9 @@ const ProductCard = ({
               </Button>
             )}
             {onDelete && (
-              <Button 
-                variant="danger" 
-                size="sm" 
+              <Button
+                variant="danger"
+                size="sm"
                 onClick={() => onDelete(product._id)}
                 icon={<FiTrash2 className="w-3.5 h-3.5" />}
                 loading={isDeleting}
