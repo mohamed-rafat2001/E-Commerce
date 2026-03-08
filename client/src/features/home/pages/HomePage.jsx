@@ -1,12 +1,18 @@
 import React, { useEffect } from 'react';
 import { Header } from '../../../shared/widgets/Header';
 import {
+	AnnouncementBar,
 	HeroSection,
+	FeaturesStrip,
 	BrandsSection,
 	CategoriesSection,
+	FlashSaleSection,
 	ProductsSection,
+	BestSellersSection,
 	FeaturedSection,
 	TestimonialsSection,
+	StatsSection,
+	SellerCtaBanner,
 	NewsletterSection,
 	FooterSection
 } from '../components';
@@ -19,32 +25,51 @@ const HomePage = () => {
 
 	return (
 		<div className="min-h-screen bg-white">
+			{/* 1. Announcement Bar (Top-most) */}
+			<AnnouncementBar />
+
+			{/* 2. Sticky Navbar */}
 			<Header />
 
 			<main>
-				{/* SECTION B4: Hero Section (Full Screen Slider) */}
+				{/* 3. Hero Section */}
 				<HeroSection />
 
-				{/* SECTION B5: Brands Section (Infinite Ticker) */}
+				{/* 4. Features Trust Strip (Immediately after Hero) */}
+				<FeaturesStrip />
+
+				{/* 5. Brands Section */}
 				<BrandsSection />
 
-				{/* SECTION B6: Categories Section (Grid/Horizontal Scroll) */}
+				{/* 6. Categories Section */}
 				<CategoriesSection />
 
-				{/* SECTION B7: Products Section (Latest Products) */}
+				{/* 7. Flash Sale Section (With Countdown) */}
+				<FlashSaleSection />
+
+				{/* 8. New Arrivals (Products Grid) */}
 				<ProductsSection />
 
-				{/* SECTION B8: Featured Products Section (Asymmetric Grid) */}
+				{/* 9. Best Sellers Section (With Tabs) */}
+				<BestSellersSection />
+
+				{/* 10. Featured Picks (Asymmetric Grid) */}
 				<FeaturedSection />
 
-				{/* SECTION B9: Testimonials Section (Swiper) */}
+				{/* 11. What Our Community Says (Testimonials) */}
 				<TestimonialsSection />
 
-				{/* SECTION B10: Newsletter Section */}
+				{/* 12. Stats / Social Proof Numbers */}
+				<StatsSection />
+
+				{/* 13. Seller CTA Banner */}
+				<SellerCtaBanner />
+
+				{/* 14. Newsletter Section */}
 				<NewsletterSection />
 			</main>
 
-			{/* Footer Section */}
+			{/* 15. Footer Section */}
 			<FooterSection />
 		</div>
 	);

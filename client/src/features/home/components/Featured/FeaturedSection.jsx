@@ -1,38 +1,43 @@
 import React from 'react';
-import FeaturedCard from './FeaturedCard';
-import { useFeaturedProducts } from '../../hooks';
+import useFeaturedProducts from '../../hooks/useFeaturedProducts';
 import { SectionTitle } from '../../../../shared/ui';
+import FeaturedLargeCard from './FeaturedLargeCard';
+import FeaturedSmallCard from './FeaturedSmallCard';
 
 const FeaturedSection = () => {
     const { featuredProducts, isLoading } = useFeaturedProducts();
 
     if (isLoading || !featuredProducts.length) return null;
 
-    return (
-        <section className="py-24 bg-gray-900 border-y border-white/5 relative overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full -mr-64 -mt-64" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full -ml-64 -mb-64" />
+    // Use top 3 featured products as specified in instructions
+    const [largeProduct, ...smallProducts] = featuredProducts.slice(0, 3);
 
-            <div className="max-w-7xl mx-auto px-4 relative z-10">
-                <div className="text-white mb-16">
+    return (
+        <section className="py-24 bg-gray-50 border-y border-gray-100 overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 md:px-8">
+                <div className="text-center mb-16">
                     <SectionTitle
-                        title="Premium Spotlight"
-                        subtitle="The absolute best of the season, selected by our experts for your discerning taste."
-                        align="left"
-                        className="[&_h2]:text-white! [&_p]:text-gray-400!"
+                        title="Featured Picks"
+                        subtitle="A visually bold asymmetric layout showcasing our hand-picked hero products."
+                        align="center"
+                        className="mb-0"
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {featuredProducts.map((product, idx) => (
-                        <FeaturedCard
-                            key={product._id}
-                            product={product}
-                            isLarge={idx === 0}
-                            index={idx}
-                        />
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 md:gap-10 grid-rows-1 md:grid-rows-2 auto-rows-fr h-auto">
+                    {/* Large Card: Left side, spans 2 rows on desktop */}
+                    <div className="h-full">
+                        <FeaturedLargeCard product={largeProduct} />
+                    </div>
+
+                    {/* Smaller Cards: Stacked on the right */}
+                    <div className="flex flex-col gap-8 md:gap-10 h-full">
+                        {smallProducts.map((product, idx) => (
+                            <div key={product._id} className="h-full">
+                                <FeaturedSmallCard product={product} index={idx} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
