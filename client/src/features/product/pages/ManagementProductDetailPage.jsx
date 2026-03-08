@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LoadingSpinner } from '../../../shared/ui';
@@ -9,6 +9,7 @@ import {
     useProductDetailTabs,
     useDeleteProductFlow
 } from '../hooks';
+import useUpdateProduct from '../hooks/useUpdateProduct.js';
 
 // Components
 import ProductPageHeader from '../components/detail/ProductPageHeader';
@@ -20,6 +21,7 @@ import ProductDescriptionTab from '../components/detail/ProductDescriptionTab';
 import ProductVariantsTab from '../components/detail/ProductVariantsTab';
 import ProductReviewsTab from '../components/detail/ProductReviewsTab';
 import DeleteProductModal from '../components/detail/DeleteProductModal';
+import ProductFormModal from '../../seller/components/products/ProductFormModal.jsx';
 
 const ManagementProductDetailPage = ({ viewerRole = 'seller' }) => {
     const { id } = useParams();
@@ -28,6 +30,8 @@ const ManagementProductDetailPage = ({ viewerRole = 'seller' }) => {
     const { activeTab, setActiveTab, tabs } = useProductDetailTabs('details');
 
     const basePath = viewerRole === 'admin' ? '/admin/products' : '/seller/inventory';
+    
+    // Delete modal state
     const {
         isModalOpen,
         openModal,
@@ -35,6 +39,28 @@ const ManagementProductDetailPage = ({ viewerRole = 'seller' }) => {
         handleDelete,
         isDeleting
     } = useDeleteProductFlow(id, basePath);
+
+    // Update modal state
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const { updateProduct, isUpdating } = useUpdateProduct({
+        invalidateKeys: ['seller-products', 'product']
+    });
+
+    const handleOpenEditModal = () => {
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+    };
+
+    const handleUpdateProduct = (data) => {
+        updateProduct({ id: product._id, product: data }, {
+            onSuccess: () => {
+                setIsEditModalOpen(false);
+            }
+        });
+    };
 
     // Scroll to top on mount
     useEffect(() => {
@@ -69,7 +95,7 @@ const ManagementProductDetailPage = ({ viewerRole = 'seller' }) => {
     }
 
     const handleEdit = () => {
-        navigate(basePath, { state: { editProduct: product } });
+        handleOpenEditModal();
     };
 
     const handleViewPublic = () => {
@@ -151,6 +177,14 @@ const ManagementProductDetailPage = ({ viewerRole = 'seller' }) => {
                 onConfirm={handleDelete}
                 isDeleting={isDeleting}
                 productName={product.name}
+            />
+
+            <ProductFormModal
+                isOpen={isEditModalOpen}
+                onClose={handleCloseEditModal}
+                onSubmit={handleUpdateProduct}
+                product={product}
+                isLoading={isUpdating}
             />
         </motion.div>
     );

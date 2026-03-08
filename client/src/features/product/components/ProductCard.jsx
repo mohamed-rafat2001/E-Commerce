@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Badge } from '../../../shared/ui/index.js';
 import { FiEdit2, FiTrash2, FiImage, FiSave, FiX, FiMoreVertical, FiEye, FiPackage, FiTrendingDown, FiMinus, FiPlus } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import ProductCardGallery from './ProductCardGallery.jsx';
 
 const ProductCard = ({
   product,
@@ -17,6 +18,7 @@ const ProductCard = ({
   const [isEditingStock, setIsEditingStock] = useState(false);
   const [stockValue, setStockValue] = useState(product.countInStock);
   const [showActions, setShowActions] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const isPrivileged = basePath.startsWith('/seller') || basePath.startsWith('/admin');
   const showLimitedCount = (basePath === '/customer' || basePath === '/') && (product.countInStock > 0 && product.countInStock < 6);
 
@@ -54,6 +56,12 @@ const ProductCard = ({
       ? { label: `${product.countInStock} left`, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100', icon: FiTrendingDown }
       : { label: `${product.countInStock} in stock`, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', icon: FiPackage };
 
+  // Build images array for slider
+  const allImages = [
+    product.coverImage,
+    ...(Array.isArray(product.images) ? product.images : [])
+  ].filter(Boolean);
+
   return (
     <motion.div
       layout
@@ -65,30 +73,27 @@ const ProductCard = ({
       style={{
         boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)',
       }}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
+      onMouseEnter={() => {
+        setShowActions(true);
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        setShowActions(false);
+        setIsHovered(false);
+      }}
     >
       {/* Image Section */}
       <Link to={detailUrl} className="block relative">
-        <div className="relative h-52 sm:h-60 lg:h-64 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
-          {product.coverImage?.secure_url ? (
-            <img
-              src={product.coverImage.secure_url}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-              crossOrigin="anonymous"
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center">
-                <FiImage className="w-8 h-8 text-gray-300" />
-              </div>
-              <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">No image</span>
-            </div>
-          )}
+        <div className="relative h-52 sm:h-60 lg:h-64 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50">
+          <ProductCardGallery
+            images={allImages}
+            productName={product.name}
+            isHovered={isHovered}
+            autoSlide={true}
+          />
 
           {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
           {/* Status Badge - Top Left */}
           <div className="absolute top-3 left-3 z-10">

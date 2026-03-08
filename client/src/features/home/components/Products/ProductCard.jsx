@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiShoppingBag, FiHeart, FiStar } from 'react-icons/fi';
 import { Badge, Button, Card } from '../../../../shared/ui';
+import ProductCardGallery from '../../../product/components/ProductCardGallery.jsx';
 
 const ProductCard = ({ product, index, onAddToCart }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    // Build images array for gallery
+    const allImages = [
+        product.image,
+        ...(Array.isArray(product.images) ? product.images : [])
+    ].filter(Boolean);
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -12,11 +20,15 @@ const ProductCard = ({ product, index, onAddToCart }) => {
             transition={{ delay: index * 0.1 }}
         >
             <Card hoverable className="p-0 border-none group">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-                    <img
-                        src={product.image?.secure_url || 'https://placehold.co/400x500'}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+                <div 
+                    className="relative aspect-[4/5] overflow-hidden rounded-2xl"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    <ProductCardGallery
+                        images={allImages}
+                        productName={product.name}
+                        isHovered={isHovered}
                     />
 
                     <div className="absolute top-4 left-4 flex flex-col gap-2">

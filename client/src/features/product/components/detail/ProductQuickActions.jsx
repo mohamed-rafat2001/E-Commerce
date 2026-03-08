@@ -14,19 +14,6 @@ const ProductQuickActions = ({
 
     return (
         <div className="flex flex-col gap-4 mt-8">
-            {isSeller && (
-                <Button
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    icon={<FiEdit3 className="w-5 h-5" />}
-                    onClick={onEdit}
-                    className="!rounded-2xl !h-16 font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-indigo-200 hover:scale-[1.02] active:scale-95 transition-all"
-                >
-                    Update Asset Record
-                </Button>
-            )}
-
             <Button
                 variant="outline"
                 size="lg"

@@ -3,6 +3,8 @@ export { default as useDeleteProduct } from './useDeleteProduct';
 export { default as useDeleteAllProducts } from './useDeleteAllProducts';
 export { default as useDeleteProductFlow } from './useDeleteProductFlow';
 export { default as useGetProduct } from './useGetProduct';
+export { default as useProductCardGallery } from './useProductCardGallery';
+export { default as useProductCardSlider } from './useProductCardSlider';
 export { default as useProductDetail } from './useProductDetail';
 export { default as useProductDetailPage } from './useProductDetailPage';
 export { default as useProductDetailTabs } from './useProductDetailTabs';

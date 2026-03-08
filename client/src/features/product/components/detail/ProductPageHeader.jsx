@@ -43,7 +43,7 @@ const ProductPageHeader = ({
                         onClick={onEdit}
                         className="!rounded-[1.5rem] !px-10 !h-16 font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-200 hover:!scale-105 active:!scale-95 transition-all"
                     >
-                        Modify Asset
+                        Update
                     </Button>
                 )}
 
