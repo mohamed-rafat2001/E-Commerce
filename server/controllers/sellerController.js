@@ -8,8 +8,8 @@ import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 import cloudinary from "../utils/cloudinary.js";
-
 import { getCache, setCache, deleteCache } from "../utils/cache.js";
+import { fetchSellerDashboardStats, fetchSellerAnalyticsData } from "../services/sellerAnalyticsService.js";
 
 //  @desc  Get seller's own profile
 // @Route  GET /api/v1/sellers/profile
@@ -78,146 +78,31 @@ export const addPayoutMethodtoSeller = catchAsync(async (req, res, next) => {
 // @desc    Get seller dashboard statistics
 // @route   GET /api/v1/sellers/dashboard-stats
 // @access  Private/Seller
+// @desc    Get seller dashboard statistics
+// @route   GET /api/v1/sellers/dashboard-stats
+// @access  Private/Seller
 export const getSellerDashboardStats = catchAsync(async (req, res, next) => {
-	const seller = await SellerModel.findOne({ userId: req.user._id });
-	if (!seller) return next(new appError("Seller profile not found", 404));
-
-	// 1. Total Products
-	const totalProducts = await ProductModel.countDocuments({ userId: req.user._id });
-
-	// 2. Total Orders and Revenue from OrderItems
-	const orderItems = await OrderItemsModel.find({ sellerId: seller._id })
-		.populate("orderId")
-		.sort("-createdAt");
-
-	const totalOrders = orderItems.length;
-	const totalRevenue = orderItems.reduce((sum, item) => sum + (item.totalPrice?.amount || 0), 0);
-	const pendingOrdersCount = orderItems.filter(oi => oi.orderId?.status === "Pending").length;
-
-	// 3. Low stock items
-	const lowStockItems = await ProductModel.countDocuments({
-		userId: req.user._id,
-		countInStock: { $lte: 5 }
-	});
-
-	// 4. Recent orders (transformed for UI)
-	const recentOrders = orderItems.slice(0, 5).map(oi => ({
-		id: oi.orderId?._id || oi._id,
-		customer: oi.orderId?.userId?.name || "Unknown",
-		amount: oi.totalPrice?.amount || 0,
-		status: oi.orderId?.status || "Pending",
-		date: oi.createdAt
-	}));
-
-	// 5. Top products
-	// (Simplification: just get top 5 products by sales if we had a sales field, 
-	// or calculate from orderItems)
-	const topProducts = await ProductModel.find({ userId: req.user._id })
-		.sort("-ratingAverage") // Placeholder sorting
-		.limit(5)
-		.select("name price ratingAverage");
-
-	sendResponse(res, 200, {
-		totalProducts,
-		totalOrders,
-		totalRevenue,
-		pendingOrders: pendingOrdersCount,
-		lowStockItems,
-		recentOrders,
-		topProducts
-	});
+	try {
+		const data = await fetchSellerDashboardStats(req.user);
+		sendResponse(res, 200, data);
+	} catch (error) {
+		return next(new appError(error.message, 404));
+	}
 });
 
 // @desc    Get seller analytics
 // @route   GET /api/v1/sellers/analytics
 // @access  Private/Seller
+// @desc    Get seller analytics
+// @route   GET /api/v1/sellers/analytics
+// @access  Private/Seller
 export const getSellerAnalytics = catchAsync(async (req, res, next) => {
-	const seller = await SellerModel.findOne({ userId: req.user._id });
-	if (!seller) return next(new appError("Seller profile not found", 404));
-
-	const orderItems = await OrderItemsModel.find({ sellerId: seller._id })
-		.populate("orderId")
-		.populate("items.item", "name price category brand coverImage")
-		.sort("-createdAt");
-
-	// Group by month for chart data
-	const monthlyRevenue = {};
-	const monthlyOrders = {};
-	orderItems.forEach(item => {
-		const date = new Date(item.createdAt);
-		const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-		const monthLabel = date.toLocaleString('default', { month: 'short' });
-		if (!monthlyRevenue[monthKey]) {
-			monthlyRevenue[monthKey] = { month: monthLabel, revenue: 0, orders: 0 };
-		}
-		monthlyRevenue[monthKey].revenue += (item.totalPrice?.amount || 0);
-		monthlyRevenue[monthKey].orders += 1;
-	});
-
-	const revenueTrend = Object.keys(monthlyRevenue)
-		.sort()
-		.slice(-12)
-		.map(key => monthlyRevenue[key]);
-
-	// Order status breakdown
-	const statusBreakdown = {
-		Pending: 0, Processing: 0, Shipped: 0, Delivered: 0, Cancelled: 0
-	};
-	orderItems.forEach(oi => {
-		const status = oi.orderId?.status || 'Pending';
-		if (statusBreakdown[status] !== undefined) statusBreakdown[status]++;
-	});
-
-	// Top products by revenue
-	const productRevenue = {};
-	orderItems.forEach(oi => {
-		oi.items.forEach(item => {
-			const productId = item.item?._id?.toString();
-			if (productId) {
-				if (!productRevenue[productId]) {
-					productRevenue[productId] = {
-						name: item.item.name,
-						image: item.item.coverImage?.secure_url || '📦',
-						sales: 0,
-						revenue: 0
-					};
-				}
-				productRevenue[productId].sales += item.quantity;
-				productRevenue[productId].revenue += (item.price?.amount || 0);
-			}
-		});
-	});
-
-	const topProducts = Object.values(productRevenue)
-		.sort((a, b) => b.revenue - a.revenue)
-		.slice(0, 5);
-
-	// Recent sales
-	const recentSales = orderItems.slice(0, 10).map(oi => ({
-		id: oi.orderId?._id || oi._id,
-		date: oi.createdAt,
-		product: oi.items?.[0]?.item?.name || 'Product',
-		amount: oi.totalPrice?.amount || 0,
-		status: oi.orderId?.status || 'Pending'
-	}));
-
-	// Total products
-	const totalProducts = await ProductModel.countDocuments({ userId: req.user._id });
-	const activeProducts = await ProductModel.countDocuments({ userId: req.user._id, status: 'active' });
-	const draftProducts = await ProductModel.countDocuments({ userId: req.user._id, status: 'draft' });
-
-	sendResponse(res, 200, {
-		revenueTrend,
-		statusBreakdown,
-		topProducts,
-		recentSales,
-		totalRevenue: orderItems.reduce((sum, item) => sum + (item.totalPrice?.amount || 0), 0),
-		totalOrders: orderItems.length,
-		totalProducts,
-		activeProducts,
-		draftProducts,
-		sellerRating: { average: seller.averageBrandRating, count: seller.totalReviews },
-	});
+	try {
+		const data = await fetchSellerAnalyticsData(req.user);
+		sendResponse(res, 200, data);
+	} catch (error) {
+		return next(new appError(error.message, 404));
+	}
 });
 
 // @desc    Update order status by seller (Processing → Shipped)

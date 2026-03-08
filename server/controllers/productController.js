@@ -8,6 +8,7 @@ import {
 	getById,
 	updateByOwner,
 } from "./handlerFactory.js";
+import { getCache, setCache } from "../utils/cache.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 
@@ -71,9 +72,6 @@ export const updateProduct = updateByOwner(ProductModel, [
 //  @Route  DELETE /api/v1/products
 //  @access Private/Admin || seller
 export const deleteAllProducts = deleteManyByOwner(ProductModel);
-
-import { getCache, setCache } from "../utils/cache.js";
-
 //  @desc   Get products by brand ID
 // @Route   GET /api/v1/products/brand/:brandId
 // @access  Private/Seller
