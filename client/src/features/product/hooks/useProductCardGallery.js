@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * useProductCardGallery - Hook for managing vertical thumbnail gallery in product cards

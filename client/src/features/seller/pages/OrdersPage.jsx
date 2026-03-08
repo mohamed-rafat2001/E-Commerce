@@ -1,4 +1,3 @@
-import { useSearchParams } from 'react-router-dom';
 import { PageHeader, Pagination, DataTable, Badge, Card, Button, Skeleton } from '../../../shared/ui/index.js';
 import { useSellerOrdersPage } from '../hooks/index.js';
 import OrdersStats from '../components/orders/OrdersStats.jsx';
@@ -50,7 +49,7 @@ const OrdersPage = () => {
 		},
 		{
 			header: 'Actions',
-			render: (row) => (
+			render: () => (
 				<Button variant="ghost" size="sm" icon={<FiEye />} className="hover:text-indigo-600">
 					Details
 				</Button>

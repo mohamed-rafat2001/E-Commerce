@@ -1,11 +1,9 @@
-import { FiHeart, FiShoppingBag, FiTrash2, FiArrowRight } from "react-icons/fi";
+import { FiHeart, FiTrash2, FiArrowRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button, Card, Badge, PageHeader, Skeleton, EmptyState } from "../../../shared/ui";
 import useWishlist from "../../wishList/hooks/useWishlist";
 import useDeleteFromWishlist from "../../wishList/hooks/useDeleteFromWishlist";
-import useAddToCart from "../../cart/hooks/useAddToCart";
-import toast from "react-hot-toast";
 import { useState } from "react";
 import ProductCardGallery from "../../product/components/ProductCardGallery.jsx";
 
@@ -58,21 +56,13 @@ const WishlistProductCard = ({ item, onDelete }) => {
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">
-						<Button
-							variant="primary"
-							icon={<FiShoppingBag />}
-							onClick={() => handleMoveToCart(item.itemId)}
-							disabled={item.itemId.stock <= 0 || isAddingToCart}
-						>
-							Add to Cart
-						</Button>
-						<Link to={`/product/${item.itemId._id}`} className="w-full">
+						<Link to={`/product/${item.itemId._id}`} className="w-full col-span-2">
 							<Button
-								variant="outline"
+								variant="primary"
 								fullWidth
 								className="flex items-center justify-center gap-2"
 							>
-								View Details
+								Add to Cart
 							</Button>
 						</Link>
 					</div>
@@ -85,19 +75,8 @@ const WishlistProductCard = ({ item, onDelete }) => {
 const WishlistPage = () => {
 	const { wishlist, isLoading } = useWishlist();
 	const { deleteFromWishlist } = useDeleteFromWishlist();
-	const { addToCart, isLoading: isAddingToCart } = useAddToCart();
 
 	const wishlistItems = wishlist?.items || [];
-
-	const handleMoveToCart = async (product) => {
-		try {
-			await addToCart({ itemId: product._id, quantity: 1 });
-			await deleteFromWishlist(product._id);
-			toast.success(`${product.name} moved to cart!`);
-		} catch {
-			toast.error("Failed to move item to cart");
-		}
-	};
 
 	if (isLoading) {
 		return (

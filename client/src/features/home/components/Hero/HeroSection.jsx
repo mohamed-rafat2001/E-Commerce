@@ -1,7 +1,5 @@
 import React from 'react';
 import HeroSlide from './HeroSlide';
-import { useHeroSlider } from '../../hooks';
-import { useBananaAI } from '../../../../shared/hooks/useBananaAI';
 import { Slider } from '../../../../shared/ui';
 
 const slidesConfig = [

@@ -5,7 +5,7 @@ import { Badge, Button, Card } from '../../../../shared/ui';
 import { AddToCartButton, WishlistButton } from '../../../../shared';
 import ProductCardGallery from '../../../product/components/ProductCardGallery.jsx';
 
-const ProductCard = ({ product, index, onAddToCart }) => {
+const ProductCard = ({ product, index }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     // Build images array for gallery

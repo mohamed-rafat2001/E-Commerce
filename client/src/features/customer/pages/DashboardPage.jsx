@@ -7,7 +7,7 @@ import useOrderHistory from '../hooks/useOrderHistory'; // Assuming this exists 
 
 const CustomerDashboard = () => {
 	const { user } = useCurrentUser();
-	const { orders, isLoading } = useOrderHistory();
+	const { orders } = useOrderHistory();
 
 	const ordersList = orders || [];
 

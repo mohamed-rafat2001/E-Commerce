@@ -23,7 +23,6 @@ const ProductCardImageSlider = memo(function ProductCardImageSlider({
     handleTouchStart,
     handleTouchEnd,
     visibleDots,
-    isSliderActive,
     containerRef,
   } = useProductCardSlider({ images, isHovered });
 

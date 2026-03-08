@@ -17,7 +17,6 @@ const ProductInfo = ({
   product
 }) => {
   const [activeTab, setActiveTab] = useState('story');
-  const [stockVal, setStockVal] = useState(product.countInStock || 0);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
 

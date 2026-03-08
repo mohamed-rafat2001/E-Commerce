@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { FiImage } from 'react-icons/fi';
 import useProductCardGallery from '../hooks/useProductCardGallery';
 
@@ -24,7 +24,6 @@ const ProductCardGallery = memo(function ProductCardGallery({
     handleMouseLeave,
     handleTouchStart,
     handleTouchEnd,
-    isSliderActive,
   } = useProductCardGallery({ images, isHovered, autoSlide });
 
   // Fallback: No images or invalid data

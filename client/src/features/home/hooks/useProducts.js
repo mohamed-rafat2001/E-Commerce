@@ -22,7 +22,7 @@ const useProducts = () => {
         try {
             await addToCart({ productId: product._id, quantity: 1 });
             showSuccess(`${product.name} added to cart!`);
-        } catch (err) {
+        } catch {
             showError('Failed to add to cart. Please try again.');
         }
     }, [showSuccess, showError]);

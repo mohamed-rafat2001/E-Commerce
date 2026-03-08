@@ -14,7 +14,9 @@ export const useBestSellers = () => {
         staleTime: 5 * 60 * 1000,
     });
 
-    const products = response?.data?.data || [];
+    const products = useMemo(() => {
+        return response?.data?.data || [];
+    }, [response]);
 
     const filteredProducts = useMemo(() => {
         if (activeTab === "All") return products;
