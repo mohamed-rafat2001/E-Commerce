@@ -6,21 +6,49 @@ import useCurrentUser from '../../user/hooks/useCurrentUser';
 import useOrderHistory from '../hooks/useOrderHistory'; // Assuming this exists or using mock
 
 const CustomerDashboard = () => {
-	const { user, userRole } = useCurrentUser();
-	const { orders, isLoading } = useOrderHistory() || { orders: [], isLoading: false };
+	const { user } = useCurrentUser();
+	const { orders, isLoading } = useOrderHistory();
+
+	const ordersList = orders || [];
 
 	const stats = [
-		{ title: 'Total Orders', value: '12', icon: <FiShoppingBag />, color: 'primary', change: '+2 this month' },
-		{ title: 'Wishlist Items', value: '8', icon: <FiHeart />, color: 'accent', change: 'Updated today' },
-		{ title: 'Pending Orders', value: '2', icon: <FiClock />, color: 'warning', change: 'Expecting delivery' },
-		{ title: 'Settings', value: 'Profile', icon: <FiSettings />, color: 'emerald', change: '100% Complete' }
+		{
+			title: 'Total Orders',
+			value: ordersList.length.toString(),
+			icon: <FiShoppingBag />,
+			color: 'primary',
+			change: '+2 this month'
+		},
+		{
+			title: 'Wishlist Items',
+			value: '8',
+			icon: <FiHeart />,
+			color: 'accent',
+			change: 'Updated today'
+		},
+		{
+			title: 'Pending Orders',
+			value: ordersList.filter(o => o.status === 'pending' || o.status === 'processing').length.toString(),
+			icon: <FiClock />,
+			color: 'warning',
+			change: 'Expecting delivery'
+		},
+		{
+			title: 'Settings',
+			value: 'Profile',
+			icon: <FiSettings />,
+			color: 'emerald',
+			change: '100% Complete'
+		}
 	];
 
-	const recentOrders = [
-		{ id: 'ORD-7721', date: '2026-03-05', total: '$129.00', status: 'Shipped', statusColor: 'primary' },
-		{ id: 'ORD-7604', date: '2026-02-28', total: '$85.50', status: 'Delivered', statusColor: 'success' },
-		{ id: 'ORD-7590', date: '2026-02-20', total: '$210.00', status: 'Delivered', statusColor: 'success' },
-	];
+	const recentOrders = ordersList.slice(0, 5).map(o => ({
+		id: `ORD-${o._id.substring(o._id.length - 4)}`,
+		date: new Date(o.createdAt).toLocaleDateString(),
+		total: `$${o.totalPrice?.amount || 0}`,
+		status: o.status,
+		statusColor: o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning'
+	}));
 
 	const orderColumns = [
 		{ header: 'Order ID', key: 'id' },

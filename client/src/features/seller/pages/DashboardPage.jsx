@@ -13,16 +13,58 @@ const DashboardPage = () => {
 	} = useSellerDashboardPage();
 
 	const dashboardStats = [
-		{ title: 'Total Revenue', value: stats?.revenue || '$0.00', icon: <FiTrendingUp />, color: 'primary', change: '+12% from last month' },
-		{ title: 'Orders', value: stats?.ordersCount || '0', icon: <FiShoppingBag />, color: 'accent', change: '5 pending' },
-		{ title: 'Active Products', value: products?.length || '0', icon: <FiPackage />, color: 'emerald', change: '2 out of stock' },
-		{ title: 'Shipments', value: stats?.shipments || '0', icon: <FiTruck />, color: 'warning', change: '3 on the way' }
+		{
+			title: 'Total Revenue',
+			value: stats?.totalRevenue ? `$${stats.totalRevenue.toLocaleString()}` : '$0.00',
+			icon: <FiTrendingUp />,
+			color: 'primary',
+			change: '+12% from last month'
+		},
+		{
+			title: 'Total Orders',
+			value: stats?.totalOrders || '0',
+			icon: <FiShoppingBag />,
+			color: 'accent',
+			change: `${stats?.pendingOrders || 0} pending`
+		},
+		{
+			title: 'Live Products',
+			value: stats?.totalProducts || '0',
+			icon: <FiPackage />,
+			color: 'emerald',
+			change: `${stats?.lowStockItems || 0} low stock`
+		},
+		{
+			title: 'Avg. Rating',
+			value: '4.9',
+			icon: <FiTruck />,
+			color: 'warning',
+			change: 'Top Rated Seller'
+		}
 	];
 
 	const orderColumns = [
-		{ header: 'Order ID', key: 'id' },
-		{ header: 'Status', render: (row) => <Badge variant={row.statusColor}>{row.status}</Badge> },
-		{ header: 'Amount', key: 'total' },
+		{
+			header: 'Order ID',
+			render: (row) => <span className="font-bold">ORD-{row._id.substring(0, 6)}</span>
+		},
+		{
+			header: 'Status',
+			render: (row) => (
+				<Badge
+					variant={
+						row.status === 'delivered' ? 'success' :
+							row.status === 'pending' ? 'warning' : 'primary'
+					}
+				>
+					{row.status}
+				</Badge>
+			)
+		},
+		{
+			header: 'Amount',
+			render: (row) => <span className="font-black">${row.totalPrice?.amount || 0}</span>
+		},
 		{ header: 'Actions', render: () => <Button variant="ghost" size="sm">Manage</Button> }
 	];
 
