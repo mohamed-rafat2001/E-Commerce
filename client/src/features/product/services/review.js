@@ -3,8 +3,8 @@ import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/servic
 // add category
 export const addReview = (review, id) => addFunc(`reviews/${id}`, review);
 
-// get review
-export const getReview = (id) => getFunc(`reviews/${id}`);
+// get reviews for a product
+export const getReview = (id, config = {}) => getFunc(`reviews/${id}`, config);
 
 // delete category
 export const deleteReview = (id) => deleteFunc(`reviews/${id}`);

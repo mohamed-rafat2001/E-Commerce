@@ -44,7 +44,7 @@ import {
 import { PersonalDetailsPage } from "../../features/user/pages/index.js";
 import { SettingsPage } from "../../features/settings/pages/index.js";
 import { PlaceholderPage } from "../../shared/pages/index.js";
-import { ProductDetailPage } from "../../features/product/pages/index.js";
+import { ProductDetailPage, ManagementProductDetailPage } from "../../features/product/pages/index.js";
 
 // UI Components
 import PageNotFound from "../../shared/ui/PageNotFound.jsx";
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
 					{ path: "users", element: <AdminUsersPage /> },
 					{ path: "users/:userId", element: <UserDetailsPage /> },
 					{ path: "products", element: <AdminProductsPage /> },
-					{ path: "products/:id", element: <ProductDetailPage /> },
+					{ path: "products/:id", element: <ManagementProductDetailPage viewerRole="admin" /> },
 					{ path: "orders", element: <AdminOrdersPage /> },
 					{ path: "analytics", element: <AdminAnalyticsPage /> },
 					{ path: "categories", element: <CategoriesAndSubCategoriesPage /> },
@@ -114,7 +114,7 @@ const router = createBrowserRouter([
 					},
 					{ path: "settings", element: <SettingsPage /> },
 					{ path: "inventory", element: <SellerProductsPage /> },
-					{ path: "inventory/:id", element: <SellerProductDetailPage /> },
+					{ path: "inventory/:id", element: <ManagementProductDetailPage viewerRole="seller" /> },
 					{ path: "orders", element: <SellerOrdersPage /> },
 					{ path: "brands", element: <BrandsManagementPage /> },
 					{ path: "brands/:id", element: <BrandDetailsPage /> },
