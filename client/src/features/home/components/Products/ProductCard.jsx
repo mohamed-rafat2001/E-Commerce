@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiShoppingBag, FiHeart, FiStar } from 'react-icons/fi';
+import { FiStar } from 'react-icons/fi';
 import { Badge, Button, Card } from '../../../../shared/ui';
+import { AddToCartButton, WishlistButton } from '../../../../shared';
 import ProductCardGallery from '../../../product/components/ProductCardGallery.jsx';
 
 const ProductCard = ({ product, index, onAddToCart }) => {
@@ -36,9 +37,9 @@ const ProductCard = ({ product, index, onAddToCart }) => {
                         {product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
                     </div>
 
-                    <button className="absolute top-4 right-4 p-3 bg-white/80 backdrop-blur-md rounded-full text-gray-400 hover:text-red-500 hover:bg-white transition-all duration-300 shadow-lg">
-                        <FiHeart className="w-5 h-5" />
-                    </button>
+                    <div className="absolute top-4 right-4 z-10">
+                        <WishlistButton product={product} size="md" />
+                    </div>
 
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                         <motion.div
@@ -46,12 +47,13 @@ const ProductCard = ({ product, index, onAddToCart }) => {
                             whileHover={{ y: 0, opacity: 1 }}
                             className="w-full"
                         >
-                            <Button
-                                onClick={() => onAddToCart(product)}
-                                className="w-full !bg-indigo-600 !text-white border-none hover:!bg-indigo-700 font-black py-4 flex items-center justify-center gap-3 shadow-2xl transition-all"
-                            >
-                                <FiShoppingBag className="w-5 h-5" /> Add to Cart
-                            </Button>
+                            <AddToCartButton 
+                                product={product}
+                                variant="primary"
+                                size="lg"
+                                fullWidth
+                                className="!bg-indigo-600 !text-white border-none hover:!bg-indigo-700 font-black py-4 shadow-2xl"
+                            />
                         </motion.div>
                     </div>
                 </div>

@@ -38,7 +38,7 @@ router.route("/").get(getCart);
 /**
  * @swagger
  * /api/v1/cart:
- *   patch:
+ *   post:
  *     summary: Add item to cart or update quantity
  *     tags: [Cart]
  *     security:
@@ -60,7 +60,7 @@ router.route("/").get(getCart);
  *       200:
  *         description: Item added/updated in cart
  */
-router.route("/").patch(addToCart);
+router.route("/").post(addToCart);
 
 /**
  * @swagger

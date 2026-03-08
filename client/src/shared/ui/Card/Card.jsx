@@ -47,8 +47,15 @@ export const Content = ({ children, className = "", padding = "p-6" }) => (
 	</div>
 );
 
+export const Footer = ({ children, className = "" }) => (
+	<div className={`px-6 py-4 bg-gray-50/30 ${className}`}>
+		{children}
+	</div>
+);
+
 Card.Header = Header;
 Card.Title = Title;
 Card.Content = Content;
+Card.Footer = Footer;
 
 export default Card;

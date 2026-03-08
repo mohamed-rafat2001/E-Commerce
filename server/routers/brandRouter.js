@@ -9,6 +9,7 @@ import {
 	deleteBrand,
 	updateBrandLogo,
 	deleteBrandLogo,
+	getAllActiveBrands,
 } from "../controllers/brandController.js";
 import { uploadBrandImages, uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 
@@ -19,6 +20,10 @@ import { uploadBrandImages, uploadSingleImage, setCloudinaryBody } from "../midd
  *   description: Brand management API for sellers
  */
 
+// Public routes (no auth required) - for landing page display
+router.get("/public", getAllActiveBrands); // Public brand list for home page
+
+// Protected routes (Seller only)
 router.use(Protect, restrictTo("Seller"));
 
 /**

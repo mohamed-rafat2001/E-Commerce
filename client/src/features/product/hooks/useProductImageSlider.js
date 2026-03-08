@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 /**
  * Hook to manage product image slider state
@@ -7,6 +7,7 @@ import { useState, useMemo } from 'react';
 export const useProductImageSlider = (images = []) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const autoSlideIntervalRef = useRef(null);
 
     const gallery = useMemo(() => {
         if (!images || images.length === 0) return [];
@@ -31,6 +32,28 @@ export const useProductImageSlider = (images = []) => {
 
     const openLightbox = () => setIsLightboxOpen(true);
     const closeLightbox = () => setIsLightboxOpen(false);
+
+    // Auto-slide functionality - slides every 5 seconds
+    useEffect(() => {
+        if (gallery.length <= 1) return;
+
+        // Clear any existing interval
+        if (autoSlideIntervalRef.current) {
+            clearInterval(autoSlideIntervalRef.current);
+        }
+
+        // Set up auto-slide interval (5 seconds)
+        autoSlideIntervalRef.current = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % gallery.length);
+        }, 5000);
+
+        // Cleanup on unmount or when gallery changes
+        return () => {
+            if (autoSlideIntervalRef.current) {
+                clearInterval(autoSlideIntervalRef.current);
+            }
+        };
+    }, [gallery.length]);
 
     return {
         gallery,

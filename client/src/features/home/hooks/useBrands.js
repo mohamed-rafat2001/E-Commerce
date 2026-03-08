@@ -8,7 +8,7 @@ import { getFunc } from '../../../shared/services/handlerFactory';
 const useBrands = () => {
     const { data: response, isLoading, error } = useQuery({
         queryKey: ['home-brands'],
-        queryFn: () => getFunc('brands'),
+        queryFn: () => getFunc('brands/public'), // Use public endpoint
         staleTime: 60 * 60 * 1000,
     });
 

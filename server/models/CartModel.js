@@ -37,35 +37,41 @@ cartSchema.pre(/^find/, function () {
 });
 
 cartSchema.pre("save", async function (next) {
-	if (!this.isModified("items")) return next();
+	if (!this.isModified("items")) {
+		return next();
+	}
 
-	// Use populate to get product details directly
-	await this.populate("items.item");
+	try {
+		// Use populate to get product details directly
+		await this.populate("items.item");
 
-	let currency = "USD";
-	let grandTotal = 0;
+		let currency = "USD";
+		let grandTotal = 0;
 
-	this.items.forEach((item) => {
-		if (item.item && item.item.price) {
-			const unitPrice = item.item.price.amount;
-			const itemSubtotal = unitPrice * item.quantity;
+		for (const item of this.items) {
+			if (item.item && item.item.price) {
+				const unitPrice = item.item.price.amount;
+				const itemSubtotal = unitPrice * item.quantity;
 
-			// Set the item price to the subtotal for that quantity
-			item.price = {
-				amount: itemSubtotal,
-				currency: item.item.price.currency,
-			};
+				// Set the item price to the subtotal for that quantity
+				item.price = {
+					amount: itemSubtotal,
+					currency: item.item.price.currency,
+				};
 
-			currency = item.item.price.currency;
-			// Add this item's subtotal to the grand total
-			grandTotal += itemSubtotal;
+				currency = item.item.price.currency;
+				// Add this item's subtotal to the grand total
+				grandTotal += itemSubtotal;
+			}
 		}
-	});
 
-	this.totalPrice = {
-		amount: grandTotal,
-		currency: currency,
-	};
+		this.totalPrice = {
+			amount: grandTotal,
+			currency: currency,
+		};
+	} catch (error) {
+		return next(error);
+	}
 
 	next();
 });

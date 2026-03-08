@@ -22,6 +22,8 @@ import {
 	ChevronRightIcon,
 	SettingsIcon
 } from '../../constants/icons.jsx';
+import CartDrawer from '../../components/CartDrawer.jsx';
+import WishlistDrawer from '../../components/WishlistDrawer.jsx';
 
 const Header = ({ isPanel = false }) => {
 	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
@@ -368,6 +370,12 @@ const Header = ({ isPanel = false }) => {
 					</div>
 				</div>
 			</Modal>
+			
+			{/* Cart Drawer */}
+			<CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+			
+			{/* Wishlist Drawer */}
+			<WishlistDrawer isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
 		</motion.header>
 	);
 };

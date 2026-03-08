@@ -27,6 +27,26 @@ const invalidateBrandCache = async (brandId) => {
 	if (brandId) await deleteCache(`brands:id:${brandId}`);
 };
 
+// @desc    Get all active brands (public endpoint for landing page)
+// @route   GET /api/v1/brands/public
+// @access  Public
+export const getAllActiveBrands = catchAsync(async (req, res, next) => {
+	const query = BrandModel.find({ isActive: true });
+
+	// Apply API features (filtering, sorting, pagination, etc.)
+	const features = new APIFeatures(query, req.query)
+		.filter()
+		.sort()
+		.limitFields()
+		.search(BrandModel.schema)
+		.paginate();
+
+	const brands = await features.query;
+
+	// Send response
+	return sendResponse(res, 200, "Brands retrieved successfully", brands);
+});
+
 // @desc    Get all brands for current seller
 // @route   GET /api/v1/brands
 // @access  Private/Seller
