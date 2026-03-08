@@ -36,7 +36,7 @@ const FeaturedLargeCard = ({ product }) => {
                         ${product.price?.amount || product.price || 0}
                     </span>
                     <Link to={`/products/${product._id}`}>
-                        <Button className="bg-white text-gray-900 border-none px-12 py-5 font-black hover:bg-amber-400 hover:text-black shadow-2xl transition-all">
+                        <Button className="!bg-indigo-600 text-white border-none px-12 py-5 font-black hover:!bg-indigo-700 shadow-2xl transition-all">
                             Shop All Now
                         </Button>
                     </Link>

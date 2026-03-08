@@ -69,7 +69,7 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
                             fullWidth
                             variant="primary"
                             onClick={() => onAddToCart(product)}
-                            className="bg-gray-900 border-none text-white hover:bg-black font-black py-4 flex items-center justify-center gap-3 shadow-xl transition-all group-hover:bg-indigo-600"
+                            className="!bg-indigo-600 border-none text-white hover:!bg-indigo-700 font-black py-4 flex items-center justify-center gap-3 shadow-xl transition-all"
                         >
                             <FiShoppingBag className="w-5 h-5" /> Grab It Now
                         </Button>

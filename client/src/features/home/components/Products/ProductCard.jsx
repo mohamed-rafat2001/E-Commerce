@@ -36,7 +36,7 @@ const ProductCard = ({ product, index, onAddToCart }) => {
                         >
                             <Button
                                 onClick={() => onAddToCart(product)}
-                                className="w-full bg-white text-gray-900 border-none hover:bg-gray-100 font-black py-4 flex items-center justify-center gap-3 shadow-2xl"
+                                className="w-full !bg-indigo-600 !text-white border-none hover:!bg-indigo-700 font-black py-4 flex items-center justify-center gap-3 shadow-2xl transition-all"
                             >
                                 <FiShoppingBag className="w-5 h-5" /> Add to Cart
                             </Button>
