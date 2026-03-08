@@ -1,11 +1,11 @@
 import SubCategoryModel from "../models/SubCategoryModel.js";
 import CategoryModel from "../models/CategoryModel.js";
-import { 
-	getAll as fetchAll, 
-	getById as fetchById, 
-	createDoc as createOneDoc, 
-	updateById as updateOneById, 
-	deleteById as deleteOneById 
+import {
+	getAll as fetchAll,
+	getById as fetchById,
+	createDoc as createOneDoc,
+	updateById as updateOneById,
+	deleteById as deleteOneById
 } from "./handlerFactory.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
@@ -25,9 +25,9 @@ export const getSubCategory = fetchById(SubCategoryModel);
 // @Route   POST /api/v1/subcategories
 // @access  Private/Admin
 export const createSubCategory = createOneDoc(SubCategoryModel, [
-	"name", 
-	"image", 
-	"categoryId", 
+	"name",
+	"image",
+	"categoryId",
 	"description"
 ]);
 
@@ -35,10 +35,10 @@ export const createSubCategory = createOneDoc(SubCategoryModel, [
 // @Route   PATCH /api/v1/subcategories/:id
 // @access  Private/Admin
 export const updateSubCategory = updateOneById(SubCategoryModel, [
-	"name", 
-	"image", 
-	"categoryId", 
-	"description", 
+	"name",
+	"image",
+	"categoryId",
+	"description",
 	"isActive"
 ]);
 
@@ -47,23 +47,30 @@ export const updateSubCategory = updateOneById(SubCategoryModel, [
 // @access  Private/Admin
 export const deleteSubCategory = deleteOneById(SubCategoryModel);
 
+import { getCache, setCache } from "../utils/cache.js";
+
 //  @desc   Get subcategories by category ID
 // @Route   GET /api/v1/categories/:categoryId/subcategories
 // @access  Public
 export const getSubCategoriesByCategory = catchAsync(async (req, res, next) => {
 	const { categoryId } = req.params;
-	
+
+	const cacheKey = `subcategories:category:${categoryId}`;
+	const cached = await getCache(cacheKey);
+	if (cached) return sendResponse(res, 200, cached);
+
 	// Verify category exists
 	const category = await CategoryModel.findById(categoryId);
 	if (!category) {
 		return next(new appError("Category not found", 404));
 	}
-	
-	const subCategories = await SubCategoryModel.find({ 
-		categoryId, 
-		isActive: true 
+
+	const subCategories = await SubCategoryModel.find({
+		categoryId,
+		isActive: true
 	}).populate("categoryId", "name description");
-	
+
+	await setCache(cacheKey, subCategories, 3600); // 1 hour TTL
 	sendResponse(res, 200, subCategories);
 });
 
@@ -71,13 +78,18 @@ export const getSubCategoriesByCategory = catchAsync(async (req, res, next) => {
 // @Route   GET /api/v1/subcategories/:id/details
 // @access  Public
 export const getSubCategoryDetails = catchAsync(async (req, res, next) => {
+	const cacheKey = `subcategories:id:${req.params.id}:details`;
+	const cached = await getCache(cacheKey);
+	if (cached) return sendResponse(res, 200, cached);
+
 	const subCategory = await SubCategoryModel.findById(req.params.id)
 		.populate("categoryId", "name description");
-	
+
 	if (!subCategory) {
 		return next(new appError("Subcategory not found", 404));
 	}
-	
+
+	await setCache(cacheKey, subCategory, 3600); // 1 hour TTL
 	// Add product count (this would require ProductModel import)
 	// For now, we'll just return the subcategory with populated category
 	sendResponse(res, 200, subCategory);
@@ -88,23 +100,28 @@ export const getSubCategoryDetails = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const getSubCategoriesByBrand = catchAsync(async (req, res, next) => {
 	const { brandId } = req.params;
-	
+
+	const cacheKey = `subcategories:brand:${brandId}`;
+	const cached = await getCache(cacheKey);
+	if (cached) return sendResponse(res, 200, cached);
+
 	// Import ProductModel to get products for this brand
 	const ProductModel = (await import("../models/ProductModel.js")).default;
-	
+
 	// Get products for this brand
-	const products = await ProductModel.find({ 
-		brandId, 
-		isActive: true 
+	const products = await ProductModel.find({
+		brandId,
+		isActive: true
 	}).populate("subCategory", "name categoryId isActive");
-	
+
 	// Extract unique subcategories from products
 	const subCategoryIds = [...new Set(products.map(p => p.subCategory?._id).filter(Boolean))];
-	
-	const subCategories = await SubCategoryModel.find({ 
+
+	const subCategories = await SubCategoryModel.find({
 		_id: { $in: subCategoryIds },
-		isActive: true 
+		isActive: true
 	}).populate("categoryId", "name description");
-	
+
+	await setCache(cacheKey, subCategories, 3600); // 1 hour TTL
 	sendResponse(res, 200, subCategories);
 });

@@ -6,8 +6,26 @@ import cloudinary from "../utils/cloudinary.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
-
 import APIFeatures from "../utils/apiFeatures.js";
+import { getCache, setCache, deleteCache, deleteCacheByPattern } from "../utils/cache.js";
+
+// Helper to build cache key for brands
+const buildBrandCacheKey = (identifier, req) => {
+	let key = `brands:${identifier}`;
+	if (Object.keys(req.query).length > 0) {
+		const sorted = Object.keys(req.query).sort().reduce((acc, k) => {
+			acc[k] = req.query[k];
+			return acc;
+		}, {});
+		key += `:${JSON.stringify(sorted)}`;
+	}
+	return key;
+};
+
+const invalidateBrandCache = async (brandId) => {
+	await deleteCacheByPattern("brands:all*");
+	if (brandId) await deleteCache(`brands:id:${brandId}`);
+};
 
 // @desc    Get all brands for current seller
 // @route   GET /api/v1/brands
@@ -17,6 +35,10 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
+
+	const cacheKey = buildBrandCacheKey(`owner:${seller._id}`, req);
+	const cached = await getCache(cacheKey);
+	if (cached) return res.status(200).json(cached);
 
 	// Initialize query with seller filter
 	const query = BrandModel.find({ sellerId: seller._id });
@@ -40,12 +62,15 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 		.search(BrandModel.schema);
 	const total = await totalFeatures.query.countDocuments();
 
-	res.status(200).json({
+	const responseData = {
 		status: "success",
 		results: brands.length,
 		total,
 		data: brands
-	});
+	};
+
+	await setCache(cacheKey, responseData, 7200); // 2 hours TTL
+	res.status(200).json(responseData);
 });
 
 // @desc    Get single brand by ID
@@ -56,6 +81,11 @@ export const getBrand = catchAsync(async (req, res, next) => {
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
+
+	const cacheKey = `brands:id:${req.params.id}`;
+	const cached = await getCache(cacheKey);
+	if (cached) return sendResponse(res, 200, cached);
+
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
 		sellerId: seller._id
@@ -68,6 +98,7 @@ export const getBrand = catchAsync(async (req, res, next) => {
 		return next(new appError("Brand not found", 404));
 	}
 
+	await setCache(cacheKey, brand, 7200); // 2 hours TTL
 	sendResponse(res, 200, brand);
 });
 
@@ -89,6 +120,8 @@ export const createBrand = catchAsync(async (req, res, next) => {
 		{ path: "primaryCategory", select: "name description" },
 		{ path: "subCategories", select: "name description" }
 	]);
+
+	await invalidateBrandCache(brand._id);
 
 	sendResponse(res, 201, brand);
 });
@@ -137,6 +170,8 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		{ path: "products", select: "_id" }
 	]);
 
+	await invalidateBrandCache(brand._id);
+
 	sendResponse(res, 200, brand);
 });
 
@@ -167,6 +202,9 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 	}
 
 	await BrandModel.deleteOne({ _id: brand._id });
+
+	await invalidateBrandCache(brand._id);
+
 	sendResponse(res, 204, null);
 });
 
@@ -198,6 +236,8 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 
 	brand.logo = req.body.logo;
 	await brand.save();
+
+	await invalidateBrandCache(brand._id);
 
 	sendResponse(res, 200, {
 		message: "Logo updated successfully",
@@ -232,6 +272,8 @@ export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 
 	brand.logo = undefined;
 	await brand.save();
+
+	await invalidateBrandCache(brand._id);
 
 	sendResponse(res, 200, {
 		message: "Logo deleted successfully"

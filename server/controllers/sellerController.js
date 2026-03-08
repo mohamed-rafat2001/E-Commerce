@@ -9,12 +9,20 @@ import appError from "../utils/appError.js";
 import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 import cloudinary from "../utils/cloudinary.js";
 
+import { getCache, setCache, deleteCache } from "../utils/cache.js";
+
 //  @desc  Get seller's own profile
 // @Route  GET /api/v1/sellers/profile
 // @access Private/Seller
 export const getSellerProfile = catchAsync(async (req, res, next) => {
+	const cacheKey = `sellers:id:${req.user._id}`;
+	const cached = await getCache(cacheKey);
+	if (cached) return sendResponse(res, 200, cached);
+
 	const seller = await SellerModel.findOne({ userId: req.user._id });
 	if (!seller) return next(new appError("Seller profile not found", 404));
+
+	await setCache(cacheKey, seller, 900); // 15 minutes TTL
 	sendResponse(res, 200, seller);
 });
 
@@ -45,6 +53,7 @@ export const addAddressestoSeller = catchAsync(async (req, res, next) => {
 	seller.addresses.push(req.body.addresses);
 	await seller.save();
 
+	await deleteCache(`sellers:id:${req.user._id}`);
 	sendResponse(res, 201, seller);
 });
 
@@ -62,6 +71,7 @@ export const addPayoutMethodtoSeller = catchAsync(async (req, res, next) => {
 	seller.payoutMethods.push(req.body.payoutMethods);
 	await seller.save();
 
+	await deleteCache(`sellers:id:${req.user._id}`);
 	sendResponse(res, 201, seller);
 });
 
@@ -85,9 +95,9 @@ export const getSellerDashboardStats = catchAsync(async (req, res, next) => {
 	const pendingOrdersCount = orderItems.filter(oi => oi.orderId?.status === "Pending").length;
 
 	// 3. Low stock items
-	const lowStockItems = await ProductModel.countDocuments({ 
-		userId: req.user._id, 
-		countInStock: { $lte: 5 } 
+	const lowStockItems = await ProductModel.countDocuments({
+		userId: req.user._id,
+		countInStock: { $lte: 5 }
 	});
 
 	// 4. Recent orders (transformed for UI)
@@ -284,6 +294,7 @@ export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
 			seller.brandImg = req.body.brandImg;
 			await seller.save();
 
+			await deleteCache(`sellers:id:${req.user._id}`);
 			sendResponse(res, 200, {
 				message: "Brand image updated successfully",
 				brandImg: seller.brandImg
@@ -310,6 +321,7 @@ export const deleteSellerBrandImage = catchAsync(async (req, res, next) => {
 	seller.brandImg = undefined;
 	await seller.save();
 
+	await deleteCache(`sellers:id:${req.user._id}`);
 	sendResponse(res, 200, {
 		message: "Brand image deleted successfully"
 	});
@@ -321,7 +333,7 @@ export const deleteSellerBrandImage = catchAsync(async (req, res, next) => {
 export const updateSellerCategories = catchAsync(async (req, res, next) => {
 	const { primaryCategory, subCategories } = req.body;
 	const seller = await SellerModel.findOne({ userId: req.user._id });
-	
+
 	if (!seller) return next(new appError("Seller profile not found", 404));
 
 	// Validate that subCategories don't contain the primary category
@@ -329,7 +341,7 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 		if (subCategories.includes(primaryCategory)) {
 			return next(new appError("Primary category cannot be selected as a subcategory", 400));
 		}
-		
+
 		// Remove duplicates from subCategories
 		const uniqueSubCategories = [...new Set(subCategories)];
 		seller.subCategories = uniqueSubCategories;
@@ -339,7 +351,7 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 	}
 
 	seller.primaryCategory = primaryCategory || undefined;
-	
+
 	await seller.save();
 
 	// Populate the categories for response
@@ -348,6 +360,7 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 		{ path: "subCategories", select: "name description" }
 	]);
 
+	await deleteCache(`sellers:id:${req.user._id}`);
 	sendResponse(res, 200, {
 		message: "Categories updated successfully",
 		seller: {
