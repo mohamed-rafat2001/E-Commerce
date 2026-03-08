@@ -5,15 +5,19 @@ import { fadeUp } from '../../../../shared/utils/animations';
 import { useBananaAI } from '../../../../shared/hooks/useBananaAI';
 
 const HeroSlide = ({ slide }) => {
-    const { imageUrl, isLoading } = useBananaAI(slide.prompt);
+    // Only call AI hook if there's no static image provided
+    const { imageUrl: aiUrl, isLoading: aiLoading } = useBananaAI(!slide.image ? slide.prompt : null);
+
+    const imageUrl = slide.image || aiUrl;
+    const isLoading = !slide.image && aiLoading;
 
     if (isLoading) {
         return (
             <div className="relative h-full w-full bg-gray-900 flex items-center justify-center">
-                <Skeleton variant="image" className="absolute inset-0 w-full h-full rounded-none" />
-                <div className="relative z-10 text-center">
-                    <Skeleton variant="text" className="w-64 h-12 mx-auto mb-4" />
-                    <Skeleton variant="text" className="w-96 h-6 mx-auto" />
+                <Skeleton variant="image" className="absolute inset-0 w-full h-full rounded-none opacity-20" />
+                <div className="relative z-10 text-center scale-up-center">
+                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-gray-400 font-black tracking-[0.3em] text-xs uppercase">Initializing Slide...</p>
                 </div>
             </div>
         );

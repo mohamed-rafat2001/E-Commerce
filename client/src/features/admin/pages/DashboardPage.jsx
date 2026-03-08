@@ -7,18 +7,36 @@ const AdminDashboardPage = () => {
 	const { stats, recentOrders, isLoading, error } = useDashboardPage();
 
 	const adminStats = [
-		{ title: 'Total Revenue', value: stats?.find(s => s.id === 'revenue')?.value || '$0', icon: <FiTrendingUp />, color: 'primary', change: stats?.find(s => s.id === 'revenue')?.change },
-		{ title: 'Active Sellers', value: stats?.find(s => s.id === 'sellers')?.value || '0', icon: <FiUsers />, color: 'accent', change: stats?.find(s => s.id === 'sellers')?.change },
-		{ title: 'New Orders', value: stats?.find(s => s.id === 'orders')?.value || '0', icon: <FiShoppingBag />, color: 'emerald', change: stats?.find(s => s.id === 'orders')?.change },
+		{
+			title: 'Total Revenue',
+			value: stats?.find(s => s.id === 'totalRevenue' || s.id === 'revenue')?.value || '$0',
+			icon: <FiTrendingUp />,
+			color: 'primary',
+			change: stats?.find(s => s.id === 'totalRevenue' || s.id === 'revenue')?.change
+		},
+		{
+			title: 'Active Sellers',
+			value: stats?.find(s => s.id === 'activeSellers' || s.id === 'sellers')?.value || '0',
+			icon: <FiUsers />,
+			color: 'accent',
+			change: stats?.find(s => s.id === 'activeSellers' || s.id === 'sellers')?.change
+		},
+		{
+			title: 'New Orders',
+			value: stats?.find(s => s.id === 'totalOrders' || s.id === 'orders')?.value || '0',
+			icon: <FiShoppingBag />,
+			color: 'emerald',
+			change: stats?.find(s => s.id === 'totalOrders' || s.id === 'orders')?.change
+		},
 		{ title: 'Satisfaction', value: '4.8', icon: <FiCheckCircle />, color: 'warning', change: 'Consistent' }
 	];
 
 	const orderColumns = [
 		{ header: 'Order ID', key: 'id' },
-		{ header: 'Customer', key: 'customerName' },
+		{ header: 'Customer', key: 'customer' },
 		{ header: 'Status', render: (row) => <Badge variant={row.statusColor || 'primary'}>{row.status}</Badge> },
-		{ header: 'Amount', key: 'total' },
-		{ header: 'Date', key: 'date' }
+		{ header: 'Amount', key: 'amount' },
+		{ header: 'Product', key: 'product' }
 	];
 
 	if (isLoading) {
@@ -62,7 +80,11 @@ const AdminDashboardPage = () => {
 						<h3 className="text-xl font-bold font-display text-gray-900">Live Transaction Stream</h3>
 						<Button variant="ghost" size="sm">Download Report</Button>
 					</div>
-					<DataTable columns={orderColumns} data={recentOrders || []} />
+					<DataTable
+						columns={orderColumns}
+						data={recentOrders || []}
+						emptyMessage="No recent transactions found."
+					/>
 				</Card>
 
 				<div className="space-y-6">
