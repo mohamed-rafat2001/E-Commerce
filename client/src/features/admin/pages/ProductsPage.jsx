@@ -29,7 +29,6 @@ const ProductsPage = () => {
 
     // Loading states
     isLoading,
-    isUpdating,
     isDeleting,
 
     // Functions

@@ -15,7 +15,6 @@ const BrandsManagementPage = () => {
 		brands,
 		totalPages,
 		loading,
-		isFetching,
 		isSubmitting,
 		isUploading,
 		categories,

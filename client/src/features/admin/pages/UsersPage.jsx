@@ -29,7 +29,6 @@ const UsersPage = () => {
     paginatedUsers,
     totalPages,
     stats,
-    currUser,
 
     // Loading states
     isLoading,

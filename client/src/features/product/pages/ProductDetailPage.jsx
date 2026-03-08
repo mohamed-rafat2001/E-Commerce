@@ -135,6 +135,7 @@ export default function ProductDetailPage() {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 const FeatureCard = ({ icon: Icon, title, subtitle }) => (
   <div className="bg-white p-4 rounded-3xl border border-gray-100 flex items-center gap-4 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/50 transition-all group cursor-default">
     <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">

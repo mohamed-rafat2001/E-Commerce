@@ -184,6 +184,7 @@ const ControlGroup = ({ label, children }) => (
     </div>
 );
 
+// eslint-disable-next-line no-unused-vars
 const StatRow = ({ label, value, icon: Icon, color }) => (
     <div className="flex justify-between items-center group/row">
         <div className="flex items-center gap-3">

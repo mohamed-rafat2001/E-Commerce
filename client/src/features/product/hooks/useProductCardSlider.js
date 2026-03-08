@@ -12,23 +12,8 @@ export default function useProductCardSlider({ images = [], isHovered = false })
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const containerRef = useRef(null);
+  const debounceTimeout = useRef(null);
   
-  // Early return if no images or single image
-  if (!images || images.length <= 1) {
-    return {
-      activeIndex: 0,
-      goToIndex: () => {},
-      goToNext: () => {},
-      goToPrev: () => {},
-      handleMouseMove: () => {},
-      handleMouseLeave: () => {},
-      handleTouchStart: () => {},
-      handleTouchEnd: () => {},
-      visibleDots: [],
-      isSliderActive: false,
-    };
-  }
-
   // Reset to first image when hover ends
   useEffect(() => {
     if (!isHovered) {
@@ -60,7 +45,6 @@ export default function useProductCardSlider({ images = [], isHovered = false })
   }, [images.length]);
 
   // Debounced mouse move handler
-  const debounceTimeout = useRef(null);
   const handleMouseMove = useCallback((e) => {
     if (!containerRef.current) return;
 
@@ -122,6 +106,22 @@ export default function useProductCardSlider({ images = [], isHovered = false })
     isActive: index === activeIndex,
   }));
 
+  // Early return if no images or single image (after all hooks)
+  if (!images || images.length <= 1) {
+    return {
+      activeIndex: 0,
+      goToIndex: () => {},
+      goToNext: () => {},
+      goToPrev: () => {},
+      handleMouseMove: () => {},
+      handleMouseLeave: () => {},
+      handleTouchStart: () => {},
+      handleTouchEnd: () => {},
+      visibleDots: [],
+      containerRef: null,
+    };
+  }
+
   return {
     activeIndex,
     goToIndex,
@@ -132,7 +132,6 @@ export default function useProductCardSlider({ images = [], isHovered = false })
     handleTouchStart,
     handleTouchEnd,
     visibleDots,
-    isSliderActive: true,
     containerRef,
   };
 }

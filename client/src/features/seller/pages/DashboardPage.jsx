@@ -6,7 +6,6 @@ import { useSellerDashboardPage } from '../hooks/index.js';
 const DashboardPage = () => {
 	const {
 		stats,
-		statsArray,
 		products,
 		alerts,
 		isLoading

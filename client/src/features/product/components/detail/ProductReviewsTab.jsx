@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiStar, FiUser, FiFilter, FiChevronDown, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import { useGetProductReviews } from '../../hooks';
@@ -10,7 +10,7 @@ const ProductReviewsTab = ({ productId, ratingsAverage = 0, ratingsQuantity = 0 
     const sort = searchParams.get("sort") || "-createdAt";
 
     // API Features: Pagination, Sort, etc.
-    const { data, isLoading, isError } = useGetProductReviews(productId, {
+    const { data, isLoading } = useGetProductReviews(productId, {
         page,
         limit: 5,
         sort,

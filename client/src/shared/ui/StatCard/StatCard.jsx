@@ -8,14 +8,6 @@ const colors = {
     info: "bg-blue-50 text-blue-600",
 };
 
-const textColors = {
-    primary: "text-indigo-600",
-    success: "text-green-600",
-    warning: "text-yellow-600",
-    error: "text-red-600",
-    info: "text-blue-600",
-};
-
 const StatCard = ({ title, value, change, icon, color = "primary", className = "" }) => {
     const isPositive = change > 0;
     const isNegative = change < 0;

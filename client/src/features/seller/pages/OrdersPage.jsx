@@ -5,17 +5,13 @@ import OrdersStats from '../components/orders/OrdersStats.jsx';
 import { FiEye } from 'react-icons/fi';
 
 const OrdersPage = () => {
-	const [searchParams] = useSearchParams();
-	const statusFilter = searchParams.get('status') || 'all';
-
 	const {
 		orders,
 		total,
 		totalPages,
 		orderStats,
 		error,
-		isLoading,
-		handleUpdateStatus
+		isLoading
 	} = useSellerOrdersPage();
 
 	const columns = [

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 /**
  * useProductCardGallery - Hook for managing vertical thumbnail gallery in product cards
@@ -14,22 +14,6 @@ export default function useProductCardGallery({ images = [], isHovered = false, 
   const hoverTimeoutRef = useRef(null);
   const autoSlideIntervalRef = useRef(null);
   
-  // Early return if no images or single image
-  if (!images || images.length <= 1) {
-    return {
-      activeIndex: 0,
-      setActiveIndex: () => {},
-      goToNext: () => {},
-      goToPrev: () => {},
-      handleThumbnailHover: () => {},
-      handleThumbnailClick: () => {},
-      handleMouseLeave: () => {},
-      handleTouchStart: () => {},
-      handleTouchEnd: () => {},
-      isSliderActive: false,
-    };
-  }
-
   // Auto-slide functionality
   useEffect(() => {
     if (!autoSlide || !isHovered || images.length <= 1) return;
@@ -138,6 +122,21 @@ export default function useProductCardGallery({ images = [], isHovered = false, 
     setTouchStartY(null);
   }, [touchStartY, goToNext, goToPrev]);
 
+  // Early return if no images or single image (after all hooks)
+  if (!images || images.length <= 1) {
+    return {
+      activeIndex: 0,
+      setActiveIndex: () => {},
+      goToNext: () => {},
+      goToPrev: () => {},
+      handleThumbnailHover: () => {},
+      handleThumbnailClick: () => {},
+      handleMouseLeave: () => {},
+      handleTouchStart: () => {},
+      handleTouchEnd: () => {},
+    };
+  }
+
   return {
     activeIndex,
     setActiveIndex: setActiveIndexSafe,
@@ -148,6 +147,5 @@ export default function useProductCardGallery({ images = [], isHovered = false, 
     handleMouseLeave,
     handleTouchStart,
     handleTouchEnd,
-    isSliderActive: true,
   };
 }

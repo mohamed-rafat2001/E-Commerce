@@ -3,7 +3,6 @@ import { showCart, updateCartItemQuantity, deleteFromCart, clearCart } from "../
 import { getGuestCart, updateGuestCartQty, removeFromGuestCart, clearGuestCart } from "../services/guestCart.js";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import { useState, useEffect, useCallback } from "react";
-import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 import toast from "react-hot-toast";
 
 /**
@@ -47,7 +46,7 @@ export default function useCart() {
 		if (isAuthenticated) {
 			deleteFromCart(productId).then(() => {
 				queryClient.invalidateQueries({ queryKey: ["cart"] });
-			}).catch(err => {
+			}).catch(() => {
 				toast.error("Failed to remove item from cart");
 			});
 		} else {
@@ -63,7 +62,7 @@ export default function useCart() {
 		if (isAuthenticated) {
 			updateCartItemQuantity(productId, quantity).then(() => {
 				queryClient.invalidateQueries({ queryKey: ["cart"] });
-			}).catch(err => {
+			}).catch(() => {
 				toast.error("Failed to update quantity");
 			});
 		} else {

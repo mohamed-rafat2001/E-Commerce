@@ -3,7 +3,6 @@ import { FiEye, FiTrash2, FiEdit3 } from 'react-icons/fi';
 import { Button } from '../../../../shared/ui';
 
 const ProductQuickActions = ({
-    onEdit,
     onViewPublic,
     onDelete,
     viewerRole = 'seller',

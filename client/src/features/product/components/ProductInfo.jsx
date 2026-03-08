@@ -13,18 +13,6 @@ import {
   FiCheck
 } from 'react-icons/fi';
 
-const statusOptions = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-  { value: 'archived', label: 'Archived' },
-];
-
-const visibilityOptions = [
-  { value: 'public', label: 'Public' },
-  { value: 'private', label: 'Private' },
-];
-
 const ProductInfo = ({
   product
 }) => {
