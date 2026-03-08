@@ -1,35 +1,112 @@
 import OrderModel from "../models/OrderModel.js";
-import SellerModel from "../models/SellerModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
+import SellerModel from "../models/SellerModel.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import APIFeatures from "../utils/apiFeatures.js";
-import {
-	createDoc,
-	getAllByOwner,
-	getById,
-	getOneByOwner,
-} from "./handlerFactory.js";
+import * as orderService from "../services/orderService.js";
 
-// @desc    Create new order
-// @route   POST /api/v1/orders
-// @access  Private
-export const createOrder = createDoc(OrderModel, [
-	"items",
-	"shippingAddress",
-	"paymentMethod",
-	"taxPrice",
-	"shippingPrice",
-]);
+// ========== CUSTOMER CONTROLLERS ==========
 
-// @desc    Get order by ID
-// @route   GET /api/v1/orders/:id
-// @access  Private
-export const getOrderById = getById(OrderModel);
+// @desc    Checkout — create orders from cart
+// @access  Private/Customer
+export const checkout = catchAsync(async (req, res, next) => {
+	const { shippingAddress, paymentMethod, notes } = req.body;
 
-// @desc    Get seller orders
-// @route   GET /api/v1/orders/seller
+	if (!paymentMethod) {
+		return next(new appError("Payment method is required", 400));
+	}
+	if (!shippingAddress) {
+		return next(new appError("Shipping address is required", 400));
+	}
+
+	const orders = await orderService.createOrdersFromCart(req.user._id, {
+		shippingAddress,
+		paymentMethod,
+		notes,
+	});
+
+	res.status(201).json({
+		status: "success",
+		results: orders.length,
+		data: orders,
+	});
+});
+
+// @desc    Get logged-in customer's orders (with status filter and pagination)
+// @access  Private/Customer
+export const getMyOrders = catchAsync(async (req, res, next) => {
+	const userId = req.user._id;
+	let filter = { userId };
+
+	const features = new APIFeatures(OrderModel.find(filter), req.query)
+		.filter()
+		.sort()
+		.paginate();
+
+	// Populate order items
+	features.query = features.query.populate({
+		path: "items",
+		populate: {
+			path: "items.item",
+			select: "name coverImage price",
+		},
+	});
+
+	const orders = await features.query;
+
+	// Count total for pagination
+	const countFeatures = new APIFeatures(
+		OrderModel.find(filter),
+		req.query
+	).filter();
+	const total = await countFeatures.query.countDocuments();
+
+	res.status(200).json({
+		status: "success",
+		results: orders.length,
+		total,
+		data: orders,
+	});
+});
+
+// @desc    Get a single order by ID (customer)
+// @access  Private/Customer
+export const getMyOrder = catchAsync(async (req, res, next) => {
+	const order = await OrderModel.findOne({
+		_id: req.params.id,
+		userId: req.user._id,
+	}).populate({
+		path: "items",
+		populate: {
+			path: "items.item",
+			select: "name coverImage price",
+		},
+	});
+
+	if (!order) {
+		return next(new appError("Order not found", 404));
+	}
+
+	sendResponse(res, 200, order);
+});
+
+// @desc    Cancel an order (customer, pending only)
+// @access  Private/Customer
+export const cancelOrder = catchAsync(async (req, res, next) => {
+	const { reason } = req.body;
+	const order = await orderService.cancelOrder(
+		req.params.id,
+		req.user._id,
+		reason
+	);
+	sendResponse(res, 200, order);
+});
+
+// ========== SELLER CONTROLLERS ==========
+
+// @desc    Get orders for the seller's products
 // @access  Private/Seller
 export const getSellerOrders = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
@@ -42,10 +119,12 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 	const queryObj = { ...req.query };
 
 	if (queryObj.status) {
-		const matchingOrders = await OrderModel.find({ status: queryObj.status }).select('_id');
-		const matchingOrderIds = matchingOrders.map(o => o._id);
+		const matchingOrders = await OrderModel.find({
+			status: queryObj.status,
+		}).select("_id");
+		const matchingOrderIds = matchingOrders.map((o) => o._id);
 		filter.orderId = { $in: matchingOrderIds };
-		delete queryObj.status; // Remove so APIFeatures doesn't apply it to OrderItemsModel
+		delete queryObj.status;
 	}
 
 	// Initialize APIFeatures
@@ -58,16 +137,17 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 	features.query = features.query
 		.populate({
 			path: "orderId",
-			populate: { path: "userId", select: "name email" },
+			populate: { path: "userId", select: "firstName lastName email" },
 		})
-		.populate("items.item", "name coverImage brand price");
+		.populate("items.item", "name coverImage price");
 
-	// Execute query
 	const orderItems = await features.query;
 
 	// Get total count for pagination
-	const countFeatures = new APIFeatures(OrderItemsModel.find(filter), queryObj)
-		.filter();
+	const countFeatures = new APIFeatures(
+		OrderItemsModel.find(filter),
+		queryObj
+	).filter();
 	const total = await countFeatures.query.countDocuments();
 
 	const transformedOrders = orderItems.map((oi) => ({
@@ -75,7 +155,9 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 		status: oi.orderId?.status || "Pending",
 		date: oi.createdAt,
 		customer: {
-			name: oi.orderId?.userId?.name || "Unknown",
+			name: oi.orderId?.userId
+				? `${oi.orderId.userId.firstName || ""} ${oi.orderId.userId.lastName || ""}`.trim()
+				: "Unknown",
 			email: oi.orderId?.userId?.email || "N/A",
 		},
 		total: oi.totalPrice?.amount || 0,
@@ -83,95 +165,87 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 			name: item.item?.name || "Product",
 			quantity: item.quantity,
 			price: item.price?.amount || 0,
-			image: item.item?.coverImage?.secure_url || "📦", // Default icon if no image
+			image: item.item?.coverImage?.secure_url || "📦",
 		})),
 	}));
 
-	// Send response with total count
 	res.status(200).json({
 		status: "success",
 		results: transformedOrders.length,
 		data: {
 			data: transformedOrders,
-			total
-		}
+			total,
+		},
 	});
 });
 
-// @desc    Update order status
-// @route   PATCH /api/v1/orders/:id/status
-// @access  Private
-export const updateOrderStatus = catchAsync(async (req, res, next) => {
-	const { status } = req.body;
-	const order = await OrderModel.findById(req.params.id);
+// @desc    Seller updates order status (Pending→Processing, Processing→Shipped)
+// @access  Private/Seller
+export const updateOrderStatusBySeller = catchAsync(async (req, res, next) => {
+	const { status, tracking_number, note } = req.body;
 
-	if (!order) {
-		return next(new appError("Order not found", 404));
+	if (!status) {
+		return next(new appError("Status is required", 400));
 	}
 
-	// Logic based on the requested status
-	switch (status) {
-		case "Processing": // Triggered after payment
-			order.isPaid = true;
-			order.paidAt = Date.now();
-			if (req.body.paymentResult) {
-				order.paymentResult = req.body.paymentResult;
-			}
-			order.status = "Processing";
-			break;
+	const order = await orderService.updateOrderStatusBySeller(
+		req.params.id,
+		req.user._id,
+		status,
+		{ tracking_number, note }
+	);
 
-		case "Shipped":
-			if (!["Admin", "SuperAdmin"].includes(req.user.role)) {
-				return next(new appError("Not authorized to ship orders", 403));
-			}
-			order.status = "Shipped";
-			break;
-
-		case "Delivered":
-			if (!["Admin", "SuperAdmin"].includes(req.user.role)) {
-				return next(new appError("Not authorized to deliver orders", 403));
-			}
-			order.isDelivered = true;
-			order.deliveredAt = Date.now();
-			order.status = "Delivered";
-			break;
-
-		case "Cancelled":
-			// Users can cancel their own orders if Pending/Processing
-			// Admins can cancel any order
-			const isAdmin = ["Admin", "SuperAdmin"].includes(req.user.role);
-			const isOwner = order.userId.toString() === req.user._id.toString();
-
-			if (!isAdmin && !isOwner) {
-				return next(new appError("Not authorized to cancel this order", 403));
-			}
-
-			if (!isAdmin && !["Pending", "Processing"].includes(order.status)) {
-				return next(
-					new appError(
-						`Cannot cancel order that is already ${order.status}`,
-						400
-					)
-				);
-			}
-
-			order.status = "Cancelled";
-			break;
-
-		default:
-			return next(new appError("Invalid status transition", 400));
-	}
-
-	const updatedOrder = await order.save();
-	sendResponse(res, 200, updatedOrder);
+	sendResponse(res, 200, order);
 });
 
-// @desc    Get logged in user orders
-// @route   GET /api/v1/orders/myorders
-// @access  Private
-export const getMyOrders = getAllByOwner(OrderModel);
+// ========== ADMIN CONTROLLERS ==========
 
-// @desc    Get logged in user orders
-// @route   GET /api/v1/orders/myorders/:id
-// @access  Private
-export const getMyOrder = getOneByOwner(OrderModel);
+// @desc    Get all orders (admin, with filters)
+// @access  Private/Admin
+export const getAllOrders = catchAsync(async (req, res, next) => {
+	const features = new APIFeatures(OrderModel.find(), req.query)
+		.filter()
+		.sort()
+		.paginate();
+
+	features.query = features.query
+		.populate("userId", "firstName lastName email")
+		.populate({
+			path: "items",
+			populate: {
+				path: "items.item",
+				select: "name coverImage price",
+			},
+		});
+
+	const orders = await features.query;
+
+	const countFeatures = new APIFeatures(OrderModel.find(), req.query).filter();
+	const total = await countFeatures.query.countDocuments();
+
+	res.status(200).json({
+		status: "success",
+		results: orders.length,
+		total,
+		data: orders,
+	});
+});
+
+// @desc    Force update any order's status (admin)
+// @access  Private/Admin
+export const updateOrderStatusByAdmin = catchAsync(async (req, res, next) => {
+	const { status, tracking_number, note } = req.body;
+
+	if (!status) {
+		return next(new appError("Status is required", 400));
+	}
+
+	const order = await orderService.updateOrderStatusByAdmin(
+		req.params.id,
+		req.user._id,
+		status,
+		{ note, tracking_number }
+	);
+
+	sendResponse(res, 200, order);
+});

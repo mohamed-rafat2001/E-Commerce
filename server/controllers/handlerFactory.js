@@ -4,389 +4,234 @@ import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import validationBody from "../utils/validationBody.js";
 import APIFeatures from "../utils/apiFeatures.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
-import ProductModel from "../models/ProductModel.js";
 
+// ===================================================================
+// Helper Functions for Specialized Validations
+// ===================================================================
+
+/**
+ * Validates relationships for ProductModel creation/updates
+ */
+const validateProductReferences = async (object, req) => {
+	// Clean up empty string values for reference fields
+	if (object.brandId === "") delete object.brandId;
+	if (object.primaryCategory === "") delete object.primaryCategory;
+	if (object.subCategory === "") delete object.subCategory;
+
+	// Validate brand
+	if (object.brandId) {
+		const BrandModel = mongoose.model("BrandModel");
+		const SellerModel = mongoose.model("SellerModel");
+
+		const seller = await SellerModel.findOne({ userId: req.user._id });
+		if (!seller) throw new appError("Seller profile not found", 404);
+
+		const brand = await BrandModel.findOne({
+			_id: object.brandId,
+			sellerId: seller._id,
+		});
+		if (!brand) throw new appError("Brand not found or doesn't belong to you", 404);
+	}
+
+	// Validate primary category
+	if (object.primaryCategory) {
+		const CategoryModel = mongoose.model("CategoryModel");
+		const category = await CategoryModel.findById(object.primaryCategory);
+		if (!category) throw new appError("Primary category not found", 404);
+	}
+
+	// Validate sub-category relationship
+	if (object.subCategory) {
+		const SubCategoryModel = mongoose.model("SubCategoryModel");
+		const subCategory = await SubCategoryModel.findById(object.subCategory);
+		if (!subCategory) throw new appError("Sub category not found", 404);
+
+		const targetCategoryId =
+			object.primaryCategory ||
+			(req.params.id ? (await mongoose.model("ProductModel").findById(req.params.id))?.primaryCategory : null);
+
+		const subCategoryParentId =
+			subCategory.categoryId._id || subCategory.categoryId;
+
+		if (targetCategoryId && subCategoryParentId.toString() !== targetCategoryId.toString()) {
+			throw new appError("Sub category doesn't belong to the selected primary category", 400);
+		}
+	}
+
+	// Validate image array length
+	if (object.images && object.images.length > 10) {
+		throw new appError("Maximum 10 additional images allowed", 400);
+	}
+
+	return object;
+};
+
+
+// ===================================================================
+// Generic CRUD Factory Controllers
+// ===================================================================
+
+/**
+ * Creates a generic document.
+ */
 export const createDoc = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
-		// validation
-		let object;
-		if (Fields.length != 0) {
+		let object = req.body;
+
+		// Filter fields if provided
+		if (Fields.length !== 0) {
 			object = validationBody(req.body, Fields);
-			if (!object || Object.keys(object).length === 0)
-				return next(
-					new appError("please provide  val id fiel ds to update", 400)
-				);
+			if (!object || Object.keys(object).length === 0) {
+				return next(new appError("Please provide valid fields to create", 400));
+			}
 		}
 
-		// Clean up empty string values for ObjectId fields
-		if (Model.modelName === "ProductModel" && object) {
-			// Convert empty strings to null/undefined for reference fields
-			if (object.brandId === "") delete object.brandId;
-			if (object.primaryCategory === "") delete object.primaryCategory;
-			if (object.subCategory === "") delete object.subCategory;
-		}
-
-		// Additional validation for ProductModel references
+		// Run specialized product validation if applicable
 		if (Model.modelName === "ProductModel") {
-			// Validate brand exists and belongs to seller
-			if (object.brandId) {
-				const BrandModel = mongoose.model("BrandModel");
-				const SellerModel = mongoose.model("SellerModel");
-
-				// First find the seller associated with current user
-				const seller = await SellerModel.findOne({ userId: req.user._id });
-				if (!seller) {
-					return next(new appError("Seller profile not found", 404));
-				}
-
-				// Then check if the brand belongs to this seller
-				const brand = await BrandModel.findOne({
-					_id: object.brandId,
-					sellerId: seller._id
-				});
-				if (!brand) {
-					return next(new appError("Brand not found or doesn't belong to you", 404));
-				}
-			}
-
-			// Validate categories exist
-			if (object.primaryCategory) {
-				const CategoryModel = mongoose.model("CategoryModel");
-				const category = await CategoryModel.findById(object.primaryCategory);
-				if (!category) {
-					return next(new appError("Primary category not found", 404));
-				}
-			}
-
-			if (object.subCategory) {
-				const SubCategoryModel = mongoose.model("SubCategoryModel");
-				const subCategory = await SubCategoryModel.findById(object.subCategory);
-				if (!subCategory) {
-					return next(new appError("Sub category not found", 404));
-				}
-				// Validate that subcategory belongs to the primary category
-				const subCategoryParentId = subCategory.categoryId._id || subCategory.categoryId;
-				if (object.primaryCategory && subCategoryParentId.toString() !== object.primaryCategory.toString()) {
-					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
-				}
-			}
-
-			// Validate images array length
-			if (object.images && object.images.length > 10) {
-				return next(new appError("Maximum 10 additional images allowed", 400));
-			}
+			object = await validateProductReferences(object, req);
 		}
 
-		// create new doc
-		let doc;
+		// Inject appropriate user ownership ID based on the model
+		const userId = req.user._id;
+		let createData = { ...object };
 
-		switch (Model.modelName) {
-			case "ReviewsModel":
-				doc = await Model.create({
-					userId: req.user._id,
-					itemId: req.params.id,
-					...object,
-				});
-				break;
-
-			case "OrderModel":
-				if (!object.items || object.items.length === 0) {
-					return next(new appError("No order items provided", 400));
-				}
-
-				// Fetch products to verify IDs and get seller info
-				const productIds = object.items.map((item) => item.item);
-				const products = await ProductModel.find({ _id: { $in: productIds } });
-
-				if (products.length !== object.items.length) {
-					return next(new appError("Some products were not found", 404));
-				}
-
-				const productMap = products.reduce((acc, p) => {
-					acc[p._id.toString()] = p;
-					return acc;
-				}, {});
-
-				const orderId = new mongoose.Types.ObjectId();
-
-				// Group items by seller using a hash map for O(N) efficiency
-				const itemsBySeller = object.items.reduce((acc, entry) => {
-					const product = productMap[entry.item.toString()];
-					const sellerId = product?.userId?.toString();
-
-					if (sellerId) {
-						if (!acc[sellerId]) acc[sellerId] = [];
-						acc[sellerId].push({
-							item: entry.item,
-							quantity: entry.quantity,
-						});
-					}
-					return acc;
-				}, {});
-
-				const sellerIds = Object.keys(itemsBySeller);
-				if (sellerIds.length === 0) {
-					return next(new appError("Invalid items data: Sellers not found", 400));
-				}
-
-				// Create an OrderItems document for each seller in parallel
-				const orderItemsDocs = await Promise.all(
-					sellerIds.map(async (sellerId) => {
-						return await OrderItemsModel.create({
-							orderId,
-							sellerId,
-							items: itemsBySeller[sellerId],
-						});
-					})
-				);
-
-				// Create the main Order document
-				doc = await Model.create({
-					...object,
-					_id: orderId,
-					items: orderItemsDocs.map((d) => d._id),
-					userId: req.user._id,
-					sellerIds,
-					shippingAddress: object.shippingAddress || req.user?.addresses?.[0],
-				});
-				break;
-
-			default:
-				const userId = req.user._id;
-				let createData = {
-					userId,
-					...object,
-				};
-
-				// For ProductModel, we need to set the correct userId
-				if (Model.modelName === "ProductModel") {
-					createData.userId = userId;
-				}
-
-				doc = await Model.create(createData);
-				break;
+		if (Model.modelName === "ReviewsModel") {
+			createData = { ...createData, userId, itemId: req.params.id };
+		} else {
+			createData = { ...createData, userId };
 		}
-		// check if doc created
-		if (!doc) return next(new appError("doc not create", 400));
-		// send response
+
+		const doc = await Model.create(createData);
+		if (!doc) return next(new appError("Document could not be created", 400));
+
 		return sendResponse(res, 201, doc);
 	});
-// update doc by owner
+
+/**
+ * Updates a document strictly enforcing ownership.
+ */
 export const updateByOwner = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
-		// validation
-		let object;
-		if (Fields.length != 0) {
+		let object = req.body;
+
+		if (Fields.length !== 0) {
 			object = validationBody(req.body, Fields);
-			if (!object || Object.keys(object).length === 0)
-				return next(new appError("please provide valid fields to update", 400));
-		}
-
-		// Clean up empty string values for ObjectId fields
-		if (Model.modelName === "ProductModel" && object) {
-			// Convert empty strings to null/undefined for reference fields
-			if (object.brandId === "") delete object.brandId;
-			if (object.primaryCategory === "") delete object.primaryCategory;
-			if (object.subCategory === "") delete object.subCategory;
-		}
-
-		// Additional validation for ProductModel references on update
-		if (Model.modelName === "ProductModel" && object) {
-			// Validate brand exists and belongs to seller
-			if (object.brandId) {
-				const BrandModel = mongoose.model("BrandModel");
-				const SellerModel = mongoose.model("SellerModel");
-
-				// First find the seller associated with current user
-				const seller = await SellerModel.findOne({ userId: req.user._id });
-				if (!seller) {
-					return next(new appError("Seller profile not found", 404));
-				}
-
-				// Then check if the brand belongs to this seller
-				const brand = await BrandModel.findOne({
-					_id: object.brandId,
-					sellerId: seller._id
-				});
-				if (!brand) {
-					return next(new appError("Brand not found or doesn't belong to you", 404));
-				}
-			}
-
-			// Validate categories exist
-			if (object.primaryCategory) {
-				const CategoryModel = mongoose.model("CategoryModel");
-				const category = await CategoryModel.findById(object.primaryCategory);
-				if (!category) {
-					return next(new appError("Primary category not found", 404));
-				}
-			}
-
-			if (object.subCategory) {
-				const SubCategoryModel = mongoose.model("SubCategoryModel");
-				const subCategory = await SubCategoryModel.findById(object.subCategory);
-				if (!subCategory) {
-					return next(new appError("Sub category not found", 404));
-				}
-
-				// Get the relevant primary category (either from payload or existing doc)
-				let targetCategoryId = object.primaryCategory;
-				if (!targetCategoryId) {
-					const existingDoc = await Model.findById(req.params.id);
-					targetCategoryId = existingDoc?.primaryCategory;
-				}
-
-				const subCategoryParentId = subCategory.categoryId._id || subCategory.categoryId;
-				if (targetCategoryId && subCategoryParentId.toString() !== targetCategoryId.toString()) {
-					return next(new appError("Sub category doesn't belong to the selected primary category", 400));
-				}
-			}
-
-			// Validate images array length
-			if (object.images && object.images.length > 10) {
-				return next(new appError("Maximum 10 additional images allowed", 400));
+			if (!object || Object.keys(object).length === 0) {
+				return next(new appError("Please provide valid fields to update", 400));
 			}
 		}
-		// update doc
-		let doc;
+
+		if (Model.modelName === "ProductModel") {
+			object = await validateProductReferences(object, req);
+		}
+
 		const userId = req.user._id;
+		let doc;
+
 		switch (Model.modelName) {
 			case "UserModel":
-				doc = await Model.findByIdAndUpdate(
-					userId,
-					{ ...object },
-					{ new: true, runValidators: true }
-				);
+				doc = await Model.findByIdAndUpdate(userId, object, {
+					new: true,
+					runValidators: true,
+				});
 				break;
 
 			case "SellerModel":
 			case "CustomerModel":
-				doc = await Model.findOneAndUpdate(
-					{ userId },
-					{ ...object },
-					{ new: true, runValidators: true }
-				);
+				doc = await Model.findOneAndUpdate({ userId }, object, {
+					new: true,
+					runValidators: true,
+				});
 				break;
 
 			default:
 				doc = await Model.findOneAndUpdate(
 					{ _id: req.params.id, userId },
-					{ ...object },
+					object,
 					{ new: true, runValidators: true }
 				);
 				break;
 		}
 
-		// check if doc updated
-		if (!doc) return next(new appError("doc didn't update", 400));
-		// send response
+		if (!doc) return next(new appError("Document could not be updated or not found", 404));
+
 		sendResponse(res, 200, doc);
 	});
 
-// delete items from doc list by owner
+/**
+ * Removes an item from an array field belonging to an owned document (e.g., Wishlist).
+ */
 export const deleteFromDocList = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const doc = await Model.findOne({ userId: req.user._id });
-		if (!doc) return next(new appError("document not found", 404));
+		if (!doc) return next(new appError("Document not found", 404));
 
-		switch (Model.modelName) {
-			case "CartModel":
-				// For CartModel, items is an array of objects { item: ID, quantity: N }
-				doc.items = doc.items.filter(
-					(item) =>
-						item.item?._id?.toString() !== req.params.id &&
-						item.item?.toString() !== req.params.id
-				);
-				break;
-			default:
-				// For WishListModel, items is an array of IDs
-				doc.items.pull(req.params.id);
-				break;
+		if (Model.modelName === "WishListModel") {
+			doc.items.pull(req.params.id);
 		}
 
-		// Save the document to trigger pre-save hooks
 		await doc.save();
-
-		// send response
 		sendResponse(res, 200, doc);
 	});
 
-// delete one doc by owner
+/**
+ * Deletes a generic document by ID enforcing user ownership.
+ */
 export const deleteOneByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const userId = req.user._id;
 		const doc = await Model.findOneAndDelete({
 			_id: req.params.id,
-			userId,
+			userId: req.user._id,
 		});
 
-		if (!doc) return next(new appError("doc not deleted", 400));
+		if (!doc) return next(new appError("Document could not be deleted", 400));
 
 		sendResponse(res, 200, {});
 	});
-// delete many docs by owner
+
+/**
+ * Deletes all documents owned by the logged-in user.
+ */
 export const deleteManyByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const userId = req.user._id;
-		const docs = await Model.deleteMany({
-			userId,
-		});
-
-		if (!docs) return next(new appError("docs not deleted", 400));
+		const docs = await Model.deleteMany({ userId: req.user._id });
+		if (!docs) return next(new appError("Documents could not be deleted", 400));
 
 		sendResponse(res, 200, {});
 	});
-// get one doc by owner
+
+/**
+ * Gets a single specific document ensuring it is owned by the logged-in user.
+ */
 export const getOneByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const userId = req.user._id;
 		let doc;
 
 		if (req.params.id === "user") {
-			if (Model.modelName === "CartModel") {
-				doc = await Model.findOne({ userId, active: true });
-			} else {
-				doc = await Model.findOne({ userId });
-			}
+			doc = await Model.findOne({ userId });
 		} else {
-			const query = { _id: req.params.id };
-			if (Model.modelName === "OrderItemsModel") {
-				query.sellerId = userId;
-			} else {
-				query.userId = userId;
-			}
-			doc = await Model.findOne(query);
+			doc = await Model.findOne({ _id: req.params.id, userId });
 		}
 
 		if (!doc) {
-			if (Model.modelName === "CartModel") {
-				return sendResponse(res, 200, { items: [], totalPrice: { amount: 0, currency: "USD" } });
-			}
 			if (Model.modelName === "WishListModel") {
 				return sendResponse(res, 200, { items: [] });
 			}
-			return next(new appError("doc not Found", 404));
+			return next(new appError("Document not found", 404));
 		}
 
 		sendResponse(res, 200, doc);
 	});
-// get all docs by owner
+
+/**
+ * Queries all documents strictly filtered by the logged-in user's ID.
+ */
 export const getAllByOwner = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const userId = req.user._id;
-		let filter = {};
+		const filter = { userId };
 
-		if (Model.modelName === "OrderItemsModel") {
-			filter = { sellerId: userId };
-		} else if (Model.modelName === "ProductModel") {
-			// For ProductModel, filter by userId directly
-			filter = { userId };
-		} else {
-			filter = { userId };
-		}
-
-		// Execute query using APIFeatures
 		const features = new APIFeatures(Model.find(filter), req.query)
 			.filter()
 			.search(Model.schema)
@@ -396,14 +241,11 @@ export const getAllByOwner = (Model) =>
 
 		const docs = await features.query;
 
-		// Count total documents for pagination
 		const countFeatures = new APIFeatures(Model.find(filter), req.query)
 			.filter()
 			.search(Model.schema);
 
 		const totalDocs = await countFeatures.query.countDocuments();
-
-		if (!docs) return next(new appError("docs not Found", 404));
 
 		res.status(200).json({
 			status: "success",
@@ -413,22 +255,22 @@ export const getAllByOwner = (Model) =>
 		});
 	});
 
-// get doc by id
+/**
+ * Retrieves a generic document by ID without ownership checks (typically for public/admin reading).
+ */
 export const getById = (Model) =>
 	catchAsync(async (req, res, next) => {
-		//do id
-		const _id = req.params.id;
-		const doc = await Model.findById(_id);
-
-		if (!doc) return next(new appError("doc not Found", 400));
+		const doc = await Model.findById(req.params.id);
+		if (!doc) return next(new appError("Document not found", 404));
 
 		sendResponse(res, 200, doc);
 	});
 
-// get all docs
+/**
+ * Queries all available documents globally for a model (Admin/Public).
+ */
 export const getAll = (Model) =>
 	catchAsync(async (req, res, next) => {
-		// Execute query using APIFeatures
 		const features = new APIFeatures(Model.find(), req.query)
 			.filter()
 			.search(Model.schema)
@@ -436,32 +278,27 @@ export const getAll = (Model) =>
 			.limitFields()
 			.paginate();
 
-		// Population
+		// Handle relations population dynamically
 		if (req.query.populate) {
 			let populateFields;
 			try {
-				// check if it is a JSON string
-				if (req.query.populate.startsWith('{') || req.query.populate.startsWith('[')) {
+				if (req.query.populate.startsWith("{") || req.query.populate.startsWith("[")) {
 					populateFields = JSON.parse(req.query.populate);
 				} else {
-					populateFields = req.query.populate.split(',').join(' ');
+					populateFields = req.query.populate.split(",").join(" ");
 				}
 			} catch (e) {
-				populateFields = req.query.populate.split(',').join(' ');
+				populateFields = req.query.populate.split(",").join(" ");
 			}
 			features.query = features.query.populate(populateFields);
 		}
 
 		const docs = await features.query;
 
-		// Count total documents for pagination (including search)
 		const countFeatures = new APIFeatures(Model.find(), req.query)
 			.filter()
 			.search(Model.schema);
-
 		const totalDocs = await countFeatures.query.countDocuments();
-
-		if (!docs) return next(new appError("docs not Found", 400));
 
 		res.status(200).json({
 			status: "success",
@@ -471,48 +308,52 @@ export const getAll = (Model) =>
 		});
 	});
 
-//delete all docs
+/**
+ * Wipes out every document in a collection (Admin/Seeder only).
+ */
 export const deleteAll = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const docs = await Model.deleteMany();
-
-		if (!docs) return next(new appError("docs not deleted", 400));
+		if (!docs) return next(new appError("Documents could not be deleted", 400));
 
 		sendResponse(res, 200, {});
 	});
 
-//delete by id
+/**
+ * Deletes a single document globally bypassing ownership checks (Admin).
+ */
 export const deleteById = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const _id = req.params.id;
-		const docs = await Model.findByIdAndDelete(_id);
-
-		if (!docs) return next(new appError("doc not deleted", 400));
+		const docs = await Model.findByIdAndDelete(req.params.id);
+		if (!docs) return next(new appError("Document not found", 404));
 
 		sendResponse(res, 200, {});
 	});
-// update doc by id
+
+/**
+ * Updates a document globally bypassing ownership checks (Admin).
+ */
 export const updateById = (Model, Fields = []) =>
 	catchAsync(async (req, res, next) => {
-		// validation body
-		let object;
+		let object = req.body;
 
-		if (Fields.length != 0) {
+		if (Fields.length !== 0) {
 			object = validationBody(req.body, Fields);
-			if (!object || Object.keys(object).length === 0)
-				return next(new appError("please provide valid fields to update", 400));
+			if (!object || Object.keys(object).length === 0) {
+				return next(new appError("Please provide valid fields to update", 400));
+			}
 		}
-		//do id
-		const _id = req.params.id;
-		const doc = await Model.findByIdAndUpdate(_id, object, {
+
+		const doc = await Model.findByIdAndUpdate(req.params.id, object, {
 			runValidators: true,
 			new: true,
 		});
 
-		if (!doc) return next(new appError("doc not updated", 400));
+		if (!doc) return next(new appError("Document could not be updated", 400));
 
 		sendResponse(res, 200, doc);
 	});
 
+// Aliases
 export const updateDoc = updateById;
 export const deleteOne = deleteById;

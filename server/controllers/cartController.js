@@ -1,65 +1,92 @@
 import catchAsync from "../middlewares/catchAsync.js";
-import CartModel from "../models/CartModel.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
-import {
-	deleteFromDocList,
-	deleteOneByOwner,
-	getOneByOwner,
-} from "./handlerFactory.js";
+import * as cartService from "../services/cartService.js";
 
-//  @desc  create Cart and push products to it
-//  PATCH /api/v1/cart
-//  private/User
-export const addToCart = catchAsync(async (req, res, next) => {
-	const { quantity, itemId } = req.body;
-
-	let cart = await CartModel.findOne({ userId: req.user._id, active: true });
-
-	if (!cart) {
-		cart = await CartModel.create({
-			userId: req.user._id,
-			items: [{ item: itemId, quantity: quantity || 1 }],
-		});
-	} else {
-		// Check if item already exists in model
-		const itemExist = cart.items.find(
-			(item) =>
-				item.item?._id?.toString() === itemId ||
-				item.item?.toString() === itemId
-		);
-
-		if (itemExist) {
-			// Update quantity if item exists
-			itemExist.quantity += Number(quantity) || 1;
-		} else {
-			// Push new item if item doesn't exist
-			cart.items.push({ item: itemId, quantity: Number(quantity) || 1 });
-		}
-
-		// Explicitly mark as modified to trigger pre-save hooks
-		cart.markModified("items");
-		// Save the document to trigger pre-save hooks (like price calculation)
-		await cart.save();
-	}
-
-	// check if cart created
-	if (!cart) return next(new appError("cart not created", 400));
-	// send response
+// @desc    Get authenticated user's cart (enriched with live product data)
+// @access  Private/Customer
+export const getCart = catchAsync(async (req, res, next) => {
+	const cart = await cartService.getCart(req.user._id);
 	sendResponse(res, 200, cart);
 });
 
-//  @desc  delete Cart by owner "user"
-//  DELETE /api/v1/cart/:id
-//  private/User
-export const deleteCart = deleteOneByOwner(CartModel);
+// @desc    Add item to cart (or increment quantity if already exists)
+// @access  Private/Customer
+export const addToCart = catchAsync(async (req, res, next) => {
+	const { itemId, product_id, quantity } = req.body;
+	const productId = itemId || product_id;
 
-//  @desc  delete items from wishlist by owner "user"
-//  PAtch /api/v1/cart/:id
-//  private/User
-export const deleteFromCart = deleteFromDocList(CartModel);
+	if (!productId) {
+		return next(new appError("Product ID is required (itemId or product_id)", 400));
+	}
 
-//  @desc  show Cart
-//  GET /api/v1/cart
-//  private/User
-export const showCart = getOneByOwner(CartModel);
+	const cart = await cartService.addItem(req.user._id, {
+		product_id: productId,
+		quantity: quantity || 1,
+	});
+
+	sendResponse(res, 200, cart);
+});
+
+// @desc    Update item quantity in cart
+// @access  Private/Customer
+export const updateItemQuantity = catchAsync(async (req, res, next) => {
+	const { quantity } = req.body;
+	const productId = req.params.id;
+
+	if (!productId) {
+		return next(new appError("Product ID is required", 400));
+	}
+	if (!quantity) {
+		return next(new appError("Quantity is required", 400));
+	}
+
+	const cart = await cartService.updateItemQuantity(
+		req.user._id,
+		productId,
+		quantity
+	);
+
+	sendResponse(res, 200, cart);
+});
+
+// @desc    Remove an item from cart
+// @access  Private/Customer
+export const removeFromCart = catchAsync(async (req, res, next) => {
+	const productId = req.params.id;
+
+	if (!productId) {
+		return next(new appError("Product ID is required", 400));
+	}
+
+	const cart = await cartService.removeItem(req.user._id, productId);
+	sendResponse(res, 200, cart);
+});
+
+// @desc    Clear entire cart
+// @access  Private/Customer
+export const clearCart = catchAsync(async (req, res, next) => {
+	const cart = await cartService.clearCart(req.user._id);
+	sendResponse(res, 200, cart);
+});
+
+// @desc    Merge guest cart items into authenticated user's cart
+// @route   POST /api/v1/cart/merge
+// @access  Private/Customer
+export const mergeGuestCart = catchAsync(async (req, res, next) => {
+	const { guest_items } = req.body;
+
+	if (!guest_items || !Array.isArray(guest_items)) {
+		return next(new appError("guest_items array is required", 400));
+	}
+
+	const cart = await cartService.mergeGuestCart(req.user._id, guest_items);
+	sendResponse(res, 200, cart);
+});
+
+// @desc    Validate cart for checkout
+// @access  Private/Customer
+export const validateCart = catchAsync(async (req, res, next) => {
+	const result = await cartService.validateCartForCheckout(req.user._id);
+	sendResponse(res, 200, result);
+});

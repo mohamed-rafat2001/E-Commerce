@@ -1,13 +1,34 @@
 import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/services/handlerFactory.js";
 
+// get cart (enriched with live product data)
+export const showCart = () => getFunc("cart");
+
 // add product to cart
 export const addToCart = (product) => addFunc("cart", product);
 
+// update item quantity in cart
+export const updateCartItemQuantity = (productId, quantity) =>
+    updateFunc(`cart/${productId}`, { quantity });
+
 // delete product from cart
-export const deleteFromCart = (id) => updateFunc(`cart/${id}`);
+export const deleteFromCart = (productId) => deleteFunc(`cart/${productId}`);
 
-// show  cart
-export const showCart = () => getFunc(`cart/user`);
+// clear entire cart
+export const clearCart = () => deleteFunc("cart/clear");
 
-// delete  cart
-export const deleteCart = (id) => deleteFunc(`cart/${id}`);
+// alias for backward compatibility
+export const deleteCart = clearCart;
+
+// validate cart for checkout
+export const validateCart = () => getFunc("cart/validate");
+
+// merge guest cart after login
+export const mergeGuestCart = (guestItems) =>
+    addFunc("cart/merge", { guest_items: guestItems });
+
+// checkout — create orders from cart
+export const checkout = (orderData) => addFunc("orders/checkout", orderData);
+
+// cancel order
+export const cancelOrder = (orderId, reason) =>
+    updateFunc(`orders/${orderId}/cancel`, { reason });

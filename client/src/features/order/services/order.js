@@ -1,28 +1,22 @@
 import { addFunc, getFunc, updateFunc } from "../../../shared/services/handlerFactory.js";
 
-// add order
-export const addOrder = (order) => addFunc("orders", order);
-
-// ===== ADMIN SERVICES =====
-// get all orders for admin
-export const getAllOrdersForAdmin = () => getFunc("admin/orders");
-
-// get order by id for admin
-export const getOrderForAdmin = (id) => getFunc(`admin/orders/${id}`);
-
-// update order status by admin
-export const updateOrderStatusByAdmin = (status, id) =>
-	updateFunc(`orders/${id}/status`, status);
-
 // ===== CUSTOMER SERVICES =====
-// get orders for customer (owner)
-export const getOrdersForCustomer = () => getFunc("orders/myorders");
+// Checkout — create orders from cart
+export const checkoutOrder = (orderData) => addFunc("orders/checkout", orderData);
 
-// get order by id for customer (owner)
+// Get orders for customer (owner)
+export const getOrdersForCustomer = (params) =>
+	getFunc("orders/myorders", { params });
+
+// Get order by id for customer (owner)
 export const getOrderForCustomer = (id) => getFunc(`orders/myorders/${id}`);
 
-// update order status by customer (cancel)
-export const updateCustomerOrderStatus = (id, status) => 
+// Cancel order (customer, pending only)
+export const cancelOrder = (id, reason) =>
+	updateFunc(`orders/${id}/cancel`, { reason });
+
+// Backward compatibility alias
+export const updateCustomerOrderStatus = (id, status) =>
 	updateFunc(`orders/${id}/status`, { status });
 
 // ===== SELLER SERVICES =====
@@ -30,5 +24,17 @@ export const updateCustomerOrderStatus = (id, status) =>
 export const getSellerOrders = (params) => getFunc("orders/seller", { params });
 
 // Update order status from seller panel
-export const updateSellerOrderStatus = (orderId, status) => 
-	updateFunc(`sellers/orders/${orderId}/status`, { status });
+export const updateSellerOrderStatus = (orderId, statusData) =>
+	updateFunc(`orders/${orderId}/seller-status`, statusData);
+
+// ===== ADMIN SERVICES =====
+// Get all orders for admin
+export const getAllOrdersForAdmin = (params) =>
+	getFunc("orders/admin/all", { params });
+
+// Get order by id for admin
+export const getOrderForAdmin = (id) => getFunc(`admin/orders/${id}`);
+
+// Update order status by admin (force any transition)
+export const updateOrderStatusByAdmin = (id, statusData) =>
+	updateFunc(`orders/${id}/status`, statusData);
