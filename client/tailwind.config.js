@@ -13,6 +13,8 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+				display: ['"Plus Jakarta Sans"', 'serif'],
+				body: ['Inter', 'sans-serif'],
 			},
 			colors: {
 				primary: {
@@ -27,7 +29,13 @@ export default {
 					800: '#3730a3',
 					900: '#312e81',
 					950: '#1e1b4b',
+					DEFAULT: '#4f46e5',
+					dark: '#3730a3',
+					light: '#e0e7ff'
 				},
+				accent: {
+					DEFAULT: '#9333ea'
+				}
 			},
 			boxShadow: {
 				'glow': '0 0 20px rgba(99, 102, 241, 0.3)',

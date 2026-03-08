@@ -1,9 +1,9 @@
-import { LoadingSpinner } from '../../../shared/ui/index.js';
+import { PageHeader, Skeleton, Card, Button } from '../../../shared/ui/index.js';
+import { FiPlus } from 'react-icons/fi';
 import { useCategoriesPage } from '../hooks/index.js';
 import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
 import CategoryFormModal from '../components/categories/CategoryFormModal.jsx';
 import SubCategoryFormModal from '../components/categories/SubCategoryFormModal.jsx';
-import CategoriesHeader from '../components/categories/CategoriesHeader.jsx';
 import CategoriesStats from '../components/categories/CategoriesStats.jsx';
 import CategoriesFilter from '../components/categories/CategoriesFilter.jsx';
 import CategoriesTable from '../components/categories/CategoriesTable.jsx';
@@ -52,46 +52,62 @@ const CategoriesAndSubCategoriesPage = () => {
 
 	if (isLoading && page === 1 && !searchQuery) {
 		return (
-			<div className="flex justify-center items-center min-h-[400px]">
-				<LoadingSpinner size="lg" message="Loading categories and subcategories..." />
+			<div className="space-y-8">
+				<Skeleton variant="text" className="w-1/4 h-10" />
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<Skeleton variant="card" count={4} />
+				</div>
+				<Skeleton variant="card" className="h-96" />
 			</div>
 		);
 	}
-	
+
 	return (
-		<div className="space-y-6 pb-10">
-			{/* Header */}
-			<CategoriesHeader handleCreateCategory={handleCreateCategory} />
-			
-			{/* Stats */}
+		<div className="space-y-8 pb-10">
+			<PageHeader
+				title="Taxonomy Management"
+				subtitle="Organize your marketplace hierarchy with categories and subcategories."
+				actions={
+					<Button
+						onClick={handleCreateCategory}
+						icon={<FiPlus className="w-5 h-5" />}
+						className="shadow-xl"
+					>
+						New Category
+					</Button>
+				}
+			/>
+
 			<CategoriesStats stats={stats} />
-			
-			{/* Filters */}
-			<CategoriesFilter 
-				searchQuery={searchQuery}
-				setSearchQuery={setSearchQuery}
-				limit={limit}
-				setLimit={setLimit}
-			/>
-			
-			{/* Categories Table */}
-			<CategoriesTable 
-				categories={categories}
-				searchQuery={searchQuery}
-				setSearchQuery={setSearchQuery}
-				page={page}
-				limit={limit}
-				total={total}
-				totalPages={totalPages}
-				setPage={setPage}
-				handleEditCategory={handleEditCategory}
-				handleDeleteCategory={handleDeleteCategory}
-				handleCreateSubCategory={handleCreateSubCategory}
-				handleEditSubCategory={handleEditSubCategory}
-				handleDeleteSubCategory={handleDeleteSubCategory}
-			/>
-			
-			{/* Modals */}
+
+			<Card padding="none" className="overflow-hidden">
+				<div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+					<h3 className="text-lg font-bold text-gray-900 font-display">Structure Overview</h3>
+				</div>
+				<CategoriesFilter
+					searchQuery={searchQuery}
+					setSearchQuery={setSearchQuery}
+					limit={limit}
+					setLimit={setLimit}
+				/>
+
+				<CategoriesTable
+					categories={categories}
+					searchQuery={searchQuery}
+					setSearchQuery={setSearchQuery}
+					page={page}
+					limit={limit}
+					total={total}
+					totalPages={totalPages}
+					setPage={setPage}
+					handleEditCategory={handleEditCategory}
+					handleDeleteCategory={handleDeleteCategory}
+					handleCreateSubCategory={handleCreateSubCategory}
+					handleEditSubCategory={handleEditSubCategory}
+					handleDeleteSubCategory={handleDeleteSubCategory}
+				/>
+			</Card>
+
 			<CategoryFormModal
 				isOpen={isCategoryModalOpen}
 				onClose={closeModal}
@@ -99,7 +115,7 @@ const CategoriesAndSubCategoriesPage = () => {
 				onSubmit={handleSubmitCategory}
 				isLoading={selectedCategory ? isUpdatingCategory : isCreatingCategory}
 			/>
-			
+
 			<SubCategoryFormModal
 				isOpen={isSubCategoryModalOpen}
 				onClose={closeModal}
@@ -109,7 +125,7 @@ const CategoriesAndSubCategoriesPage = () => {
 				uploadProgress={selectedSubCategory ? updateProgress : createProgress}
 				categories={allCategories || []}
 			/>
-			
+
 			<DeleteConfirmModal
 				isOpen={!!categoryToDelete}
 				onClose={closeDeleteModal}
@@ -119,7 +135,7 @@ const CategoriesAndSubCategoriesPage = () => {
 				onConfirm={handleConfirmDeleteCategory}
 				isLoading={isDeletingCategory}
 			/>
-			
+
 			<DeleteConfirmModal
 				isOpen={!!subCategoryToDelete}
 				onClose={closeDeleteModal}

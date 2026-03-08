@@ -1,141 +1,109 @@
-// Theme configuration constants
-export const colors = {
-	primary: {
-		50: '#eef2ff',
-		100: '#e0e7ff',
-		200: '#c7d2fe',
-		300: '#a5b4fc',
-		400: '#818cf8',
-		500: '#6366f1',
-		600: '#4f46e5',
-		700: '#4338ca',
-		800: '#3730a3',
-		900: '#312e81',
+export const theme = {
+	// ─── COLORS ───────────────────────────────────────────────
+	colors: {
+		primary: "bg-primary text-white",
+		primaryHover: "hover:bg-primary-dark",
+		primaryText: "text-primary",
+		primaryBg: "bg-primary-light",
+		primaryBorder: "border-primary",
+		accent: "text-accent",
+		accentBg: "bg-accent",
+
+		textMain: "text-gray-900",
+		textMuted: "text-gray-500",
+		textLight: "text-gray-400",
+		textInverse: "text-white",
+
+		bgPage: "bg-gray-50",
+		bgCard: "bg-white",
+		bgSoft: "bg-gray-100",
+		bgDark: "bg-gray-900",
+		bgSidebar: "bg-white",
+		border: "border-gray-200",
+		borderDark: "border-gray-300",
+
+		success: "text-green-600", successBg: "bg-green-50",
+		warning: "text-yellow-600", warningBg: "bg-yellow-50",
+		error: "text-red-600", errorBg: "bg-red-50",
+		info: "text-blue-600", infoBg: "bg-blue-50",
 	},
-	secondary: {
-		50: '#f0fdf4',
-		100: '#dcfce7',
-		200: '#bbf7d0',
-		300: '#86efac',
-		400: '#4ade80',
-		500: '#22c55e',
-		600: '#16a34a',
-		700: '#15803d',
-		800: '#166534',
-		900: '#14532d',
+
+	// ─── TYPOGRAPHY ───────────────────────────────────────────
+	typography: {
+		displayFont: "font-display",
+		bodyFont: "font-body",
+		heroTitle: "text-5xl md:text-7xl font-extrabold tracking-tight font-display",
+		pageTitle: "text-2xl md:text-3xl font-bold tracking-tight font-display",
+		sectionTitle: "text-xl md:text-2xl font-semibold font-display",
+		cardTitle: "text-base md:text-lg font-semibold",
+		label: "text-sm font-medium text-gray-700",
+		body: "text-base leading-relaxed",
+		small: "text-sm leading-relaxed",
+		tiny: "text-xs",
+		tableHeader: "text-xs font-semibold uppercase tracking-wider text-gray-500",
 	},
-	accent: {
-		50: '#fff7ed',
-		100: '#ffedd5',
-		200: '#fed7aa',
-		300: '#fdba74',
-		400: '#fb923c',
-		500: '#f97316',
-		600: '#ea580c',
-		700: '#c2410c',
-		800: '#9a3412',
-		900: '#7c2d12',
+
+	// ─── SPACING ──────────────────────────────────────────────
+	spacing: {
+		sectionY: "py-20 md:py-28",
+		sectionX: "px-4 md:px-8",
+		container: "max-w-7xl mx-auto",
+		pageY: "py-6 md:py-8",
+		pageX: "px-4 md:px-6",
+		panelContainer: "max-w-screen-xl mx-auto",
+		cardPadding: "p-4 md:p-6",
+		gridGap: "gap-4 md:gap-6",
+		gridGapLarge: "gap-6 md:gap-10",
 	},
-	neutral: {
-		50: '#f8fafc',
-		100: '#f1f5f9',
-		200: '#e2e8f0',
-		300: '#cbd5e1',
-		400: '#94a3b8',
-		500: '#64748b',
-		600: '#475569',
-		700: '#334155',
-		800: '#1e293b',
-		900: '#0f172a',
-		950: '#020617',
+
+	// ─── BORDER RADIUS ────────────────────────────────────────
+	radius: {
+		card: "rounded-2xl",
+		panel: "rounded-xl",
+		button: "rounded-lg",
+		badge: "rounded-full",
+		input: "rounded-lg",
+		image: "rounded-xl",
+		avatar: "rounded-full",
+		table: "rounded-xl",
+		modal: "rounded-2xl",
+	},
+
+	// ─── SHADOWS ──────────────────────────────────────────────
+	shadow: {
+		card: "shadow-sm border border-gray-200",
+		cardHover: "shadow-md",
+		panel: "shadow-sm",
+		dropdown: "shadow-lg",
+		modal: "shadow-2xl",
+		sidebar: "shadow-sm border-r border-gray-200",
+		table: "shadow-sm border border-gray-200",
+	},
+
+	// ─── TRANSITIONS ──────────────────────────────────────────
+	transition: {
+		default: "transition-all duration-300 ease-in-out",
+		fast: "transition-all duration-150 ease-in-out",
+		slow: "transition-all duration-500 ease-in-out",
 	},
 };
-
-export const gradients = {
-	primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-	secondary: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-	accent: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)',
-	dark: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
-	glass: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-	admin: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-	seller: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-	customer: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-};
-
-export const shadows = {
-	sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-	md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-	lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-	xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-	glow: '0 0 20px rgba(99, 102, 241, 0.3)',
-	glowGreen: '0 0 20px rgba(34, 197, 94, 0.3)',
-	glowOrange: '0 0 20px rgba(249, 115, 22, 0.3)',
-};
-
-export const animations = {
-	springIn: {
-		type: 'spring',
-		stiffness: 260,
-		damping: 20,
-	},
-	fadeIn: {
-		initial: { opacity: 0 },
-		animate: { opacity: 1 },
-		transition: { duration: 0.3 },
-	},
-	slideInLeft: {
-		initial: { x: -20, opacity: 0 },
-		animate: { x: 0, opacity: 1 },
-		transition: { duration: 0.3 },
-	},
-	slideInRight: {
-		initial: { x: 20, opacity: 0 },
-		animate: { x: 0, opacity: 1 },
-		transition: { duration: 0.3 },
-	},
-	slideInUp: {
-		initial: { y: 20, opacity: 0 },
-		animate: { y: 0, opacity: 1 },
-		transition: { duration: 0.3 },
-	},
-	scaleIn: {
-		initial: { scale: 0.9, opacity: 0 },
-		animate: { scale: 1, opacity: 1 },
-		transition: { duration: 0.2 },
-	},
-};
-
 export const roleThemes = {
 	Admin: {
-		gradient: gradients.admin,
-		primaryColor: colors.primary[600],
-		accentColor: colors.primary[400],
-		bgColor: colors.primary[50],
-		icon: '👑',
-		title: 'Administrator',
+		primary: "indigo",
+		gradient: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+		colorClass: "text-indigo-600",
+		bgClass: "bg-indigo-50",
 	},
 	Seller: {
-		gradient: gradients.seller,
-		primaryColor: '#11998e',
-		accentColor: '#38ef7d',
-		bgColor: colors.secondary[50],
-		icon: '🏪',
-		title: 'Seller Dashboard',
+		primary: "emerald",
+		gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+		colorClass: "text-emerald-600",
+		bgClass: "bg-emerald-50",
 	},
 	Customer: {
-		gradient: gradients.customer,
-		primaryColor: '#4facfe',
-		accentColor: '#00f2fe',
-		bgColor: '#f0f9ff',
-		icon: '🛒',
-		title: 'My Account',
-	},
-};
-
-export default {
-	colors,
-	gradients,
-	shadows,
-	animations,
-	roleThemes,
+		primary: "blue",
+		gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+		colorClass: "text-blue-600",
+		bgClass: "bg-blue-50",
+	}
 };

@@ -1,28 +1,37 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { Card, Button, Input, Avatar, Badge, Modal, Dropdown } from '../../../shared/ui/index.js';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import {
+	Card,
+	Button,
+	Input,
+	Avatar,
+	Badge,
+	Modal,
+	Dropdown,
+	ToastSuccess,
+	ToastError
+} from '../../../shared/ui/index.js';
 import useCurrentUser from '../hooks/useCurrentUser.js';
 import useUpdateUser from '../hooks/useUpdateUser.js';
 import useUpdateAvatar from '../hooks/useUpdateAvatar.jsx';
 import { roleThemes } from '../../../shared/constants/theme.js';
 import { UserIcon, LockIcon, TrashIcon, ShieldIcon } from '../../../shared/constants/icons.jsx';
 import { updatePassword as updatePasswordService, deleteMe as deleteMeService } from '../../auth/services/auth.js';
-import toast from 'react-hot-toast';
-import { ToastSuccess, ToastError } from '../../../shared/ui/index.js';
-import { useNavigate } from 'react-router-dom';
 
 const PersonalDetailsPage = () => {
 	const navigate = useNavigate();
 	const { user, userRole } = useCurrentUser();
 	const { updateDetails, isLoading: isUpdating } = useUpdateUser();
-	const { 
-		updateAvatar, 
-		deleteAvatar, 
-		isUpdating: isUploadingAvatar, 
-		uploadProgress 
+	const {
+		updateAvatar,
+		deleteAvatar,
+		isUpdating: isUploadingAvatar,
+		uploadProgress
 	} = useUpdateAvatar();
-	
+
 	const [isEditing, setIsEditing] = useState(false);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -51,7 +60,7 @@ const PersonalDetailsPage = () => {
 			phoneNumber: userData?.phoneNumber || '',
 		},
 	});
-	
+
 	const {
 		register: passwordRegister,
 		handleSubmit: handlePasswordSubmit,
@@ -122,22 +131,22 @@ const PersonalDetailsPage = () => {
 		});
 	};
 
-	const memberSince = user?.createdAt 
+	const memberSince = user?.createdAt
 		? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 		: 'January 2024';
-		
+
 	const onPasswordSubmit = async (data) => {
 		try {
 			setIsUpdatingPassword(true);
 			const response = await updatePasswordService(data);
-			
+
 			if (response.status === 200 || response.status === 201) {
 				toast.success(
-					<ToastSuccess 
-						successObj={{ 
-							title: 'Password Updated', 
-							message: 'Your password has been changed successfully.' 
-						}} 
+					<ToastSuccess
+						successObj={{
+							title: 'Password Updated',
+							message: 'Your password has been changed successfully.'
+						}}
 					/>,
 					{ icon: null }
 				);
@@ -146,11 +155,11 @@ const PersonalDetailsPage = () => {
 			}
 		} catch (error) {
 			toast.error(
-				<ToastError 
-					errorObj={{ 
-						title: 'Password Update Failed', 
-						message: error.response?.data?.message || 'Something went wrong. Please check your current password.' 
-					}} 
+				<ToastError
+					errorObj={{
+						title: 'Password Update Failed',
+						message: error.response?.data?.message || 'Something went wrong. Please check your current password.'
+					}}
 				/>,
 				{ icon: null }
 			);
@@ -164,22 +173,22 @@ const PersonalDetailsPage = () => {
 			setIsDeletingAccount(true);
 			await deleteMeService();
 			toast.success(
-				<ToastSuccess 
-					successObj={{ 
-						title: 'Account Deleted', 
-						message: 'Your account has been deactivated successfully.' 
-					}} 
+				<ToastSuccess
+					successObj={{
+						title: 'Account Deleted',
+						message: 'Your account has been deactivated successfully.'
+					}}
 				/>,
 				{ icon: null }
 			);
 			navigate('/login');
 		} catch (error) {
 			toast.error(
-				<ToastError 
-					errorObj={{ 
-						title: 'Deletion Failed', 
-						message: error.response?.data?.message || 'Something went wrong.' 
-					}} 
+				<ToastError
+					errorObj={{
+						title: 'Deletion Failed',
+						message: error.response?.data?.message || 'Something went wrong.'
+					}}
 				/>,
 				{ icon: null }
 			);
@@ -240,7 +249,7 @@ const PersonalDetailsPage = () => {
 									align="center"
 									width="w-56"
 								>
-									<Dropdown.Item 
+									<Dropdown.Item
 										icon={
 											<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -251,7 +260,7 @@ const PersonalDetailsPage = () => {
 										Upload Profile Image
 									</Dropdown.Item>
 									<Dropdown.Divider />
-									<Dropdown.Item 
+									<Dropdown.Item
 										variant="danger"
 										icon={
 											<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -273,18 +282,17 @@ const PersonalDetailsPage = () => {
 								</h1>
 								<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
 									<Badge
-										variant="gradient"
-										size="md"
-										icon={<span>{roleTheme.icon}</span>}
+										variant="primary"
+										className="bg-indigo-50 text-indigo-700"
 									>
-										{roleTheme.title}
+										{userRole}
 									</Badge>
 								</div>
 							</div>
 
 							{/* Edit button */}
 							<Button
-								variant={isEditing ? 'danger' : 'secondary'}
+								variant={isEditing ? 'danger' : 'outline'}
 								onClick={() => setIsEditing(!isEditing)}
 							>
 								{isEditing ? 'Cancel' : 'Edit Profile'}
@@ -308,20 +316,20 @@ const PersonalDetailsPage = () => {
 				size="sm"
 			>
 				<div className="space-y-6">
-					<div 
+					<div
 						className={`relative aspect-square rounded-3xl overflow-hidden border-2 border-dashed 
 							${previewUrl ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-gray-50'} 
 							flex flex-col items-center justify-center transition-all duration-300`}
 					>
 						{previewUrl ? (
 							<>
-								<img 
-									src={previewUrl} 
-									alt="Preview" 
+								<img
+									src={previewUrl}
+									alt="Preview"
 									className="w-full h-full object-cover"
 								/>
 								{!isUploadingAvatar && (
-									<button 
+									<button
 										onClick={() => {
 											setSelectedFile(null);
 											setPreviewUrl(null);
@@ -335,7 +343,7 @@ const PersonalDetailsPage = () => {
 								)}
 							</>
 						) : (
-							<div 
+							<div
 								className="text-center p-8 cursor-pointer"
 								onClick={() => fileInputRef.current?.click()}
 							>
@@ -348,9 +356,9 @@ const PersonalDetailsPage = () => {
 								<p className="text-gray-500 text-sm mt-1">PNG, JPG up to 5MB</p>
 							</div>
 						)}
-						
-						<input 
-							type="file" 
+
+						<input
+							type="file"
 							ref={fileInputRef}
 							className="hidden"
 							accept="image/*"
@@ -366,7 +374,7 @@ const PersonalDetailsPage = () => {
 								<span className="text-indigo-600">{uploadProgress}%</span>
 							</div>
 							<div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-								<motion.div 
+								<motion.div
 									className="h-full bg-indigo-500"
 									initial={{ width: 0 }}
 									animate={{ width: `${uploadProgress}%` }}
@@ -377,19 +385,19 @@ const PersonalDetailsPage = () => {
 					)}
 
 					<div className="flex gap-3">
-						<Button 
-							variant="ghost" 
+						<Button
+							variant="ghost"
 							className="flex-1"
 							onClick={() => setIsUploadModalOpen(false)}
 							disabled={isUploadingAvatar}
 						>
 							Cancel
 						</Button>
-						<Button 
-							variant="primary" 
+						<Button
+							variant="primary"
 							className="flex-1"
 							onClick={handleUploadAvatar}
-							loading={isUploadingAvatar}
+							isLoading={isUploadingAvatar}
 							disabled={!selectedFile}
 						>
 							Upload Image
@@ -419,15 +427,15 @@ const PersonalDetailsPage = () => {
 					</div>
 
 					<div className="flex gap-3">
-						<Button 
-							variant="ghost" 
+						<Button
+							variant="ghost"
 							className="flex-1"
 							onClick={() => setIsDeleteModalOpen(false)}
 						>
 							Cancel
 						</Button>
-						<Button 
-							variant="danger" 
+						<Button
+							variant="danger"
 							className="flex-1"
 							onClick={handleDeleteAvatar}
 						>
@@ -456,19 +464,19 @@ const PersonalDetailsPage = () => {
 					</div>
 
 					<div className="flex gap-3">
-						<Button 
-							variant="ghost" 
+						<Button
+							variant="ghost"
 							className="flex-1"
 							onClick={() => setIsAccountDeleteModalOpen(false)}
 							disabled={isDeletingAccount}
 						>
 							Cancel
 						</Button>
-						<Button 
-							variant="danger" 
+						<Button
+							variant="danger"
 							className="flex-1"
 							onClick={handleAccountDeletion}
-							loading={isDeletingAccount}
+							isLoading={isDeletingAccount}
 						>
 							Deactivate
 						</Button>
@@ -485,7 +493,7 @@ const PersonalDetailsPage = () => {
 					transition={{ delay: 0.3 }}
 					className="md:col-span-1"
 				>
-					<Card variant="elevated" className="h-full">
+					<Card className="h-full">
 						<Card.Header>
 							<Card.Title>Account Overview</Card.Title>
 						</Card.Header>
@@ -516,7 +524,7 @@ const PersonalDetailsPage = () => {
 					transition={{ delay: 0.4 }}
 					className="md:col-span-2"
 				>
-					<Card variant="elevated">
+					<Card>
 						<Card.Header>
 							<Card.Title>Personal Information</Card.Title>
 						</Card.Header>
@@ -571,8 +579,8 @@ const PersonalDetailsPage = () => {
 										animate={{ opacity: 1, y: 0 }}
 										className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100"
 									>
-										<Button 
-											variant="ghost" 
+										<Button
+											variant="ghost"
 											type="button"
 											onClick={() => {
 												setIsEditing(false);
@@ -582,10 +590,10 @@ const PersonalDetailsPage = () => {
 										>
 											Cancel
 										</Button>
-										<Button 
-											variant="primary" 
+										<Button
+											variant="primary"
 											type="submit"
-											loading={isUpdating}
+											isLoading={isUpdating}
 										>
 											Save Changes
 										</Button>
@@ -604,7 +612,7 @@ const PersonalDetailsPage = () => {
 				>
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 						{/* Password & Security Card */}
-						<Card variant="elevated" className="lg:col-span-2">
+						<Card className="lg:col-span-2">
 							<Card.Header className="flex flex-row items-center justify-between border-b border-gray-100">
 								<div className="flex items-center gap-3">
 									<div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
@@ -614,7 +622,7 @@ const PersonalDetailsPage = () => {
 								</div>
 								{!isChangingPassword && (
 									<Button
-										variant="secondary"
+										variant="outline"
 										size="sm"
 										onClick={() => setIsChangingPassword(true)}
 									>
@@ -640,7 +648,7 @@ const PersonalDetailsPage = () => {
 												SECURE
 											</div>
 										</div>
-										
+
 										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
 											<div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
 												<p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Last Change</p>
@@ -692,15 +700,15 @@ const PersonalDetailsPage = () => {
 												error={passwordErrors.confirmPassword?.message}
 												{...passwordRegister('confirmPassword', {
 													required: 'Please confirm your new password',
-													validate: (value) => 
+													validate: (value) =>
 														value === watchPassword('newPassword') || 'Passwords do not match'
 												})}
 											/>
 										</div>
-										
+
 										<div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
-											<Button 
-												variant="ghost" 
+											<Button
+												variant="ghost"
 												type="button"
 												onClick={() => {
 													setIsChangingPassword(false);
@@ -710,10 +718,10 @@ const PersonalDetailsPage = () => {
 											>
 												Cancel
 											</Button>
-											<Button 
-												variant="primary" 
+											<Button
+												variant="primary"
 												type="submit"
-												loading={isUpdatingPassword}
+												isLoading={isUpdatingPassword}
 											>
 												Update Password
 											</Button>
@@ -724,7 +732,7 @@ const PersonalDetailsPage = () => {
 						</Card>
 
 						{/* Account Actions Card */}
-						<Card variant="elevated">
+						<Card>
 							<Card.Header>
 								<Card.Title>Account Control</Card.Title>
 							</Card.Header>
@@ -742,9 +750,9 @@ const PersonalDetailsPage = () => {
 									<p className="text-xs text-gray-500 mb-4">
 										Deleting your account will deactivate your profile. All your data will be archived.
 									</p>
-									<Button 
-										variant="danger" 
-										size="sm" 
+									<Button
+										variant="danger"
+										size="sm"
 										className="w-full"
 										onClick={() => setIsAccountDeleteModalOpen(true)}
 									>

@@ -1,20 +1,26 @@
 import { motion } from 'framer-motion';
-import { 
-	ProductIcon
-} from '../../../shared/constants/icons.jsx';
-import { LoadingSpinner, Select } from '../../../shared/ui/index.js';
-import { 
-	FiDollarSign, 
+import {
+	PageHeader,
+	Card,
+	StatCard,
+	Select,
+	Skeleton,
+	DataTable,
+	Badge
+} from '../../../shared/ui/index.js';
+import {
+	FiDollarSign,
 	FiShoppingBag,
-	FiUsers
+	FiUsers,
+	FiTrendingUp,
+	FiStar
 } from 'react-icons/fi';
 import { useSellerAnalyticsPage } from '../hooks/index.js';
 import LargeStatCard from '../components/analytics/LargeStatCard.jsx';
-import SmallStatCard from '../components/analytics/SmallStatCard.jsx';
-import StatusBreakdownCard from '../components/analytics/StatusBreakdownCard.jsx';
 import TopProductsCard from '../components/analytics/TopProductsCard.jsx';
 import RecentSalesCard from '../components/analytics/RecentSalesCard.jsx';
 import RatingCard from '../components/analytics/RatingCard.jsx';
+import StatusBreakdownCard from '../components/analytics/StatusBreakdownCard.jsx';
 
 // Fallback analytics data
 const fallbackAnalytics = {
@@ -65,7 +71,6 @@ const fallbackAnalytics = {
 	],
 };
 
-// Main Analytics Page
 const AnalyticsPage = () => {
 	const {
 		analytics,
@@ -76,112 +81,104 @@ const AnalyticsPage = () => {
 
 	const safeAnalytics = analytics || fallbackAnalytics;
 
+	if (isLoading) {
+		return (
+			<div className="space-y-8">
+				<Skeleton variant="text" className="w-1/3 h-10" />
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<Skeleton variant="card" className="h-64" />
+					<Skeleton variant="card" className="h-64" />
+				</div>
+				<div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+					<Skeleton variant="card" count={4} />
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div className="space-y-6 pb-10">
-			{/* Page Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">Sales Analytics 📈</h1>
-					<p className="text-gray-500 font-medium mt-1">Track your store performance and insights</p>
-				</motion.div>
-				<div className="min-w-[200px]">
-					<Select
-						value={timeRange}
-						onChange={setTimeRange}
-						options={[
-							{ value: 'week', label: 'Last 7 days' },
-							{ value: 'month', label: 'Last 30 days' },
-							{ value: 'quarter', label: 'Last 3 months' },
-							{ value: 'year', label: 'Last 12 months' },
-						]}
-					/>
+		<div className="space-y-8 pb-10">
+			<PageHeader
+				title="Sales Analytics"
+				subtitle="Comprehensive insights into your shop's performance and customer behavior."
+				actions={
+					<div className="min-w-[180px]">
+						<Select
+							value={timeRange}
+							onChange={setTimeRange}
+							options={[
+								{ value: 'week', label: 'Last 7 days' },
+								{ value: 'month', label: 'Last 30 days' },
+								{ value: 'quarter', label: 'Last 3 months' },
+								{ value: 'year', label: 'Last 12 months' },
+							]}
+							className="bg-white"
+						/>
+					</div>
+				}
+			/>
+
+			{/* Main Graphs */}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<LargeStatCard
+					title="Revenue Performance"
+					value={`$${(safeAnalytics.revenue.total || 0).toLocaleString()}`}
+					change={safeAnalytics.revenue.change}
+					icon={FiDollarSign}
+					chartData={safeAnalytics.revenue.chartData}
+					color="emerald"
+				/>
+				<LargeStatCard
+					title="Order Volume"
+					value={safeAnalytics.orders.total}
+					change={safeAnalytics.orders.change}
+					icon={FiShoppingBag}
+					chartData={safeAnalytics.orders.chartData}
+					color="indigo"
+				/>
+			</div>
+
+			{/* Secondary KPIs */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+				<StatCard
+					title="Active Listings"
+					value={safeAnalytics.products.active}
+					icon={<FiShoppingBag />}
+					color="success"
+				/>
+				<StatCard
+					title="Total Customers"
+					value={safeAnalytics.customers.total}
+					icon={<FiUsers />}
+					color="info"
+				/>
+				<StatCard
+					title="Average Rating"
+					value={safeAnalytics.rating.average}
+					icon={<FiStar />}
+					color="warning"
+				/>
+				<StatCard
+					title="New Growth"
+					value={`+${safeAnalytics.customers.new}`}
+					icon={<FiTrendingUp />}
+					color="primary"
+				/>
+			</div>
+
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+				<div className="lg:col-span-2">
+					<TopProductsCard products={safeAnalytics.topProducts || []} />
+				</div>
+				<div className="space-y-6">
+					<RatingCard average={safeAnalytics.rating.average} count={safeAnalytics.rating.count} />
+					{safeAnalytics.statusBreakdown && (
+						<StatusBreakdownCard statusBreakdown={safeAnalytics.statusBreakdown} />
+					)}
 				</div>
 			</div>
 
-			{isLoading ? (
-				<motion.div 
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100"
-					style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-				>
-					<div className="relative">
-						<LoadingSpinner size="lg" color="indigo" />
-						<div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
-					</div>
-					<p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Analytics...</p>
-				</motion.div>
-			) : (
-				<>
-					{/* Main Stats Grid */}
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						<LargeStatCard
-							title="Total Revenue"
-							value={typeof safeAnalytics.revenue.total === 'number' ? safeAnalytics.revenue.total.toFixed(2) : safeAnalytics.revenue.total}
-							change={safeAnalytics.revenue.change}
-							icon={FiDollarSign}
-							chartData={safeAnalytics.revenue.chartData}
-							color="emerald"
-							prefix="$"
-						/>
-						<LargeStatCard
-							title="Total Orders"
-							value={safeAnalytics.orders.total}
-							change={safeAnalytics.orders.change}
-							icon={FiShoppingBag}
-							chartData={safeAnalytics.orders.chartData}
-							color="indigo"
-						/>
-					</div>
-
-					{/* Secondary Stats */}
-					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-						<SmallStatCard
-							title="Total Products"
-							value={safeAnalytics.products.total}
-							icon={ProductIcon}
-							gradient="from-violet-500 to-purple-600"
-						/>
-						<SmallStatCard
-							title="Active Listings"
-							value={safeAnalytics.products.active}
-							icon={FiShoppingBag}
-							gradient="from-emerald-500 to-teal-600"
-						/>
-						<SmallStatCard
-							title="Total Customers"
-							value={safeAnalytics.customers.total}
-							icon={FiUsers}
-							gradient="from-blue-500 to-indigo-600"
-						/>
-						<SmallStatCard
-							title="Draft Products"
-							value={safeAnalytics.products.draft}
-							icon={ProductIcon}
-							gradient="from-gray-500 to-slate-600"
-						/>
-					</div>
-
-					{/* Lower Section */}
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-						{/* Top Products */}
-						<div className="lg:col-span-2">
-							<TopProductsCard products={safeAnalytics.topProducts || []} />
-						</div>
-
-						{/* Right Column */}
-						<div className="space-y-6">
-							<RatingCard average={safeAnalytics.rating.average} count={safeAnalytics.rating.count} />
-							{safeAnalytics.statusBreakdown && (
-								<StatusBreakdownCard statusBreakdown={safeAnalytics.statusBreakdown} />
-							)}
-						</div>
-					</div>
-
-					{/* Recent Sales */}
-					<RecentSalesCard sales={safeAnalytics.recentSales || []} />
-				</>
-			)}
+			<RecentSalesCard sales={safeAnalytics.recentSales || []} />
 		</div>
 	);
 };

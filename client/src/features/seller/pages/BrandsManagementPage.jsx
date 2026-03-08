@@ -1,24 +1,23 @@
 import { useSearchParams } from 'react-router-dom';
-import { LoadingSpinner, Pagination, Modal, Button, DataHeader } from '../../../shared/ui/index.js';
-import { FiPlus } from 'react-icons/fi';
+import { PageHeader, Card, Button, Pagination, Skeleton, Modal, EmptyState } from '../../../shared/ui/index.js';
+import { FiPlus, FiTag } from 'react-icons/fi';
 import { useBrandsManagementPage } from '../hooks/index.js';
 import BrandDetailsSidebar from '../components/brands/BrandDetailsSidebar.jsx';
 import BrandFormModal from '../components/brands/BrandFormModal.jsx';
 import LogoEditModal from '../components/brands/LogoEditModal.jsx';
-import BrandEmptyState from '../components/brands/BrandEmptyState.jsx';
 import BrandsList from '../components/brands/BrandsList.jsx';
 
 const BrandsManagementPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const isFiltering = searchParams.get("search");
 
-	const { 
-		brands, 
+	const {
+		brands,
 		totalPages,
-		loading, 
+		loading,
 		isFetching,
-		isSubmitting, 
-		isUploading, 
+		isSubmitting,
+		isUploading,
 		categories,
 		isFormModalOpen,
 		setIsFormModalOpen,
@@ -39,49 +38,37 @@ const BrandsManagementPage = () => {
 		handleLogoEdit,
 		handleUploadLogo
 	} = useBrandsManagementPage();
-	
+
 	if (loading) {
 		return (
-			<div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100 max-w-7xl mx-auto my-8" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-				<div className="relative">
-					<LoadingSpinner size="lg" color="indigo" />
-					<div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-30 animate-pulse" />
+			<div className="space-y-8">
+				<Skeleton variant="text" className="w-1/4 h-10" />
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					<Skeleton variant="card" count={6} />
 				</div>
-				<p className="mt-6 font-black text-gray-400 uppercase tracking-[0.2em] text-[10px]">Loading Brands...</p>
 			</div>
 		);
 	}
-	
+
 	return (
-		<div className="space-y-6 pb-10">
-			<DataHeader 
-				title="Brand Management 🏷️"
-				description="Manage your brand portfolio and settings."
-				searchPlaceholder="Search brands..."
-				sortOptions={[
-					{ label: 'Newest First', value: '-createdAt' },
-					{ label: 'Oldest First', value: 'createdAt' },
-					{ label: 'Name (A-Z)', value: 'name' },
-					{ label: 'Name (Z-A)', value: '-name' }
-				]}
+		<div className="space-y-8 pb-10">
+			<PageHeader
+				title="Brand Portfolio"
+				subtitle="Customize your profile by managing the brands you represent and sell."
 				actions={
-					<Button 
+					<Button
 						onClick={handleCreateBrand}
-						icon={<FiPlus className="w-4 h-4" />}
+						icon={<FiPlus className="w-5 h-5" />}
+						className="shadow-xl"
 					>
-						Add New Brand
+						Register New Brand
 					</Button>
 				}
 			/>
-			
+
 			{brands.length > 0 ? (
 				<div className="relative">
-					{isFetching && (
-						<div className="absolute inset-0 bg-white/60 z-10 flex justify-center items-start pt-20 rounded-lg transition-all duration-200 backdrop-blur-[1px]">
-							<LoadingSpinner />
-						</div>
-					)}
-					<BrandsList 
+					<BrandsList
 						brands={brands}
 						onEdit={handleEditBrand}
 						onDelete={handleDeleteBrand}
@@ -89,19 +76,27 @@ const BrandsManagementPage = () => {
 						onSelect={handleSelectBrand}
 						selectedBrandId={currentlySelectedBrand?._id}
 					/>
-					<div className="mt-6">
+					<div className="mt-8">
 						<Pagination totalPages={totalPages} />
 					</div>
 				</div>
-			) : isFiltering ? (
-				<div className="text-center py-20 bg-white rounded-lg border border-gray-200">
-					<p className="text-gray-500 mb-4">No brands found matching your criteria.</p>
-					<Button variant="ghost" onClick={() => setSearchParams({})}>Clear Filters</Button>
-				</div>
 			) : (
-				<BrandEmptyState onCreate={handleCreateBrand} />
+				<Card padding="lg">
+					<EmptyState
+						icon={<FiTag className="w-12 h-12" />}
+						title={isFiltering ? "No matches found" : "No brands registered"}
+						message={isFiltering ? "Try a different search term or clear filters." : "Start by registering your first brand to showcase your products."}
+						action={!isFiltering ? {
+							label: "Add Brand",
+							onClick: handleCreateBrand
+						} : {
+							label: "Clear Search",
+							onClick: () => setSearchParams({})
+						}}
+					/>
+				</Card>
 			)}
-			
+
 			{/* Modals */}
 			<BrandFormModal
 				isOpen={isFormModalOpen}
@@ -111,7 +106,7 @@ const BrandsManagementPage = () => {
 				categories={categories}
 				isSubmitting={isSubmitting}
 			/>
-			
+
 			<LogoEditModal
 				isOpen={isLogoModalOpen}
 				onClose={() => setIsLogoModalOpen(false)}
@@ -119,38 +114,34 @@ const BrandsManagementPage = () => {
 				brand={selectedBrand}
 				isUploading={isUploading}
 			/>
-			
+
 			{/* Delete Confirmation Modal */}
 			<Modal
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
-				title="Delete Brand"
+				title="Confirm Deletion"
 				size="sm"
 				footer={
 					<div className="flex justify-end gap-3 w-full">
-						<Button 
-							variant="ghost" 
+						<Button
+							variant="ghost"
 							onClick={() => setIsDeleteModalOpen(false)}
 						>
 							Cancel
 						</Button>
-						<Button 
-							variant="danger" 
+						<Button
+							variant="danger"
 							onClick={confirmDeleteBrand}
 						>
-							Delete
+							Delete Permanently
 						</Button>
 					</div>
 				}
 			>
-				<div className="text-center">
-					<div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
-						<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-						</svg>
-					</div>
-					<p className="text-gray-600">
-						Are you sure you want to delete this brand? This action cannot be undone.
+				<div className="text-center py-4">
+					<p className="text-gray-600 font-medium">
+						Are you sure you want to delete <span className="text-gray-900 font-bold">"{selectedBrand?.name}"</span>?
+						This action will remove all associated brand data and cannot be undone.
 					</p>
 				</div>
 			</Modal>
@@ -162,11 +153,11 @@ const BrandsManagementPage = () => {
 				onClose={handleCloseSidebar}
 				categories={categories}
 			/>
-			
+
 			{/* Overlay for sidebar */}
 			{isSidebarOpen && (
-				<div 
-					className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+				<div
+					className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] lg:hidden"
 					onClick={handleCloseSidebar}
 				/>
 			)}

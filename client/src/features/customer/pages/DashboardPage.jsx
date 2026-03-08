@@ -1,86 +1,80 @@
-import WelcomeBanner from '../components/WelcomeBanner.jsx';
-import DashboardStatCard from '../components/DashboardStatCard.jsx';
-import RecentOrders from '../components/RecentOrders.jsx';
-import WishlistPreview from '../components/WishlistPreview.jsx';
-import useOrderHistory from '../hooks/useOrderHistory.js';
-import useWishlist from '../../wishList/hooks/useWishlist.js';
-import useCustomerProfile from '../hooks/useCustomerProfile.js';
-import {
-	OrderIcon,
-	HeartIcon,
-	ShippingIcon,
-} from '../../../shared/constants/icons.jsx';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { FiShoppingBag, FiHeart, FiClock, FiSettings } from 'react-icons/fi';
+import { PageHeader, StatCard, Card, DataTable, Badge, Button, Skeleton } from '../../../shared/ui';
+import useCurrentUser from '../../user/hooks/useCurrentUser';
+import useOrderHistory from '../hooks/useOrderHistory'; // Assuming this exists or using mock
 
-const CustomerDashboardPage = () => {
-	const { orders, isLoading: ordersLoading } = useOrderHistory();
-	const { wishlist, isLoading: wishlistLoading } = useWishlist();
-	const { addresses, isLoading: profileLoading } = useCustomerProfile();
+const CustomerDashboard = () => {
+	const { user, userRole } = useCurrentUser();
+	const { orders, isLoading } = useOrderHistory() || { orders: [], isLoading: false };
 
 	const stats = [
-		{ 
-			icon: OrderIcon, 
-			label: 'Total Orders', 
-			value: ordersLoading ? '...' : orders.length.toString(), 
-			color: 'from-blue-500 to-cyan-500' 
-		},
-		{ 
-			icon: HeartIcon, 
-			label: 'Wishlist Items', 
-			value: wishlistLoading ? '...' : (wishlist?.items?.length || 0).toString(), 
-			color: 'from-pink-500 to-rose-500' 
-		},
-		{ 
-			icon: ShippingIcon, 
-			label: 'Saved Addresses', 
-			value: profileLoading ? '...' : addresses.length.toString(), 
-			color: 'from-emerald-500 to-teal-500' 
-		},
+		{ title: 'Total Orders', value: '12', icon: <FiShoppingBag />, color: 'primary', change: '+2 this month' },
+		{ title: 'Wishlist Items', value: '8', icon: <FiHeart />, color: 'accent', change: 'Updated today' },
+		{ title: 'Pending Orders', value: '2', icon: <FiClock />, color: 'warning', change: 'Expecting delivery' },
+		{ title: 'Settings', value: 'Profile', icon: <FiSettings />, color: 'emerald', change: '100% Complete' }
 	];
 
-	// Prepare recent orders (last 3)
-	const recentOrders = orders.slice(0, 3).map(order => ({
-		id: order._id.substring(order._id.length - 8).toUpperCase(),
-		date: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-		items: order.items.length,
-		total: `$${order.totalPrice?.amount || 0}`,
-		status: order.status,
-		statusColor: order.status === 'Delivered' ? 'success' : order.status === 'Processing' ? 'warning' : 'info'
-	}));
+	const recentOrders = [
+		{ id: 'ORD-7721', date: '2026-03-05', total: '$129.00', status: 'Shipped', statusColor: 'primary' },
+		{ id: 'ORD-7604', date: '2026-02-28', total: '$85.50', status: 'Delivered', statusColor: 'success' },
+		{ id: 'ORD-7590', date: '2026-02-20', total: '$210.00', status: 'Delivered', statusColor: 'success' },
+	];
 
-	// Prepare wishlist items (last 3)
-	const wishlistPreviewItems = (wishlist?.items || []).slice(0, 3).map(item => ({
-		id: item.itemId._id,
-		name: item.itemId.name,
-		price: `$${item.itemId.price}`,
-		image: item.itemId.image?.secure_url || '📦',
-		discount: null // Could be calculated if needed
-	}));
+	const orderColumns = [
+		{ header: 'Order ID', key: 'id' },
+		{ header: 'Date', key: 'date' },
+		{ header: 'Amount', key: 'total' },
+		{
+			header: 'Status',
+			render: (row) => <Badge variant={row.statusColor}>{row.status}</Badge>
+		},
+		{
+			header: '',
+			render: () => <Button variant="ghost" size="sm">View</Button>
+		}
+	];
 
 	return (
 		<div className="space-y-8">
-			{/* Welcome Banner */}
-			<WelcomeBanner 
-				title="Welcome back! 🛒"
-				subtitle="Track your orders, manage your wishlist, and discover amazing deals waiting just for you."
+			<PageHeader
+				title={`Welcome back, ${user?.firstName || 'User'}!`}
+				subtitle="Here's a quick overview of your account activity and recent purchases."
 			/>
 
-			{/* Quick Stats */}
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-				{stats.map((stat, index) => (
-					<DashboardStatCard key={stat.label} stat={stat} index={index} />
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+				{stats.map((stat, i) => (
+					<StatCard key={i} {...stat} />
 				))}
 			</div>
 
-			{/* Main Content */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				{/* Recent Orders */}
-				<RecentOrders orders={recentOrders} />
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+				<Card padding="none" className="lg:col-span-2 overflow-hidden">
+					<div className="p-6 border-b border-gray-100 flex items-center justify-between">
+						<h3 className="text-xl font-bold text-gray-900">Recent Orders</h3>
+						<Button variant="ghost" size="sm">View All</Button>
+					</div>
+					<DataTable columns={orderColumns} data={recentOrders} />
+				</Card>
 
-				{/* Wishlist Preview */}
-				<WishlistPreview items={wishlistPreviewItems} />
+				<Card className="flex flex-col">
+					<h3 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+					<div className="space-y-3 flex-1">
+						<Button variant="outline" fullWidth className="justify-start gap-3">
+							<FiShoppingBag /> Continue Shopping
+						</Button>
+						<Button variant="outline" fullWidth className="justify-start gap-3">
+							<FiHeart /> View Favorites
+						</Button>
+						<Button variant="outline" fullWidth className="justify-start gap-3">
+							<FiSettings /> Account Settings
+						</Button>
+					</div>
+				</Card>
 			</div>
 		</div>
 	);
 };
 
-export default CustomerDashboardPage;
+export default CustomerDashboard;

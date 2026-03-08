@@ -1,58 +1,27 @@
-import { motion } from 'framer-motion';
+import React from 'react';
 
 const variants = {
-	primary: 'bg-indigo-100 text-indigo-700',
-	secondary: 'bg-gray-100 text-gray-700',
-	success: 'bg-emerald-100 text-emerald-700',
-	warning: 'bg-amber-100 text-amber-700',
-	danger: 'bg-red-100 text-red-700',
-	info: 'bg-sky-100 text-sky-700',
-	gradient:
-		'bg-linear-to-r from-indigo-500 to-purple-600 text-white',
-};
-
-const sizes = {
-	sm: 'px-2 py-0.5 text-xs',
-	md: 'px-2.5 py-1 text-sm',
-	lg: 'px-3 py-1.5 text-base',
+	default: "bg-gray-100 text-gray-600",
+	primary: "bg-indigo-50 text-indigo-600",
+	success: "bg-green-50 text-green-700",
+	warning: "bg-yellow-50 text-yellow-700",
+	error: "bg-red-50 text-red-600",
+	info: "bg-blue-50 text-blue-700",
+	new: "bg-emerald-500 text-white",
+	sale: "bg-red-500 text-white",
+	featured: "bg-yellow-400 text-yellow-900"
 };
 
 const Badge = ({
-	children,
-	variant = 'primary',
-	size = 'md',
-	className = '',
-	dot = false,
-	icon = null,
-	animate = true,
+	label,
+	variant = "default",
+	className = "",
+	children
 }) => {
-	const baseClasses =
-		'inline-flex items-center font-medium rounded-full whitespace-nowrap cursor-default';
-
-	const Component = animate ? motion.span : 'span';
-	const animationProps = animate
-		? {
-				initial: { scale: 0.8, opacity: 0 },
-				animate: { scale: 1, opacity: 1 },
-				transition: { type: 'spring', stiffness: 500, damping: 25 },
-		  }
-		: {};
-
 	return (
-		<Component
-			className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
-			{...animationProps}
-		>
-			{dot && (
-				<span
-					className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-						variant === 'gradient' ? 'bg-white' : 'bg-current'
-					}`}
-				></span>
-			)}
-			{icon && <span className="mr-1">{icon}</span>}
-			{children}
-		</Component>
+		<span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-flex items-center ${variants[variant]} ${className}`}>
+			{label || children}
+		</span>
 	);
 };
 
