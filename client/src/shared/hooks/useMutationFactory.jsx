@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 export default function useMutationFactory(serviceFunc, keyName, err, success) {
 	const queryClient = useQueryClient();
 
-	const { error, isPending, mutate, data } = useMutation({
+	const { error, isPending, mutate, mutateAsync, data } = useMutation({
 		mutationFn: serviceFunc,
 		onSuccess: () => {
 			// Update React Query cache
@@ -16,5 +16,5 @@ export default function useMutationFactory(serviceFunc, keyName, err, success) {
 		},
 	});
 
-	return { error, isPending, isLoading: isPending, mutate, data: data?.data?.data };
+	return { error, isPending, isLoading: isPending, mutate, mutateAsync, data: data?.data?.data };
 }

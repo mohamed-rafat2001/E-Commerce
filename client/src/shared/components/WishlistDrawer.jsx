@@ -4,7 +4,7 @@ import { Button } from '../ui/index.js';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
 import useCurrentUser from '../../features/user/hooks/useCurrentUser.js';
 import { useNavigate } from 'react-router-dom';
-import WishlistButton from './WishlistButton.jsx';
+import AddToCartButton from './AddToCartButton.jsx';
 
 /**
  * Wishlist Drawer - Slide-in mini wishlist from the right
@@ -14,12 +14,6 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
     const { wishlistItems, isLoading } = useWishlist();
     const { isAuthenticated } = useCurrentUser();
     const navigate = useNavigate();
-
-    const handleAddToCart = (product) => {
-        // Navigate to product page or implement direct add to cart
-        navigate(`/products/${product._id || product.product_id}`);
-        onClose();
-    };
 
     return (
         <AnimatePresence>
@@ -36,6 +30,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
 
                     {/* Drawer */}
                     <motion.div
+                        id="wishlist-drawer"
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
@@ -89,7 +84,6 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                                             <WishlistItemCard
                                                 key={product._id || item._id}
                                                 product={product}
-                                                onAddToCart={() => handleAddToCart(product)}
                                             />
                                         );
                                     })}
@@ -123,7 +117,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
 /**
  * Individual Wishlist Item Card Component
  */
-const WishlistItemCard = ({ product, onAddToCart }) => {
+const WishlistItemCard = ({ product }) => {
     const { removeFromWishlist } = useWishlist();
 
     const price = product.price?.amount || product.price || 0;
@@ -148,16 +142,15 @@ const WishlistItemCard = ({ product, onAddToCart }) => {
             {/* Product Details */}
             <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
-                <p className="text-indigo-600 font-bold mt-1">${price.toFixed(2)}</p>
+                <p className="text-indigo-600 font-bold mt-1">${typeof price === 'number' ? price.toFixed(2) : price}</p>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 mt-2">
-                    <button
-                        onClick={onAddToCart}
-                        className="flex-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
-                    >
-                        <FiShoppingBag className="w-3 h-3" /> Add to Cart
-                    </button>
+                    <AddToCartButton
+                        product={product}
+                        size="sm"
+                        className="flex-1 !text-xs !py-1.5 !rounded-lg"
+                    />
                     <button
                         onClick={handleRemove}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"

@@ -25,6 +25,9 @@ export const getGuestWishlist = () => {
  */
 const saveGuestWishlist = (wishlist) => {
     localStorage.setItem(GUEST_WISHLIST_KEY, JSON.stringify(wishlist));
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("guestWishlistUpdated"));
+    }
 };
 
 /**
@@ -35,7 +38,7 @@ const saveGuestWishlist = (wishlist) => {
  */
 export const addToGuestWishlist = (product) => {
     const wishlist = getGuestWishlist();
-    
+
     const productId = product._id || product.id;
     const existingIndex = wishlist.items.findIndex(
         (item) => item.product_id === productId
@@ -75,6 +78,9 @@ export const removeFromGuestWishlist = (productId) => {
  */
 export const clearGuestWishlist = () => {
     localStorage.removeItem(GUEST_WISHLIST_KEY);
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("guestWishlistUpdated"));
+    }
 };
 
 /**

@@ -9,8 +9,8 @@ import useCart from '../../features/cart/hooks/useCart.js';
  * Handles all states: default, loading, success, error, in-cart, out-of-stock
  * Works for both authenticated and guest users
  */
-const AddToCartButton = ({ 
-    product, 
+const AddToCartButton = ({
+    product,
     quantity = 1,
     variant = 'primary',
     size = 'md',
@@ -24,36 +24,41 @@ const AddToCartButton = ({
     const { cartItems } = useCart();
 
     // Check if product is already in cart
-    const isInCart = cartItems.some(item => 
-        item.productId?._id === product._id || 
-        item.productId === product._id ||
-        item.product_id === product._id
-    );
+    const isInCart = cartItems.some(item => {
+        const p = item.item || item.itemId || item.productId || item;
+        const pId = p?._id || p?.id || item.product_id;
+        return pId === product._id || pId === product.id;
+    });
 
     // Check stock availability
     const isOutOfStock = product.countInStock === 0;
     const hasStockLimit = quantity > product.countInStock && product.countInStock > 0;
 
-    const handleClick = useCallback(async () => {
+    const handleClick = useCallback(async (e) => {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
         if (isOutOfStock) return;
 
         setButtonState('loading');
-        
+
         try {
             await addToCart(product, quantity);
             setButtonState('success');
-            
+
             if (onSuccess) onSuccess();
-            
+
             // Reset to default after 1.5s
             setTimeout(() => {
                 setButtonState('default');
             }, 1500);
         } catch (error) {
             setButtonState('error');
-            
+
             if (onError) onError(error);
-            
+
             // Reset to default after 2s
             setTimeout(() => {
                 setButtonState('default');

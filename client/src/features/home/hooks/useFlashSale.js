@@ -11,7 +11,7 @@ export const useFlashSale = () => {
 
     const { data: response, isLoading, error } = useQuery({
         queryKey: ['flash-sale-products'],
-        queryFn: () => getFunc('products', { params: { 'price.discount': { gt: 0 }, limit: 6 } }),
+        queryFn: () => getFunc('products', { params: { sort: 'price.amount', limit: 8 } }),
         staleTime: 5 * 60 * 1000,
     });
 

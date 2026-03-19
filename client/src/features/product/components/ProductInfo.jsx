@@ -12,10 +12,37 @@ import {
   FiActivity,
   FiCheck
 } from 'react-icons/fi';
+import useAddToCart from '../../cart/hooks/useAddToCart.js';
+import useAddToWishlist from '../../wishList/hooks/useAddToWishlist.js';
+import useWishlist from '../../wishList/hooks/useWishlist.js';
+import useDeleteFromWishlist from '../../wishList/hooks/useDeleteFromWishlist.js';
 
 const ProductInfo = ({
   product
 }) => {
+  const { addToCart, isLoading: isAddingToCart } = useAddToCart();
+  const { addToWishlist, isLoading: isAddingToWishlist } = useAddToWishlist();
+  const { deleteFromWishlist, isLoading: isRemovingFromWishlist } = useDeleteFromWishlist();
+  const { isInWishlist } = useWishlist();
+
+  const productId = product._id;
+  const isWishlisted = isInWishlist(productId);
+  const isWishlistLoading = isAddingToWishlist || isRemovingFromWishlist;
+  const isOutOfStock = product.countInStock === 0;
+
+  const handleAddToCart = () => {
+    if (!isOutOfStock) addToCart(product, 1);
+  };
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isWishlisted) {
+      deleteFromWishlist(productId);
+    } else {
+      addToWishlist(product);
+    }
+  };
   const [activeTab, setActiveTab] = useState('story');
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -188,12 +215,33 @@ const ProductInfo = ({
 
       <div className="mt-auto">
         <div className="flex items-stretch gap-4">
-          <button className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 group">
-            <FiShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="uppercase tracking-widest text-sm">Add to Bag</span>
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isAddingToCart}
+            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          >
+            {isAddingToCart ? (
+              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <FiShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            )}
+            <span className="uppercase tracking-widest text-sm">
+              {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'Add to Bag'}
+            </span>
           </button>
-          <button className="w-16 h-[60px] bg-rose-50 rounded-2xl border border-rose-100 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all">
-            <FiHeart className="w-6 h-6" />
+          <button
+            onClick={handleWishlistToggle}
+            disabled={isWishlistLoading}
+            className={`w-16 h-[60px] rounded-2xl border flex items-center justify-center transition-all disabled:opacity-60 disabled:cursor-not-allowed ${isWishlisted
+                ? 'bg-rose-500 border-rose-500 text-white hover:bg-rose-600'
+                : 'bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white'
+              }`}
+          >
+            {isWishlistLoading ? (
+              <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+            ) : (
+              <FiHeart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
+            )}
           </button>
         </div>
       </div>

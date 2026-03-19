@@ -40,6 +40,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
                     {/* Drawer */}
                     <motion.div
+                        id="cart-drawer"
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
@@ -87,9 +88,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             ) : (
                                 /* Cart Items List */
                                 <div className="space-y-4">
-                                    {cartItems.map((item) => (
-                                        <CartItemCard key={item.productId?._id || item.product_id} item={item} />
-                                    ))}
+                                    {cartItems.map((item) => {
+                                        const product = item.item || item.itemId || item.productId || item;
+                                        const productId = product?._id || product?.id || item.product_id;
+                                        return <CartItemCard key={productId} item={item} />;
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -103,7 +106,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                                         ${cartTotal.toFixed(2)}
                                     </span>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-2 gap-3">
                                     <Button
                                         onClick={() => {
@@ -139,30 +142,36 @@ const CartDrawer = ({ isOpen, onClose }) => {
 const CartItemCard = ({ item }) => {
     const { removeFromCart, updateQuantity } = useCart();
 
-    const product = item.productId || item;
+    const product = item.item || item.itemId || item.productId || item;
     const quantity = item.quantity || 1;
-    const price = product.price?.amount || product.price || 0;
+    const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
+    const productId = product?._id || product?.id || item.product_id;
+    const name = product?.name || item.name;
+    const image = product?.coverImage?.secure_url || product?.image?.secure_url || product?.image || item.image || "";
+
+    if (!productId) return null;
 
     return (
         <div className="flex gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
             {/* Product Image */}
             <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
                 <img
-                    src={product.coverImage?.secure_url || product.image || ''}
-                    alt={product.name}
+                    src={image}
+                    alt={name}
                     className="w-full h-full object-cover"
+                    crossOrigin="anonymous"
                 />
             </div>
 
             {/* Product Details */}
             <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
+                <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
                 <p className="text-indigo-600 font-bold mt-1">${price.toFixed(2)}</p>
 
                 {/* Quantity Controls */}
                 <div className="flex items-center gap-2 mt-2">
                     <button
-                        onClick={() => updateQuantity(product._id || product.id, Math.max(1, quantity - 1))}
+                        onClick={() => updateQuantity(productId, Math.max(1, quantity - 1))}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                         disabled={quantity <= 1}
                     >
@@ -170,7 +179,7 @@ const CartItemCard = ({ item }) => {
                     </button>
                     <span className="w-8 text-center font-medium">{quantity}</span>
                     <button
-                        onClick={() => updateQuantity(product._id || product.id, quantity + 1)}
+                        onClick={() => updateQuantity(productId, quantity + 1)}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                     >
                         <FiPlus className="w-4 h-4" />
@@ -180,7 +189,7 @@ const CartItemCard = ({ item }) => {
 
             {/* Remove Button */}
             <button
-                onClick={() => removeFromCart(product._id || product.id)}
+                onClick={() => removeFromCart(productId)}
                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
             >
                 <FiTrash2 className="w-5 h-5" />

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FiShoppingBag, FiStar } from 'react-icons/fi';
 import { Badge, Button, Card } from '../../../../shared/ui';
 import SaleProgressBar from './SaleProgressBar';
+import { Link } from 'react-router-dom';
 
 const FlashSaleCard = ({ product, index, onAddToCart }) => {
     // Determine the original vs sale price correctly based on common schema patterns (mocking if missing)
@@ -19,12 +20,15 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
             className="p-1"
         >
             <Card hoverable className="p-0 border-none group bg-white shadow-2xl shadow-indigo-100 overflow-hidden h-full">
-                <div className="relative aspect-square overflow-hidden">
-                    <img
-                        src={product.image?.secure_url || 'https://placehold.co/500x500?text=Sale+Product'}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
-                    />
+                <div className="relative aspect-square overflow-hidden cursor-pointer">
+                    <Link to={`/customer/products/${product._id || product.id}`}>
+                        <img
+                            src={product.coverImage?.secure_url || product.image?.secure_url || 'https://placehold.co/500x500?text=Sale+Product'}
+                            alt={product.name}
+                            className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
+                            crossOrigin="anonymous"
+                        />
+                    </Link>
 
                     {/* Urgent Badges */}
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -45,13 +49,15 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
                             {product.category?.name || 'Exclusive'}
                         </span>
                         <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50 px-2 py-1 rounded-full">
-                            <FiStar className="fill-current" /> {product.ratingsAverage || 4.8}
+                            <FiStar className="fill-current" /> {product.ratingAverage || 4.8}
                         </div>
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-2">
-                        {product.name}
-                    </h3>
+                    <Link to={`/customer/products/${product._id || product.id}`}>
+                        <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-2 hover:text-indigo-600 transition-colors">
+                            {product.name}
+                        </h3>
+                    </Link>
 
                     <div className="flex items-baseline gap-3 mb-6">
                         <span className="text-2xl font-black text-red-500">

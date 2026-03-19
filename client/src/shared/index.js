@@ -6,3 +6,5 @@ export { default as AddToCartButton } from './components/AddToCartButton.jsx';
 export { default as WishlistButton } from './components/WishlistButton.jsx';
 export { default as CartDrawer } from './components/CartDrawer.jsx';
 export { default as WishlistDrawer } from './components/WishlistDrawer.jsx';
+export { default as PublicProductCard } from './components/PublicProductCard.jsx';
+export { default as PublicProductCardSkeleton } from './components/PublicProductCardSkeleton.jsx';

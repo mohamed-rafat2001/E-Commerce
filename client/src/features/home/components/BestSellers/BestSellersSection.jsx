@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useBestSellers, useCategories } from '../../hooks';
-import ProductCard from '../Products/ProductCard';
+import { PublicProductCard, PublicProductCardSkeleton } from '../../../../shared';
 import { SectionTitle } from '../../../../shared/ui';
 
 const BestSellersSection = () => {
@@ -58,9 +58,9 @@ const BestSellersSection = () => {
                 {/* Products Grid with AnimatePresence */}
                 <div className="relative min-h-[400px]">
                     {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                             {[...Array(8)].map((_, i) => (
-                                <div key={i} className="aspect-[3/4] bg-gray-50 rounded-3xl animate-pulse" />
+                                <PublicProductCardSkeleton key={`skeleton-${i}`} />
                             ))}
                         </div>
                     ) : (
@@ -71,16 +71,14 @@ const BestSellersSection = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
                             >
                                 {filteredProducts.length > 0 ? (
-                                    filteredProducts.map((product, idx) => (
-                                        <div key={product._id} className="relative group">
-                                            <ProductCard
-                                                product={product}
-                                                index={idx}
-                                                onAddToCart={() => console.log('Add', product)}
-                                            />
+                                    filteredProducts.map((product) => (
+                                        <div key={product._id} className="relative group flex">
+                                            <div className="w-full flex">
+                                                <PublicProductCard product={product} />
+                                            </div>
                                             {/* Best Seller Gold Badge Overlay */}
                                             <div className="absolute top-4 left-4 z-20 pointer-events-none">
                                                 <div className="flex items-center gap-1.5 bg-amber-400 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg transform -rotate-1 shadow-amber-400/20">

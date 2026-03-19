@@ -32,6 +32,9 @@ const recalculateTotal = (items) => {
  */
 const saveGuestCart = (cart) => {
     localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("guestCartUpdated"));
+    }
 };
 
 /**
@@ -108,6 +111,9 @@ export const updateGuestCartQty = (productId, quantity) => {
  */
 export const clearGuestCart = () => {
     localStorage.removeItem(GUEST_CART_KEY);
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("guestCartUpdated"));
+    }
 };
 
 /**

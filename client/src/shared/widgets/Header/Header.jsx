@@ -32,7 +32,7 @@ const Header = ({ isPanel = false }) => {
 	const [isCartOpen, setIsCartOpen] = useState(false);
 	const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-	
+
 	const dropdownRef = useRef(null);
 	const cartRef = useRef(null);
 	const wishlistRef = useRef(null);
@@ -41,10 +41,9 @@ const Header = ({ isPanel = false }) => {
 	const { deleteFromWishlist } = useDeleteFromWishlist();
 	const { addToCart } = useAddToCart();
 
-	const { cart } = useCart();
+	const { cart, cartItemCount, cartTotal } = useCart();
 	const cartItems = cart?.items || [];
-	const cartCount = cartItems.length;
-	const cartTotal = cartItems.reduce((acc, item) => acc + (item.itemId.price.amount * item.quantity), 0);
+	const cartCount = cartItemCount;
 
 	const { wishlist } = useWishlist();
 	const wishlistItems = wishlist?.items || [];
@@ -52,8 +51,8 @@ const Header = ({ isPanel = false }) => {
 
 	const handleMoveToCart = async (product) => {
 		try {
-			await addToCart({ itemId: product._id, quantity: 1 });
-			await deleteFromWishlist(product._id);
+			await addToCart(product, 1);
+			await deleteFromWishlist(product._id || product.id);
 			toast.success(`${product.name} moved to cart!`);
 		} catch {
 			toast.error("Failed to move item to cart");
@@ -64,7 +63,7 @@ const Header = ({ isPanel = false }) => {
 
 	const fullName = user?.userId
 		? `${user.userId.firstName} ${user.userId.lastName}`
-		: user?.firstName 
+		: user?.firstName
 			? `${user.firstName} ${user.lastName}`
 			: 'Guest';
 
@@ -74,10 +73,15 @@ const Header = ({ isPanel = false }) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
 				setIsDropdownOpen(false);
 			}
-			if (cartRef.current && !cartRef.current.contains(event.target)) {
+
+			// Don't close logic if click originates inside the drawer
+			const isInsideCartDrawer = document.getElementById('cart-drawer')?.contains(event.target);
+			if (cartRef.current && !cartRef.current.contains(event.target) && !isInsideCartDrawer) {
 				setIsCartOpen(false);
 			}
-			if (wishlistRef.current && !wishlistRef.current.contains(event.target)) {
+
+			const isInsideWishlistDrawer = document.getElementById('wishlist-drawer')?.contains(event.target);
+			if (wishlistRef.current && !wishlistRef.current.contains(event.target) && !isInsideWishlistDrawer) {
 				setIsWishlistOpen(false);
 			}
 		};
@@ -170,10 +174,10 @@ const Header = ({ isPanel = false }) => {
 											</span>
 										)}
 									</motion.button>
-									
+
 									<AnimatePresence>
 										{isWishlistOpen && (
-											<WishlistDropdown 
+											<WishlistDropdown
 												items={wishlistItems}
 												isLoading={isLoading}
 												viewAllPath={wishlistViewAllPath}
@@ -203,7 +207,7 @@ const Header = ({ isPanel = false }) => {
 
 									<AnimatePresence>
 										{isCartOpen && (
-											<CartDropdown 
+											<CartDropdown
 												items={cartItems}
 												total={cartTotal}
 												isLoading={isLoading}
@@ -239,10 +243,10 @@ const Header = ({ isPanel = false }) => {
 											className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
 												hover:bg-gray-100/80 transition-all duration-200 border border-transparent hover:border-gray-200"
 										>
-											<Avatar 
+											<Avatar
 												src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
-												name={fullName} 
-												size="md" 
+												name={fullName}
+												size="md"
 												ring
 												ringColor="ring-indigo-500/20"
 											/>
@@ -270,7 +274,7 @@ const Header = ({ isPanel = false }) => {
 													<div className="px-4 py-3 border-b border-gray-50 mb-1">
 														<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
 													</div>
-													
+
 													<Link
 														to={`/${userRole?.toLowerCase()}/dashboard`}
 														onClick={() => setIsDropdownOpen(false)}
@@ -353,15 +357,15 @@ const Header = ({ isPanel = false }) => {
 					</div>
 
 					<div className="flex gap-3">
-						<Button 
-							variant="ghost" 
+						<Button
+							variant="ghost"
 							className="flex-1"
 							onClick={() => setIsLogoutModalOpen(false)}
 						>
 							Cancel
 						</Button>
-						<Button 
-							variant="danger" 
+						<Button
+							variant="danger"
 							className="flex-1"
 							onClick={handleLogout}
 						>
@@ -370,10 +374,10 @@ const Header = ({ isPanel = false }) => {
 					</div>
 				</div>
 			</Modal>
-			
+
 			{/* Cart Drawer */}
 			<CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-			
+
 			{/* Wishlist Drawer */}
 			<WishlistDrawer isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
 		</motion.header>

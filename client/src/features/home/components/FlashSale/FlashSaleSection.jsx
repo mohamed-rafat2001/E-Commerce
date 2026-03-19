@@ -6,6 +6,7 @@ import { Slider } from '../../../../shared/ui';
 import useFlashSale from '../../hooks/useFlashSale';
 import CountdownTimer from './CountdownTimer';
 import FlashSaleCard from './FlashSaleCard';
+import { PublicProductCard, PublicProductCardSkeleton } from '../../../../shared';
 
 const FlashSaleSection = () => {
     const { products, isLoading, endTime } = useFlashSale();
@@ -48,7 +49,7 @@ const FlashSaleSection = () => {
                     {isLoading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[...Array(4)].map((_, i) => (
-                                <div key={i} className="aspect-[3/4] bg-white/5 rounded-3xl animate-pulse" />
+                                <PublicProductCardSkeleton key={`skeleton-${i}`} />
                             ))}
                         </div>
                     ) : (
@@ -66,13 +67,10 @@ const FlashSaleSection = () => {
                             }}
                             className="flash-sale-slider !overflow-visible"
                         >
-                            {products.map((product, idx) => (
-                                <FlashSaleCard
-                                    key={product._id || idx}
-                                    product={product}
-                                    index={idx}
-                                    onAddToCart={() => console.log('Added to cart', product)}
-                                />
+                            {products.map((product) => (
+                                <div key={product._id} className="pb-8">
+                                    <PublicProductCard product={product} />
+                                </div>
                             ))}
                         </Slider>
                     )}

@@ -32,30 +32,41 @@ const CartDropdown = ({ items = [], total = 0, isLoading, viewAllPath, onRemove 
 					</div>
 				) : (
 					<div className="space-y-1">
-						{items.slice(0, 3).map((item) => (
-							<div key={item.itemId._id} className="px-4 py-2 hover:bg-gray-50 transition-colors flex gap-3 group">
-								<div className="w-16 h-16 rounded-xl bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
-									<img 
-										src={item.itemId.image?.secure_url || '/placeholder-product.png'} 
-										alt={item.itemId.name}
-										className="w-full h-full object-cover"
-									/>
+						{items.slice(0, 3).map((item) => {
+							const product = item.item || item.itemId || item.productId || item;
+							const productId = product?._id || product?.id || item.product_id;
+							const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
+							const name = product?.name || item.name;
+							const image = product?.coverImage?.secure_url || product?.image?.secure_url || product?.image || item.image || "/placeholder-product.png";
+
+							if (!productId) return null;
+
+							return (
+								<div key={productId} className="px-4 py-2 hover:bg-gray-50 transition-colors flex gap-3 group">
+									<div className="w-16 h-16 rounded-xl bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
+										<img
+											src={image}
+											alt={name || 'Product'}
+											className="w-full h-full object-cover"
+											crossOrigin="anonymous"
+										/>
+									</div>
+									<div className="flex-1 min-w-0">
+										<h4 className="text-sm font-bold text-gray-900 truncate">{name}</h4>
+										<p className="text-xs text-gray-500 mb-1">{item.quantity} x ${typeof price === 'number' ? price.toFixed(2) : price}</p>
+										<p className="text-sm font-bold text-indigo-600">${(item.quantity * price).toFixed(2)}</p>
+									</div>
+									{onRemove && (
+										<button
+											onClick={() => onRemove(productId)}
+											className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+										>
+											<FiTrash2 className="w-4 h-4" />
+										</button>
+									)}
 								</div>
-								<div className="flex-1 min-w-0">
-									<h4 className="text-sm font-bold text-gray-900 truncate">{item.itemId.name}</h4>
-									<p className="text-xs text-gray-500 mb-1">{item.quantity} x ${item.itemId.price}</p>
-									<p className="text-sm font-bold text-indigo-600">${(item.quantity * item.itemId.price).toFixed(2)}</p>
-								</div>
-								{onRemove && (
-									<button 
-										onClick={() => onRemove(item.itemId._id)}
-										className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-									>
-										<FiTrash2 className="w-4 h-4" />
-									</button>
-								)}
-							</div>
-						))}
+							);
+						})}
 						{items.length > 3 && (
 							<p className="text-center text-xs text-gray-400 py-2">
 								+ {items.length - 3} more items

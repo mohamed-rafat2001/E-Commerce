@@ -4,6 +4,7 @@ export { default as useSellerAnalyticsPage } from './analytics/useSellerAnalytic
 // Brands
 export { default as useBrandsManagementPage } from './brands/useBrandsManagementPage.js';
 export { default as useSellerBrands } from './brands/useSellerBrands.js';
+export { default as useBrandDetailsPage } from './brands/useBrandDetailsPage.js';
 
 // Dashboard
 export { default as useSellerDashboardPage } from './dashboard/useSellerDashboardPage.js';
@@ -19,7 +20,7 @@ export { default as useDeleteProduct } from './products/useDeleteProduct.js';
 export { default as useSellerProducts } from './products/useSellerProducts.js';
 export { default as useSellerProductsPage } from './products/useSellerProductsPage.js';
 export { default as useUpdateProduct } from './products/useUpdateProduct.js';
-export {  useStockCounts } from './products/useStockCounts.js';
+export { useStockCounts } from './products/useStockCounts.js';
 
 // Profile
 export { default as useAddPayoutMethod } from './profile/useAddPayoutMethod.js';

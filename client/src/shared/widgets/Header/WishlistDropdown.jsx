@@ -32,42 +32,51 @@ const WishlistDropdown = ({ items = [], isLoading, viewAllPath, onRemove, onMove
 					</div>
 				) : (
 					<div className="space-y-1">
-						{items.slice(0, 3).map((item) => (
-							<div key={item.itemId._id} className="px-4 py-2 hover:bg-gray-50 transition-colors flex gap-3 group">
-								<div className="w-16 h-16 rounded-xl bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
-									<img 
-										src={item.itemId.image?.secure_url || '/placeholder-product.png'} 
-										alt={item.itemId.name}
-										className="w-full h-full object-cover"
-									/>
+						{items.slice(0, 3).map((item) => {
+							const product = item.itemId || item.productId || item;
+							const productId = product?._id || product?.id || item.product_id;
+							const price = product?.price?.amount || product?.price || 0;
+
+							if (!product || !productId) return null;
+
+							return (
+								<div key={productId} className="px-4 py-2 hover:bg-gray-50 transition-colors flex gap-3 group">
+									<div className="w-16 h-16 rounded-xl bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
+										<img
+											src={product.image?.secure_url || product.coverImage?.secure_url || '/placeholder-product.png'}
+											alt={product.name || 'Product'}
+											className="w-full h-full object-cover"
+											crossOrigin="anonymous"
+										/>
+									</div>
+									<div className="flex-1 min-w-0">
+										<h4 className="text-sm font-bold text-gray-900 truncate">{product.name}</h4>
+										<p className="text-xs text-gray-500 mb-1">{product.category?.name || 'Product'}</p>
+										<p className="text-sm font-bold text-gray-900">${typeof price === 'number' ? price.toFixed(2) : price}</p>
+									</div>
+									<div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all">
+										{onMoveToCart && (
+											<button
+												onClick={() => onMoveToCart(product)}
+												className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+												title="Move to Cart"
+											>
+												<FiShoppingBag className="w-4 h-4" />
+											</button>
+										)}
+										{onRemove && (
+											<button
+												onClick={() => onRemove(productId)}
+												className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+												title="Remove"
+											>
+												<FiTrash2 className="w-4 h-4" />
+											</button>
+										)}
+									</div>
 								</div>
-								<div className="flex-1 min-w-0">
-									<h4 className="text-sm font-bold text-gray-900 truncate">{item.itemId.name}</h4>
-									<p className="text-xs text-gray-500 mb-1">{item.itemId.category?.name || 'Product'}</p>
-									<p className="text-sm font-bold text-gray-900">${item.itemId.price}</p>
-								</div>
-								<div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all">
-									{onMoveToCart && (
-										<button 
-											onClick={() => onMoveToCart(item.itemId)}
-											className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-											title="Move to Cart"
-										>
-											<FiShoppingBag className="w-4 h-4" />
-										</button>
-									)}
-									{onRemove && (
-										<button 
-											onClick={() => onRemove(item.itemId._id)}
-											className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
-											title="Remove"
-										>
-											<FiTrash2 className="w-4 h-4" />
-										</button>
-									)}
-								</div>
-							</div>
-						))}
+							);
+						})}
 						{items.length > 3 && (
 							<p className="text-center text-xs text-gray-400 py-2">
 								+ {items.length - 3} more items
