@@ -4,7 +4,7 @@ import { addFunc, deleteFunc, getFunc, updateFunc } from "../../../shared/servic
 export const addProduct = (product) => addFunc("products", product);
 
 // get all products
-export const getAllProducts = () => getFunc("products");
+export const getAllProducts = (params = {}) => getFunc("products", { params });
 
 // get seller's own products
 export const getMyProducts = (params) => getFunc("products/myproducts", { params });

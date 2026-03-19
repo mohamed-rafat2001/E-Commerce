@@ -42,7 +42,7 @@ const CategorySlider = ({ categories }) => {
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.05 }}
                         >
-                            <Link to={`/category/${cat.name.toLowerCase()}`} className={`block p-8 rounded-3xl ${cat.color} text-center transition-all duration-300 hover:shadow-xl hover:bg-white border border-transparent hover:border-indigo-100 group`}>
+                            <Link to={`/products?category=${cat._id}`} className={`block p-8 rounded-3xl ${cat.color} text-center transition-all duration-300 hover:shadow-xl hover:bg-white border border-transparent hover:border-indigo-100 group`}>
                                 <span className="text-5xl mb-4 block group-hover:scale-110 transition-transform duration-300">
                                     {cat.icon}
                                 </span>

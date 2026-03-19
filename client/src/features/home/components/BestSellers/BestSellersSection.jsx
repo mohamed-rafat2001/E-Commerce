@@ -27,7 +27,7 @@ const BestSellersSection = () => {
                     </div>
 
                     <div className="flex flex-col items-start lg:items-end gap-6 w-full lg:w-auto shrink-0">
-                        <Link to="/best-sellers" className="text-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] hover:text-black transition-all flex items-center gap-2 group">
+                        <Link to="/products?sort=-sold" className="text-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] hover:text-black transition-all flex items-center gap-2 group">
                             View All Picks <span className="group-hover:translate-x-1 transition-transform">→</span>
                         </Link>
 

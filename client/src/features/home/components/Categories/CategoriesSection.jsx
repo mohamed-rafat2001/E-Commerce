@@ -16,7 +16,7 @@ const CategoriesSection = () => {
                     subtitle="Explore our vast selection of categories, handpicked for your lifestyle."
                     align="left"
                     actionLabel="View All Categories"
-                    actionLink="/categories"
+                    actionLink="/products"
                     className="mb-12"
                 />
 

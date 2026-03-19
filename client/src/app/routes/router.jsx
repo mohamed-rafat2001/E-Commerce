@@ -44,7 +44,7 @@ import {
 import { PersonalDetailsPage } from "../../features/user/pages/index.js";
 import { SettingsPage } from "../../features/settings/pages/index.js";
 import { PlaceholderPage } from "../../shared/pages/index.js";
-import { ProductDetailPage, ManagementProductDetailPage } from "../../features/product/pages/index.js";
+import { ProductsPage, ProductDetailPage, ManagementProductDetailPage } from "../../features/product/pages/index.js";
 
 // UI Components
 import PageNotFound from "../../shared/ui/PageNotFound.jsx";
@@ -57,6 +57,8 @@ const router = createBrowserRouter([
 	{ path: "/register", element: <RegisterPage /> },
 	{ path: "/public-cart", element: <PublicCartPage /> },
 	{ path: "/public-wishlist", element: <PublicWishlistPage /> },
+	{ path: "/products", element: <ProductsPage /> },
+	{ path: "/products/:id", element: <ProductDetailPage /> },
 
 	// Admin Routes
 	{

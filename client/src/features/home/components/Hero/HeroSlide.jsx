@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button, Badge, Skeleton } from '../../../../shared/ui';
 import { fadeUp } from '../../../../shared/utils/animations';
 
 const HeroSlide = ({ slide }) => {
     const imageUrl = slide.image;
+    const navigate = useNavigate();
 
     return (
         <div className="relative h-full w-full flex items-center">
@@ -49,10 +51,10 @@ const HeroSlide = ({ slide }) => {
                             transition={{ delay: 0.3 }}
                             className="flex flex-wrap gap-4"
                         >
-                            <Button variant="premium" size="lg" className="px-10">
+                            <Button onClick={() => navigate('/products')} variant="premium" size="lg" className="px-10">
                                 Shop Now
                             </Button>
-                            <Button variant="outline" size="lg" className="px-10 text-white border-white hover:bg-white/10">
+                            <Button onClick={() => navigate('/register')} variant="outline" size="lg" className="px-10 text-white border-white hover:bg-white/10">
                                 Sell With Us
                             </Button>
                         </motion.div>

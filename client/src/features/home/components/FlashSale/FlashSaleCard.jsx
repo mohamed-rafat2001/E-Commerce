@@ -21,7 +21,7 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
         >
             <Card hoverable className="p-0 border-none group bg-white shadow-2xl shadow-indigo-100 overflow-hidden h-full">
                 <div className="relative aspect-square overflow-hidden cursor-pointer">
-                    <Link to={`/customer/products/${product._id || product.id}`}>
+                    <Link to={`/products/${product._id || product.id}`}>
                         <img
                             src={product.coverImage?.secure_url || product.image?.secure_url || 'https://placehold.co/500x500?text=Sale+Product'}
                             alt={product.name}
@@ -53,7 +53,7 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
                         </div>
                     </div>
 
-                    <Link to={`/customer/products/${product._id || product.id}`}>
+                    <Link to={`/products/${product._id || product.id}`}>
                         <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-2 hover:text-indigo-600 transition-colors">
                             {product.name}
                         </h3>

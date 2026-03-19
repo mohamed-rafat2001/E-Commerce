@@ -63,7 +63,7 @@ const PublicProductCard = ({ product }) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Image Area */}
-            <Link to={`/customer/products/${productId}`} className="block relative aspect-[4/5] overflow-hidden bg-gray-50">
+            <Link to={`/products/${productId}`} className="block relative aspect-[4/5] overflow-hidden bg-gray-50">
                 <motion.div
                     className="w-full h-full"
                     animate={{ scale: isHovered ? 1.02 : 1 }}
@@ -108,7 +108,7 @@ const PublicProductCard = ({ product }) => {
                 </div>
 
                 {/* Name */}
-                <Link to={`/customer/products/${productId}`} className="mt-1 mb-1">
+                <Link to={`/products/${productId}`} className="mt-1 mb-1">
                     <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-indigo-600 transition-colors">
                         {product.name}
                     </h3>

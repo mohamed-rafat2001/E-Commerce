@@ -38,7 +38,7 @@ const FlashSaleSection = () => {
 
                     <div className="flex flex-col items-center md:items-end gap-3 order-first md:order-last">
                         <CountdownTimer endTime={endTime} />
-                        <Link to="/sale" className="group text-red-500 hover:text-white flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all duration-300">
+                        <Link to="/products?sale=true" className="group text-red-500 hover:text-white flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all duration-300">
                             See All Deals <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                     </div>

@@ -11,7 +11,11 @@ import {
 } from 'react-icons/fi';
 import ProductGallery from '../components/ProductGallery.jsx';
 import ProductInfo from '../components/ProductInfo.jsx';
+import ProductTabs from '../components/ProductTabs.jsx';
 import useProductDetailPage from '../hooks/useProductDetailPage.js';
+import useRelatedProducts from '../hooks/useRelatedProducts.js';
+import { Slider } from '../../../shared/ui/index.js';
+import { PublicProductCard } from '../../../shared/index.js';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -23,6 +27,9 @@ export default function ProductDetailPage() {
     basePath,
     gallery
   } = useProductDetailPage(id);
+
+  const categoryId = product?.primaryCategory?._id || product?.primaryCategory;
+  const { relatedProducts, isLoading: isRelatedLoading } = useRelatedProducts(id, categoryId);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
@@ -70,22 +77,12 @@ export default function ProductDetailPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between mb-8 md:mb-12 sticky top-4 z-40 bg-white/50 backdrop-blur-xl border border-white/50 px-6 py-4 rounded-3xl shadow-sm"
         >
-          <button
-            onClick={() => navigate(basePath)}
-            className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-gray-900 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:-translate-x-1 transition-transform">
-              <FiArrowLeft className="w-4 h-4" />
-            </div>
-            Back to Collection
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">
-            <span className="text-indigo-600 px-3 py-1 bg-indigo-50 rounded-full">Overview</span>
-            <FiChevronRight className="w-3 h-3 text-gray-300" />
-            <span>Details</span>
-            <FiChevronRight className="w-3 h-3 text-gray-300" />
-            <span>Reviews</span>
+          <div className="flex items-center text-sm text-gray-400 whitespace-nowrap overflow-x-auto no-scrollbar w-full">
+            <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
+            <span className="mx-2 text-gray-300">{'>'}</span>
+            <Link to="/products" className="hover:text-indigo-600 transition-colors">Products</Link>
+            <span className="mx-2 text-gray-300">{'>'}</span>
+            <span className="text-gray-800 font-medium truncate max-w-[150px] sm:max-w-xs md:max-w-md">{product.name}</span>
           </div>
         </motion.nav>
 
@@ -130,6 +127,39 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Product Full Details Tabs */}
+        <div className="mt-16 sm:mt-24 w-full">
+          <ProductTabs product={product} />
+        </div>
+
+        {/* Related Products Section */}
+        {!isRelatedLoading && relatedProducts?.length > 0 && (
+          <div className="mt-24 mb-10 pt-10 border-t border-gray-100">
+            <h3 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 text-center md:text-left">
+              You Might Also Like
+            </h3>
+            <Slider
+              children={relatedProducts.map(rp => (
+                <div key={rp._id} className="pb-8 h-full">
+                  <PublicProductCard product={rp} />
+                </div>
+              ))}
+              slidesPerView={1}
+              spaceBetween={24}
+              loop={false}
+              navigation={true}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4 }
+              }}
+              className="!overflow-visible"
+              nextEl=".custom-related-next"
+              prevEl=".custom-related-prev"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

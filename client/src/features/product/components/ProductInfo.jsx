@@ -10,12 +10,18 @@ import {
   FiShare2,
   FiShoppingBag,
   FiActivity,
-  FiCheck
+  FiCheck,
+  FiMinus,
+  FiPlus,
+  FiTruck,
+  FiRefreshCw,
+  FiShield
 } from 'react-icons/fi';
 import useAddToCart from '../../cart/hooks/useAddToCart.js';
 import useAddToWishlist from '../../wishList/hooks/useAddToWishlist.js';
 import useWishlist from '../../wishList/hooks/useWishlist.js';
 import useDeleteFromWishlist from '../../wishList/hooks/useDeleteFromWishlist.js';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProductInfo = ({
   product
@@ -25,13 +31,26 @@ const ProductInfo = ({
   const { deleteFromWishlist, isLoading: isRemovingFromWishlist } = useDeleteFromWishlist();
   const { isInWishlist } = useWishlist();
 
+  const { reviews, totalCount, averageRating, ratingDistribution, page, setPage, totalPages } = useProductReviews(product._id);
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const productId = product._id;
   const isWishlisted = isInWishlist(productId);
   const isWishlistLoading = isAddingToWishlist || isRemovingFromWishlist;
   const isOutOfStock = product.countInStock === 0;
 
+  const [quantity, setQuantity] = useState(1);
+  const [copied, setCopied] = useState(false);
+
   const handleAddToCart = () => {
-    if (!isOutOfStock) addToCart(product, 1);
+    if (!isOutOfStock) addToCart(product, quantity);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleWishlistToggle = (e) => {
@@ -43,15 +62,8 @@ const ProductInfo = ({
       addToWishlist(product);
     }
   };
-  const [activeTab, setActiveTab] = useState('story');
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
-
-  const tabs = [
-    { id: 'story', label: 'Story', icon: FiActivity },
-    { id: 'specs', label: 'Specs', icon: FiLayers },
-    { id: 'brand', label: 'Brand', icon: FiGlobe },
-  ];
 
   return (
     <motion.div
@@ -145,75 +157,57 @@ const ProductInfo = ({
             </div>
           </div>
         )}
-      </div>
 
-      {/* Information Tabs */}
-      <div className="mb-10">
-        <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl mb-6">
-          {tabs.map(tab => (
+        {/* Quantity Selector */}
+        <div className="flex items-center gap-4 py-2">
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Quantity</span>
+          <div className="flex items-center gap-3">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                }`}
+              onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+              disabled={quantity <= 1 || isOutOfStock}
+              className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors disabled:opacity-50"
             >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
+              <FiMinus className="w-3 h-3" />
             </button>
-          ))}
-        </div>
-
-        <div className="min-h-[120px] bg-gray-50 rounded-2xl p-6 border border-gray-100">
-          <AnimatePresence mode="wait">
-            {activeTab === 'story' && (
-              <motion.div
-                key="story"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-gray-600 leading-relaxed font-medium text-sm"
-              >
-                {product.description}
-              </motion.div>
-            )}
-
-            {activeTab === 'specs' && (
-              <motion.div
-                key="specs"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid grid-cols-2 gap-6"
-              >
-                <Spec label="Asset ID" value={product._id?.slice(-8).toUpperCase()} />
-                <Spec label="Stock" value={`${product.countInStock} Units`} />
-                <Spec label="Category" value={product.primaryCategory?.name} />
-                <Spec label="Sub-Category" value={product.subCategory?.name} />
-              </motion.div>
-            )}
-
-            {activeTab === 'brand' && (
-              <motion.div
-                key="brand"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-5"
-              >
-                <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center p-2 shadow-sm border border-gray-100 shrink-0">
-                  <img src={product.brandId?.logo?.secure_url} alt="brand" className="max-h-full max-w-full object-contain" crossOrigin="anonymous" />
-                </div>
-                <div>
-                  <h4 className="font-black text-gray-900 text-lg">{product.brandId?.name}</h4>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{product.brandId?.description || "Curated aesthetic excellence."}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <span className="w-6 text-center text-sm font-bold">{quantity}</span>
+            <button
+              onClick={() => setQuantity(prev => Math.min(product.countInStock || 10, prev + 1))}
+              disabled={quantity >= (product.countInStock || 10) || isOutOfStock}
+              className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors disabled:opacity-50"
+            >
+              <FiPlus className="w-3 h-3" />
+            </button>
+          </div>
+          {product.countInStock > 0 && product.countInStock <= 5 && (
+            <span className="text-xs font-bold text-orange-500 whitespace-nowrap hidden sm:block">Only {product.countInStock} remaining!</span>
+          )}
         </div>
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto space-y-6">
+        {/* Delivery Info Strip */}
+        <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 flex flex-col gap-3">
+          <div className="flex items-center gap-3 text-sm text-gray-600 font-medium">
+            <div className="w-8 h-8 rounded-full bg-blue-50/50 flex items-center justify-center text-blue-500 shrink-0"><FiTruck className="w-4 h-4" /></div>
+            Free delivery on orders over $50
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-600 font-medium">
+            <div className="w-8 h-8 rounded-full bg-emerald-50/50 flex items-center justify-center text-emerald-500 shrink-0"><FiRefreshCw className="w-4 h-4" /></div>
+            Easy 30-day returns
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-600 font-medium">
+            <div className="w-8 h-8 rounded-full bg-amber-50/50 flex items-center justify-center text-amber-500 shrink-0"><FiShield className="w-4 h-4" /></div>
+            Secure checkout
+          </div>
+        </div>
+
+        {/* Share Button */}
+        <div className="flex justify-end">
+          <button onClick={handleCopyLink} className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-gray-400 hover:text-gray-900 transition-colors">
+            {copied ? <FiCheck className="w-3.5 h-3.5 text-emerald-500" /> : <FiShare2 className="w-3.5 h-3.5" />}
+            {copied ? <span className="text-emerald-500">Link Copied!</span> : 'Share Product'}
+          </button>
+        </div>
         <div className="flex items-stretch gap-4">
           <button
             onClick={handleAddToCart}
@@ -233,8 +227,8 @@ const ProductInfo = ({
             onClick={handleWishlistToggle}
             disabled={isWishlistLoading}
             className={`w-16 h-[60px] rounded-2xl border flex items-center justify-center transition-all disabled:opacity-60 disabled:cursor-not-allowed ${isWishlisted
-                ? 'bg-rose-500 border-rose-500 text-white hover:bg-rose-600'
-                : 'bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white'
+              ? 'bg-rose-500 border-rose-500 text-white hover:bg-rose-600'
+              : 'bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white'
               }`}
           >
             {isWishlistLoading ? (
