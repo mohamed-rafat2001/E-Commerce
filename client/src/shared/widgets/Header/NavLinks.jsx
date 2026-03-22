@@ -77,7 +77,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 						to={link.path}
 						className={({ isActive }) => `
 							px-3 py-2 text-sm font-medium transition-all duration-200 relative
-							${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}
+							${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}
 						`}
 					>
 						{({ isActive }) => (
@@ -86,7 +86,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 								{isActive && (
 									<motion.div
 										layoutId="nav-active-indicator"
-										className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"
+										className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full"
 										initial={false}
 										transition={{ type: 'spring', stiffness: 380, damping: 30 }}
 									/>
@@ -149,7 +149,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										to="/brands/all"
 										className={({ isActive }) => `
 											flex items-center px-4 py-3 rounded-xl font-semibold transition-all
-											${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}
+											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
 										Brands
@@ -158,7 +158,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										to="/categories/all"
 										className={({ isActive }) => `
 											flex items-center px-4 py-3 rounded-xl font-semibold transition-all mt-1
-											${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}
+											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
 										Categories
@@ -171,7 +171,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										to={link.path}
 										className={({ isActive }) => `
 											flex items-center px-4 py-3 rounded-xl font-semibold transition-all
-											${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}
+											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
 										{link.name}

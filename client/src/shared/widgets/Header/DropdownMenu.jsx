@@ -110,11 +110,11 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 				aria-expanded={isOpen}
 				aria-haspopup="true"
 				className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none
-					${isOpen ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
+					${isOpen ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}
 			>
 				{label}
 				<ChevronDownIcon
-					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-600' : 'text-gray-400'}`}
+					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-gray-900' : 'text-gray-400'}`}
 				/>
 			</button>
 
@@ -126,38 +126,38 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className="absolute left-0 mt-2 w-[90vw] md:w-[600px] lg:w-[800px] max-h-[500px]
-							bg-white rounded-xl shadow-lg border border-gray-100 z-50 flex flex-col overflow-hidden"
+						className="absolute left-0 mt-4 w-[90vw] md:w-[600px] lg:w-[800px] max-h-[500px]
+							bg-white rounded-[2rem] shadow-2xl border border-gray-100 z-50 flex flex-col overflow-hidden"
 						ref={menuRef}
 						role="menu"
 					>
 						{/* Search Input */}
-						<div className="p-4 border-b border-gray-100 sticky top-0 bg-white z-10">
+						<div className="p-6 border-b border-gray-50 sticky top-0 bg-white z-10">
 							<div className="relative">
-								<SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+								<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 								<input
 									ref={searchInputRef}
 									type="text"
 									placeholder={`Search ${label.toLowerCase()}...`}
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
-									className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm
-										focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+									className="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm
+										focus:outline-none focus:ring-2 focus:ring-gray-900/5 transition-all font-medium"
 								/>
 							</div>
 						</div>
 
 						{/* Items Grid */}
-						<div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+						<div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
 							{filteredItems.length > 0 ? (
-								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 									{filteredItems.map((item) => (
 										<Link
 											key={item.id}
 											to={`${basePath}/${item.slug}`}
 											onClick={() => setIsOpen(false)}
-											className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50
-												transition-colors duration-150 group"
+											className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50
+												transition-all duration-200 group border border-transparent hover:border-gray-100"
 											role="menuitem"
 										>
 											{item.icon && (
@@ -165,27 +165,27 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 													{item.icon}
 												</span>
 											)}
-											<span className="text-sm text-gray-700 group-hover:text-blue-600 font-medium">
+											<span className="text-sm text-gray-600 group-hover:text-gray-900 font-bold">
 												{item.name}
 											</span>
 										</Link>
 									))}
 								</div>
 							) : (
-								<div className="py-8 text-center">
-									<p className="text-sm text-gray-500">No {label.toLowerCase()} found matching "{searchQuery}"</p>
+								<div className="py-12 text-center">
+									<p className="text-sm font-medium text-gray-400">No {label.toLowerCase()} found matching "{searchQuery}"</p>
 								</div>
 							)}
 						</div>
 
 						{/* Sticky Footer CTA */}
-						<div className="p-4 border-t border-gray-100 bg-gray-50 sticky bottom-0">
+						<div className="p-6 border-t border-gray-50 bg-gray-50 sticky bottom-0">
 							<Link
 								to={viewAllPath}
 								onClick={() => setIsOpen(false)}
-								className="flex items-center justify-center w-full py-2.5 px-4 bg-white border border-gray-200
-									rounded-lg text-sm font-semibold text-gray-700 hover:text-blue-600 hover:border-blue-600
-									transition-all duration-200 shadow-sm"
+								className="flex items-center justify-center w-full py-4 px-6 bg-white border border-gray-100
+									rounded-full text-xs font-black uppercase tracking-widest text-gray-900 hover:bg-gray-900 hover:text-white
+									transition-all duration-300 shadow-sm"
 							>
 								View All {label}
 							</Link>

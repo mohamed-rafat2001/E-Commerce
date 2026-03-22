@@ -9,9 +9,12 @@ import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
 import CartDropdown from './CartDropdown.jsx';
 import WishlistDropdown from './WishlistDropdown.jsx';
+import NavLinks from './NavLinks.jsx';
 import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
 import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
 import useAddToCart from '../../../features/cart/hooks/useAddToCart.js';
+import useCategories from '../../../features/home/hooks/useCategories.js';
+import useBrands from '../../../features/home/hooks/useBrands.js';
 import toast from 'react-hot-toast';
 import {
 	NotificationIcon,
@@ -41,6 +44,8 @@ const Header = ({ isPanel = false }) => {
 	const { deleteFromCart } = useDeleteFromCart();
 	const { deleteFromWishlist } = useDeleteFromWishlist();
 	const { addToCart } = useAddToCart();
+	const { categories } = useCategories();
+	const { originalBrands: brands } = useBrands();
 
 	const { cart, cartItemCount, cartTotal } = useCart();
 	const cartItems = cart?.items || [];
@@ -111,34 +116,33 @@ const Header = ({ isPanel = false }) => {
 					<div className="flex items-center justify-between h-20">
 						{/* Logo & Brand */}
 						{!isPanel && (
-							<div className="flex items-center gap-10">
+							<div className="flex items-center gap-8">
 								<Link to="/" className="flex items-center gap-2 group">
-									<span className="text-2xl font-bold text-gray-900 font-display tracking-tight">
+									<span className="text-2xl font-black text-gray-900 font-display tracking-tighter">
 										CuratorMarket
 									</span>
 								</Link>
 
-								<nav className="hidden lg:flex items-center gap-8">
-									<Link to="/products" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Explore</Link>
-									<Link to="/designers" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Designers</Link>
-									<Link to="/trending" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Trending</Link>
-								</nav>
+								{/* Desktop Navigation Links */}
+								<div className="hidden lg:block">
+									<NavLinks categories={categories} brands={brands} />
+								</div>
 							</div>
 						)}
 
 						{/* Right hand Side: Search + Icons */}
 						<div className="flex items-center gap-6">
-							{/* Search Bar */}
+							{/* Search Bar - hidden on mobile */}
 							{!isPanel && (
-								<div className="hidden md:flex w-full max-w-[240px]">
+								<div className="hidden xl:flex w-full min-w-[300px]">
 									<div className="relative w-full">
 										<input
 											type="text"
-											placeholder="Search curated goods..."
-											className="w-full pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full
+											placeholder="Search curated findings..."
+											className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 border-0 rounded-2xl
 												text-sm text-gray-700 placeholder:text-gray-400
-												focus:ring-2 focus:ring-primary/10 focus:bg-white
-												transition-all duration-300"
+												focus:ring-2 focus:ring-gray-900/5 focus:bg-white
+												transition-all duration-300 outline-none font-medium"
 										/>
 										<svg
 											className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -162,13 +166,13 @@ const Header = ({ isPanel = false }) => {
 								<div className="relative" ref={wishlistRef}>
 									<motion.button
 										onClick={() => setIsWishlistOpen(!isWishlistOpen)}
-										className="relative p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+										className="relative p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
 										<HeartIcon className="w-5 h-5" />
 										{wishlistCount > 0 && (
-											<span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+											<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
 												{wishlistCount}
 											</span>
 										)}
@@ -190,13 +194,13 @@ const Header = ({ isPanel = false }) => {
 								<div className="relative" ref={cartRef}>
 									<motion.button
 										onClick={() => setIsCartOpen(!isCartOpen)}
-										className="relative p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+										className="relative p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
 										<StoreIcon className="w-5 h-5" />
 										{cartCount > 0 && (
-											<span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+											<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
 												{cartCount}
 											</span>
 										)}
@@ -213,19 +217,10 @@ const Header = ({ isPanel = false }) => {
 										)}
 									</AnimatePresence>
 								</div>
-
-								{/* Notification */}
-								<motion.button
-									className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-								>
-									<NotificationIcon className="w-5 h-5" />
-								</motion.button>
 							</div>
 
 							{isAuthenticated ? (
-								<div className="relative pl-2 border-l border-gray-100" ref={dropdownRef}>
+								<div className="relative pl-3 border-l border-gray-100" ref={dropdownRef}>
 									<button
 										onClick={() => setIsDropdownOpen(!isDropdownOpen)}
 										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors"
@@ -242,45 +237,61 @@ const Header = ({ isPanel = false }) => {
 												initial={{ opacity: 0, y: 10, scale: 0.95 }}
 												animate={{ opacity: 1, y: 0, scale: 1 }}
 												exit={{ opacity: 0, y: 10, scale: 0.95 }}
-												className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden font-sans"
+												className="absolute right-0 mt-2 w-64 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden font-sans"
 											>
-												<Link to={`/${userRole?.toLowerCase()}/dashboard`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-													<DashboardIcon className="w-4 h-4 text-gray-400" />
-													<span className="font-medium">Dashboard</span>
+												<div className="px-6 py-4 border-b border-gray-50 mb-2">
+													<p className="text-sm font-black text-gray-900 truncate">{fullName}</p>
+													<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{userRole}</p>
+												</div>
+
+												<Link to={`/${userRole?.toLowerCase()}/dashboard`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+													<div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+														<DashboardIcon className="w-4 h-4" />
+													</div>
+													<span className="font-bold">Dashboard</span>
 												</Link>
-												<Link to={`/${userRole?.toLowerCase()}/settings`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-													<SettingsIcon className="w-4 h-4 text-gray-400" />
-													<span className="font-medium">Settings</span>
+												<Link to={`/${userRole?.toLowerCase()}/settings`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+													<div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+														<SettingsIcon className="w-4 h-4" />
+													</div>
+													<span className="font-bold">Settings</span>
 												</Link>
-												<div className="h-px bg-gray-50 my-1"></div>
-												<button
-													onClick={() => {
-														setIsLogoutModalOpen(true);
-														setIsDropdownOpen(false);
-													}}
-													className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
-												>
-													<LogoutIcon className="w-4 h-4" />
-													<span className="font-medium">Logout</span>
-												</button>
+
+												<div className="px-3 mt-2">
+													<button
+														onClick={() => {
+															setIsLogoutModalOpen(true);
+															setIsDropdownOpen(false);
+														}}
+														className="w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl text-sm text-red-500 hover:bg-red-50 transition-colors"
+													>
+														<LogoutIcon className="w-4 h-4" />
+														<span className="font-black uppercase tracking-widest text-[10px]">Logout Account</span>
+													</button>
+												</div>
 											</motion.div>
 										)}
 									</AnimatePresence>
 								</div>
 							) : (
-								<div className="flex items-center gap-3 pl-2 border-l border-gray-100 font-sans">
+								<div className="flex items-center gap-3 pl-3 border-l border-gray-100 font-sans">
 									<Link to="/login">
 										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:bg-gray-100">
 											Login
 										</Button>
 									</Link>
 									<Link to="/register">
-										<Button variant="primary" size="sm" className="rounded-full px-6 !bg-gray-900 !text-white !border-gray-900 shadow-lg hover:bg-black transition-all active:scale-95">
-											Get Started
+										<Button variant="primary" size="sm" className="rounded-full px-6 !bg-gray-900 !text-white !border-gray-900 shadow-xl hover:bg-black transition-all active:scale-95">
+											Join Join
 										</Button>
 									</Link>
 								</div>
 							)}
+
+							{/* Mobile Menu Toggle - Only visible on small screens */}
+							<div className="lg:hidden pl-2 border-l border-gray-100">
+								<NavLinks categories={categories} brands={brands} />
+							</div>
 						</div>
 					</div>
 				</div>
@@ -292,28 +303,28 @@ const Header = ({ isPanel = false }) => {
 				onClose={() => setIsLogoutModalOpen(false)}
 				title="Confirm Logout"
 			>
-				<div className="p-6 text-center font-sans">
-					<div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+				<div className="p-8 text-center font-sans">
+					<div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
 						<LogoutIcon className="w-10 h-10 text-red-500" />
 					</div>
-					<h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Trying to leave?</h3>
-					<p className="text-gray-500 mb-8 font-medium">We'll miss you. Are you sure you want to logout from your account?</p>
-					<div className="flex flex-col sm:flex-row gap-3">
+					<h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tighter">Parting ways?</h3>
+					<p className="text-gray-500 mb-10 font-medium">We hope you'll be back soon to discover more curated finds.</p>
+					<div className="flex flex-col gap-3">
+						<Button
+							fullWidth
+							variant="primary"
+							className="!bg-red-500 !text-white !border-red-500 rounded-full py-5 uppercase font-black tracking-widest text-xs shadow-2xl shadow-red-100"
+							onClick={handleLogout}
+						>
+							Confirm Logout
+						</Button>
 						<Button
 							fullWidth
 							variant="outline"
 							onClick={() => setIsLogoutModalOpen(false)}
-							className="rounded-full py-4 uppercase font-black tracking-widest text-xs"
+							className="rounded-full py-5 uppercase font-black tracking-widest text-xs border-gray-100 hover:bg-gray-50"
 						>
-							Stay logged in
-						</Button>
-						<Button
-							fullWidth
-							variant="primary"
-							className="!bg-red-500 !text-white !border-red-500 rounded-full py-4 uppercase font-black tracking-widest text-xs shadow-xl shadow-red-100"
-							onClick={handleLogout}
-						>
-							Yes, Logout
+							Cancel
 						</Button>
 					</div>
 				</div>
