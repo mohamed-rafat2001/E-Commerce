@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
-import { Header } from '../../../shared/widgets/Header';
 import {
-	AnnouncementBar,
 	HeroSection,
 	FeaturesStrip,
 	BrandsSection,
@@ -13,8 +11,7 @@ import {
 	TestimonialsSection,
 	StatsSection,
 	SellerCtaBanner,
-	NewsletterSection,
-	FooterSection
+	NewsletterSection
 } from '../components';
 
 const HomePage = () => {

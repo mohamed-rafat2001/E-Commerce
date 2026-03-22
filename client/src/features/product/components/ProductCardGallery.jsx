@@ -11,11 +11,12 @@ import useProductCardGallery from '../hooks/useProductCardGallery';
  * @param {boolean} props.isHovered - Whether the card is hovered
  * @param {boolean} props.autoSlide - Enable automatic sliding (default: true)
  */
-const ProductCardGallery = memo(function ProductCardGallery({ 
-  images = [], 
+const ProductCardGallery = memo(function ProductCardGallery({
+  images = [],
   productName = 'Product',
   isHovered = false,
-  autoSlide = true
+  autoSlide = true,
+  showThumbnails = true
 }) {
   const {
     activeIndex,
@@ -35,10 +36,10 @@ const ProductCardGallery = memo(function ProductCardGallery({
     );
   }
 
-  // Single image - no gallery needed, show full width
-  if (images.length === 1) {
-    const imageUrl = images[0]?.secure_url || images[0];
-    
+  // Single image or thumbnails hidden - show full width main image
+  if (images.length === 1 || !showThumbnails) {
+    const imageUrl = images[activeIndex]?.secure_url || images[activeIndex];
+
     if (!imageUrl) {
       return (
         <div className="w-full h-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 flex items-center justify-center">
@@ -57,14 +58,14 @@ const ProductCardGallery = memo(function ProductCardGallery({
     );
   }
 
-  // Multiple images - show gallery with thumbnails
+  // Multiple images with thumbnails - show gallery with thumbnails
   return (
     <div className="flex gap-1 w-full h-full">
       {/* LEFT — Vertical thumbnail strip */}
       <div className="flex flex-col gap-1.5 overflow-y-auto no-scrollbar w-14 flex-shrink-0">
         {images.map((imageObj, index) => {
           const imageUrl = imageObj?.secure_url || imageObj;
-          
+
           if (!imageUrl) {
             return (
               <div
@@ -85,11 +86,10 @@ const ProductCardGallery = memo(function ProductCardGallery({
                 e.stopPropagation();
                 handleThumbnailClick(index);
               }}
-              className={`w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-150 ${
-                activeIndex === index
+              className={`w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-150 ${activeIndex === index
                   ? 'border-primary opacity-100'
                   : 'border-transparent opacity-70 hover:opacity-100'
-              }`}
+                }`}
             >
               <img
                 src={imageUrl}
