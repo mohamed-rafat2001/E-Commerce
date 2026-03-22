@@ -4,7 +4,7 @@ import useBrands from '../../home/hooks/useBrands.js';
 
 export default function SortBar({ totalCount, filters, setFilter, clearFilters, onMobileFilterClick }) {
     const { categories } = useCategories();
-    const { brands } = useBrands();
+    const { originalBrands: brands } = useBrands();
 
     const activeFilters = [];
     if (filters.category) {
