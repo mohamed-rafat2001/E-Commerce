@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiChevronUp, FiFilter, FiX } from 'react-icons/fi';
-import { Button } from '../../../shared/ui/index.js';
 import useCategories from '../../home/hooks/useCategories.js';
 import useBrands from '../../home/hooks/useBrands.js';
 
-export default function FiltersSidebar({ filters, setFilter, clearFilters, hasActiveFilters, isMobileOpen, setIsMobileOpen }) {
+export default function FiltersSidebar({ filters, setFilter, clearFilters, hasActiveFilters, isMobile = false }) {
     const { categories } = useCategories();
     const { brands } = useBrands();
 
@@ -41,29 +40,25 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
         setFilter('brandId', newBrands.join(','));
     };
 
-    const sidebarContent = (
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-y-auto max-h-[calc(100vh-120px)] hide-scrollbar">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                    <FiFilter className="text-indigo-600" /> Filters
-                </h3>
-                {hasActiveFilters && (
-                    <button
-                        onClick={clearFilters}
-                        className="text-xs font-bold text-gray-400 hover:text-rose-500 transition-colors uppercase tracking-wider"
-                    >
-                        Clear All
-                    </button>
-                )}
-            </div>
+    const sidebarClass = isMobile ? "bg-white" : "bg-white rounded-2xl border border-gray-100 shadow-sm p-5";
+
+    return (
+        <div className={sidebarClass}>
+            {!isMobile && (
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                        <FiFilter /> Filters
+                    </h3>
+                </div>
+            )}
 
             <div className="space-y-6">
                 {/* Category Filter */}
                 <FilterSection title="Category" isOpen={openSections.category} onToggle={() => toggleSection('category')}>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-1">
                         <button
                             onClick={() => setFilter('category', '')}
-                            className={`w-full text-left text-sm py-1.5 transition-colors ${!filters.category ? 'font-bold text-indigo-600' : 'text-gray-600 hover:text-gray-900'}`}
+                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${!filters.category ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-50'}`}
                         >
                             All Categories
                         </button>
@@ -71,7 +66,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                             <button
                                 key={cat._id}
                                 onClick={() => setFilter('category', cat._id)}
-                                className={`w-full text-left text-sm py-1.5 transition-colors ${filters.category === cat._id ? 'font-bold text-indigo-600' : 'text-gray-600 hover:text-gray-900'}`}
+                                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${filters.category === cat._id ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 {cat.name}
                             </button>
@@ -83,46 +78,48 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                 <FilterSection title="Price Range" isOpen={openSections.price} onToggle={() => toggleSection('price')}>
                     <form onSubmit={handlePriceApply} className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <div className="relative flex-1">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                                <input
-                                    type="number"
-                                    name="min"
-                                    defaultValue={filters.minPrice}
-                                    placeholder="Min"
-                                    className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                                />
-                            </div>
-                            <span className="text-gray-300">-</span>
-                            <div className="relative flex-1">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                                <input
-                                    type="number"
-                                    name="max"
-                                    defaultValue={filters.maxPrice}
-                                    placeholder="Max"
-                                    className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                                />
-                            </div>
+                            <input
+                                type="number"
+                                name="min"
+                                defaultValue={filters.minPrice}
+                                placeholder="Min"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none"
+                                onWheel={(e) => e.target.blur()}
+                            />
+                            <span className="text-gray-400">—</span>
+                            <input
+                                type="number"
+                                name="max"
+                                defaultValue={filters.maxPrice}
+                                placeholder="Max"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none"
+                                onWheel={(e) => e.target.blur()}
+                            />
                         </div>
-                        <Button type="submit" variant="outline" size="sm" fullWidth className="py-2 text-xs font-bold uppercase tracking-wider">
+                        <button
+                            type="submit"
+                            className="w-full mt-3 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all duration-150"
+                        >
                             Apply Range
-                        </Button>
+                        </button>
                     </form>
                 </FilterSection>
 
                 {/* Brands Filter */}
                 {brands?.length > 0 && (
                     <FilterSection title="Brands" isOpen={openSections.brand} onToggle={() => toggleSection('brand')}>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-1 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                             {brands.map(brand => {
-                                const isSelected = (filters.brand || '').includes(brand._id);
+                                const isSelected = (filters.brand || '').split(',').includes(brand._id);
                                 return (
-                                    <label key={brand._id} className="flex items-center gap-3 cursor-pointer group">
-                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-gray-300 group-hover:border-indigo-400'}`}>
-                                            {isSelected && <FiCheck className="w-3.5 h-3.5" />}
-                                        </div>
-                                        <span className={`text-sm select-none transition-colors ${isSelected ? 'font-semibold text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                                    <label key={brand._id} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => handleBrandToggle(brand._id)}
+                                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
+                                        />
+                                        <span className={`text-sm ${isSelected ? 'font-semibold text-primary' : 'text-gray-600'}`}>
                                             {brand.name}
                                         </span>
                                     </label>
@@ -134,18 +131,18 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
 
                 {/* Rating Filter */}
                 <FilterSection title="Rating" isOpen={openSections.rating} onToggle={() => toggleSection('rating')}>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         {[4, 3, 2, 1].map(rating => (
-                            <label key={rating} className="flex items-center gap-3 cursor-pointer group">
+                            <label key={rating} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
                                 <input
                                     type="radio"
                                     name="rating"
                                     checked={filters.rating === String(rating)}
                                     onChange={() => setFilter('ratingAverage[gte]', String(rating))}
-                                    className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                                    className="w-4 h-4 text-primary border-gray-300 focus:ring-primary/20"
                                 />
-                                <div className="flex items-center gap-1 text-sm text-gray-600 group-hover:text-gray-900">
-                                    <div className="flex text-amber-400">
+                                <div className="flex items-center gap-1 text-sm text-gray-600">
+                                    <div className="flex text-yellow-400">
                                         {[...Array(5)].map((_, i) => (
                                             <FiStar key={i} className={`w-3.5 h-3.5 ${i < rating ? 'fill-current' : 'text-gray-300 fill-gray-100'}`} />
                                         ))}
@@ -159,96 +156,48 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
 
                 {/* Availability Filter */}
                 <FilterSection title="Availability" isOpen={openSections.availability} onToggle={() => toggleSection('availability')}>
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.inStock ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-gray-300 group-hover:border-emerald-400'}`}>
-                            {filters.inStock && <FiCheck className="w-3.5 h-3.5" />}
-                        </div>
-                        <span className={`text-sm select-none transition-colors ${filters.inStock ? 'font-semibold text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
-                            In Stock Only
-                        </span>
+                    <label className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
                         <input
                             type="checkbox"
-                            className="sr-only"
                             checked={!!filters.inStock}
                             onChange={(e) => setFilter('inStock', e.target.checked ? 'true' : '')}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
                         />
+                        <span className={`text-sm ${filters.inStock ? 'font-semibold text-primary' : 'text-gray-600'}`}>
+                            In Stock Only
+                        </span>
                     </label>
                 </FilterSection>
             </div>
-        </div>
-    );
 
-    return (
-        <>
-            {/* Desktop Sidebar */}
-            <div className="hidden lg:block w-72 shrink-0 relative z-10 sticky top-28">
-                {sidebarContent}
-            </div>
-
-            {/* Mobile Drawer Overlay */}
-            <AnimatePresence>
-                {isMobileOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsMobileOpen(false)}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] lg:hidden"
-                        />
-                        <motion.div
-                            initial={{ x: '-100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '-100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed inset-y-0 left-0 w-80 bg-white z-[101] shadow-2xl lg:hidden flex flex-col"
-                        >
-                            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                                <h3 className="text-xl font-black text-gray-900">Filters</h3>
-                                <button onClick={() => setIsMobileOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                    <FiX className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                                <div className="p-6">
-                                    {sidebarContent}
-                                </div>
-                            </div>
-                            <div className="p-4 border-t border-gray-100 bg-gray-50 flex gap-3">
-                                <Button variant="outline" fullWidth onClick={() => { clearFilters(); setIsMobileOpen(false); }}>
-                                    Clear
-                                </Button>
-                                <Button variant="primary" fullWidth onClick={() => setIsMobileOpen(false)}>
-                                    View Results
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+            {hasActiveFilters && (
+                <button
+                    onClick={clearFilters}
+                    className="text-sm text-center text-gray-400 hover:text-red-500 transition-colors duration-150 mt-8 block w-full"
+                >
+                    Reset all filters
+                </button>
+            )}
 
             <style>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
                 .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #cbd5e1; }
-                
-                .hide-scrollbar::-webkit-scrollbar { display: none; }
-                .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
-        </>
+        </div>
     );
 }
 
 const FilterSection = ({ title, isOpen, onToggle, children }) => (
-    <div className="border-b border-gray-100 pb-5 last:border-0 last:pb-0">
+    <div className="mb-2">
         <button
             onClick={onToggle}
-            className="flex items-center justify-between w-full py-2 mb-2 group"
+            className="flex items-center justify-between w-full mb-3 cursor-pointer group"
         >
-            <span className="font-bold text-gray-800 text-sm uppercase tracking-wide group-hover:text-indigo-600 transition-colors">{title}</span>
-            <div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all">
-                {isOpen ? <FiChevronUp className="w-3.5 h-3.5" /> : <FiChevronDown className="w-3.5 h-3.5" />}
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-primary transition-colors">{title}</span>
+            <div className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                <FiChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary" />
             </div>
         </button>
         <AnimatePresence initial={false}>
@@ -259,19 +208,13 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                 >
-                    <div className="pt-2 pb-1">
+                    <div className="pb-1">
                         {children}
                     </div>
                 </motion.div>
             )}
         </AnimatePresence>
     </div>
-);
-
-const FiCheck = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-    </svg>
 );
 
 const FiStar = ({ className }) => (
