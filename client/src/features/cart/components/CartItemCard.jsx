@@ -1,15 +1,12 @@
 import React from 'react';
 import { FiTrash2 } from 'react-icons/fi';
-import { useDispatch } from 'react-redux';
-import { removeFromCart, updateQuantity } from '../../../app/store/slices/cartSlice';
 import QuantityStepper from './QuantityStepper.jsx';
 
 /**
  * CartItemCard redesigned for the Public Cart Page as per design specification
  * @param {object} item - The cart item object
  */
-const CartItemCard = ({ item }) => {
-    const dispatch = useDispatch();
+const CartItemCard = ({ item, onRemove, onUpdateQuantity }) => {
     const product = item.item || item.itemId || item.productId || item;
     const productId = product?._id || product?.id || item.product_id || item.id;
     const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
@@ -20,11 +17,11 @@ const CartItemCard = ({ item }) => {
     const variantInfo = `${item.color || 'Universal'} / ${item.size || 'One Size'} / ${item.material || 'Premium'}`;
 
     const handleRemove = () => {
-        dispatch(removeFromCart(productId));
+        onRemove(productId);
     };
 
-    const handleUpdateQuantity = (newQty) => {
-        dispatch(updateQuantity({ id: productId, quantity: newQty }));
+    const handleUpdateQuantity = (delta) => {
+        onUpdateQuantity(productId, delta);
     };
 
     if (!productId) return null;
@@ -65,8 +62,8 @@ const CartItemCard = ({ item }) => {
                         {/* Quantity Stepper */}
                         <QuantityStepper
                             quantity={item.quantity}
-                            onIncrease={() => handleUpdateQuantity(item.quantity + 1)}
-                            onDecrease={() => handleUpdateQuantity(item.quantity - 1)}
+                            onIncrease={() => handleUpdateQuantity(1)}
+                            onDecrease={() => handleUpdateQuantity(-1)}
                         />
 
                         {/* Item Total Price */}

@@ -1,29 +1,27 @@
 import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { selectCartItems } from '../../../app/store/slices/cartSlice';
 import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import EmptyCart from '../components/EmptyCart.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import useCartPage from '../hooks/useCartPage.js';
 
 /**
  * Public Cart Page - Production-grade React component adhering to user spec
  */
 const CartPage = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const cartItems = useSelector(selectCartItems);
+    const {
+        cartItems,
+        isLoading,
+        calculations,
+        handleQuantityChange,
+        removeFromCart,
+        handleCheckout
+    } = useCartPage();
 
     // Ensure we start at the top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-
-    const handleCheckout = () => {
-        // Logic for proceeding to checkout (usually maps to user flow)
-        navigate('/customer/checkout');
-    };
 
     return (
         <div className="min-h-screen bg-[#F8F9FF] font-sans">
@@ -56,7 +54,11 @@ const CartPage = () => {
                                             exit={{ opacity: 0, scale: 0.95 }}
                                             transition={{ duration: 0.3 }}
                                         >
-                                            <CartItemCard item={item} />
+                                            <CartItemCard
+                                                item={item}
+                                                onRemove={removeFromCart}
+                                                onUpdateQuantity={handleQuantityChange}
+                                            />
                                         </motion.div>
                                     );
                                 })}
@@ -65,7 +67,10 @@ const CartPage = () => {
 
                         {/* Right Column: Order Summary Card */}
                         <aside className="w-full lg:w-[380px] shrink-0">
-                            <OrderSummary onCheckout={handleCheckout} />
+                            <OrderSummary
+                                onCheckout={handleCheckout}
+                                calculations={calculations}
+                            />
                         </aside>
                     </div>
                 )}

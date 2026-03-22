@@ -1,35 +1,14 @@
-import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { selectCartItems, selectPromoInfo } from '../../../app/store/slices/cartSlice';
+import React from 'react';
 import PromoCodeInput from './PromoCodeInput.jsx';
 import { FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 
 /**
  * OrderSummary Sidebar Card redesigned for the public cart page
  * @param {function} onCheckout - Action to perform on checkout click
+ * @param {object} calculations - Financial calculations passed from parent
  */
-const OrderSummary = ({ onCheckout }) => {
-    const cartItems = useSelector(selectCartItems);
-    const { discount } = useSelector(selectPromoInfo);
-
-    // Derive financial calculations using useMemo as requested
-    const calculations = useMemo(() => {
-        const subtotal = cartItems.reduce((acc, item) => {
-            const product = item.item || item.itemId || item.productId || item;
-            const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
-            return acc + (price * (item.quantity || 1));
-        }, 0);
-
-        const discountAmount = subtotal * (discount / 100);
-        const taxableAmount = subtotal - discountAmount;
-        const tax = taxableAmount * 0.08; // Fixed 8% tax
-        const shipping = subtotal > 500 ? 0 : 25; // FREE if subtotal > 500
-        const total = taxableAmount + tax + shipping;
-
-        return { subtotal, discountAmount, tax, shipping, total };
-    }, [cartItems, discount]);
-
-    const isEmpty = cartItems.length === 0;
+const OrderSummary = ({ onCheckout, calculations }) => {
+    const isEmpty = calculations.subtotal === 0;
 
     return (
         <div className="sticky top-24 bg-white p-8 rounded-3xl border border-gray-100 shadow-xl space-y-8 h-fit">
@@ -44,9 +23,9 @@ const OrderSummary = ({ onCheckout }) => {
                     <span>Subtotal</span>
                     <span className="text-gray-900">${calculations.subtotal.toFixed(2)}</span>
                 </div>
-                {discount > 0 && (
+                {calculations.discountAmount > 0 && (
                     <div className="flex justify-between text-sm text-emerald-600 font-medium tracking-tight">
-                        <span>Discount ({discount}%)</span>
+                        <span>Discount</span>
                         <span>-${calculations.discountAmount.toFixed(2)}</span>
                     </div>
                 )}
