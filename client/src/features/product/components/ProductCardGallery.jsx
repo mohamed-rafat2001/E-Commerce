@@ -87,7 +87,7 @@ const ProductCardGallery = memo(function ProductCardGallery({
               }}
               className={`w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-150 ${
                 activeIndex === index
-                  ? 'border-indigo-500 opacity-100'
+                  ? 'border-primary opacity-100'
                   : 'border-transparent opacity-70 hover:opacity-100'
               }`}
             >

@@ -10,16 +10,14 @@ export default function useProductFilters() {
             category: searchParams.get('category') || '',
             search: searchParams.get('search') || '',
             sort: searchParams.get('sort') || '-createdAt',
-            minPrice: searchParams.get('price[gte]') || '',
-            maxPrice: searchParams.get('price[lte]') || '',
-            brand: searchParams.get('brandId') || '',
-            rating: searchParams.get('ratingAverage[gte]') || '',
+            'price[gte]': searchParams.get('price[gte]') || '',
+            'price[lte]': searchParams.get('price[lte]') || '',
+            brandId: searchParams.get('brandId') || '',
+            'ratingAverage[gte]': searchParams.get('ratingAverage[gte]') || '',
             page: parseInt(searchParams.get('page')) || 1,
             limit: parseInt(searchParams.get('limit')) || 12,
+            inStock: searchParams.get('inStock') === 'true'
         };
-        // Add boolean flags
-        if (searchParams.get('sale') === 'true') parsed.sale = true;
-        if (searchParams.get('inStock') === 'true') parsed.inStock = true;
 
         return parsed;
     }, [searchParams]);
@@ -34,10 +32,10 @@ export default function useProductFilters() {
 
         if (filters.search) params.search = filters.search;
         if (filters.category) params.primaryCategory = filters.category;
-        if (filters.brand) params.brandId = filters.brand;
-        if (filters.minPrice) params['price.amount[gte]'] = filters.minPrice;
-        if (filters.maxPrice) params['price.amount[lte]'] = filters.maxPrice;
-        if (filters.rating) params['ratingAverage[gte]'] = filters.rating;
+        if (filters.brandId) params.brandId = filters.brandId;
+        if (filters['price[gte]']) params['price.amount[gte]'] = filters['price[gte]'];
+        if (filters['price[lte]']) params['price.amount[lte]'] = filters['price[lte]'];
+        if (filters['ratingAverage[gte]']) params['ratingAverage[gte]'] = filters['ratingAverage[gte]'];
 
         // Sale and InStock are custom flags that might need specific backend handling
         // For standard Mongoose queries:

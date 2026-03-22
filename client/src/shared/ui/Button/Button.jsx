@@ -1,8 +1,9 @@
 import React from 'react';
 
 const variants = {
-	primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm",
-	outline: "border border-indigo-600 text-indigo-600 hover:bg-indigo-50",
+	primary: "bg-primary text-white hover:bg-primary-dark shadow-sm",
+	accent: "bg-accent text-primary-950 hover:bg-accent-dark shadow-sm",
+	outline: "border border-primary text-primary hover:bg-primary-light",
 	ghost: "text-gray-600 hover:bg-gray-100",
 	danger: "bg-red-500 text-white hover:bg-red-600",
 	success: "bg-green-500 text-white hover:bg-green-600",
