@@ -11,11 +11,12 @@ import useProductCardGallery from '../hooks/useProductCardGallery';
  * @param {boolean} props.isHovered - Whether the card is hovered
  * @param {boolean} props.autoSlide - Enable automatic sliding (default: true)
  */
-const ProductCardGallery = memo(function ProductCardGallery({ 
-  images = [], 
+const ProductCardGallery = memo(function ProductCardGallery({
+  images = [],
   productName = 'Product',
   isHovered = false,
-  autoSlide = true
+  autoSlide = true,
+  showThumbnails = true
 }) {
   const {
     activeIndex,
@@ -35,10 +36,10 @@ const ProductCardGallery = memo(function ProductCardGallery({
     );
   }
 
-  // Single image - no gallery needed, show full width
-  if (images.length === 1) {
-    const imageUrl = images[0]?.secure_url || images[0];
-    
+  // Single image or thumbnails hidden - show full width main image
+  if (images.length === 1 || !showThumbnails) {
+    const imageUrl = images[activeIndex]?.secure_url || images[activeIndex];
+
     if (!imageUrl) {
       return (
         <div className="w-full h-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 flex items-center justify-center">
@@ -57,14 +58,14 @@ const ProductCardGallery = memo(function ProductCardGallery({
     );
   }
 
-  // Multiple images - show gallery with thumbnails
+  // Multiple images with thumbnails - show gallery with thumbnails
   return (
     <div className="flex gap-1 w-full h-full">
       {/* LEFT — Vertical thumbnail strip */}
       <div className="flex flex-col gap-1.5 overflow-y-auto no-scrollbar w-14 flex-shrink-0">
         {images.map((imageObj, index) => {
           const imageUrl = imageObj?.secure_url || imageObj;
-          
+
           if (!imageUrl) {
             return (
               <div
@@ -85,16 +86,16 @@ const ProductCardGallery = memo(function ProductCardGallery({
                 e.stopPropagation();
                 handleThumbnailClick(index);
               }}
-              className={`w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-150 ${
-                activeIndex === index
-                  ? 'border-primary opacity-100'
+              className={`w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-150 ${activeIndex === index
+                  ? 'border-gray-900 opacity-100'
                   : 'border-transparent opacity-70 hover:opacity-100'
-              }`}
+                }`}
             >
               <img
                 src={imageUrl}
-                alt={`${productName} view ${index + 1}`}
+                alt={`${productName} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
+                crossOrigin="anonymous"
               />
             </button>
           );
@@ -102,17 +103,11 @@ const ProductCardGallery = memo(function ProductCardGallery({
       </div>
 
       {/* RIGHT — Main image */}
-      <div
-        className="flex-1 relative overflow-hidden"
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+      <div className="flex-1 rounded-r-lg overflow-hidden relative">
         <img
-          key={activeIndex}
           src={images[activeIndex]?.secure_url || images[activeIndex]}
           alt={productName}
-          className="w-full h-full object-cover transition-opacity duration-200"
+          className="w-full h-full object-cover transition-transform duration-500"
           crossOrigin="anonymous"
         />
       </div>

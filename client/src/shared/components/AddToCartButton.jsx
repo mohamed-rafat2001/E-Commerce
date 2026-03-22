@@ -15,6 +15,7 @@ const AddToCartButton = ({
     variant = 'primary',
     size = 'md',
     fullWidth = false,
+    showText = true,
     className = '',
     onSuccess,
     onError
@@ -71,34 +72,31 @@ const AddToCartButton = ({
         switch (buttonState) {
             case 'loading':
                 return (
-                    <>
-                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-                        Adding...
-                    </>
+                    <div className="flex items-center gap-2">
+                        <div className="animate-spin h-3 w-3 border-2 border-current border-t-transparent rounded-full" />
+                        {showText && <span>Adding...</span>}
+                    </div>
                 );
             case 'success':
                 return (
-                    <>
-                        <FiCheck className="w-4 h-4" /> Added ✓
-                    </>
+                    <div className="flex items-center gap-2">
+                        <FiCheck className="w-4 h-4" /> 
+                        {showText && <span>Added</span>}
+                    </div>
                 );
             case 'error':
                 return (
-                    <>
-                        <FiX className="w-4 h-4" /> Try Again
-                    </>
+                    <div className="flex items-center gap-2">
+                        <FiX className="w-4 h-4" /> 
+                        {showText && <span>Error</span>}
+                    </div>
                 );
-            case 'in-cart':
-                return isInCart ? (
-                    <>
-                        <FiShoppingBag className="w-4 h-4" /> Go to Cart →
-                    </>
-                ) : null;
             default:
                 return (
-                    <>
-                        <FiShoppingBag className="w-4 h-4" /> Add to Cart
-                    </>
+                    <div className="flex items-center gap-2">
+                        <FiShoppingBag className="w-4 h-4" /> 
+                        {showText && <span>Add to Cart</span>}
+                    </div>
                 );
         }
     };
@@ -113,7 +111,10 @@ const AddToCartButton = ({
                 disabled
                 className={`${className} opacity-60 cursor-not-allowed`}
             >
-                <FiX className="w-4 h-4 mr-2" /> Out of Stock
+                <div className="flex items-center gap-2">
+                    <FiX className="w-4 h-4" /> 
+                    {showText && <span>Out of Stock</span>}
+                </div>
             </Button>
         );
     }
@@ -128,7 +129,11 @@ const AddToCartButton = ({
                 onClick={handleClick}
                 className={`${className}`}
             >
-                Only {product.countInStock} left
+                {showText ? (
+                    <span className="text-[10px]">Only {product.countInStock} left</span>
+                ) : (
+                    <FiShoppingBag className="w-4 h-4" />
+                )}
             </Button>
         );
     }
@@ -141,7 +146,7 @@ const AddToCartButton = ({
             onClick={handleClick}
             isLoading={isLoading || buttonState === 'loading'}
             disabled={buttonState === 'success' || buttonState === 'error'}
-            className={`${className} transition-all duration-200`}
+            className={`${className} transition-all duration-300 font-bold`}
         >
             {getButtonContent()}
         </Button>

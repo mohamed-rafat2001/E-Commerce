@@ -4,13 +4,15 @@ import { Sidebar } from '../shared/widgets/Sidebar/index.js';
 import { Header } from '../shared/widgets/Header/index.js';
 import useCurrentUser from '../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../shared/constants/theme.js';
+import ScrollToTop from '../shared/components/ScrollToTop.jsx';
 
 const DashboardLayout = () => {
 	const { userRole } = useCurrentUser();
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	return (
-		<div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50">
+		<div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 font-sans">
+			<ScrollToTop />
 			{/* Decorative background elements */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">
 				{/* Gradient orbs */}

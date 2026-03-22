@@ -1,36 +1,57 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-	items: [],
-	totalPrice: 0,
+	items: [], // Array of { id, name, price, quantity, color, size, material, image, ... }
+	promoCode: null,
+	discount: 0,
+	isLoading: false,
 };
+
 const cartSlice = createSlice({
 	name: "cart",
 	initialState,
 	reducers: {
-		// add item to cart
 		addToCart: (state, action) => {
-			const totalPriceForItem = action.payload.price * action.payload.quantity;
-
-			state.items.push({ ...action.payload, totalPriceForItem });
-			state.totalPrice += totalPriceForItem;
-
-			return state;
+			const existingItem = state.items.find(item => item.id === action.payload.id);
+			if (existingItem) {
+				existingItem.quantity += action.payload.quantity || 1;
+			} else {
+				state.items.push({ ...action.payload, quantity: action.payload.quantity || 1 });
+			}
 		},
-		// delete item from cart
-		deleteFromCart: (state, action) => {
-			state.items = state.items.filter(
-				(items) => items.id !== action.payload.id
-			);
-			state.totalPrice -= action.payload.totalPriceForItem;
-			return state;
+		removeFromCart: (state, action) => {
+			state.items = state.items.filter(item => item.id !== action.payload);
 		},
-		// delete all items from cart
-        clearCart: (state) => {
-            state.items = [];
-            state.totalPrice = 0;
-            return state;
-        },
+		updateQuantity: (state, action) => {
+			const { id, quantity } = action.payload;
+			const item = state.items.find(item => item.id === id);
+			if (item) {
+				item.quantity = Math.max(1, quantity);
+			}
+		},
+		applyPromoCode: (state, action) => {
+			const code = action.payload.toUpperCase();
+			// Mocking promo logic as requested: "if a /api/promo endpoint exists use it; otherwise handle locally"
+			// I'll handle it locally for now with a simple "SAVE10" example.
+			if (code === "SAVE10") {
+				state.promoCode = code;
+				state.discount = 10; // 10% discount
+			} else {
+				state.promoCode = null;
+				state.discount = 0;
+			}
+		},
+		clearCart: (state) => {
+			state.items = [];
+			state.promoCode = null;
+			state.discount = 0;
+		},
 	},
 });
-export const { addToCart, deleteFromCart, clearCart } = cartSlice.actions;
+
+export const { addToCart, removeFromCart, updateQuantity, applyPromoCode, clearCart } = cartSlice.actions;
+
+// Selectors
+export const selectCartItems = (state) => state.cartStore.items;
+export const selectPromoInfo = (state) => ({ code: state.cartStore.promoCode, discount: state.cartStore.discount });
+
 export default cartSlice.reducer;

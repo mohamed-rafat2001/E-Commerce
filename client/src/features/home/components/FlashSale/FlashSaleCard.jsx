@@ -19,8 +19,8 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
             transition={{ delay: index * 0.1, duration: 0.5 }}
             className="p-1"
         >
-            <Card hoverable className="p-0 border-none group bg-white shadow-2xl shadow-indigo-100 overflow-hidden h-full">
-                <div className="relative aspect-square overflow-hidden cursor-pointer">
+            <Card hoverable className="p-0 border border-white/5 group bg-gray-900/40 backdrop-blur-2xl shadow-2xl overflow-hidden h-full rounded-[2.5rem] transition-all duration-500 hover:border-red-500/20">
+                <div className="relative aspect-[4/5] overflow-hidden cursor-pointer">
                     <Link to={`/products/${product._id || product.id}`}>
                         <img
                             src={product.coverImage?.secure_url || product.image?.secure_url || 'https://placehold.co/500x500?text=Sale+Product'}
@@ -31,51 +31,50 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
                     </Link>
 
                     {/* Urgent Badges */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                        <Badge variant="sale" className="bg-red-500 text-white font-black px-3 py-1.5 shadow-xl">
+                    <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
+                        <div className="bg-red-600 text-white font-black px-4 py-2 rounded-full shadow-2xl text-xs tracking-widest uppercase">
                             -{discountPercent}% OFF
-                        </Badge>
-                        {discountPercent >= 40 && (
-                            <Badge className="bg-amber-400 text-black border-none font-black px-2 py-1 shadow-lg text-[10px]">
-                                🏆 MEGA DEAL
-                            </Badge>
-                        )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                            {product.category?.name || 'Exclusive'}
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+                            {product.brand?.name || 'Exclusive'}
                         </span>
-                        <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50 px-2 py-1 rounded-full">
-                            <FiStar className="fill-current" /> {product.ratingAverage || 4.8}
+                        <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs bg-amber-400/10 px-3 py-1.5 rounded-full border border-amber-400/20">
+                            <FiStar className="fill-current w-3 h-3" /> {product.ratingAverage || 4.8}
                         </div>
                     </div>
 
                     <Link to={`/products/${product._id || product.id}`}>
-                        <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-2 hover:text-indigo-600 transition-colors">
+                        <h3 className="text-xl font-bold text-white line-clamp-1 mb-2 hover:text-red-500 transition-colors tracking-tight">
                             {product.name}
                         </h3>
                     </Link>
 
                     <div className="flex items-baseline gap-3 mb-6">
-                        <span className="text-2xl font-black text-red-500">
+                        <span className="text-3xl font-black text-red-500 tracking-tighter">
                             ${currentPrice}
                         </span>
-                        <span className="text-gray-400 line-through text-sm font-medium">
+                        <span className="text-gray-500 line-through text-sm font-medium">
                             ${originalPrice}
                         </span>
                     </div>
 
-                    <SaleProgressBar sold={product.sold || (index + 2) * 5} total={(index + 5) * 10} />
+                    <div className="space-y-4">
+                        <SaleProgressBar
+                            sold={product.sold || (index + 2) * 5}
+                            total={(index + 5) * 10}
+                            className="text-white"
+                        />
 
-                    <div className="mt-8">
                         <Button
                             fullWidth
                             variant="primary"
                             onClick={() => onAddToCart(product)}
-                            className="!bg-indigo-600 border-none text-white hover:!bg-indigo-700 font-black py-4 flex items-center justify-center gap-3 shadow-xl transition-all"
+                            className="!bg-white !text-gray-900 !border-none hover:!bg-red-500 hover:!text-white font-black py-4 !rounded-full flex items-center justify-center gap-3 shadow-2xl transition-all duration-300 transform active:scale-95 text-xs uppercase tracking-widest"
                         >
                             <FiShoppingBag className="w-5 h-5" /> Grab It Now
                         </Button>

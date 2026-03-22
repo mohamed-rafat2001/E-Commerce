@@ -9,12 +9,9 @@ import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
 import CartDropdown from './CartDropdown.jsx';
 import WishlistDropdown from './WishlistDropdown.jsx';
-import NavLinks from './NavLinks.jsx';
 import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
 import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
 import useAddToCart from '../../../features/cart/hooks/useAddToCart.js';
-import useCategories from '../../../features/home/hooks/useCategories.js';
-import useBrands from '../../../features/home/hooks/useBrands.js';
 import toast from 'react-hot-toast';
 import {
 	NotificationIcon,
@@ -23,7 +20,8 @@ import {
 	DashboardIcon,
 	LogoutIcon,
 	ChevronRightIcon,
-	SettingsIcon
+	SettingsIcon,
+	UserIcon
 } from '../../constants/icons.jsx';
 import CartDrawer from '../../components/CartDrawer.jsx';
 import WishlistDrawer from '../../components/WishlistDrawer.jsx';
@@ -43,8 +41,6 @@ const Header = ({ isPanel = false }) => {
 	const { deleteFromCart } = useDeleteFromCart();
 	const { deleteFromWishlist } = useDeleteFromWishlist();
 	const { addToCart } = useAddToCart();
-	const { categories } = useCategories();
-	const { brands } = useBrands();
 
 	const { cart, cartItemCount, cartTotal } = useCart();
 	const cartItems = cart?.items || [];
@@ -99,12 +95,12 @@ const Header = ({ isPanel = false }) => {
 		setIsDropdownOpen(false);
 	};
 
-	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/public-cart";
+	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/cart";
 	const wishlistViewAllPath = isAuthenticated ? "/customer/wishlist" : "/public-wishlist";
 
 	return (
 		<motion.header
-			className={`sticky top-0 z-30 w-full ${isPanel ? 'bg-transparent' : ''}`}
+			className={`sticky top-0 z-40 w-full ${isPanel ? 'bg-transparent' : ''}`}
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
 			transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -112,81 +108,71 @@ const Header = ({ isPanel = false }) => {
 			{/* Glassmorphism header */}
 			<div className={`${isPanel ? 'bg-white/40' : 'bg-white/80'} backdrop-blur-xl border-b border-gray-100/50 shadow-sm`}>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between h-16">
+					<div className="flex items-center justify-between h-20">
 						{/* Logo & Brand */}
 						{!isPanel && (
-							<Link to="/" className="flex items-center gap-3 group">
-								<motion.div
-									className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
-									style={{ background: roleTheme.gradient }}
-									whileHover={{ scale: 1.05, rotate: 5 }}
-									whileTap={{ scale: 0.95 }}
-								>
-									E
-								</motion.div>
-								<span className="text-xl font-bold text-gray-800 hidden sm:block group-hover:text-indigo-600 transition-colors">
-									E-Commerce
-								</span>
-							</Link>
-						)}
+							<div className="flex items-center gap-10">
+								<Link to="/" className="flex items-center gap-2 group">
+									<span className="text-2xl font-bold text-gray-900 font-display tracking-tight">
+										CuratorMarket
+									</span>
+								</Link>
 
-						{/* Desktop Navigation Links */}
-						{!isPanel && (
-							<div className="hidden lg:flex flex-1 justify-center px-4">
-								<NavLinks categories={categories} brands={brands} />
+								<nav className="hidden lg:flex items-center gap-8">
+									<Link to="/products" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Explore</Link>
+									<Link to="/designers" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Designers</Link>
+									<Link to="/trending" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">Trending</Link>
+								</nav>
 							</div>
 						)}
 
-						{/* Search Bar (hidden on mobile and in panel) */}
-						{!isPanel && (
-							<div className="hidden xl:flex flex-1 max-w-xs mx-4">
-								<div className="relative w-full">
-									<input
-										type="text"
-										placeholder="Search products, orders..."
-										className="w-full pl-4 pr-10 py-2.5 bg-gray-100/80 border-0 rounded-xl
-											text-gray-700 placeholder:text-gray-400
-											focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-white
-											transition-all duration-300"
-									/>
-									<svg
-										className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						{/* Right hand Side: Search + Icons */}
+						<div className="flex items-center gap-6">
+							{/* Search Bar */}
+							{!isPanel && (
+								<div className="hidden md:flex w-full max-w-[240px]">
+									<div className="relative w-full">
+										<input
+											type="text"
+											placeholder="Search curated goods..."
+											className="w-full pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full
+												text-sm text-gray-700 placeholder:text-gray-400
+												focus:ring-2 focus:ring-primary/10 focus:bg-white
+												transition-all duration-300"
 										/>
-									</svg>
+										<svg
+											className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+											/>
+										</svg>
+									</div>
 								</div>
-							</div>
-						)}
+							)}
 
-						{/* Right side actions */}
-						<div className={`flex items-center gap-2 sm:gap-4 ${isPanel ? 'ml-auto' : ''}`}>
-							{/* Quick action buttons */}
-							<div className="flex items-center gap-1">
+							<div className="flex items-center gap-2">
+								{/* Wishlist */}
 								<div className="relative" ref={wishlistRef}>
 									<motion.button
 										onClick={() => setIsWishlistOpen(!isWishlistOpen)}
-										className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-											hover:bg-gray-100 transition-all duration-200"
+										className="relative p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
 										<HeartIcon className="w-5 h-5" />
 										{wishlistCount > 0 && (
-											<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 
-												text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+											<span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
 												{wishlistCount}
 											</span>
 										)}
 									</motion.button>
-
 									<AnimatePresence>
 										{isWishlistOpen && (
 											<WishlistDropdown
@@ -200,23 +186,21 @@ const Header = ({ isPanel = false }) => {
 									</AnimatePresence>
 								</div>
 
+								{/* Cart */}
 								<div className="relative" ref={cartRef}>
 									<motion.button
 										onClick={() => setIsCartOpen(!isCartOpen)}
-										className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-											hover:bg-gray-100 transition-all duration-200"
+										className="relative p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
 										<StoreIcon className="w-5 h-5" />
 										{cartCount > 0 && (
-											<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-500 
-												text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+											<span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
 												{cartCount}
 											</span>
 										)}
 									</motion.button>
-
 									<AnimatePresence>
 										{isCartOpen && (
 											<CartDropdown
@@ -229,133 +213,72 @@ const Header = ({ isPanel = false }) => {
 										)}
 									</AnimatePresence>
 								</div>
+
+								{/* Notification */}
 								<motion.button
-									className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-700 
-										hover:bg-gray-100 transition-all duration-200"
+									className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
 								>
 									<NotificationIcon className="w-5 h-5" />
-									<span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-emerald-500 
-										text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-										5
-									</span>
 								</motion.button>
 							</div>
 
-							{/* Divider */}
-							<div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-
-							{/* User profile */}
-							{!isLoading && (
-								isAuthenticated ? (
-									<div className="relative" ref={dropdownRef}>
-										<button
-											onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-											className="flex items-center gap-3 p-1.5 pr-4 rounded-xl
-												hover:bg-gray-100/80 transition-all duration-200 border border-transparent hover:border-gray-200"
-										>
-											<Avatar
-												src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
-												name={fullName}
-												size="md"
-												ring
-												ringColor="ring-indigo-500/20"
-											/>
-											<div className="hidden sm:block text-left">
-												<p className="text-sm font-bold text-gray-900 truncate max-w-[150px]">
-													{fullName}
-												</p>
-												<Badge variant="gradient" size="sm">
-													{userRole}
-												</Badge>
-											</div>
-											<ChevronRightIcon className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-90' : ''}`} />
-										</button>
-
-										{/* Mobile Nav Trigger inside User Actions */}
-										{!isPanel && (
-											<div className="lg:hidden ml-2 border-l pl-2 border-gray-100">
-												<NavLinks categories={categories} brands={brands} />
-											</div>
-										)}
-
-										{/* Dropdown Menu */}
-										<AnimatePresence>
-											{isDropdownOpen && (
-												<motion.div
-													initial={{ opacity: 0, y: 10, scale: 0.95 }}
-													animate={{ opacity: 1, y: 0, scale: 1 }}
-													exit={{ opacity: 0, y: 10, scale: 0.95 }}
-													transition={{ duration: 0.2 }}
-													className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+							{isAuthenticated ? (
+								<div className="relative pl-2 border-l border-gray-100" ref={dropdownRef}>
+									<button
+										onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors"
+									>
+										<Avatar
+											src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
+											name={fullName}
+											size="md"
+										/>
+									</button>
+									<AnimatePresence>
+										{isDropdownOpen && (
+											<motion.div
+												initial={{ opacity: 0, y: 10, scale: 0.95 }}
+												animate={{ opacity: 1, y: 0, scale: 1 }}
+												exit={{ opacity: 0, y: 10, scale: 0.95 }}
+												className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden font-sans"
+											>
+												<Link to={`/${userRole?.toLowerCase()}/dashboard`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+													<DashboardIcon className="w-4 h-4 text-gray-400" />
+													<span className="font-medium">Dashboard</span>
+												</Link>
+												<Link to={`/${userRole?.toLowerCase()}/settings`} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+													<SettingsIcon className="w-4 h-4 text-gray-400" />
+													<span className="font-medium">Settings</span>
+												</Link>
+												<div className="h-px bg-gray-50 my-1"></div>
+												<button
+													onClick={() => {
+														setIsLogoutModalOpen(true);
+														setIsDropdownOpen(false);
+													}}
+													className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
 												>
-													<div className="px-4 py-3 border-b border-gray-50 mb-1">
-														<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
-													</div>
-
-													<Link
-														to={`/${userRole?.toLowerCase()}/dashboard`}
-														onClick={() => setIsDropdownOpen(false)}
-														className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
-													>
-														<div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-															<DashboardIcon className="w-4 h-4" />
-														</div>
-														<span className="font-medium">User Panel</span>
-													</Link>
-
-													<Link
-														to={`/${userRole?.toLowerCase()}/settings`}
-														onClick={() => setIsDropdownOpen(false)}
-														className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
-													>
-														<div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-															<SettingsIcon className="w-4 h-4" />
-														</div>
-														<span className="font-medium">Settings</span>
-													</Link>
-
-													<button
-														onClick={() => {
-															setIsDropdownOpen(false);
-															setIsLogoutModalOpen(true);
-														}}
-														className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors group"
-													>
-														<div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-															<LogoutIcon className="w-4 h-4" />
-														</div>
-														<span className="font-medium">Logout</span>
-													</button>
-												</motion.div>
-											)}
-										</AnimatePresence>
-									</div>
-								) : (
-									<div className="flex items-center gap-2">
-										<Link
-											to="/login"
-											className="px-4 py-2 text-sm font-medium text-gray-700 
-												hover:text-indigo-600 transition-colors"
-										>
-											Sign In
-										</Link>
-										<Link
-											to="/register"
-											className="px-4 py-2 text-sm font-medium text-white rounded-xl
-												shadow-lg hover:shadow-xl transition-all duration-200"
-											style={{ background: roleTheme.gradient }}
-										>
+													<LogoutIcon className="w-4 h-4" />
+													<span className="font-medium">Logout</span>
+												</button>
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							) : (
+								<div className="flex items-center gap-3 pl-2 border-l border-gray-100 font-sans">
+									<Link to="/login">
+										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:bg-gray-100">
+											Login
+										</Button>
+									</Link>
+									<Link to="/register">
+										<Button variant="primary" size="sm" className="rounded-full px-6 !bg-gray-900 !text-white !border-gray-900 shadow-lg hover:bg-black transition-all active:scale-95">
 											Get Started
-										</Link>
-									</div>
-								)
-							)}
-							{/* Mobile Nav if not authenticated */}
-							{!isAuthenticated && !isPanel && (
-								<div className="lg:hidden ml-2 border-l pl-2 border-gray-100">
-									<NavLinks categories={categories} brands={brands} />
+										</Button>
+									</Link>
 								</div>
 							)}
 						</div>
@@ -368,43 +291,33 @@ const Header = ({ isPanel = false }) => {
 				isOpen={isLogoutModalOpen}
 				onClose={() => setIsLogoutModalOpen(false)}
 				title="Confirm Logout"
-				size="sm"
 			>
-				<div className="space-y-6">
-					<div className="flex flex-col items-center justify-center text-center">
-						<div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-4 text-red-500">
-							<LogoutIcon className="w-8 h-8" />
-						</div>
-						<h3 className="text-xl font-bold text-gray-900">Sign Out</h3>
-						<p className="text-gray-500 mt-2">
-							Are you sure you want to log out of your account?
-						</p>
+				<div className="p-6 text-center font-sans">
+					<div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+						<LogoutIcon className="w-10 h-10 text-red-500" />
 					</div>
-
-					<div className="flex gap-3">
+					<h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Trying to leave?</h3>
+					<p className="text-gray-500 mb-8 font-medium">We'll miss you. Are you sure you want to logout from your account?</p>
+					<div className="flex flex-col sm:flex-row gap-3">
 						<Button
-							variant="ghost"
-							className="flex-1"
+							fullWidth
+							variant="outline"
 							onClick={() => setIsLogoutModalOpen(false)}
+							className="rounded-full py-4 uppercase font-black tracking-widest text-xs"
 						>
-							Cancel
+							Stay logged in
 						</Button>
 						<Button
-							variant="danger"
-							className="flex-1"
+							fullWidth
+							variant="primary"
+							className="!bg-red-500 !text-white !border-red-500 rounded-full py-4 uppercase font-black tracking-widest text-xs shadow-xl shadow-red-100"
 							onClick={handleLogout}
 						>
-							Logout
+							Yes, Logout
 						</Button>
 					</div>
 				</div>
 			</Modal>
-
-			{/* Cart Drawer */}
-			<CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-
-			{/* Wishlist Drawer */}
-			<WishlistDrawer isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
 		</motion.header>
 	);
 };

@@ -4,7 +4,7 @@ import useBrands from '../../home/hooks/useBrands.js';
 
 export default function SortBar({ totalCount, filters, setFilter, clearFilters, onMobileFilterClick }) {
     const { categories } = useCategories();
-    const { brands } = useBrands();
+    const { originalBrands: brands } = useBrands();
 
     const activeFilters = [];
     if (filters.category) {
@@ -53,9 +53,9 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
             {activeFilters.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap mb-4">
                     {activeFilters.map(af => (
-                        <div key={af.key} className="flex items-center gap-1.5 bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full border border-primary/20">
+                        <div key={af.key} className="flex items-center gap-1.5 bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-full border border-gray-200">
                             {af.label}
-                            <button onClick={() => handleRemoveFilter(af)} className="hover:bg-primary/20 rounded-full p-0.5 transition-colors">
+                            <button onClick={() => handleRemoveFilter(af)} className="hover:bg-gray-200 rounded-full p-0.5 transition-colors">
                                 <FiX className="w-3.5 h-3.5" />
                             </button>
                         </div>
@@ -82,31 +82,28 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                 <div className="flex items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
                     <button
                         onClick={onMobileFilterClick}
-                        className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-primary transition-all duration-150"
+                        className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-900 transition-all duration-150"
                     >
                         <FiFilter />
                         Filters
                         {activeFilters.length > 0 && (
-                            <span className="flex items-center justify-center w-5 h-5 bg-primary text-white text-[10px] rounded-full">
+                            <span className="flex items-center justify-center w-5 h-5 bg-gray-900 text-white text-[10px] rounded-full">
                                 {activeFilters.length}
                             </span>
                         )}
                     </button>
 
                     <div className="flex items-center">
-                        <span className="text-sm text-gray-500 mr-2 hidden sm:inline">Sort by:</span>
-                        <div className="relative group">
-                            <select
-                                value={filters.sort}
-                                onChange={(e) => setFilter('sort', e.target.value)}
-                                className="appearance-none flex items-center gap-2 px-4 py-2 pr-10 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 cursor-pointer hover:border-primary focus:border-primary focus:ring-0 transition-all duration-150 outline-none"
-                            >
-                                {sortOptions.map(opt => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                            </select>
-                            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-primary transition-colors" />
-                        </div>
+                        <select
+                            value={filters.sort}
+                            onChange={(e) => setFilter('sort', e.target.value)}
+                            className="appearance-none bg-transparent pl-2 pr-8 py-1.5 text-sm font-bold text-gray-900 focus:outline-none cursor-pointer"
+                        >
+                            {sortOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                        <FiChevronDown className="w-4 h-4 text-gray-400 -ml-6 pointer-events-none" />
                     </div>
                 </div>
             </div>

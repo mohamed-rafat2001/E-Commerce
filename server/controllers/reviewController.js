@@ -3,6 +3,7 @@ import {
 	createDoc,
 	updateByOwner,
 	getById,
+	getAll,
 	deleteOneByOwner,
 } from "./handlerFactory.js";
 
@@ -20,10 +21,10 @@ export const updateReview = updateByOwner(
 	["rating", "comment"]
 );
 
-//  @desc   get single review
-//  @Route  GET /api/v1/reviews/:id
-//  @access Public
-export const getSingleReview = getById(ReviewsModel);
+//  @desc   get reviews for a product or seller
+// @Route  GET /api/v1/reviews/:id
+// @access Public
+export const getSingleReview = getAll(ReviewsModel);
 
 //  @desc   delete single review by owner
 //  @Route  GET /api/v1/reviews/:id

@@ -9,19 +9,17 @@ const FooterSection = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-16 mb-20">
                     <div className="md:col-span-2">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-black text-2xl shadow-glow">
-                                E
-                            </div>
-                            <span className="text-2xl font-black tracking-tight">E-Commerce</span>
+                            <span className="text-3xl font-black tracking-tight text-white font-display">
+                                CuratorMarket
+                            </span>
                         </div>
                         <p className="text-gray-400 text-lg leading-relaxed max-w-sm mb-8 opacity-70">
-                            Redefining global trade through innovation, accessibility, and trust.
-                            Join the next generation of online commerce.
+                            The world's most curated destination for designer goods, artisan crafts, and trending aesthetics.
                         </p>
                         <div className="flex gap-4">
                             {[FiFacebook, FiTwitter, FiInstagram, FiLinkedin].map((Icon, i) => (
-                                <div key={i} className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300 cursor-pointer">
-                                    <Icon className="w-5 h-5" />
+                                <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-all duration-300 cursor-pointer">
+                                    <Icon className="w-4 h-4" />
                                 </div>
                             ))}
                         </div>
