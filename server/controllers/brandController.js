@@ -44,7 +44,7 @@ export const getAllActiveBrands = catchAsync(async (req, res, next) => {
 	const brands = await features.query;
 
 	// Send response
-	return sendResponse(res, 200, "Brands retrieved successfully", brands);
+	return sendResponse(res, 200, brands);
 });
 
 // @desc    Get all brands for current seller

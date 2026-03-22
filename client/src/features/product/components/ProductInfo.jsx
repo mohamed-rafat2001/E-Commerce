@@ -46,16 +46,16 @@ const ProductInfo = ({ product }) => {
 
   const handleAddToCart = () => {
     if (!isOutOfStock) {
-        addToCart(product, quantity);
-        setAddSuccess(true);
-        setTimeout(() => setAddSuccess(false), 2000);
+      addToCart(product, quantity);
+      setAddSuccess(true);
+      setTimeout(() => setAddSuccess(false), 2000);
     }
   };
 
   const handleBuyNow = () => {
     if (!isOutOfStock) {
-        addToCart(product, quantity);
-        navigate('/cart');
+      addToCart(product, quantity);
+      navigate('/cart');
     }
   };
 
@@ -77,7 +77,7 @@ const ProductInfo = ({ product }) => {
   const scrollToReviews = () => {
     const tabs = document.querySelector('.flex.border-b.border-gray-200.mb-8');
     if (tabs) {
-        tabs.scrollIntoView({ behavior: 'smooth' });
+      tabs.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -153,11 +153,10 @@ const ProductInfo = ({ product }) => {
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`relative w-10 h-10 rounded-full border-2 transition-all ${
-                  selectedColor === color
+                className={`relative w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color
                     ? 'border-primary ring-2 ring-primary/30'
                     : 'border-transparent hover:border-gray-300'
-                }`}
+                  }`}
                 style={{ backgroundColor: color }}
                 title={color}
               />
@@ -175,11 +174,10 @@ const ProductInfo = ({ product }) => {
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-                  selectedSize === size
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedSize === size
                     ? 'border-primary bg-primary text-white'
                     : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
-                }`}
+                  }`}
               >
                 {size}
               </button>
@@ -214,47 +212,45 @@ const ProductInfo = ({ product }) => {
         </div>
 
         <div className="flex flex-col gap-3">
-            <button
-                onClick={handleBuyNow}
-                disabled={isOutOfStock}
-                className="w-full py-4 rounded-xl text-base font-bold bg-primary text-white hover:bg-primary-dark transition-all duration-200"
-            >
-                Buy Now
-            </button>
-            <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || isAddingToCart}
-                className={`w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-3 transition-all duration-200 ${
-                    isOutOfStock
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : addSuccess
-                    ? 'bg-green-500 text-white'
-                    : 'bg-accent text-primary-950 hover:bg-accent-dark'
-                }`}
-            >
-                {isAddingToCart ? (
-                    <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-                ) : addSuccess ? (
-                    <>
-                        <FiCheck className="w-5 h-5" />
-                        <span>Added to Cart ✓</span>
-                    </>
-                ) : (
-                    <>
-                        <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
-                    </>
-                )}
-            </button>
+          <button
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            className="w-full py-4 rounded-xl text-base font-bold bg-primary text-white hover:bg-primary-dark transition-all duration-200"
+          >
+            Buy Now
+          </button>
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isAddingToCart}
+            className={`w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-3 transition-all duration-200 ${isOutOfStock
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : addSuccess
+                  ? 'bg-green-500 text-white'
+                  : 'bg-accent text-primary-950 hover:bg-accent-dark'
+              }`}
+          >
+            {isAddingToCart ? (
+              <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+            ) : addSuccess ? (
+              <>
+                <FiCheck className="w-5 h-5" />
+                <span>Added to Cart ✓</span>
+              </>
+            ) : (
+              <>
+                <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
+              </>
+            )}
+          </button>
         </div>
 
         <button
           onClick={handleWishlistToggle}
           disabled={isWishlistLoading}
-          className={`flex items-center justify-center gap-2 text-sm font-semibold transition-all duration-200 ${
-            isWishlisted
+          className={`flex items-center justify-center gap-2 text-sm font-semibold transition-all duration-200 ${isWishlisted
               ? 'text-primary'
               : 'text-gray-500 hover:text-primary'
-          }`}
+            }`}
         >
           {isWishlistLoading ? (
             <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />

@@ -6,7 +6,7 @@ import useBrands from '../../home/hooks/useBrands.js';
 
 export default function FiltersSidebar({ filters, setFilter, clearFilters, hasActiveFilters, isMobile = false }) {
     const { categories } = useCategories();
-    const { brands } = useBrands();
+    const { originalBrands: brands } = useBrands();
 
     const [openSections, setOpenSections] = useState({
         category: true,

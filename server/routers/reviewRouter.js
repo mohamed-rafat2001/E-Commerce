@@ -16,6 +16,8 @@ const router = express.Router();
  *   description: Product and Seller reviews management API
  */
 
+router.get("/:id", getSingleReview);
+
 //  add protect to all routes
 router.use(Protect);
 
@@ -106,7 +108,6 @@ router
   .route("/:id")
   .post(addReview)
   .patch(updateReview)
-  .delete(deleteReview)
-  .get(getSingleReview);
+  .delete(deleteReview);
 
 export default router;

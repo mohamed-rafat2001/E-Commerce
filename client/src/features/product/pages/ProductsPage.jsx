@@ -57,7 +57,7 @@ export default function ProductsPage() {
 						<p className="text-sm text-gray-500">Showing <span className="font-semibold text-gray-900">{totalCount}</span> products</p>
 					</div>
 				</div>
-			</div>
+			</div >
 
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
 				<div className="flex gap-8">
@@ -171,6 +171,6 @@ export default function ProductsPage() {
 					</>
 				)}
 			</AnimatePresence>
-		</div>
+		</div >
 	);
 }

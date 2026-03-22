@@ -24,13 +24,7 @@ const HomePage = () => {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-white">
-			{/* 1. Announcement Bar (Top-most) */}
-			<AnnouncementBar />
-
-			{/* 2. Sticky Navbar */}
-			<Header />
-
+		<>
 			<main>
 				{/* 3. Hero Section */}
 				<HeroSection />
@@ -68,10 +62,7 @@ const HomePage = () => {
 				{/* 14. Newsletter Section */}
 				<NewsletterSection />
 			</main>
-
-			{/* 15. Footer Section */}
-			<FooterSection />
-		</div>
+		</>
 	);
 };
 

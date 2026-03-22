@@ -4,7 +4,7 @@ import useBrands from '../../home/hooks/useBrands.js';
 
 export default function SortBar({ totalCount, filters, setFilter, clearFilters, onMobileFilterClick }) {
     const { categories } = useCategories();
-    const { brands } = useBrands();
+    const { originalBrands: brands } = useBrands();
 
     const activeFilters = [];
     if (filters.category) {
@@ -46,6 +46,7 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
         { value: '-ratingAverage', label: 'Best Rated' },
         { value: '-sold', label: 'Most Popular' },
     ];
+
 
     return (
         <div className="w-full">
