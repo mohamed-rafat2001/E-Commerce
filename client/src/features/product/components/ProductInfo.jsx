@@ -21,6 +21,7 @@ import useAddToCart from '../../cart/hooks/useAddToCart.js';
 import useAddToWishlist from '../../wishList/hooks/useAddToWishlist.js';
 import useWishlist from '../../wishList/hooks/useWishlist.js';
 import useDeleteFromWishlist from '../../wishList/hooks/useDeleteFromWishlist.js';
+import useProductReviews from '../hooks/useProductReviews.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProductInfo = ({
