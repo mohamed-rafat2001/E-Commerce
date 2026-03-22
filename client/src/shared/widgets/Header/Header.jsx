@@ -9,9 +9,12 @@ import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
 import CartDropdown from './CartDropdown.jsx';
 import WishlistDropdown from './WishlistDropdown.jsx';
+import NavLinks from './NavLinks.jsx';
 import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
 import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
 import useAddToCart from '../../../features/cart/hooks/useAddToCart.js';
+import useCategories from '../../../features/home/hooks/useCategories.js';
+import useBrands from '../../../features/home/hooks/useBrands.js';
 import toast from 'react-hot-toast';
 import {
 	NotificationIcon,
@@ -40,6 +43,8 @@ const Header = ({ isPanel = false }) => {
 	const { deleteFromCart } = useDeleteFromCart();
 	const { deleteFromWishlist } = useDeleteFromWishlist();
 	const { addToCart } = useAddToCart();
+	const { categories } = useCategories();
+	const { brands } = useBrands();
 
 	const { cart, cartItemCount, cartTotal } = useCart();
 	const cartItems = cart?.items || [];
@@ -125,9 +130,16 @@ const Header = ({ isPanel = false }) => {
 							</Link>
 						)}
 
+						{/* Desktop Navigation Links */}
+						{!isPanel && (
+							<div className="hidden lg:flex flex-1 justify-center px-4">
+								<NavLinks categories={categories} brands={brands} />
+							</div>
+						)}
+
 						{/* Search Bar (hidden on mobile and in panel) */}
 						{!isPanel && (
-							<div className="hidden md:flex flex-1 max-w-md mx-8">
+							<div className="hidden xl:flex flex-1 max-w-xs mx-4">
 								<div className="relative w-full">
 									<input
 										type="text"
@@ -261,6 +273,13 @@ const Header = ({ isPanel = false }) => {
 											<ChevronRightIcon className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-90' : ''}`} />
 										</button>
 
+										{/* Mobile Nav Trigger inside User Actions */}
+										{!isPanel && (
+											<div className="lg:hidden ml-2 border-l pl-2 border-gray-100">
+												<NavLinks categories={categories} brands={brands} />
+											</div>
+										)}
+
 										{/* Dropdown Menu */}
 										<AnimatePresence>
 											{isDropdownOpen && (
@@ -332,6 +351,12 @@ const Header = ({ isPanel = false }) => {
 										</Link>
 									</div>
 								)
+							)}
+							{/* Mobile Nav if not authenticated */}
+							{!isAuthenticated && !isPanel && (
+								<div className="lg:hidden ml-2 border-l pl-2 border-gray-100">
+									<NavLinks categories={categories} brands={brands} />
+								</div>
 							)}
 						</div>
 					</div>
