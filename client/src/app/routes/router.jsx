@@ -8,7 +8,8 @@ import PublicLayout from "../../shared/layout/PublicLayout.jsx";
 // Pages - Public
 import { HomePage } from "../../features/home/pages/index.js";
 import { LoginPage, RegisterPage } from "../../features/auth/pages/index.js";
-import { PublicCartPage, PublicWishlistPage } from "../../features/public/pages/index.js";
+import { PublicWishlistPage } from "../../features/public/pages/index.js";
+import { CartPage } from "../../features/cart/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
 import {
@@ -37,7 +38,6 @@ import {
 	ShippingAddressesPage,
 	PaymentMethodsPage,
 	OrderHistoryPage,
-	CartPage,
 	WishlistPage
 } from "../../features/customer/pages/index.js";
 
@@ -59,7 +59,8 @@ const router = createBrowserRouter([
 			{ path: "/", element: <HomePage /> },
 			{ path: "/login", element: <LoginPage /> },
 			{ path: "/register", element: <RegisterPage /> },
-			{ path: "/public-cart", element: <PublicCartPage /> },
+			{ path: "/cart", element: <CartPage /> },
+			{ path: "/public-cart", element: <CartPage /> },
 			{ path: "/public-wishlist", element: <PublicWishlistPage /> },
 			{ path: "/products", element: <ProductsPage /> },
 			{ path: "/products/:id", element: <ProductDetailPage /> },
