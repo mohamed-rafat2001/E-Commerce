@@ -12,30 +12,28 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
         if (cat) activeFilters.push({ key: 'category', label: `Category: ${cat.name}` });
     }
     if (filters.search) activeFilters.push({ key: 'search', label: `Search: "${filters.search}"` });
-    if (filters.minPrice || filters.maxPrice) {
-        const min = filters.minPrice ? `$${filters.minPrice}` : '$0';
-        const max = filters.maxPrice ? `$${filters.maxPrice}` : 'Any';
+    if (filters['price[gte]'] || filters['price[lte]']) {
+        const min = filters['price[gte]'] ? `$${filters['price[gte]']}` : '$0';
+        const max = filters['price[lte]'] ? `$${filters['price[lte]']}` : 'Any';
         activeFilters.push({ key: 'price', label: `Price: ${min} - ${max}` });
     }
-    if (filters.brand) {
-        filters.brand.split(',').forEach(brandId => {
+    if (filters.brandId) {
+        filters.brandId.split(',').forEach(brandId => {
             const brand = brands?.find(b => b._id === brandId);
             if (brand) activeFilters.push({ key: `brand-${brandId}`, label: `Brand: ${brand.name}`, type: 'brand', val: brandId });
         });
     }
-    if (filters.rating) activeFilters.push({ key: 'rating', label: `Rating: ${filters.rating}+ Stars` });
+    if (filters['ratingAverage[gte]']) activeFilters.push({ key: 'ratingAverage[gte]', label: `Rating: ${filters['ratingAverage[gte]']}+ Stars` });
     if (filters.inStock) activeFilters.push({ key: 'inStock', label: 'In Stock Only' });
 
     const handleRemoveFilter = (filterObj) => {
         if (filterObj.type === 'brand') {
-            const currentBrands = filters.brand.split(',');
+            const currentBrands = filters.brandId.split(',');
             const newBrands = currentBrands.filter(id => id !== filterObj.val);
             setFilter('brandId', newBrands.join(','));
         } else if (filterObj.key === 'price') {
             setFilter('price[gte]', '');
             setFilter('price[lte]', '');
-        } else if (filterObj.key === 'rating') {
-            setFilter('ratingAverage[gte]', '');
         } else {
             setFilter(filterObj.key, '');
         }
