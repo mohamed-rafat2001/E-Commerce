@@ -46,7 +46,7 @@ export default function ProductsPage() {
 				<div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
 					<div>
 						<h1 className="text-3xl md:text-4xl font-bold text-gray-900 font-display mt-1">
-							Latest Collection
+							Collection
 						</h1>
 						<p className="text-gray-500 text-sm mt-1">
 							Explore our hand-picked collection

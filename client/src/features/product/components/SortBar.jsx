@@ -77,7 +77,7 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
             {/* Sort + Results Bar */}
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
                 <div className="hidden lg:block">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-400">
                         Showing <span className="font-semibold text-gray-900">{totalCount}</span> results
                     </p>
                 </div>
@@ -102,7 +102,7 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                             <select
                                 value={filters.sort}
                                 onChange={(e) => setFilter('sort', e.target.value)}
-                                className="appearance-none flex items-center gap-2 px-4 py-2 pr-10 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 cursor-pointer hover:border-primary focus:border-primary focus:ring-0 transition-all duration-150 outline-none"
+                                className="appearance-none flex items-center gap-2 px-4 py-2 pr-10 rounded-xl border border-gray-100 bg-white text-sm font-medium text-gray-700 cursor-pointer hover:border-gray-300 focus:border-primary focus:ring-0 transition-all duration-150 outline-none"
                             >
                                 {sortOptions.map(opt => (
                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
