@@ -84,7 +84,7 @@ const CartDropdown = ({ items = [], total = 0, isLoading, viewAllPath, onRemove 
 					</div>
 					<Link to={viewAllPath} className="block">
 						<Button fullWidth size="sm" icon={<FiArrowRight />} iconPosition="right">
-							View All Products
+							View Full Cart
 						</Button>
 					</Link>
 				</div>

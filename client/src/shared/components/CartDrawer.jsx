@@ -111,7 +111,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                                     <Button
                                         onClick={() => {
                                             onClose();
-                                            navigate('/customer/cart');
+                                            navigate(isAuthenticated ? '/customer/cart' : '/cart');
                                         }}
                                         variant="outline"
                                         size="lg"

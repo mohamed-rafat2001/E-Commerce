@@ -95,7 +95,7 @@ const Header = ({ isPanel = false }) => {
 		setIsDropdownOpen(false);
 	};
 
-	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/public-cart";
+	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/cart";
 	const wishlistViewAllPath = isAuthenticated ? "/customer/wishlist" : "/public-wishlist";
 
 	return (
