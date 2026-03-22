@@ -67,9 +67,13 @@ const FlashSaleSection = () => {
                             }}
                             className="flash-sale-slider !overflow-visible"
                         >
-                            {products.map((product) => (
-                                <div key={product._id} className="pb-8">
-                                    <PublicProductCard product={product} />
+                            {products.map((product, index) => (
+                                <div key={product._id} className="pb-8 h-full">
+                                    <FlashSaleCard
+                                        product={product}
+                                        index={index}
+                                        onAddToCart={() => { }} // Placeholder for now or connect to useCart
+                                    />
                                 </div>
                             ))}
                         </Slider>

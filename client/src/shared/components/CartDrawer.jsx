@@ -123,6 +123,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                                         variant="primary"
                                         size="lg"
                                         fullWidth
+                                        className="!bg-gray-900 !text-white !border-gray-900 !rounded-full !py-4 uppercase font-black tracking-widest text-xs shadow-xl active:scale-95"
                                     >
                                         Checkout
                                     </Button>

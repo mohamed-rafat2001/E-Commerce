@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
-import { Header } from '../../../shared/widgets/Header';
 import {
-	AnnouncementBar,
 	HeroSection,
 	FeaturesStrip,
 	BrandsSection,
@@ -13,8 +11,7 @@ import {
 	TestimonialsSection,
 	StatsSection,
 	SellerCtaBanner,
-	NewsletterSection,
-	FooterSection
+	NewsletterSection
 } from '../components';
 
 const HomePage = () => {
@@ -24,13 +21,7 @@ const HomePage = () => {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-white">
-			{/* 1. Announcement Bar (Top-most) */}
-			<AnnouncementBar />
-
-			{/* 2. Sticky Navbar */}
-			<Header />
-
+		<>
 			<main>
 				{/* 3. Hero Section */}
 				<HeroSection />
@@ -68,10 +59,7 @@ const HomePage = () => {
 				{/* 14. Newsletter Section */}
 				<NewsletterSection />
 			</main>
-
-			{/* 15. Footer Section */}
-			<FooterSection />
-		</div>
+		</>
 	);
 };
 

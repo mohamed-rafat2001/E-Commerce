@@ -6,7 +6,7 @@ import { getFunc } from '../../../shared/services/handlerFactory';
  * Hook to fetch brands with infinite scroll duplication
  */
 const useBrands = () => {
-    const { data: response, error } = useQuery({
+    const { data: response, isLoading, error } = useQuery({
         queryKey: ['home-brands'],
         queryFn: () => getFunc('brands/public'), // Use public endpoint
         staleTime: 60 * 60 * 1000,
@@ -25,6 +25,7 @@ const useBrands = () => {
     return {
         brands: duplicatedBrands,
         originalBrands: rawBrands,
+        isLoading,
         error
     };
 };

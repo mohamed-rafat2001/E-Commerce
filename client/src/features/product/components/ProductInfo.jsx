@@ -46,16 +46,16 @@ const ProductInfo = ({ product }) => {
 
   const handleAddToCart = () => {
     if (!isOutOfStock) {
-        addToCart(product, quantity);
-        setAddSuccess(true);
-        setTimeout(() => setAddSuccess(false), 2000);
+      addToCart(product, quantity);
+      setAddSuccess(true);
+      setTimeout(() => setAddSuccess(false), 2000);
     }
   };
 
   const handleBuyNow = () => {
     if (!isOutOfStock) {
-        addToCart(product, quantity);
-        navigate('/cart');
+      addToCart(product, quantity);
+      navigate('/cart');
     }
   };
 
@@ -77,87 +77,72 @@ const ProductInfo = ({ product }) => {
   const scrollToReviews = () => {
     const tabs = document.querySelector('.flex.border-b.border-gray-200.mb-8');
     if (tabs) {
-        tabs.scrollIntoView({ behavior: 'smooth' });
+      tabs.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      {/* Brand + Category */}
-      <div className="text-sm text-gray-400 mb-1 flex items-center gap-2">
-        <span className="hover:text-primary transition-colors cursor-pointer">{product.brandId?.name || 'Brand'}</span>
-        <span className="text-gray-300">·</span>
-        <span className="hover:text-primary transition-colors cursor-pointer">{product.primaryCategory?.name || 'Category'}</span>
+    <div className="flex flex-col h-full bg-white font-sans">
+      {/* Brand & Badges */}
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <span className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">
+          {product.brand?.name || 'Exclusive Design'}
+        </span>
+        <div className="flex items-center gap-2">
+          {hasDiscount && (
+            <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
+              -{discountPercent}%
+            </span>
+          )}
+          {isOutOfStock && (
+            <span className="bg-gray-900 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
+              Out of Stock
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Product Name */}
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-display leading-tight mt-1">
+      {/* Title */}
+      <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4 leading-tight">
         {product.name}
       </h1>
 
-      {/* Rating Row */}
-      <div className="flex items-center gap-3 mt-3">
-        <div className="flex items-center text-yellow-400 text-lg">
-          {[...Array(5)].map((_, i) => (
-            <FiStar key={i} className={`w-4 h-4 ${i < Math.round(averageRating || product.ratingAverage || 5) ? 'fill-current' : 'text-gray-200 fill-gray-100'}`} />
-          ))}
-        </div>
-        <span className="text-sm font-bold text-gray-800">{averageRating || product.ratingAverage || '5.0'}</span>
-        <button
-          onClick={scrollToReviews}
-          className="text-sm text-gray-400 underline hover:text-primary transition-colors"
-        >
-          ({totalCount || product.ratingCount || 0} reviews)
+      {/* Rating & Short Info */}
+      <div className="flex items-center gap-6 mb-8">
+        <button onClick={scrollToReviews} className="flex items-center gap-1.5 group">
+          <div className="flex items-center text-amber-500">
+            <FiStar className="w-4 h-4 fill-current" />
+            <span className="text-lg font-black text-gray-900 ml-1.5">{averageRating || product.ratingAverage || '4.8'}</span>
+          </div>
+          <span className="text-sm text-gray-400 font-medium group-hover:text-gray-900 transition-colors">
+            ({totalCount || 0} Reviews)
+          </span>
         </button>
+        <div className="h-4 w-px bg-gray-200" />
+        <span className="text-sm text-emerald-600 font-bold uppercase tracking-widest">In Stock ({product.countInStock})</span>
       </div>
 
       {/* Price Section */}
-      <div className="mt-6">
-        {hasDiscount ? (
-          <div className="flex items-center flex-wrap">
-            <span className="text-3xl font-bold text-primary">${price.toFixed(2)}</span>
-            <span className="text-lg text-gray-400 line-through ml-3">${oldPrice.toFixed(2)}</span>
-            <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-lg ml-3">-{discountPercent}%</span>
-          </div>
-        ) : (
-          <span className="text-3xl font-bold text-gray-900">${price.toFixed(2)}</span>
-        )}
-      </div>
-
-      {/* Stock Indicator */}
-      <div className="mt-4 flex items-center gap-2 text-sm">
-        {isOutOfStock ? (
-          <div className="flex items-center gap-2 text-red-500">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="font-medium">Out of Stock</span>
-          </div>
-        ) : product.countInStock <= 5 ? (
-          <div className="flex items-center gap-2 text-orange-500">
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-            <span className="font-medium">Only {product.countInStock} left in stock!</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-green-500">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="font-medium">In Stock</span>
-          </div>
+      <div className="flex items-baseline gap-4 mb-10">
+        <span className="text-4xl font-black text-gray-900 tracking-tighter">${price.toFixed(0)}</span>
+        {hasDiscount && (
+          <span className="text-xl text-gray-300 line-through font-medium">${oldPrice.toFixed(0)}</span>
         )}
       </div>
 
       {/* Color Variants */}
       {product.colors?.length > 0 && (
-        <div className="mt-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Select Finish</p>
+        <div className="mb-8">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Select Finish</p>
           <div className="flex flex-wrap gap-3">
             {product.colors.map(color => (
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`relative w-10 h-10 rounded-full border-2 transition-all ${
-                  selectedColor === color
-                    ? 'border-primary ring-2 ring-primary/30'
-                    : 'border-transparent hover:border-gray-300'
-                }`}
+                className={`relative w-8 h-8 rounded-full border transition-all ${selectedColor === color
+                  ? 'ring-2 ring-offset-2 ring-gray-900 border-gray-900 scale-110'
+                  : 'border-transparent hover:scale-105'
+                  }`}
                 style={{ backgroundColor: color }}
                 title={color}
               />
@@ -168,18 +153,17 @@ const ProductInfo = ({ product }) => {
 
       {/* Size Variants */}
       {product.sizes?.length > 0 && (
-        <div className="mt-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Select Size</p>
-          <div className="flex flex-wrap gap-3">
+        <div className="mb-8">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Select Size</p>
+          <div className="flex flex-wrap gap-2.5">
             {product.sizes.map(size => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-                  selectedSize === size
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
-                }`}
+                className={`px-6 py-2.5 rounded-full border text-[11px] font-black uppercase tracking-widest transition-all ${selectedSize === size
+                  ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                  : 'border-gray-200 text-gray-500 hover:border-gray-900 hover:text-gray-900'
+                  }`}
               >
                 {size}
               </button>
@@ -188,105 +172,106 @@ const ProductInfo = ({ product }) => {
         </div>
       )}
 
-      {/* Quantity + Add to Cart */}
-      <div className="mt-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-gray-500">Quantity</span>
-          <div className="flex items-center w-fit bg-gray-100 rounded-lg p-1">
+      {/* Call to Actions */}
+      <div className="mt-auto space-y-4">
+        <div className="flex gap-4">
+          <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
             <button
               onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
               disabled={quantity <= 1 || isOutOfStock}
-              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary transition-all disabled:opacity-50"
+              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-900 disabled:opacity-30 transition-all"
             >
-              <FiMinus className="w-3.5 h-3.5" />
+              <FiMinus className="w-4 h-4" />
             </button>
-            <div className="w-10 text-center text-sm font-bold text-gray-900">
-              {quantity}
-            </div>
+            <span className="w-10 text-center text-sm font-black text-gray-900">{quantity.toString().padStart(2, '0')}</span>
             <button
               onClick={() => setQuantity(prev => Math.min(product.countInStock || 10, prev + 1))}
               disabled={quantity >= (product.countInStock || 10) || isOutOfStock}
-              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary transition-all disabled:opacity-50"
+              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-900 disabled:opacity-30 transition-all"
             >
-              <FiPlus className="w-3.5 h-3.5" />
+              <FiPlus className="w-4 h-4" />
             </button>
           </div>
+
+          <button
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            className="flex-1 py-4 bg-gray-900 text-white rounded-full text-sm font-black uppercase tracking-widest hover:bg-black transition-all active:scale-[0.98] shadow-2xl shadow-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Buy Now
+          </button>
         </div>
 
-        <div className="flex flex-col gap-3">
-            <button
-                onClick={handleBuyNow}
-                disabled={isOutOfStock}
-                className="w-full py-4 rounded-xl text-base font-bold bg-primary text-white hover:bg-primary-dark transition-all duration-200"
-            >
-                Buy Now
-            </button>
-            <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || isAddingToCart}
-                className={`w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-3 transition-all duration-200 ${
-                    isOutOfStock
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : addSuccess
-                    ? 'bg-green-500 text-white'
-                    : 'bg-accent text-primary-950 hover:bg-accent-dark'
-                }`}
-            >
-                {isAddingToCart ? (
-                    <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-                ) : addSuccess ? (
-                    <>
-                        <FiCheck className="w-5 h-5" />
-                        <span>Added to Cart ✓</span>
-                    </>
-                ) : (
-                    <>
-                        <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
-                    </>
-                )}
-            </button>
-        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isAddingToCart}
+            className={`flex-1 py-4 border-2 rounded-full text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${addSuccess
+                ? 'bg-emerald-500 border-emerald-500 text-white'
+                : 'border-gray-100 bg-white text-gray-900 hover:border-gray-900'
+              }`}
+          >
+            {isAddingToCart ? (
+              <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+            ) : addSuccess ? (
+              <><FiCheck className="w-5 h-5" /> Added to Cart</>
+            ) : (
+              <><FiShoppingBag className="w-5 h-5" /> Add to Cart</>
+            )}
+          </button>
 
-        <button
-          onClick={handleWishlistToggle}
-          disabled={isWishlistLoading}
-          className={`flex items-center justify-center gap-2 text-sm font-semibold transition-all duration-200 ${
-            isWishlisted
-              ? 'text-primary'
-              : 'text-gray-500 hover:text-primary'
-          }`}
-        >
-          {isWishlistLoading ? (
-            <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-          ) : (
-            <>
-              <FiHeart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-              {isWishlisted ? 'Saved to Wishlist' : 'Save to Wishlist'}
-            </>
-          )}
-        </button>
-      </div>
+          <button
+            onClick={handleWishlistToggle}
+            className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-all ${isWishlisted
+                ? 'bg-rose-50 border-rose-100 text-rose-500'
+                : 'border-gray-100 text-gray-300 hover:border-rose-100 hover:text-rose-500'
+              }`}
+          >
+            <FiHeart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+          </button>
 
-      {/* Delivery Info Strip */}
-      <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-gray-100 pt-6">
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-gray-600">
-          <FiTruck className="w-4 h-4" />
-          <span>Free Shipping</span>
-        </div>
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-gray-600">
-          <FiShield className="w-4 h-4" />
-          <span>2 Year Warranty</span>
+          <button
+            onClick={handleCopyLink}
+            className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-all ${copied
+                ? 'bg-blue-50 border-blue-100 text-blue-500'
+                : 'border-gray-100 text-gray-300 hover:border-blue-100 hover:text-blue-500'
+              }`}
+          >
+            <FiShare2 className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
-      {/* Share Button */}
-      <button
-        onClick={handleCopyLink}
-        className="mt-6 flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors w-fit group"
-      >
-        <FiShare2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-        {copied ? 'Link copied!' : 'Share this product'}
-      </button>
+      {/* Trust Badges */}
+      <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-gray-50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900">
+            <FiTruck className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-900">Fast Shipping</p>
+            <p className="text-[10px] text-gray-400 font-medium">Free over $500</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900">
+            <FiRefreshCw className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-900">30-Day Return</p>
+            <p className="text-[10px] text-gray-400 font-medium">Hassle-free service</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900">
+            <FiShield className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-900">Secure Payment</p>
+            <p className="text-[10px] text-gray-400 font-medium">Certified safety</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
