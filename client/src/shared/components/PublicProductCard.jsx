@@ -57,7 +57,7 @@ const PublicProductCard = ({ product }) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Image Area */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6 font-sans">
                 <Link to={`/products/${productId}`} className="block w-full h-full">
                     <div className="w-full h-full transform group-hover:scale-110 transition-transform duration-700 ease-out">
                         <ProductCardGallery
