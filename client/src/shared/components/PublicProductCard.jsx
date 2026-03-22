@@ -115,9 +115,9 @@ const PublicProductCard = ({ product }) => {
                 <div className="mt-4">
                     <AddToCartButton
                         product={product}
-                        variant="primary"
+                        variant="accent"
                         fullWidth
-                        className="py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+                        className="py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                     />
                 </div>
             </div>

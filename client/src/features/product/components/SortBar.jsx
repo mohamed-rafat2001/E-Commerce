@@ -50,7 +50,6 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
     ];
 
     const currentSortLabel = sortOptions.find(opt => opt.value === filters.sort)?.label || 'Sort By';
-
     return (
         <div className="w-full">
             {/* Active Filters Row */}
@@ -65,7 +64,7 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                         </div>
                     ))}
                     {activeFilters.length >= 2 && (
-                        <button 
+                        <button
                             onClick={clearFilters}
                             className="text-sm text-red-500 hover:text-red-600 font-medium ml-auto flex-shrink-0"
                         >
@@ -82,13 +81,13 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                         Showing <span className="font-semibold text-gray-900">{totalCount}</span> results
                     </p>
                 </div>
-                
+
                 <div className="flex items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
                     <button
                         onClick={onMobileFilterClick}
                         className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-primary transition-all duration-150"
                     >
-                        <FiFilter /> 
+                        <FiFilter />
                         Filters
                         {activeFilters.length > 0 && (
                             <span className="flex items-center justify-center w-5 h-5 bg-primary text-white text-[10px] rounded-full">

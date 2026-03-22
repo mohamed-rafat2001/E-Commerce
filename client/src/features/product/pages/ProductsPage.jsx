@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner, Pagination, EmptyState, Button } from '../../../shared/ui/index.js';
 import { PublicProductCard, PublicProductCardSkeleton } from '../../../shared/index.js';
@@ -38,11 +39,10 @@ export default function ProductsPage() {
 			{/* Page Header */}
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-10">
 				<nav className="flex items-center text-sm text-gray-400 mb-1 whitespace-nowrap overflow-x-auto no-scrollbar">
-					<a href="/" className="hover:text-primary transition-colors">Home</a>
+					<Link to="/" className="hover:text-primary transition-colors">Home</Link>
 					<span className="mx-2 text-gray-300">/</span>
 					<span className="text-gray-700 font-medium">Products</span>
 				</nav>
-				
 				<div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
 					<div>
 						<h1 className="text-3xl md:text-4xl font-bold text-gray-900 font-display mt-1">
@@ -56,7 +56,7 @@ export default function ProductsPage() {
 						<p className="text-sm text-gray-500">Showing <span className="font-semibold text-gray-900">{totalCount}</span> products</p>
 					</div>
 				</div>
-			</div>
+			</div >
 
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
 				<div className="flex gap-8">
@@ -142,7 +142,7 @@ export default function ProductsPage() {
 						>
 							<div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
 								<h3 className="text-lg font-bold text-gray-900">Filters</h3>
-								<button 
+								<button
 									onClick={() => setIsMobileFiltersOpen(false)}
 									className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-900"
 								>
@@ -170,6 +170,6 @@ export default function ProductsPage() {
 					</>
 				)}
 			</AnimatePresence>
-		</div>
+		</div >
 	);
 }

@@ -96,8 +96,8 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                 onWheel={(e) => e.target.blur()}
                             />
                         </div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="w-full mt-3 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all duration-150"
                         >
                             Apply Range
