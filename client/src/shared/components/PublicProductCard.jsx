@@ -59,7 +59,7 @@ const PublicProductCard = ({ product }) => {
             {/* Image Area */}
             <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6">
                 <Link to={`/products/${productId}`} className="block w-full h-full">
-                    <div className="w-full h-full transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                    <div data-card-image className="w-full h-full transform group-hover:scale-110 transition-transform duration-700 ease-out will-change-transform">
                         <ProductCardGallery
                             images={allImages}
                             productName={product.name}

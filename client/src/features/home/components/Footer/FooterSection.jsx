@@ -1,10 +1,61 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin } from 'react-icons/fi';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion } from '../../../../utils/animations.js';
 
 const FooterSection = () => {
+    const footerRef = useRef(null);
+    const linksRef = useRef(null);
+
+    useGSAP(() => {
+        if (prefersReducedMotion()) return;
+        gsap.registerPlugin(ScrollTrigger);
+
+        const ctx = gsap.context(() => {
+            gsap.fromTo(
+                footerRef.current,
+                { opacity: 0, y: 40 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: footerRef.current,
+                        start: 'top 90%',
+                    },
+                }
+            );
+
+            const staggerLinks = linksRef.current?.querySelectorAll('a');
+            if (staggerLinks && staggerLinks.length) {
+                gsap.fromTo(
+                    staggerLinks,
+                    { opacity: 0, y: 10 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6,
+                        ease: 'power2.out',
+                        stagger: 0.05,
+                        delay: 0.3,
+                        scrollTrigger: {
+                            trigger: footerRef.current,
+                            start: 'top 90%',
+                        },
+                    }
+                );
+            }
+        }, footerRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <footer className="bg-gray-900 pt-24 pb-12 text-white overflow-hidden border-t border-white/5">
+        <footer ref={footerRef} className="bg-gray-900 pt-24 pb-12 text-white overflow-hidden border-t border-white/5">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-16 mb-20">
                     <div className="md:col-span-2">
@@ -39,7 +90,7 @@ const FooterSection = () => {
                             links: ['Terms of Service', 'Privacy Policy', 'Cookie Policy', 'Accessibility'],
                         },
                     ].map((section) => (
-                        <div key={section.title}>
+                        <div key={section.title} ref={section.title === 'Legals' ? linksRef : null}>
                             <h4 className="font-black mb-8 uppercase tracking-widest text-xs text-white/50">{section.title}</h4>
                             <ul className="space-y-4">
                                 {section.links.map((link) => (

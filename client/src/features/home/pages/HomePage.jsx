@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
 	HeroSection,
 	FeaturesStrip,
@@ -15,10 +15,7 @@ import {
 } from '../components';
 
 const HomePage = () => {
-	useEffect(() => {
-		// Ensure we start at top on load
-		window.scrollTo(0, 0);
-	}, []);
+    
 
 	return (
 		<>
