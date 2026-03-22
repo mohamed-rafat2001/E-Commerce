@@ -52,7 +52,7 @@ const PublicProductCard = ({ product }) => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="group bg-white rounded-2xl border border-gray-100 hover:border-primary/20 group-hover:shadow-2xl group-hover:shadow-primary/10 transition-all duration-300 flex flex-col h-full overflow-hidden"
+            className="group bg-white rounded-2xl border border-gray-100 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex flex-col h-full overflow-hidden"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -87,7 +87,7 @@ const PublicProductCard = ({ product }) => {
             <div className="p-4 flex flex-col flex-1">
                 {/* Category + Rating */}
                 <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-[120px]">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate max-w-[120px]">
                         {product.primaryCategory?.name || product.category?.name || 'Uncategorized'}
                     </span>
                     <div className="flex items-center gap-1">
@@ -98,7 +98,7 @@ const PublicProductCard = ({ product }) => {
 
                 {/* Name */}
                 <Link to={`/products/${productId}`}>
-                    <h3 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2 h-10 group-hover:text-primary transition-colors">
+                    <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 h-10 group-hover:text-primary transition-colors">
                         {product.name}
                     </h3>
                 </Link>

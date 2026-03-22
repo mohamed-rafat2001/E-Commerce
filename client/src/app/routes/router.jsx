@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 
 // Layouts
 import DashboardLayout from "../../layouts/DashboardLayout.jsx";
+import PublicLayout from "../../shared/layout/PublicLayout.jsx";
 
 // Pages - Public
 import { HomePage } from "../../features/home/pages/index.js";
@@ -52,14 +53,18 @@ import PageNotFound from "../../shared/ui/PageNotFound.jsx";
 // Create app routing
 const router = createBrowserRouter([
 	// Public Routes
-	{ path: "/", element: <HomePage /> },
-	{ path: "/login", element: <LoginPage /> },
-	{ path: "/register", element: <RegisterPage /> },
-	{ path: "/public-cart", element: <PublicCartPage /> },
-	{ path: "/public-wishlist", element: <PublicWishlistPage /> },
-	{ path: "/products", element: <ProductsPage /> },
-	{ path: "/products/:id", element: <ProductDetailPage /> },
-
+	{
+		element: <PublicLayout />,
+		children: [
+			{ path: "/", element: <HomePage /> },
+			{ path: "/login", element: <LoginPage /> },
+			{ path: "/register", element: <RegisterPage /> },
+			{ path: "/public-cart", element: <PublicCartPage /> },
+			{ path: "/public-wishlist", element: <PublicWishlistPage /> },
+			{ path: "/products", element: <ProductsPage /> },
+			{ path: "/products/:id", element: <ProductDetailPage /> },
+		]
+	},
 	// Admin Routes
 	{
 		element: <ProtectedRoute allowedRoles={["Admin"]} />,

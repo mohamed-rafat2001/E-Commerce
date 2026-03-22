@@ -46,8 +46,8 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
         <div className={sidebarClass}>
             {!isMobile && (
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <FiFilter /> FILTER
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                        <FiFilter /> Filters
                     </h3>
                 </div>
             )}

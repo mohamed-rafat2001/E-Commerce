@@ -40,13 +40,14 @@ export default function ProductsPage() {
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-10">
 				<nav className="flex items-center text-sm text-gray-400 mb-1 whitespace-nowrap overflow-x-auto no-scrollbar">
 					<Link to="/" className="hover:text-primary transition-colors">Home</Link>
-					<span className="mx-2 text-gray-300">/</span>
+					<span className="mx-2 text-gray-300">{'>'}</span>
 					<span className="text-gray-700 font-medium">Products</span>
 				</nav>
+
 				<div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
 					<div>
 						<h1 className="text-3xl md:text-4xl font-bold text-gray-900 font-display mt-1">
-							Collection
+							Latest Collection
 						</h1>
 						<p className="text-gray-500 text-sm mt-1">
 							Explore our hand-picked collection
