@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner, Pagination, EmptyState, Button } from '../../../shared/ui/index.js';
 import { PublicProductCard, PublicProductCardSkeleton } from '../../../shared/index.js';
-import { FiSearch, FiFrown, FiFilter, FiX } from 'react-icons/fi';
+import { FiSearch, FiFrown, FiFilter, FiX, FiChevronDown } from 'react-icons/fi';
 import useProductsPage from '../hooks/useProductsPage.js';
 import FiltersSidebar from '../components/FiltersSidebar.jsx';
 import SortBar from '../components/SortBar.jsx';
@@ -37,32 +37,42 @@ export default function ProductsPage() {
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Page Header */}
-			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-10">
-				<nav className="flex items-center text-sm text-gray-400 mb-1 whitespace-nowrap overflow-x-auto no-scrollbar">
-					<Link to="/" className="hover:text-primary transition-colors">Home</Link>
-					<span className="mx-2 text-gray-300">{'>'}</span>
-					<span className="text-gray-700 font-medium">Products</span>
-				</nav>
-
-				<div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-					<div>
-						<h1 className="text-3xl md:text-4xl font-bold text-gray-900 font-display mt-1">
-							Latest Collection
+			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-12 md:pt-20">
+				<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-10">
+					<div className="flex flex-col gap-2">
+						<span className="text-xs font-black text-primary uppercase tracking-[0.3em]">
+							Curated Collection
+						</span>
+						<h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight">
+							Latest Findings
 						</h1>
-						<p className="text-gray-500 text-sm mt-1">
-							Explore our hand-picked collection
-						</p>
 					</div>
-					<div className="md:hidden">
-						<p className="text-sm text-gray-500">Showing <span className="font-semibold text-gray-900">{totalCount}</span> products</p>
+
+					<div className="flex items-center gap-4">
+						<div className="hidden md:block text-sm text-gray-400 font-medium mr-4">
+							Sort by:
+						</div>
+						<div className="relative group">
+							<select
+								value={filters.sort}
+								onChange={(e) => setFilter('sort', e.target.value)}
+								className="appearance-none flex items-center gap-2 px-6 py-3 pr-12 rounded-full border border-gray-200 bg-white text-sm font-bold text-gray-900 cursor-pointer hover:border-primary focus:border-primary focus:ring-0 transition-all duration-300 outline-none shadow-sm h-12"
+							>
+								<option value="-createdAt">Relevance</option>
+								<option value="price.amount">Price: Low to High</option>
+								<option value="-price.amount">Price: High to Low</option>
+								<option value="-ratingAverage">Best Rated</option>
+							</select>
+							<FiChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-primary transition-colors" />
+						</div>
 					</div>
 				</div>
 			</div >
 
-			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
-				<div className="flex gap-8">
+			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-12 md:py-20">
+				<div className="flex flex-col lg:flex-row gap-12">
 					{/* Desktop Filters Sidebar */}
-					<aside className="hidden lg:block w-72 flex-shrink-0 sticky top-24 self-start">
+					<aside className="hidden lg:block w-64 flex-shrink-0">
 						<FiltersSidebar
 							filters={filters}
 							setFilter={setFilter}
@@ -73,16 +83,18 @@ export default function ProductsPage() {
 
 					{/* Main Content */}
 					<main className="flex-1 min-w-0">
-						<SortBar
-							totalCount={totalCount}
-							filters={filters}
-							setFilter={setFilter}
-							clearFilters={clearFilters}
-							onMobileFilterClick={() => setIsMobileFiltersOpen(true)}
-						/>
+						{/* Active Filters Summary (Optional, but useful) */}
+						{hasActiveFilters && (
+							<div className="flex items-center gap-2 flex-wrap mb-8">
+								<span className="text-sm font-bold text-gray-400 mr-2 uppercase tracking-widest px-1">Filters</span>
+								<button onClick={clearFilters} className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors uppercase tracking-widest px-2 py-1">
+									Clear all
+								</button>
+							</div>
+						)}
 
 						{isLoading && products.length === 0 ? (
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
 								{[...Array(6)].map((_, i) => (
 									<PublicProductCardSkeleton key={`skeleton-${i}`} />
 								))}
@@ -93,23 +105,18 @@ export default function ProductsPage() {
 									<FiSearch className="w-10 h-10 text-gray-300" />
 								</div>
 								<h3 className="text-lg font-semibold text-gray-700">No products found</h3>
-								<p className="text-sm text-gray-400 mt-1 mb-6">Try adjusting your filters or search terms</p>
-								{hasActiveFilters && (
-									<Button variant="outline" onClick={clearFilters}>
-										Clear all filters
-									</Button>
-								)}
+								<p className="text-sm text-gray-400 mt-1">Try adjusting your filters or search terms</p>
 							</div>
 						) : (
 							<>
-								<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100 transition-opacity duration-300'}`}>
+								<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100 transition-opacity duration-300'}`}>
 									{products.map(product => (
 										<PublicProductCard key={product._id} product={product} />
 									))}
 								</div>
 
 								{totalPages > 1 && (
-									<div className="flex items-center justify-center gap-2 mt-10">
+									<div className="flex items-center justify-center gap-2 mt-20 pt-10 border-t border-gray-50">
 										<Pagination
 											currentPage={currentPage}
 											totalPages={totalPages}
@@ -122,6 +129,15 @@ export default function ProductsPage() {
 					</main>
 				</div>
 			</div>
+
+			{/* Mobile Filter Trigger (Floating) */}
+			<button
+				onClick={() => setIsMobileFiltersOpen(true)}
+				className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all"
+			>
+				<FiFilter />
+				Filter & Sort
+			</button>
 
 			{/* Mobile Filter Drawer */}
 			<AnimatePresence>
@@ -139,26 +155,21 @@ export default function ProductsPage() {
 							animate={{ x: 0 }}
 							exit={{ x: '-100%' }}
 							transition={{ type: 'tween', duration: 0.3 }}
-							className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-[101] shadow-2xl lg:hidden flex flex-col"
+							className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-white z-[101] lg:hidden overflow-y-auto px-6 py-8"
 						>
-							<div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-								<h3 className="text-lg font-bold text-gray-900">Filters</h3>
-								<button
-									onClick={() => setIsMobileFiltersOpen(false)}
-									className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-900"
-								>
-									<FiX className="w-5 h-5" />
+							<div className="flex items-center justify-between mb-8">
+								<h2 className="text-2xl font-black text-gray-900 tracking-tight">Filters</h2>
+								<button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-gray-900">
+									<FiX className="w-6 h-6" />
 								</button>
 							</div>
-							<div className="flex-1 overflow-y-auto p-5">
-								<FiltersSidebar
-									filters={filters}
-									setFilter={setFilter}
-									clearFilters={clearFilters}
-									hasActiveFilters={hasActiveFilters}
-									isMobile={true}
-								/>
-							</div>
+							<FiltersSidebar
+								filters={filters}
+								setFilter={setFilter}
+								clearFilters={clearFilters}
+								hasActiveFilters={hasActiveFilters}
+								isMobile={true}
+							/>
 							<div className="p-4 border-t border-gray-100 bg-white flex gap-3">
 								<Button variant="outline" fullWidth onClick={() => { clearFilters(); setIsMobileFiltersOpen(false); }}>
 									Reset

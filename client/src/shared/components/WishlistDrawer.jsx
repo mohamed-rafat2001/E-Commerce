@@ -149,7 +149,8 @@ const WishlistItemCard = ({ product }) => {
                     <AddToCartButton
                         product={product}
                         size="sm"
-                        className="flex-1 !text-xs !py-1.5 !rounded-lg"
+                        showText={true}
+                        className="flex-1 !text-[10px] !py-2 !rounded-full !bg-gray-900 !text-white !border-gray-900 uppercase font-black tracking-widest"
                     />
                     <button
                         onClick={handleRemove}

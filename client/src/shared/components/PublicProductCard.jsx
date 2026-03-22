@@ -49,75 +49,79 @@ const PublicProductCard = ({ product }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="group bg-white rounded-2xl border border-gray-100 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex flex-col h-full overflow-hidden"
+            className="group flex flex-col h-full"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Image Area (60-65% height) */}
-            <Link to={`/products/${productId}`} className="block relative aspect-[4/5] overflow-hidden bg-gray-50">
-                <div className="w-full h-full transform group-hover:scale-105 transition-transform duration-500">
-                    <ProductCardGallery
-                        images={allImages}
-                        productName={product.name}
-                        isHovered={isHovered}
-                        autoSlide={false}
-                    />
-                </div>
+            {/* Image Area */}
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6">
+                <Link to={`/products/${productId}`} className="block w-full h-full">
+                    <div className="w-full h-full transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                        <ProductCardGallery
+                            images={allImages}
+                            productName={product.name}
+                            isHovered={isHovered}
+                            autoSlide={true}
+                            showThumbnails={false}
+                        />
+                    </div>
+                </Link>
 
-                {/* Badge Container */}
+                {/* Badge */}
                 {badge && (
-                    <div className="absolute top-3 left-3 z-10">
-                        {badge}
+                    <div className="absolute top-6 left-6 z-10">
+                        <div className="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                            {product.countInStock === 0 ? 'Out of Stock' : (hasDiscount ? `-${discountPercent}%` : 'New Arrival')}
+                        </div>
                     </div>
                 )}
+
 
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlistToggle}
-                    className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 group/wishlist"
+                    className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
                 >
-                    <FiHeart className={`w-4.5 h-4.5 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover/wishlist:text-red-500'}`} />
+                    <FiHeart className={`w-4.5 h-4.5 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                 </button>
-            </Link>
+            </div>
 
-            {/* Product Info Section (35-40% height) */}
-            <div className="p-4 flex flex-col flex-1">
-                {/* Category + Rating */}
-                <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate max-w-[120px]">
-                        {product.primaryCategory?.name || product.category?.name || 'Uncategorized'}
+            {/* Product Info Section */}
+            <div className="px-1 flex flex-col flex-1">
+                {/* Brand */}
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">
+                    {product.brandId?.name || product.brand?.name || 'Curated Design'}
+                </span>
+
+                {/* Title and Price */}
+                <div className="flex justify-between items-start gap-4 mb-3">
+                    <Link to={`/products/${productId}`} className="flex-1">
+                        <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
+                            {product.name}
+                        </h3>
+                    </Link>
+                    <span className="text-xl font-bold text-gray-900">
+                        ${price.toFixed(0)}
                     </span>
-                    <div className="flex items-center gap-1">
-                        <FiStar className="text-yellow-400 text-xs fill-yellow-400" />
-                        <span className="text-xs font-bold text-gray-700">{product.ratingAverage || '0'}</span>
+                </div>
+
+                {/* Rating & Actions */}
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                    <div className="flex items-center gap-1.5">
+                        <div className="flex items-center text-yellow-500">
+                            <FiStar className="w-3.5 h-3.5 fill-current" />
+                            <span className="ml-1 text-sm font-bold text-gray-900">{product.ratingAverage || '4.8'}</span>
+                        </div>
                     </div>
-                </div>
 
-                {/* Name */}
-                <Link to={`/products/${productId}`}>
-                    <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 h-10 group-hover:text-primary transition-colors">
-                        {product.name}
-                    </h3>
-                </Link>
-
-                {/* Price Row */}
-                <div className="mt-2 flex items-center gap-2">
-                    <span className="text-base font-bold text-gray-900">${price.toFixed(2)}</span>
-                    {hasDiscount && (
-                        <span className="text-xs text-gray-400 line-through">${oldPrice.toFixed(2)}</span>
-                    )}
-                </div>
-
-                {/* Add to Cart Button */}
-                <div className="mt-4">
                     <AddToCartButton
                         product={product}
-                        variant="accent"
-                        fullWidth
-                        className="py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                        variant="primary"
+                        showText={true}
+                        className="!rounded-full px-6 py-2.5 !bg-gray-900 !text-white !border-gray-900 text-[10px] uppercase font-black tracking-widest shadow-xl hover:bg-black transition-all active:scale-95"
                     />
                 </div>
             </div>
