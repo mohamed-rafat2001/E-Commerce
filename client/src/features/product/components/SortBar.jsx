@@ -49,8 +49,6 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
         { value: '-sold', label: 'Most Popular' },
     ];
 
-    const currentSortLabel = sortOptions.find(opt => opt.value === filters.sort)?.label || 'Sort By';
-
     return (
         <div className="w-full">
             {/* Active Filters Row */}

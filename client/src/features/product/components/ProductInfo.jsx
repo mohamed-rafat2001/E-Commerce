@@ -16,12 +16,15 @@ import useAddToCart from '../../cart/hooks/useAddToCart.js';
 import useAddToWishlist from '../../wishList/hooks/useAddToWishlist.js';
 import useWishlist from '../../wishList/hooks/useWishlist.js';
 import useDeleteFromWishlist from '../../wishList/hooks/useDeleteFromWishlist.js';
+import useProductReviews from '../hooks/useProductReviews.js';
 
 const ProductInfo = ({ product }) => {
   const { addToCart, isLoading: isAddingToCart } = useAddToCart();
   const { addToWishlist, isLoading: isAddingToWishlist } = useAddToWishlist();
   const { deleteFromWishlist, isLoading: isRemovingFromWishlist } = useDeleteFromWishlist();
   const { isInWishlist } = useWishlist();
+
+  const { totalCount, averageRating } = useProductReviews(product._id);
 
   const productId = product._id;
   const isWishlisted = isInWishlist(productId);
@@ -66,8 +69,6 @@ const ProductInfo = ({ product }) => {
     const tabs = document.querySelector('.flex.border-b.border-gray-200.mb-8');
     if (tabs) {
         tabs.scrollIntoView({ behavior: 'smooth' });
-        // Simulating tab click to reviews if possible would be better,
-        // but this is a quick fix based on current structure.
     }
   };
 
@@ -89,15 +90,15 @@ const ProductInfo = ({ product }) => {
       <div className="flex items-center gap-3 mt-3">
         <div className="flex items-center text-yellow-400 text-lg">
           {[...Array(5)].map((_, i) => (
-            <FiStar key={i} className={`w-4 h-4 ${i < Math.round(product.ratingAverage || 5) ? 'fill-current' : 'text-gray-200 fill-gray-100'}`} />
+            <FiStar key={i} className={`w-4 h-4 ${i < Math.round(averageRating || product.ratingAverage || 5) ? 'fill-current' : 'text-gray-200 fill-gray-100'}`} />
           ))}
         </div>
-        <span className="text-sm font-bold text-gray-800">{product.ratingAverage || '5.0'}</span>
+        <span className="text-sm font-bold text-gray-800">{averageRating || product.ratingAverage || '5.0'}</span>
         <button
           onClick={scrollToReviews}
           className="text-sm text-gray-400 underline hover:text-primary transition-colors"
         >
-          ({product.ratingCount || 0} reviews)
+          ({totalCount || product.ratingCount || 0} reviews)
         </button>
       </div>
 
