@@ -18,23 +18,25 @@ export default {
 			},
 			colors: {
 				primary: {
-					50: '#eef2ff',
-					100: '#e0e7ff',
-					200: '#c7d2fe',
-					300: '#a5b4fc',
-					400: '#818cf8',
-					500: '#6366f1',
-					600: '#4f46e5',
-					700: '#4338ca',
-					800: '#3730a3',
-					900: '#312e81',
-					950: '#1e1b4b',
-					DEFAULT: '#4f46e5',
-					dark: '#3730a3',
-					light: '#e0e7ff'
+					50: '#f0f4ff',
+					100: '#e0e9fe',
+					200: '#c1d4fe',
+					300: '#91b4fd',
+					400: '#5a89fa',
+					500: '#325df5',
+					600: '#1d3ee9',
+					700: '#162fd1',
+					800: '#1827a9',
+					900: '#192686',
+					950: '#003BB3',
+					DEFAULT: '#003BB3',
+					dark: '#002D8A',
+					light: '#E6EFFF'
 				},
 				accent: {
-					DEFAULT: '#9333ea'
+					DEFAULT: '#72F1DE',
+					dark: '#5EEAD4',
+					light: '#E0FFF9'
 				}
 			},
 			boxShadow: {
