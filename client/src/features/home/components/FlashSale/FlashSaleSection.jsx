@@ -7,9 +7,11 @@ import useFlashSale from '../../hooks/useFlashSale';
 import CountdownTimer from './CountdownTimer';
 import FlashSaleCard from './FlashSaleCard';
 import { PublicProductCard, PublicProductCardSkeleton } from '../../../../shared';
+import useAddToCart from '../../../cart/hooks/useAddToCart';
 
 const FlashSaleSection = () => {
     const { products, isLoading, endTime } = useFlashSale();
+    const { addToCart } = useAddToCart();
 
     if (!isLoading && products.length === 0) return null;
 
@@ -72,7 +74,7 @@ const FlashSaleSection = () => {
                                     <FlashSaleCard
                                         product={product}
                                         index={index}
-                                        onAddToCart={() => { }} // Placeholder for now or connect to useCart
+                                        onAddToCart={() => addToCart(product)}
                                     />
                                 </div>
                             ))}

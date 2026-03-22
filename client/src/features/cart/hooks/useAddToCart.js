@@ -42,8 +42,9 @@ export default function useAddToCart() {
 				const previousCart = queryClient.getQueryData(["cart", userId]);
 				if (previousCart) {
 					queryClient.setQueryData(["cart", userId], (old) => {
-						if (!old || !old.data || !old.data.data) return old;
-						const cartData = old.data.data;
+						// The structure is axiosResponse.data.data.data
+						if (!old || !old.data?.data?.data) return old;
+						const cartData = old.data.data.data;
 						const newItems = [...(cartData.items || [])];
 
 						const existingIndex = newItems.findIndex(i => {
@@ -69,8 +70,11 @@ export default function useAddToCart() {
 							data: {
 								...old.data,
 								data: {
-									...cartData,
-									items: newItems
+									...old.data.data,
+									data: {
+										...cartData,
+										items: newItems
+									}
 								}
 							}
 						};

@@ -47,9 +47,6 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 
 	const staticLinks = [
 		{ name: 'New Arrivals', path: '/new-arrivals' },
-		{ name: 'Editorials', path: '/editorials' },
-		{ name: 'Sell', path: '/sell' },
-		{ name: 'Help', path: '/help' },
 	];
 
 	return (

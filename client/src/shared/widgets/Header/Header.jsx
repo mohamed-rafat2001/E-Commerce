@@ -7,8 +7,6 @@ import { roleThemes } from "../../constants/theme.js";
 import { Avatar, Badge, Modal, Button } from '../../ui/index.js';
 import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
-import CartDropdown from './CartDropdown.jsx';
-import WishlistDropdown from './WishlistDropdown.jsx';
 import NavLinks from './NavLinks.jsx';
 import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
 import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
@@ -177,17 +175,6 @@ const Header = ({ isPanel = false }) => {
 											</span>
 										)}
 									</motion.button>
-									<AnimatePresence>
-										{isWishlistOpen && (
-											<WishlistDropdown
-												items={wishlistItems}
-												isLoading={isLoading}
-												viewAllPath={wishlistViewAllPath}
-												onRemove={deleteFromWishlist}
-												onMoveToCart={handleMoveToCart}
-											/>
-										)}
-									</AnimatePresence>
 								</div>
 
 								{/* Cart */}
@@ -205,17 +192,6 @@ const Header = ({ isPanel = false }) => {
 											</span>
 										)}
 									</motion.button>
-									<AnimatePresence>
-										{isCartOpen && (
-											<CartDropdown
-												items={cartItems}
-												total={cartTotal}
-												isLoading={isLoading}
-												viewAllPath={cartViewAllPath}
-												onRemove={deleteFromCart}
-											/>
-										)}
-									</AnimatePresence>
 								</div>
 							</div>
 
@@ -282,7 +258,7 @@ const Header = ({ isPanel = false }) => {
 									</Link>
 									<Link to="/register">
 										<Button variant="primary" size="sm" className="rounded-full px-6 !bg-gray-900 !text-white !border-gray-900 shadow-xl hover:bg-black transition-all active:scale-95">
-											Join Join
+											Get Started
 										</Button>
 									</Link>
 								</div>
@@ -329,6 +305,9 @@ const Header = ({ isPanel = false }) => {
 					</div>
 				</div>
 			</Modal>
+
+			<CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+			<WishlistDrawer isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
 		</motion.header>
 	);
 };

@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
  */
 export default function useCart() {
 	const { isAuthenticated, user } = useCurrentUser();
-	const userId = user?.userId?._id;
+	const userId = user?.userId?._id || user?._id;
 	const [guestCart, setGuestCart] = useState(null);
 	const queryClient = useQueryClient();
 
@@ -57,8 +57,8 @@ export default function useCart() {
 
 			if (previousCart) {
 				queryClient.setQueryData(["cart", userId], (old) => {
-					if (!old || !old.data || !old.data.data) return old;
-					const cartData = old.data.data;
+					if (!old || !old.data?.data?.data) return old;
+					const cartData = old.data.data.data;
 					const newItems = (cartData.items || []).filter(i => {
 						const pid = i.item?._id || i.itemId?._id || i.productId || i.item;
 						return pid !== productId;
@@ -69,8 +69,11 @@ export default function useCart() {
 						data: {
 							...old.data,
 							data: {
-								...cartData,
-								items: newItems
+								...old.data.data,
+								data: {
+									...cartData,
+									items: newItems
+								}
 							}
 						}
 					};
@@ -100,8 +103,8 @@ export default function useCart() {
 
 			if (previousCart) {
 				queryClient.setQueryData(["cart", userId], (old) => {
-					if (!old || !old.data || !old.data.data) return old;
-					const cartData = old.data.data;
+					if (!old || !old.data?.data?.data) return old;
+					const cartData = old.data.data.data;
 					const newItems = [...(cartData.items || [])];
 
 					const existingIndex = newItems.findIndex(i => {
@@ -121,8 +124,11 @@ export default function useCart() {
 						data: {
 							...old.data,
 							data: {
-								...cartData,
-								items: newItems
+								...old.data.data,
+								data: {
+									...cartData,
+									items: newItems
+								}
 							}
 						}
 					};
@@ -150,16 +156,19 @@ export default function useCart() {
 
 			if (previousCart) {
 				queryClient.setQueryData(["cart", userId], (old) => {
-					if (!old || !old.data || !old.data.data) return old;
-					const cartData = old.data.data;
+					if (!old || !old.data?.data?.data) return old;
+					const cartData = old.data.data.data;
 
 					return {
 						...old,
 						data: {
 							...old.data,
 							data: {
-								...cartData,
-								items: []
+								...old.data.data,
+								data: {
+									...cartData,
+									items: []
+								}
 							}
 						}
 					};
@@ -181,7 +190,7 @@ export default function useCart() {
 	}, [isAuthenticated, queryClient, userId]);
 
 	const cart = isAuthenticated
-		? response?.data?.data || response?.data
+		? response?.data?.data?.data || response?.data?.data || response?.data
 		: guestCart;
 
 	const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
