@@ -1,28 +1,31 @@
+/* Audit Findings:
+ - Wishlist API is authenticated-only and supports toggle via POST /wishlist/:id.
+ - Guest wishlist persistence exists, but required product-page behavior is auth prompt on heart click.
+ - Intent should be resumed after login using modal callback payload.
+*/
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { addToWishList, deleteFromWishList } from '../../../app/store/slices/wishList';
+import useWishlist from '../../wishList/hooks/useWishlist.js';
+import useAuthGuard from '../../../hooks/useAuthGuard.js';
 
 const ProductGallery = ({ images = [], productName = "Product", productId }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const dispatch = useDispatch();
-  
-  // Redux Wishlist state
-  const wishlistItems = useSelector(state => state.wishListStore.items);
-  const isWishlisted = wishlistItems.some(item => item.id === productId);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isAuthenticated, requireAuth } = useAuthGuard();
+  const isWishlisted = isInWishlist(productId);
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = async (e) => {
     e.preventDefault();
-    if (isWishlisted) {
-      dispatch(deleteFromWishList({ id: productId }));
-    } else {
-      dispatch(addToWishList({ 
-        id: productId, 
-        name: productName, 
-        image: images[0],
-        // Adding basic product info for the wishlist view
-      }));
+    if (!isAuthenticated) {
+      requireAuth({
+        message: "Sign in to save items to your wishlist",
+        redirectAfter: `/products/${productId}`,
+        onSuccessCallback: "wishlist:add",
+        callbackPayload: { productId }
+      });
+      return;
     }
+    await toggleWishlist(productId);
   };
 
   const nextImage = () => setActiveIndex((prev) => (prev + 1) % images.length);

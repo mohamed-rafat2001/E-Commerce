@@ -15,6 +15,7 @@ const FeaturedSection = () => {
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
+        if (!sectionRef.current) return;
         gsap.registerPlugin(ScrollTrigger);
 
         const ctx = gsap.context(() => {
@@ -39,21 +40,23 @@ const FeaturedSection = () => {
 
             if (gridRef.current) {
                 const items = Array.from(gridRef.current.children);
-                gsap.fromTo(
-                    items,
-                    { opacity: 0, y: 60 },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.55,
-                        ease: 'power2.out',
-                        stagger: 0.1,
-                        scrollTrigger: {
-                            trigger: gridRef.current,
-                            start: 'top 80%',
-                        },
-                    }
-                );
+                if (items.length) {
+                    gsap.fromTo(
+                        items,
+                        { opacity: 0, y: 60 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.55,
+                            ease: 'power2.out',
+                            stagger: 0.1,
+                            scrollTrigger: {
+                                trigger: gridRef.current,
+                                start: 'top 80%',
+                            },
+                        }
+                    );
+                }
 
                 const images = gridRef.current.querySelectorAll('[data-card-image]');
                 images.forEach((el) => {
@@ -79,7 +82,7 @@ const FeaturedSection = () => {
                     });
                 });
             }
-        }, sectionRef);
+        }, sectionRef.current);
 
         return () => ctx.revert();
     }, []);

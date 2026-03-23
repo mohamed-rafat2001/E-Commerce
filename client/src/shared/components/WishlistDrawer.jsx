@@ -1,5 +1,6 @@
 import { FiX, FiTrash2, FiShoppingBag, FiHeart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui/index.js';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
 import useCurrentUser from '../../features/user/hooks/useCurrentUser.js';
@@ -84,6 +85,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                                             <WishlistItemCard
                                                 key={product._id || item._id}
                                                 product={product}
+                                                onClose={onClose}
                                             />
                                         );
                                     })}
@@ -117,7 +119,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
 /**
  * Individual Wishlist Item Card Component
  */
-const WishlistItemCard = ({ product }) => {
+const WishlistItemCard = ({ product, onClose }) => {
     const { removeFromWishlist } = useWishlist();
 
     const price = product.price?.amount || product.price || 0;
@@ -131,17 +133,27 @@ const WishlistItemCard = ({ product }) => {
     return (
         <div className="flex gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
             {/* Product Image */}
-            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+            <Link
+                to={`/products/${product._id || product.id || product.product_id}`}
+                onClick={onClose}
+                className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 block"
+            >
                 <img
                     src={image}
                     alt={product.name}
                     className="w-full h-full object-cover"
                 />
-            </div>
+            </Link>
 
             {/* Product Details */}
             <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
+                <Link
+                    to={`/products/${product._id || product.id || product.product_id}`}
+                    onClick={onClose}
+                    className="font-semibold text-gray-900 truncate block hover:text-indigo-600 transition-colors"
+                >
+                    {product.name}
+                </Link>
                 <p className="text-indigo-600 font-bold mt-1">${typeof price === 'number' ? price.toFixed(2) : price}</p>
 
                 {/* Action Buttons */}

@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - Existing routing protects role dashboards but not generic authenticated routes like /checkout.
+ - Public cart and product routes remain accessible for guests.
+ - Query-based redirect handling is needed for protected direct URL access.
+*/
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 
@@ -64,6 +69,16 @@ const router = createBrowserRouter([
 			{ path: "/public-wishlist", element: <PublicWishlistPage /> },
 			{ path: "/products", element: <ProductsPage /> },
 			{ path: "/products/:id", element: <ProductDetailPage /> },
+			{
+				element: <ProtectedRoute />,
+				children: [
+					{ path: "/checkout", element: <PlaceholderPage title="Checkout" /> },
+					{ path: "/orders", element: <PlaceholderPage title="Orders" /> },
+					{ path: "/orders/:orderId", element: <PlaceholderPage title="Order Details" /> },
+					{ path: "/profile", element: <PlaceholderPage title="Profile" /> },
+					{ path: "/profile/edit", element: <PlaceholderPage title="Edit Profile" /> },
+				],
+			},
 		]
 	},
 	// Admin Routes

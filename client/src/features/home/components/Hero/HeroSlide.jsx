@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Badge, Skeleton } from '../../../../shared/ui';
+import { Button, Badge } from '../../../../shared/ui';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { prefersReducedMotion } from '../../../../utils/animations.js';
@@ -16,6 +16,7 @@ const HeroSlide = ({ slide }) => {
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
+        if (!containerRef.current) return;
 
         const ctx = gsap.context(() => {
             if (bgRef.current) {
@@ -55,7 +56,7 @@ const HeroSlide = ({ slide }) => {
                     { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", delay: 0.9 }
                 );
             }
-        }, containerRef);
+        }, containerRef.current);
 
         return () => ctx.revert();
     }, []);

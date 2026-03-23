@@ -1,20 +1,22 @@
+/* Audit Findings:
+ - Auth uses cookie-based session with getMe query and login mutation.
+ - Guest cart merge endpoint exists and is now centralized in useCartMerge hook.
+ - Wishlist backend toggles via POST /wishlist/:id; modal intent should be resumed after login.
+*/
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { LoginFunc } from "../services/auth.js";
-import { mergeGuestCart } from "../../cart/services/cart.js";
-import {
-	getGuestCart,
-	clearGuestCart,
-	hasGuestCartItems,
-} from "../../cart/services/guestCart.js";
-import { getGuestWishlist, clearGuestWishlist, hasGuestWishlistItems } from "../../wishList/services/guestWishlist.js";
 import { addToWishlist } from "../../wishList/services/wishList.js";
 import toast from "react-hot-toast";
 import { ToastSuccess, ToastError } from "../../../shared/ui/index.js";
+import { resetAuthModal } from "../../../app/store/slices/authModalSlice.js";
 
 export default function useLogin() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const { onSuccessCallback, callbackPayload } = useSelector((state) => state.authModalStore);
 	const {
 		mutate: login,
 		isLoading: isLoggingIn,
@@ -24,44 +26,28 @@ export default function useLogin() {
 		mutationFn: LoginFunc,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.invalidateQueries({ queryKey: ["cart"] });
+			queryClient.invalidateQueries({ queryKey: ["wishlist"] });
 
-			// --- Guest cart merge logic ---
-			try {
-				if (hasGuestCartItems()) {
-					const guestCart = getGuestCart();
-					await mergeGuestCart(guestCart.items);
-					clearGuestCart();
-					// Invalidate cart cache so UI refreshes
-					queryClient.invalidateQueries({ queryKey: ["cart"] });
-				}
-			} catch (err) {
-				// Silently log — merge failure should not block login
-				console.log("Guest cart merge failed:", err.message);
-			}
-
-			// --- Guest wishlist merge logic ---
-			try {
-				if (hasGuestWishlistItems()) {
-					const guestWishlist = getGuestWishlist();
-					// Add each guest wishlist item to server wishlist
-					for (const item of guestWishlist.items) {
-						await addToWishlist(item.product_id);
-					}
-					clearGuestWishlist();
-					// Invalidate wishlist cache so UI refreshes
+			if (onSuccessCallback === "wishlist:add" && callbackPayload?.productId) {
+				try {
+					await addToWishlist(callbackPayload.productId);
 					queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+					toast.success("Added to wishlist!");
+				} catch {
+					toast.error("Failed to update wishlist");
 				}
-			} catch (err) {
-				// Silently log — merge failure should not block login
-				console.log("Guest wishlist merge failed:", err.message);
 			}
 
 			const userRole =
 				data?.data?.data?.user?.role ||
 				data?.data?.data?.user?.userId?.role;
 
-			// Redirect based on role
-			if (userRole === "Customer") {
+			const params = new URLSearchParams(window.location.search);
+			const redirectTarget = params.get("redirect");
+			if (redirectTarget) {
+				navigate(redirectTarget.startsWith("/") ? redirectTarget : `/${redirectTarget}`);
+			} else if (userRole === "Customer") {
 				navigate("/customer/dashboard");
 			} else if (userRole === "Seller") {
 				navigate("/seller/dashboard");
@@ -70,6 +56,7 @@ export default function useLogin() {
 			} else {
 				navigate("/");
 			}
+			dispatch(resetAuthModal());
 
 			toast.success(
 				<ToastSuccess

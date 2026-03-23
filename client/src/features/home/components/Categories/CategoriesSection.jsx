@@ -15,6 +15,7 @@ const CategoriesSection = () => {
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
+        if (!sectionRef.current) return;
         gsap.registerPlugin(ScrollTrigger);
 
         const ctx = gsap.context(() => {
@@ -57,23 +58,25 @@ const CategoriesSection = () => {
 
             if (gridRef.current) {
                 const cards = Array.from(gridRef.current.children);
-                gsap.fromTo(
-                    cards,
-                    { opacity: 0, y: 50 },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.6,
-                        ease: 'power2.out',
-                        stagger: 0.12,
-                        scrollTrigger: {
-                            trigger: gridRef.current,
-                            start: 'top 80%',
-                        },
-                    }
-                );
+                if (cards.length) {
+                    gsap.fromTo(
+                        cards,
+                        { opacity: 0, y: 50 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.6,
+                            ease: 'power2.out',
+                            stagger: 0.12,
+                            scrollTrigger: {
+                                trigger: gridRef.current,
+                                start: 'top 80%',
+                            },
+                        }
+                    );
+                }
             }
-        }, sectionRef);
+        }, sectionRef.current);
 
         return () => ctx.revert();
     }, []);

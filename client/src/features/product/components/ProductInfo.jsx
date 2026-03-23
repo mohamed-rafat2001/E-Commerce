@@ -1,19 +1,22 @@
+/* Audit Findings:
+ - Product page previously dispatched local Redux cart only, bypassing authenticated cart API.
+ - Unified add-to-cart must route through auth-aware hook for server/guest consistency.
+ - Cart payload supports itemId/quantity; guest payload preserves selected color and size.
+*/
 import React, { useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiStar, FiShoppingBag, FiArrowRight } from 'react-icons/fi';
-import { addToCart } from '../../../app/store/slices/cartSlice';
+import { FiStar, FiShoppingBag } from 'react-icons/fi';
 import ColorSelector from './ColorSelector';
 import SizeSelector from './SizeSelector';
 import TrustBadges from './TrustBadges';
 import toast from 'react-hot-toast';
+import useAddToCart from '../../cart/hooks/useAddToCart.js';
 
 const ProductInfo = ({ product }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToCart, isLoading: isAdding } = useAddToCart();
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
 
   // Derived values
   const currentPrice = useMemo(() => {
@@ -26,10 +29,6 @@ const ProductInfo = ({ product }) => {
   }, [product.price, product.oldPrice, currentPrice]);
 
   const hasDiscount = originalPrice > currentPrice;
-  const discountPercentage = useMemo(() => {
-    if (!hasDiscount) return 0;
-    return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
-  }, [originalPrice, currentPrice, hasDiscount]);
 
   const isOutOfStock = useMemo(() => {
     if (product.countInStock === 0) return true;
@@ -54,31 +53,30 @@ const ProductInfo = ({ product }) => {
       return;
     }
 
-    setIsAdding(true);
-    // Simulate API delay for "loading spinner" requirement
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    dispatch(addToCart({
-      id: product._id,
+    try {
+      await addToCart({
+      itemId: product._id,
+      productId: product._id,
       name: product.name,
       price: currentPrice,
-      image: product.coverImage?.secure_url || product.image?.secure_url,
+      imageUrl: product.coverImage?.secure_url || product.image?.secure_url,
       color: selectedColor,
       size: selectedSize,
       quantity: 1,
       brand: product.brandId?.name || product.brand?.name
-    }));
-
-    setIsAdding(false);
-    toast.success('Added to cart successfully!');
+    }, 1);
+      toast.success('Added to cart!');
+    } catch {
+      toast.error('Failed to update cart');
+    }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!canAddToCart) {
       toast.error('Please select a color and size');
       return;
     }
-    handleAddToCart();
+    await handleAddToCart();
     navigate('/cart');
   };
 
@@ -161,7 +159,7 @@ const ProductInfo = ({ product }) => {
             </button>
             <button
               onClick={handleBuyNow}
-              className="px-10 py-5 rounded-full border-2 border-gray-200 text-gray-900 font-black uppercase tracking-widest hover:border-gray-900 transition-all duration-300 hover:bg-gray-50"
+              className="px-10 py-5 rounded-full border-2 border-gray-200 bg-white text-gray-900 font-black uppercase tracking-widest hover:border-gray-900 transition-all duration-300 hover:bg-gray-50"
             >
               Buy Now
             </button>

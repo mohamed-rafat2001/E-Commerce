@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - Authenticated cart endpoint is POST /cart with itemId/product_id and quantity.
+ - Guest cart persists in localStorage (guest_cart) and updates via guestCart service.
+ - First guest add-to-cart should prompt authentication without blocking guest cart behavior.
+*/
 import { useCallback } from "react";
 import { addToCart as addToCartApi } from "../services/cart.js";
 import { addToGuestCart } from "../services/guestCart.js";
@@ -5,6 +10,8 @@ import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 import useCart from "./useCart.js";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { openAuthModal } from "../../../app/store/slices/authModalSlice.js";
 
 /**
  * Add to cart hook with guest/auth decision logic.
@@ -14,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export default function useAddToCart() {
 	const { isAuthenticated, user } = useCurrentUser();
 	const { refreshGuestCart } = useCart();
+	const dispatch = useDispatch();
 
 	const { error, data, mutateAsync, isLoading } = useMutationFactory(
 		addToCartApi,
@@ -93,10 +101,21 @@ export default function useAddToCart() {
 				// Guest: use localStorage
 				addToGuestCart(productOrPayload, quantity);
 				refreshGuestCart();
+				const hasShownPrompt = localStorage.getItem("guest_cart_auth_prompt_shown") === "true";
+				if (!hasShownPrompt) {
+					dispatch(
+						openAuthModal({
+							message: "Sign in to complete your purchase",
+							redirectAfter: "/cart",
+							onSuccessCallback: "merge:guestCart",
+						})
+					);
+					localStorage.setItem("guest_cart_auth_prompt_shown", "true");
+				}
 				return Promise.resolve();
 			}
 		},
-		[isAuthenticated, mutateAsync, refreshGuestCart, queryClient, userId]
+		[dispatch, isAuthenticated, mutateAsync, refreshGuestCart, queryClient, userId]
 	);
 
 	return { error, data, addToCart, isLoading };

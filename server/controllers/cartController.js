@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - Cart routes are protected by Protect middleware (authenticated user required).
+ - Merge endpoint historically expects guest_items from frontend localStorage schema.
+ - Supporting guestItems alias improves compatibility for unified auth-aware clients.
+*/
 import catchAsync from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -74,13 +79,13 @@ export const clearCart = catchAsync(async (req, res, next) => {
 // @route   POST /api/v1/cart/merge
 // @access  Private/Customer
 export const mergeGuestCart = catchAsync(async (req, res, next) => {
-	const { guest_items } = req.body;
+	const guestItems = req.body?.guest_items || req.body?.guestItems;
 
-	if (!guest_items || !Array.isArray(guest_items)) {
+	if (!guestItems || !Array.isArray(guestItems)) {
 		return next(new appError("guest_items array is required", 400));
 	}
 
-	const cart = await cartService.mergeGuestCart(req.user._id, guest_items);
+	const cart = await cartService.mergeGuestCart(req.user._id, guestItems);
 	sendResponse(res, 200, cart);
 });
 

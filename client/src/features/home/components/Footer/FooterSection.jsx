@@ -12,23 +12,26 @@ const FooterSection = () => {
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
+        if (!footerRef.current) return;
         gsap.registerPlugin(ScrollTrigger);
 
         const ctx = gsap.context(() => {
-            gsap.fromTo(
-                footerRef.current,
-                { opacity: 0, y: 40 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: footerRef.current,
-                        start: 'top 90%',
-                    },
-                }
-            );
+            if (footerRef.current) {
+                gsap.fromTo(
+                    footerRef.current,
+                    { opacity: 0, y: 40 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: footerRef.current,
+                            start: 'top 90%',
+                        },
+                    }
+                );
+            }
 
             const staggerLinks = linksRef.current?.querySelectorAll('a');
             if (staggerLinks && staggerLinks.length) {
@@ -49,7 +52,7 @@ const FooterSection = () => {
                     }
                 );
             }
-        }, footerRef);
+        }, footerRef.current);
 
         return () => ctx.revert();
     }, []);

@@ -15,22 +15,25 @@ const BrandsSection = () => {
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
+        if (!sectionRef.current) return;
         gsap.registerPlugin(ScrollTrigger);
 
         const ctx = gsap.context(() => {
-            gsap.fromTo(
-                sectionRef.current,
-                { opacity: 0 },
-                {
-                    opacity: 1,
-                    duration: 0.5,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 90%',
-                    },
-                }
-            );
+            if (sectionRef.current) {
+                gsap.fromTo(
+                    sectionRef.current,
+                    { opacity: 0 },
+                    {
+                        opacity: 1,
+                        duration: 0.5,
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: sectionRef.current,
+                            start: 'top 90%',
+                        },
+                    }
+                );
+            }
 
             if (trackRef.current) {
                 tweenRef.current = gsap.to(trackRef.current, {
@@ -40,7 +43,7 @@ const BrandsSection = () => {
                     repeat: -1,
                 });
             }
-        }, sectionRef);
+        }, sectionRef.current);
 
         return () => {
             if (tweenRef.current) tweenRef.current.kill();

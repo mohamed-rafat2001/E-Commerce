@@ -101,6 +101,26 @@ const Header = ({ isPanel = false }) => {
 	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/cart";
 	const wishlistViewAllPath = isAuthenticated ? "/customer/wishlist" : "/public-wishlist";
 
+	useEffect(() => {
+		const isAnyDrawerOpen = isCartOpen || isWishlistOpen;
+		if (!isAnyDrawerOpen) {
+			document.body.style.overflow = '';
+			document.body.style.paddingRight = '';
+			return;
+		}
+
+		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+		document.body.style.overflow = 'hidden';
+		if (scrollbarWidth > 0) {
+			document.body.style.paddingRight = `${scrollbarWidth}px`;
+		}
+
+		return () => {
+			document.body.style.overflow = '';
+			document.body.style.paddingRight = '';
+		};
+	}, [isCartOpen, isWishlistOpen]);
+
 	return (
 		<motion.header
 			className={`sticky top-0 z-40 w-full ${isPanel ? 'bg-transparent' : ''}`}
@@ -163,8 +183,11 @@ const Header = ({ isPanel = false }) => {
 								{/* Wishlist */}
 								<div className="relative" ref={wishlistRef}>
 									<motion.button
-										onClick={() => setIsWishlistOpen(!isWishlistOpen)}
-										className="relative p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+										onClick={() => {
+											setIsWishlistOpen(!isWishlistOpen);
+											setIsCartOpen(false);
+										}}
+										className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
@@ -180,8 +203,11 @@ const Header = ({ isPanel = false }) => {
 								{/* Cart */}
 								<div className="relative" ref={cartRef}>
 									<motion.button
-										onClick={() => setIsCartOpen(!isCartOpen)}
-										className="relative p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+										onClick={() => {
+											setIsCartOpen(!isCartOpen);
+											setIsWishlistOpen(false);
+										}}
+										className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors"
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 									>
@@ -252,7 +278,7 @@ const Header = ({ isPanel = false }) => {
 							) : (
 								<div className="flex items-center gap-3 pl-3 border-l border-gray-100 font-sans">
 									<Link to="/login">
-										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:bg-gray-100">
+										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 bg-white border border-gray-100 hover:bg-gray-100">
 											Login
 										</Button>
 									</Link>

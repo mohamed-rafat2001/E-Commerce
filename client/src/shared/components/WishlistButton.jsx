@@ -1,9 +1,13 @@
+/* Audit Findings:
+ - Wishlist interactions should require authentication for guests.
+ - Optimistic authenticated toggle is centralized in useWishlist.toggleWishlist.
+ - Auth modal stores pending wishlist intent for post-login completion.
+*/
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiHeart } from 'react-icons/fi';
-import useAddToWishlist from '../../features/wishList/hooks/useAddToWishlist.js';
-import useDeleteFromWishlist from '../../features/wishList/hooks/useDeleteFromWishlist.js';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
+import useAuthGuard from '../../hooks/useAuthGuard.js';
 
 /**
  * Universal Wishlist heart icon button component
@@ -18,13 +22,12 @@ const WishlistButton = ({
     onError
 }) => {
     const [isAnimating, setIsAnimating] = useState(false);
-    const { addToWishlist, isLoading: isAdding } = useAddToWishlist();
-    const { deleteFromWishlist, isLoading: isRemoving } = useDeleteFromWishlist();
-    const { isInWishlist } = useWishlist();
+    const { isInWishlist, toggleWishlist } = useWishlist();
+    const { isAuthenticated, requireAuth } = useAuthGuard();
 
     const productId = product._id || product.id || product.product_id;
     const isInList = isInWishlist(productId);
-    const isLoading = isAdding || isRemoving;
+    const isLoading = false;
 
     const handleClick = useCallback(async (e) => {
         e.preventDefault();
@@ -32,16 +35,20 @@ const WishlistButton = ({
         
         if (isLoading) return;
 
+        if (!isAuthenticated) {
+            requireAuth({
+                message: "Sign in to save items to your wishlist",
+                redirectAfter: `/products/${productId}`,
+                onSuccessCallback: "wishlist:add",
+                callbackPayload: { productId }
+            });
+            return;
+        }
+
         setIsAnimating(true);
         
         try {
-            if (isInList) {
-                // Remove from wishlist
-                await deleteFromWishlist(productId);
-            } else {
-                // Add to wishlist
-                await addToWishlist(product);
-            }
+            await toggleWishlist(productId);
             
             if (onSuccess) onSuccess(!isInList);
             
@@ -54,7 +61,7 @@ const WishlistButton = ({
             
             if (onError) onError(error);
         }
-    }, [productId, product, isInList, isLoading, addToWishlist, deleteFromWishlist, onSuccess, onError]);
+    }, [isAuthenticated, isInList, isLoading, onError, onSuccess, productId, requireAuth, toggleWishlist]);
 
     // Size variants
     const sizeClasses = {

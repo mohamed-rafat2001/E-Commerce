@@ -1,9 +1,16 @@
+/* Audit Findings:
+ - Drawer checkout currently hard-redirects guests to login.
+ - Requirement calls for contextual auth modal from action entry points.
+ - Checkout route remains protected for direct URL access.
+*/
 import { FiX, FiTrash2, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui/index.js';
 import useCart from '../../features/cart/hooks/useCart.js';
 import useCurrentUser from '../../features/user/hooks/useCurrentUser.js';
 import { useNavigate } from 'react-router-dom';
+import useAuthGuard from '../../hooks/useAuthGuard.js';
 
 /**
  * Cart Drawer - Slide-in mini cart from the right
@@ -12,15 +19,17 @@ import { useNavigate } from 'react-router-dom';
 const CartDrawer = ({ isOpen, onClose }) => {
     const { cartItems, cartTotal, isLoading } = useCart();
     const { isAuthenticated } = useCurrentUser();
+    const { requireAuth } = useAuthGuard();
     const navigate = useNavigate();
 
     const handleCheckout = () => {
         if (!isAuthenticated) {
-            // Redirect to login with checkout redirect
-            navigate('/login?redirect=checkout');
+            requireAuth({
+                message: "You need an account to place an order",
+                redirectAfter: "/checkout",
+            });
         } else {
-            // Go to checkout page
-            navigate('/customer/checkout');
+            navigate('/checkout');
         }
         onClose();
     };
@@ -91,7 +100,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                                     {cartItems.map((item) => {
                                         const product = item.item || item.itemId || item.productId || item;
                                         const productId = product?._id || product?.id || item.product_id;
-                                        return <CartItemCard key={productId} item={item} />;
+                                        return <CartItemCard key={productId} item={item} onClose={onClose} />;
                                     })}
                                 </div>
                             )}
@@ -140,7 +149,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 /**
  * Individual Cart Item Card Component
  */
-const CartItemCard = ({ item }) => {
+const CartItemCard = ({ item, onClose }) => {
     const { removeFromCart, updateQuantity } = useCart();
 
     const product = item.item || item.itemId || item.productId || item;
@@ -155,18 +164,24 @@ const CartItemCard = ({ item }) => {
     return (
         <div className="flex gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
             {/* Product Image */}
-            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+            <Link
+                to={`/products/${productId}`}
+                onClick={onClose}
+                className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 block"
+            >
                 <img
                     src={image}
                     alt={name}
                     className="w-full h-full object-cover"
                     crossOrigin="anonymous"
                 />
-            </div>
+            </Link>
 
             {/* Product Details */}
             <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
+                <Link to={`/products/${productId}`} onClick={onClose} className="font-semibold text-gray-900 truncate block hover:text-indigo-600 transition-colors">
+                    {name}
+                </Link>
                 <p className="text-indigo-600 font-bold mt-1">${price.toFixed(2)}</p>
 
                 {/* Quantity Controls */}

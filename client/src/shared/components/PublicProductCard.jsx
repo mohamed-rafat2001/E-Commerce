@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - Public product cards currently allow guest wishlist via localStorage.
+ - New workflow requires auth prompt for wishlist intent, with post-login resume.
+ - Cart add supports guest flow separately and remains available without forced redirect.
+*/
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,14 +10,12 @@ import { FiHeart, FiStar, FiShoppingBag } from 'react-icons/fi';
 import ProductCardGallery from '../../features/product/components/ProductCardGallery.jsx';
 import AddToCartButton from './AddToCartButton.jsx';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
-import useAddToWishlist from '../../features/wishList/hooks/useAddToWishlist.js';
-import useDeleteFromWishlist from '../../features/wishList/hooks/useDeleteFromWishlist.js';
+import useAuthGuard from '../../hooks/useAuthGuard.js';
 
 const PublicProductCard = ({ product }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const { isInWishlist } = useWishlist();
-    const { addToWishlist } = useAddToWishlist();
-    const { deleteFromWishlist } = useDeleteFromWishlist();
+    const { isInWishlist, toggleWishlist } = useWishlist();
+    const { requireAuth, isAuthenticated } = useAuthGuard();
 
     const productId = product._id || product.id || product.product_id;
     const isWishlisted = isInWishlist(productId);
@@ -30,14 +33,20 @@ const PublicProductCard = ({ product }) => {
         badge = <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">-{discountPercent}%</span>;
     }
 
-    const handleWishlistToggle = (e) => {
+    const handleWishlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (isWishlisted) {
-            deleteFromWishlist(productId);
-        } else {
-            addToWishlist(product);
+        if (!isAuthenticated) {
+            requireAuth({
+                message: "Sign in to save items to your wishlist",
+                redirectAfter: `/products/${productId}`,
+                onSuccessCallback: "wishlist:add",
+                callbackPayload: { productId }
+            });
+            return;
         }
+
+        await toggleWishlist(productId);
     };
 
     const allImages = [

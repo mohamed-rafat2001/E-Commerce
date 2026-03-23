@@ -1,11 +1,18 @@
+/* Audit Findings:
+ - Cart page is public and currently redirects guests directly to login on checkout click.
+ - Requirement calls for auth modal prompt during user-initiated checkout action.
+ - Direct /checkout navigation is guarded separately by route protection.
+*/
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCart from './useCart';
 import useCurrentUser from '../../user/hooks/useCurrentUser.js';
+import useAuthGuard from '../../../hooks/useAuthGuard.js';
 
 const useCartPage = () => {
     const { cart, isLoading, updateQuantity, removeFromCart, clearCart: clearCartAction } = useCart();
     const { isAuthenticated } = useCurrentUser();
+    const { requireAuth } = useAuthGuard();
     const navigate = useNavigate();
 
     const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
@@ -43,9 +50,12 @@ const useCartPage = () => {
 
     const handleCheckout = () => {
         if (!isAuthenticated) {
-            navigate('/login?redirect=checkout');
+            requireAuth({
+                message: "You need an account to place an order",
+                redirectAfter: "/checkout",
+            });
         } else {
-            navigate('/customer/checkout');
+            navigate('/checkout');
         }
     };
 

@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - Existing route protection redirects unauthenticated users to /login via location state.
+ - Auth workflows need query-based redirect handling for seamless post-login return.
+ - Role checks remain required for admin/seller/customer dashboard paths.
+*/
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import useCurrentUser from "../../features/user/hooks/useCurrentUser.js";
 import LoadingSpinner from "../../shared/ui/LoadingSpinner";
@@ -20,7 +25,8 @@ function ProtectedRoute({ allowedRoles = [] }) {
 
 	// If user is not authenticated, redirect to login
 	if (!isAuthenticated) {
-		return <Navigate to="/login" state={{ from: location }} replace />;
+		const redirectPath = `${location.pathname}${location.search}`;
+		return <Navigate to={`/login?redirect=${encodeURIComponent(redirectPath)}`} replace />;
 	}
 
 	// Check role-based access

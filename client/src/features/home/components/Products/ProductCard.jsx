@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { FiStar } from 'react-icons/fi';
 import { Badge, Button, Card } from '../../../../shared/ui';
 import { AddToCartButton, WishlistButton } from '../../../../shared';
@@ -13,6 +14,8 @@ const ProductCard = ({ product, index }) => {
         product.image,
         ...(Array.isArray(product.images) ? product.images : [])
     ].filter(Boolean);
+    const productId = product._id || product.id || product.product_id;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -26,11 +29,13 @@ const ProductCard = ({ product, index }) => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <ProductCardGallery
-                        images={allImages}
-                        productName={product.name}
-                        isHovered={isHovered}
-                    />
+                    <Link to={`/products/${productId}`} className="block w-full h-full">
+                        <ProductCardGallery
+                            images={allImages}
+                            productName={product.name}
+                            isHovered={isHovered}
+                        />
+                    </Link>
 
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
                         {product.isNew && <Badge variant="new">New</Badge>}
@@ -65,9 +70,11 @@ const ProductCard = ({ product, index }) => {
                             <FiStar className="fill-current" /> {product.ratingsAverage || 4.5}
                         </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
-                        {product.name}
-                    </h3>
+                    <Link to={`/products/${productId}`}>
+                        <h3 className="text-xl font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
+                            {product.name}
+                        </h3>
+                    </Link>
                     <div className="flex items-center gap-3">
                         <span className="text-2xl font-black text-indigo-600">
                             ${typeof product.price === 'object' ? product.price.amount : product.price}

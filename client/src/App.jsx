@@ -1,16 +1,33 @@
+/* Audit Findings:
+ - Global app shell already mounts router and toast system.
+ - Cart merge must run after authentication transitions and react-query availability.
+ - Auth modal must render at app root to support prompts from any feature component.
+*/
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "react-router-dom";
 import router from "./app/routes/router.jsx";
 import queryClient from "./shared/utils/queryClient.js";
 import { Toaster } from "react-hot-toast";
+import AuthModal from "./components/auth/AuthModal.jsx";
+import useCartMerge from "./hooks/useCartMerge.js";
+
+function AppBoot() {
+	useCartMerge();
+	return (
+		<>
+			<RouterProvider router={router} />
+			<AuthModal />
+		</>
+	);
+}
 
 function App() {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<QueryClientProvider client={queryClient}>
 				<ReactQueryDevtools initialIsOpen={false} />
-				<RouterProvider router={router} />
+				<AppBoot />
 				<Toaster
 					position="top-right"
 					toastOptions={{

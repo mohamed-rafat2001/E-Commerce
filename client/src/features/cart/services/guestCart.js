@@ -1,3 +1,8 @@
+/* Audit Findings:
+ - guest_cart is the canonical localStorage key for unauthenticated cart flow.
+ - Merge endpoint expects guest_items with product_id and quantity.
+ - UI actions may pass either a product object or a normalized payload with productId.
+*/
 const GUEST_CART_KEY = "guest_cart";
 
 /**
@@ -47,7 +52,7 @@ const saveGuestCart = (cart) => {
 export const addToGuestCart = (product, quantity = 1) => {
     const cart = getGuestCart();
 
-    const productId = product._id || product.id;
+    const productId = product.productId || product._id || product.id || product.product_id;
     const existingIndex = cart.items.findIndex(
         (item) => item.product_id === productId
     );
@@ -61,9 +66,11 @@ export const addToGuestCart = (product, quantity = 1) => {
             product_id: productId,
             name: product.name,
             price: product.price?.amount || product.price || 0,
-            image: product.coverImage?.secure_url || product.image || "",
+            image: product.coverImage?.secure_url || product.image || product.imageUrl || "",
             seller_id: product.userId || product.seller_id || "",
             quantity,
+            color: product.color || "",
+            size: product.size || "",
         });
     }
 
