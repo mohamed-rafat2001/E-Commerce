@@ -70,13 +70,14 @@ export default function ProductsPage() {
 			</div >
 
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
-				<div className="flex gap-12">
+				<div className="flex flex-col lg:flex-row gap-12">
 					{/* Desktop Filters Sidebar */}
-					<aside className="hidden lg:block w-72 shrink-0 border-r border-gray-100 pr-12 sticky top-24 self-start">
+					<aside className="hidden lg:block w-80 shrink-0">
 						<FiltersSidebar
 							filters={filters}
 							setFilter={setFilter}
 							clearFilters={clearFilters}
+							hasActiveFilters={hasActiveFilters}
 						/>
 					</aside>
 
@@ -159,9 +160,9 @@ export default function ProductsPage() {
 							animate={{ x: 0 }}
 							exit={{ x: '100%' }}
 							transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-							className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-[101] shadow-2xl p-8 overflow-y-auto"
+							className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-[101] shadow-2xl p-0 flex flex-col"
 						>
-							<div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-50">
+							<div className="flex items-center justify-between p-8 border-b border-gray-50">
 								<h2 className="text-2xl font-black text-gray-900 tracking-tight">Refine Collection</h2>
 								<button
 									onClick={() => setIsMobileFiltersOpen(false)}
@@ -170,27 +171,30 @@ export default function ProductsPage() {
 									<FiX className="w-5 h-5" />
 								</button>
 							</div>
-							<FiltersSidebar
-								filters={filters}
-								setFilter={setFilter}
-								clearFilters={clearFilters}
-							/>
-							<div className="mt-12 sticky bottom-0 bg-white pt-4 pb-2 border-t border-gray-50 flex gap-3">
-								<Button
-									variant="outline"
-									fullWidth
+							
+							<div className="flex-1 overflow-y-auto">
+								<FiltersSidebar
+									filters={filters}
+									setFilter={setFilter}
+									clearFilters={clearFilters}
+									hasActiveFilters={hasActiveFilters}
+									isMobile={true}
+								/>
+							</div>
+
+							<div className="p-8 border-t border-gray-50 bg-white/80 backdrop-blur-sm grid grid-cols-2 gap-4">
+								<button
 									onClick={() => { clearFilters(); setIsMobileFiltersOpen(false); }}
-									className="rounded-full h-14"
+									className="w-full py-4 rounded-2xl border-2 border-gray-100 text-gray-900 text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all"
 								>
 									Reset
-								</Button>
-								<Button
-									fullWidth
+								</button>
+								<button
 									onClick={() => setIsMobileFiltersOpen(false)}
-									className="rounded-full h-14 bg-gray-900 hover:bg-black text-white font-black"
+									className="w-full py-4 rounded-2xl bg-indigo-600 text-white text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all"
 								>
-									Results
-								</Button>
+									See Results
+								</button>
 							</div>
 						</motion.div>
 					</>

@@ -14,8 +14,9 @@ export default function useProductFilters() {
             'price[lte]': searchParams.get('price[lte]') || '',
             brandId: searchParams.get('brandId') || '',
             'ratingAverage[gte]': searchParams.get('ratingAverage[gte]') || '',
+            subCategory: searchParams.get('subCategory') || '',
             page: parseInt(searchParams.get('page')) || 1,
-            limit: parseInt(searchParams.get('limit')) || 12,
+            limit: parseInt(searchParams.get('limit')) || 6,
             inStock: searchParams.get('inStock') === 'true'
         };
 
@@ -32,6 +33,7 @@ export default function useProductFilters() {
 
         if (filters.search) params.search = filters.search;
         if (filters.category) params.primaryCategory = filters.category;
+        if (filters.subCategory) params.subCategory = filters.subCategory;
         if (filters.brandId) params.brandId = filters.brandId;
         if (filters['price[gte]']) params['price.amount[gte]'] = filters['price[gte]'];
         if (filters['price[lte]']) params['price.amount[lte]'] = filters['price[lte]'];

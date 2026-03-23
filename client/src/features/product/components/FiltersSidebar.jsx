@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiChevronDown, FiChevronUp, FiFilter, FiX, FiStar } from 'react-icons/fi';
+import { FiChevronDown, FiFilter, FiX, FiStar, FiRefreshCw } from 'react-icons/fi';
 import useCategories from '../../home/hooks/useCategories.js';
 import useBrands from '../../home/hooks/useBrands.js';
 
@@ -40,88 +40,145 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
         setFilter('brandId', newBrands.join(','));
     };
 
-    const sidebarClass = isMobile ? "bg-white" : "bg-white rounded-2xl border border-gray-100 shadow-sm p-5";
+    const sidebarClass = isMobile 
+        ? "bg-white px-4 pb-10" 
+        : "bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 p-8 sticky top-28";
 
     return (
         <div className={sidebarClass}>
             {!isMobile && (
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
-                        <FiFilter /> Filters
+                <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-50">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                            <FiFilter className="w-4 h-4" />
+                        </div>
+                        Refine Search
                     </h3>
+                    {hasActiveFilters && (
+                        <button
+                            onClick={clearFilters}
+                            className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 group"
+                            title="Clear All"
+                        >
+                            <FiRefreshCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
+                        </button>
+                    )}
                 </div>
             )}
 
-            <div className="space-y-6">
+            <div className="space-y-10">
                 {/* Category Filter */}
                 <FilterSection title="Category" isOpen={openSections.category} onToggle={() => toggleSection('category')}>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                         <button
-                            onClick={() => setFilter('category', '')}
-                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${!filters.category ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-50'}`}
+                            onClick={() => {
+                                setFilter('category', '');
+                                setFilter('subCategory', '');
+                            }}
+                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                         >
-                            All Categories
+                            All Pieces
                         </button>
-                        {categories?.map(cat => (
-                            <button
-                                key={cat._id}
-                                onClick={() => setFilter('category', cat._id)}
-                                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${filters.category === cat._id ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
+                        {categories?.map(cat => {
+                            const isCategoryActive = filters.category === cat._id;
+                            return (
+                                <div key={cat._id} className="space-y-1.5">
+                                    <button
+                                        onClick={() => {
+                                            setFilter('category', cat._id);
+                                            setFilter('subCategory', ''); // Clear subcategory when changing category
+                                        }}
+                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                    
+                                    {/* Subcategories */}
+                                    <AnimatePresence>
+                                        {isCategoryActive && cat.subCategories?.length > 0 && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="pl-4 space-y-1 overflow-hidden"
+                                            >
+                                                {cat.subCategories.map(sub => (
+                                                    <button
+                                                        key={sub._id}
+                                                        onClick={() => setFilter('subCategory', sub._id)}
+                                                        className={`w-full text-left px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filters.subCategory === sub._id ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
+                                                    >
+                                                        — {sub.name}
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            );
+                        })}
                     </div>
                 </FilterSection>
 
                 {/* Price Range */}
-                <FilterSection title="Price Range" isOpen={openSections.price} onToggle={() => toggleSection('price')}>
-                    <form onSubmit={handlePriceApply} className="space-y-3">
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="number"
-                                name="min"
-                                defaultValue={filters['price[gte]']}
-                                placeholder="Min"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none"
-                                onWheel={(e) => e.target.blur()}
-                            />
-                            <span className="text-gray-400">—</span>
-                            <input
-                                type="number"
-                                name="max"
-                                defaultValue={filters['price[lte]']}
-                                placeholder="Max"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none"
-                                onWheel={(e) => e.target.blur()}
-                            />
+                <FilterSection title="Price Point" isOpen={openSections.price} onToggle={() => toggleSection('price')}>
+                    <form onSubmit={handlePriceApply} className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="relative flex-1">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">$</span>
+                                <input
+                                    type="number"
+                                    name="min"
+                                    defaultValue={filters['price[gte]']}
+                                    placeholder="Min"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none"
+                                    onWheel={(e) => e.target.blur()}
+                                />
+                            </div>
+                            <div className="h-px w-3 bg-gray-200" />
+                            <div className="relative flex-1">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">$</span>
+                                <input
+                                    type="number"
+                                    name="max"
+                                    defaultValue={filters['price[lte]']}
+                                    placeholder="Max"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none"
+                                    onWheel={(e) => e.target.blur()}
+                                />
+                            </div>
                         </div>
                         <button
                             type="submit"
-                            className="w-full mt-3 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all duration-150"
+                            className="w-full py-4 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:shadow-xl hover:shadow-gray-200 transition-all duration-300 active:scale-95"
                         >
-                            Apply Range
+                            Update Range
                         </button>
                     </form>
                 </FilterSection>
 
                 {/* Brands Filter */}
                 {brands?.length > 0 && (
-                    <FilterSection title="Brands" isOpen={openSections.brand} onToggle={() => toggleSection('brand')}>
-                        <div className="space-y-1 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                    <FilterSection title="Designers" isOpen={openSections.brand} onToggle={() => toggleSection('brand')}>
+                        <div className="space-y-1 max-h-56 overflow-y-auto pr-3 custom-scrollbar">
                             {brands.map(brand => {
                                 const isSelected = (filters.brandId || '').split(',').includes(brand._id);
                                 return (
-                                    <label key={brand._id} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => handleBrandToggle(brand._id)}
-                                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
-                                        />
-                                        <span className={`text-sm ${isSelected ? 'font-semibold text-primary' : 'text-gray-600'}`}>
-                                            {brand.name}
-                                        </span>
+                                    <label key={brand._id} className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-indigo-50/50' : 'hover:bg-gray-50'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="relative flex items-center justify-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleBrandToggle(brand._id)}
+                                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-indigo-600 focus:ring-indigo-100 transition-all cursor-pointer appearance-none checked:bg-indigo-600 checked:border-indigo-600"
+                                                />
+                                                <FiX className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none rotate-45" />
+                                            </div>
+                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-indigo-600' : 'text-gray-600'}`}>
+                                                {brand.name}
+                                            </span>
+                                        </div>
                                     </label>
                                 );
                             })}
@@ -130,60 +187,70 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                 )}
 
                 {/* Rating Filter */}
-                <FilterSection title="Rating" isOpen={openSections.rating} onToggle={() => toggleSection('rating')}>
-                    <div className="space-y-1">
-                        {[4, 3, 2, 1].map(rating => (
-                            <label key={rating} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
-                                <input
-                                    type="radio"
-                                    name="rating"
-                                    checked={filters['ratingAverage[gte]'] === String(rating)}
-                                    onChange={() => setFilter('ratingAverage[gte]', String(rating))}
-                                    className="w-4 h-4 text-primary border-gray-300 focus:ring-primary/20"
-                                />
-                                <div className="flex items-center gap-1 text-sm text-gray-600">
-                                    <div className="flex text-yellow-400">
-                                        {[...Array(5)].map((_, i) => (
-                                            <FiStar key={i} className={`w-3.5 h-3.5 ${i < rating ? 'fill-current' : 'text-gray-300 fill-gray-100'}`} />
-                                        ))}
+                <FilterSection title="Curator Rating" isOpen={openSections.rating} onToggle={() => toggleSection('rating')}>
+                    <div className="space-y-2">
+                        {[4, 3, 2, 1].map(rating => {
+                            const isSelected = filters['ratingAverage[gte]'] === String(rating);
+                            return (
+                                <label key={rating} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-amber-50/50' : 'hover:bg-gray-50'}`}>
+                                    <input
+                                        type="radio"
+                                        name="rating"
+                                        checked={isSelected}
+                                        onChange={() => setFilter('ratingAverage[gte]', String(rating))}
+                                        className="w-5 h-5 text-amber-500 border-2 border-gray-200 focus:ring-amber-100 transition-all cursor-pointer"
+                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <FiStar key={i} className={`w-3 h-3 ${i < rating ? 'text-amber-400 fill-current' : 'text-gray-200'}`} />
+                                            ))}
+                                        </div>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-amber-600' : 'text-gray-400'}`}>
+                                            & Up
+                                        </span>
                                     </div>
-                                    <span className="ml-1">& Up</span>
-                                </div>
-                            </label>
-                        ))}
+                                </label>
+                            );
+                        })}
                     </div>
                 </FilterSection>
 
                 {/* Availability Filter */}
-                <FilterSection title="Availability" isOpen={openSections.availability} onToggle={() => toggleSection('availability')}>
-                    <label className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50">
-                        <input
-                            type="checkbox"
-                            checked={!!filters.inStock}
-                            onChange={(e) => setFilter('inStock', e.target.checked ? 'true' : '')}
-                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
-                        />
-                        <span className={`text-sm ${filters.inStock ? 'font-semibold text-primary' : 'text-gray-600'}`}>
-                            In Stock Only
-                        </span>
+                <FilterSection title="Stock Status" isOpen={openSections.availability} onToggle={() => toggleSection('availability')}>
+                    <label className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${filters.inStock ? 'bg-emerald-50/50' : 'hover:bg-gray-50'}`}>
+                        <div className="flex items-center gap-3">
+                            <div className="relative flex items-center justify-center">
+                                <input
+                                    type="checkbox"
+                                    checked={!!filters.inStock}
+                                    onChange={(e) => setFilter('inStock', e.target.checked ? 'true' : '')}
+                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-emerald-500 focus:ring-emerald-100 transition-all cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500"
+                                />
+                                <div className="absolute w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                            </div>
+                            <span className={`text-[11px] font-bold uppercase tracking-wider ${filters.inStock ? 'text-emerald-600' : 'text-gray-600'}`}>
+                                Ready to Ship
+                            </span>
+                        </div>
                     </label>
                 </FilterSection>
             </div>
 
-            {hasActiveFilters && (
+            {hasActiveFilters && isMobile && (
                 <button
                     onClick={clearFilters}
-                    className="text-sm text-center text-gray-400 hover:text-red-500 transition-colors duration-150 mt-8 block w-full"
+                    className="w-full mt-10 py-4 rounded-xl border-2 border-rose-100 text-rose-500 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-rose-50 transition-all duration-300"
                 >
-                    Reset all filters
+                    Clear All Filters
                 </button>
             )}
 
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
-                .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #cbd5e1; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
+                .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #e2e8f0; }
             `}</style>
         </div>
     );
@@ -193,11 +260,11 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
     <div className="mb-2">
         <button
             onClick={onToggle}
-            className="flex items-center justify-between w-full mb-3 cursor-pointer group"
+            className="flex items-center justify-between w-full mb-5 cursor-pointer group"
         >
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-primary transition-colors">{title}</span>
-            <div className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                <FiChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-indigo-600 transition-colors">{title}</span>
+            <div className={`transition-all duration-300 w-6 h-6 rounded-lg flex items-center justify-center group-hover:bg-gray-50 ${isOpen ? 'rotate-180' : ''}`}>
+                <FiChevronDown className="w-4 h-4 text-gray-400 group-hover:text-indigo-600" />
             </div>
         </button>
         <AnimatePresence initial={false}>
@@ -206,9 +273,10 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
                 >
-                    <div className="pb-1">
+                    <div className="pb-4">
                         {children}
                     </div>
                 </motion.div>
@@ -216,4 +284,3 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
         </AnimatePresence>
     </div>
 );
-

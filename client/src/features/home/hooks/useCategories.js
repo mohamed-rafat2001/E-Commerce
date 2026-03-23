@@ -7,7 +7,7 @@ import { getFunc } from '../../../shared/services/handlerFactory';
 const useCategories = () => {
     const { data: response, isLoading, error } = useQuery({
         queryKey: ['home-categories'],
-        queryFn: () => getFunc('categories'),
+        queryFn: () => getFunc('categories?populate=subCategories'),
         staleTime: 60 * 60 * 1000,
     });
 
