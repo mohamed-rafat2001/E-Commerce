@@ -13,7 +13,13 @@ import PublicLayout from "../../shared/layout/PublicLayout.jsx";
 // Pages - Public
 import { HomePage } from "../../features/home/pages/index.js";
 import { LoginPage, RegisterPage } from "../../features/auth/pages/index.js";
-import { PublicWishlistPage } from "../../features/public/pages/index.js";
+import {
+	PublicWishlistPage,
+	BrandsPage as PublicBrandsPage,
+	CategoriesPage as PublicCategoriesPage,
+	BrandProductsRedirectPage,
+	CategoryProductsRedirectPage,
+} from "../../features/public/pages/index.js";
 import { CartPage } from "../../features/cart/pages/index.js";
 
 // Pages - Dashboard (Role-specific)
@@ -69,6 +75,12 @@ const router = createBrowserRouter([
 			{ path: "/public-wishlist", element: <PublicWishlistPage /> },
 			{ path: "/products", element: <ProductsPage /> },
 			{ path: "/products/:id", element: <ProductDetailPage /> },
+			{ path: "/brands", element: <PublicBrandsPage /> },
+			{ path: "/brands/all", element: <PublicBrandsPage /> },
+			{ path: "/brands/:brandId", element: <BrandProductsRedirectPage /> },
+			{ path: "/categories", element: <PublicCategoriesPage /> },
+			{ path: "/categories/all", element: <PublicCategoriesPage /> },
+			{ path: "/categories/:categoryId", element: <CategoryProductsRedirectPage /> },
 			{
 				element: <ProtectedRoute />,
 				children: [
