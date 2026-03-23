@@ -1,8 +1,15 @@
 import { useMemo } from 'react';
 import { Modal, Button } from '../../../../shared/ui/index.js';
 import { FiUser, FiMail, FiPhone, FiCalendar, FiDollarSign, FiCheck, FiMapPin, FiBox, FiCreditCard } from 'react-icons/fi';
-import { paymentMethodLabels } from './orderConstants.js';
 import OrderStatusSelector from './OrderStatusSelector.jsx';
+
+const paymentMethodLabels = {
+	card: 'Credit Card',
+	paypal: 'PayPal',
+	bank_transfer: 'Bank Transfer',
+	cash_on_delivery: 'Cash on Delivery',
+	wallet: 'Wallet',
+};
 
 const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus, isUpdating }) => {
 	const allItems = useMemo(() => {

@@ -22,9 +22,6 @@ const ProductCardGallery = memo(function ProductCardGallery({
     activeIndex,
     handleThumbnailHover,
     handleThumbnailClick,
-    handleMouseLeave,
-    handleTouchStart,
-    handleTouchEnd,
   } = useProductCardGallery({ images, isHovered, autoSlide });
 
   // Fallback: No images or invalid data

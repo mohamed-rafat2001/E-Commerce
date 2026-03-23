@@ -47,6 +47,7 @@ const usePersonalDetailsPage = () => {
             phoneNumber: userData?.phoneNumber || '',
         },
     });
+    const { reset: resetProfileForm } = profileForm;
 
     // Password form
     const passwordForm = useForm({
@@ -56,14 +57,14 @@ const usePersonalDetailsPage = () => {
     // Sync form when user data changes
     useEffect(() => {
         if (userData) {
-            profileForm.reset({
+            resetProfileForm({
                 firstName: userData.firstName || '',
                 lastName: userData.lastName || '',
                 email: userData.email || '',
                 phoneNumber: userData.phoneNumber || '',
             });
         }
-    }, [userData, profileForm.reset]);
+    }, [userData, resetProfileForm]);
 
     // Handlers
     const onSubmit = (data) => {

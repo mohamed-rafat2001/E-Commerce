@@ -2,8 +2,18 @@ import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Modal, Button, Input, Select } from '../../../../shared/ui/index.js';
 import { FiEdit2, FiUserCheck } from 'react-icons/fi';
-import { roleOptions, statusOptions } from './userConstants.js';
 import toast from 'react-hot-toast';
+
+const roleOptions = [
+	{ value: 'Customer', label: 'Customer' },
+	{ value: 'Seller', label: 'Seller' },
+	{ value: 'Admin', label: 'Admin' },
+];
+
+const statusOptions = [
+	{ value: 'active', label: 'Active' },
+	{ value: 'suspended', label: 'Suspended' },
+];
 
 const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 	const isEdit = !!user;

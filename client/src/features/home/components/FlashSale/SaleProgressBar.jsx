@@ -1,16 +1,14 @@
-import React from 'react';
-
-/**
- * Progress bar showing sold out status for flash sale
- */
 const SaleProgressBar = ({ sold, total }) => {
-    const percentage = Math.min(Math.round((sold / total) * 100), 100);
+    const safeSold = Number.isFinite(sold) ? sold : 0;
+    const safeTotal = Number.isFinite(total) && total > 0 ? total : safeSold;
+    const percentage = safeTotal > 0 ? Math.min(Math.round((safeSold / safeTotal) * 100), 100) : 0;
+    const available = Math.max(safeTotal - safeSold, 0);
 
     return (
         <div className="space-y-2 mt-4">
             <div className="flex justify-between text-[11px] font-black uppercase tracking-wider">
                 <span className={`${percentage >= 80 ? 'text-red-500' : 'text-gray-400'}`}>
-                    Available: <span className="text-gray-900">{total - sold}</span>
+                    Available: <span className="text-gray-900">{available}</span>
                 </span>
                 <span className="text-indigo-600">Sold: {percentage}%</span>
             </div>

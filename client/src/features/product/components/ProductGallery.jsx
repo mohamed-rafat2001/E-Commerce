@@ -1,9 +1,4 @@
-/* Audit Findings:
- - Wishlist API is authenticated-only and supports toggle via POST /wishlist/:id.
- - Guest wishlist persistence exists, but required product-page behavior is auth prompt on heart click.
- - Intent should be resumed after login using modal callback payload.
-*/
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import useWishlist from '../../wishList/hooks/useWishlist.js';
 import useAuthGuard from '../../../hooks/useAuthGuard.js';
@@ -31,6 +26,12 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
   const nextImage = () => setActiveIndex((prev) => (prev + 1) % images.length);
   const prevImage = () => setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
 
+  useEffect(() => {
+    if (activeIndex >= images.length) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, images.length]);
+
   const mainImage = images[activeIndex] || 'https://placehold.co/600x600?text=No+Image';
 
   return (
@@ -46,6 +47,7 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
         
         {/* Wishlist Button */}
         <button
+          type="button"
           onClick={handleWishlistToggle}
           className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-10"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
@@ -58,10 +60,10 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
         {/* Navigation Arrows (Optional, but good for UX) */}
         {images.length > 1 && (
           <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <button onClick={prevImage} className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center pointer-events-auto hover:bg-white transition-colors">
+            <button type="button" onClick={prevImage} className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center pointer-events-auto hover:bg-white transition-colors">
               <FiChevronLeft className="w-6 h-6 text-gray-900" />
             </button>
-            <button onClick={nextImage} className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center pointer-events-auto hover:bg-white transition-colors">
+            <button type="button" onClick={nextImage} className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center pointer-events-auto hover:bg-white transition-colors">
               <FiChevronRight className="w-6 h-6 text-gray-900" />
             </button>
           </div>
@@ -75,6 +77,7 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
             const isActive = activeIndex === idx;
             return (
               <button
+                type="button"
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 className={`relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 border-2 ${
@@ -90,6 +93,7 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
           {/* More images indicator */}
           {images.length > 4 && (
             <button 
+              type="button"
               onClick={() => setActiveIndex(4)}
               className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
                 activeIndex >= 4 ? 'border-blue-600' : 'border-transparent'

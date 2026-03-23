@@ -1,6 +1,12 @@
 import { Select } from '../../../../shared/ui/index.js';
 import { FiSearch } from 'react-icons/fi';
-import { statusOptions } from './productConstants.js';
+
+const statusOptions = [
+  { value: 'active', label: 'Active' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'inactive', label: 'Inactive' },
+  { value: 'archived', label: 'Archived' },
+];
 
 const ProductsFilter = ({ 
   searchQuery, 

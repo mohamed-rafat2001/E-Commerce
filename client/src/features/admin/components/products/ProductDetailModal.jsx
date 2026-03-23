@@ -1,6 +1,12 @@
 import { Modal, Badge, Button } from '../../../../shared/ui/index.js';
 import { FiImage, FiStar, FiBox, FiLayers, FiGlobe, FiLock, FiUser } from 'react-icons/fi';
-import { statusConfig } from './productConstants.js';
+
+const statusConfig = {
+	active: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', dot: 'bg-emerald-500', label: 'Active' },
+	draft: { color: 'bg-amber-50 text-amber-600 border-amber-100', dot: 'bg-amber-500', label: 'Draft' },
+	inactive: { color: 'bg-slate-50 text-slate-500 border-slate-200', dot: 'bg-slate-400', label: 'Inactive' },
+	archived: { color: 'bg-indigo-50 text-indigo-600 border-indigo-100', dot: 'bg-indigo-500', label: 'Archived' },
+};
 
 const ProductDetailModal = ({ product, isOpen, onClose }) => {
 	if (!product) return null;

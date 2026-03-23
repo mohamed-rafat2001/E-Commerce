@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import useAdminOrders from './useAdminOrders.js';
 import { useUpdateOrder } from './useOrderMutations.js';
-import { ITEMS_PER_PAGE } from '../../components/orders/orderConstants.js';
+
+const ITEMS_PER_PAGE = 10;
 
 const useOrdersPage = () => {
   const [searchQuery, setSearchQuery] = useState('');

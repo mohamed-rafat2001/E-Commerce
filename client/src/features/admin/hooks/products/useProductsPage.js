@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import useAdminProducts from './useAdminProducts.js';
 import { useUpdateProduct, useDeleteProduct } from './useProductMutations.js';
 import useCategories from '../categories/useCategories.js';
-import { ITEMS_PER_PAGE } from '../../components/products/productConstants.js';
+
+const ITEMS_PER_PAGE = 10;
 
 const useProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');

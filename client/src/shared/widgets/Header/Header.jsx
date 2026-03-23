@@ -3,32 +3,24 @@ import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import useLogout from '../../../features/auth/hooks/useLogout.jsx';
-import { roleThemes } from "../../constants/theme.js";
-import { Avatar, Badge, Modal, Button } from '../../ui/index.js';
+import { Avatar, Modal, Button } from '../../ui/index.js';
 import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
 import NavLinks from './NavLinks.jsx';
-import useDeleteFromCart from '../../../features/cart/hooks/useDeleteFromCart.js';
-import useDeleteFromWishlist from '../../../features/wishList/hooks/useDeleteFromWishlist.js';
-import useAddToCart from '../../../features/cart/hooks/useAddToCart.js';
 import useCategories from '../../../features/home/hooks/useCategories.js';
 import useBrands from '../../../features/home/hooks/useBrands.js';
-import toast from 'react-hot-toast';
 import {
-	NotificationIcon,
 	StoreIcon,
 	HeartIcon,
 	DashboardIcon,
 	LogoutIcon,
-	ChevronRightIcon,
-	SettingsIcon,
-	UserIcon
+	SettingsIcon
 } from '../../constants/icons.jsx';
 import CartDrawer from '../../components/CartDrawer.jsx';
 import WishlistDrawer from '../../components/WishlistDrawer.jsx';
 
 const Header = ({ isPanel = false }) => {
-	const { userRole, user, isAuthenticated, isLoading } = useCurrentUser();
+	const { userRole, user, isAuthenticated } = useCurrentUser();
 	const { logout } = useLogout();
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
@@ -39,31 +31,15 @@ const Header = ({ isPanel = false }) => {
 	const cartRef = useRef(null);
 	const wishlistRef = useRef(null);
 
-	const { deleteFromCart } = useDeleteFromCart();
-	const { deleteFromWishlist } = useDeleteFromWishlist();
-	const { addToCart } = useAddToCart();
 	const { categories } = useCategories();
 	const { originalBrands: brands } = useBrands();
 
-	const { cart, cartItemCount, cartTotal } = useCart();
-	const cartItems = cart?.items || [];
+	const { cartItemCount } = useCart();
 	const cartCount = cartItemCount;
 
 	const { wishlist } = useWishlist();
 	const wishlistItems = wishlist?.items || [];
 	const wishlistCount = wishlistItems.length;
-
-	const handleMoveToCart = async (product) => {
-		try {
-			await addToCart(product, 1);
-			await deleteFromWishlist(product._id || product.id);
-			toast.success(`${product.name} moved to cart!`);
-		} catch {
-			toast.error("Failed to move item to cart");
-		}
-	};
-
-	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	const fullName = user?.userId
 		? `${user.userId.firstName} ${user.userId.lastName}`
@@ -97,9 +73,6 @@ const Header = ({ isPanel = false }) => {
 		logout();
 		setIsDropdownOpen(false);
 	};
-
-	const cartViewAllPath = isAuthenticated ? "/customer/cart" : "/cart";
-	const wishlistViewAllPath = isAuthenticated ? "/customer/wishlist" : "/public-wishlist";
 
 	useEffect(() => {
 		const isAnyDrawerOpen = isCartOpen || isWishlistOpen;

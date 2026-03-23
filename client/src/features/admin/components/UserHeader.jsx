@@ -1,5 +1,11 @@
-import { FiMail, FiPhone, FiCalendar, FiMapPin, FiDollarSign, FiStar, FiInfo, FiUserCheck, FiCreditCard } from 'react-icons/fi';
-import { roleConfig } from './users/userConstants.js';
+import { FiMail, FiPhone, FiCalendar, FiMapPin, FiDollarSign, FiStar, FiInfo, FiUserCheck, FiCreditCard, FiUser, FiShoppingBag, FiShield, FiLock } from 'react-icons/fi';
+
+const roleConfig = {
+  Customer: { color: 'bg-blue-50 text-blue-600 border-blue-100', icon: FiUser, label: 'Customer' },
+  Seller: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', icon: FiShoppingBag, label: 'Seller' },
+  Admin: { color: 'bg-rose-50 text-rose-600 border-rose-100', icon: FiShield, label: 'Admin' },
+  SuperAdmin: { color: 'bg-purple-50 text-purple-600 border-purple-100', icon: FiLock, label: 'Super Admin' },
+};
 
 const UserHeader = ({ user }) => {
   const config = roleConfig[user.role] || roleConfig.Customer;

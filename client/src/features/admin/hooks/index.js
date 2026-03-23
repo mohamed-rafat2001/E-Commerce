@@ -45,5 +45,4 @@ export { useCreateUser, useUpdateUser, useDeleteUser } from './users/useUserMuta
 // Users Details
 export { default as useUserDetails } from './users/details/useUserDetails.js';
 export { default as useAccordionSections } from './users/details/useAccordionSections.js';
-export { default as useUserData } from './users/details/useUserData.js';
 export { default as useUserDetailsPage } from './users/details/useUserDetailsPage.js';

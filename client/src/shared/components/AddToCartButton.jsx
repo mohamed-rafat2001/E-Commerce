@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { Button } from '../ui/index.js';
 import { FiShoppingBag, FiCheck, FiX } from 'react-icons/fi';
 import useAddToCart from '../../features/cart/hooks/useAddToCart.js';
-import useCart from '../../features/cart/hooks/useCart.js';
 
 /**
  * Universal Add to Cart button component
@@ -22,14 +21,6 @@ const AddToCartButton = ({
 }) => {
     const [buttonState, setButtonState] = useState('default'); // default, loading, success, error
     const { addToCart, isLoading } = useAddToCart();
-    const { cartItems } = useCart();
-
-    // Check if product is already in cart
-    const isInCart = cartItems.some(item => {
-        const p = item.item || item.itemId || item.productId || item;
-        const pId = p?._id || p?.id || item.product_id;
-        return pId === product._id || pId === product.id;
-    });
 
     // Check stock availability
     const isOutOfStock = product.countInStock === 0;

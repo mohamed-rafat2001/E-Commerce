@@ -1,7 +1,22 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiChevronDown } from 'react-icons/fi';
-import { statusConfig, allowedTransitions } from './orderConstants.js';
+import { FiChevronDown, FiClock, FiPackage, FiTruck, FiCheck, FiXCircle } from 'react-icons/fi';
+
+const statusConfig = {
+	Pending: { color: 'bg-gray-50 text-gray-600 border-gray-200', dot: 'bg-gray-400', icon: FiClock, label: 'Pending' },
+	Processing: { color: 'bg-blue-50 text-blue-600 border-blue-100', dot: 'bg-blue-500', icon: FiPackage, label: 'Processing' },
+	Shipped: { color: 'bg-amber-50 text-amber-600 border-amber-100', dot: 'bg-amber-500', icon: FiTruck, label: 'Shipped' },
+	Delivered: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', dot: 'bg-emerald-500', icon: FiCheck, label: 'Delivered' },
+	Cancelled: { color: 'bg-rose-50 text-rose-600 border-rose-100', dot: 'bg-rose-500', icon: FiXCircle, label: 'Cancelled' },
+};
+
+const allowedTransitions = {
+	Pending: ['Processing', 'Cancelled'],
+	Processing: ['Shipped', 'Cancelled'],
+	Shipped: ['Delivered'],
+	Delivered: [],
+	Cancelled: [],
+};
 
 const OrderStatusSelector = ({ value, onChange, disabled }) => {
 	const [isOpen, setIsOpen] = useState(false);

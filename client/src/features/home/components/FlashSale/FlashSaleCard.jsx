@@ -1,15 +1,15 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { FiShoppingBag, FiStar } from 'react-icons/fi';
-import { Badge, Button, Card } from '../../../../shared/ui';
+import { Button, Card } from '../../../../shared/ui';
 import SaleProgressBar from './SaleProgressBar';
 import { Link } from 'react-router-dom';
 
 const FlashSaleCard = ({ product, index, onAddToCart }) => {
-    // Determine the original vs sale price correctly based on common schema patterns (mocking if missing)
-    const currentPrice = product.price?.amount || product.price || 0;
-    const originalPrice = product.oldPrice?.amount || product.oldPrice || (currentPrice * 1.4).toFixed(2);
-    const discountPercent = product.discount || Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    const currentPrice = Number(product.price?.amount ?? product.price ?? 0);
+    const originalPrice = Number(product.oldPrice?.amount ?? product.oldPrice ?? currentPrice);
+    const discountPercent = Number(product.discount ?? (originalPrice > 0 ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0));
+    const soldCount = Number(product.sold ?? product.soldCount ?? 0);
+    const totalCount = Number(product.totalStock ?? product.stock ?? product.countInStock ?? 0);
 
     return (
         <motion.div
@@ -65,8 +65,8 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
 
                     <div className="space-y-4">
                         <SaleProgressBar
-                            sold={product.sold || (index + 2) * 5}
-                            total={(index + 5) * 10}
+                            sold={soldCount}
+                            total={totalCount}
                             className="text-white"
                         />
 

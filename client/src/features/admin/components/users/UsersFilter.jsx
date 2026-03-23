@@ -1,6 +1,16 @@
 import { Select } from '../../../../shared/ui/index.js';
 import { FiSearch } from 'react-icons/fi';
-import { roleOptions, statusOptions } from './userConstants.js';
+
+const roleOptions = [
+  { value: 'Customer', label: 'Customer' },
+  { value: 'Seller', label: 'Seller' },
+  { value: 'Admin', label: 'Admin' },
+];
+
+const statusOptions = [
+  { value: 'active', label: 'Active' },
+  { value: 'suspended', label: 'Suspended' },
+];
 
 const UsersFilter = ({ 
   searchQuery, 

@@ -1,15 +1,16 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { FiShoppingBag, FiHeart, FiClock, FiSettings } from 'react-icons/fi';
-import { PageHeader, StatCard, Card, DataTable, Badge, Button, Skeleton } from '../../../shared/ui';
+import { PageHeader, StatCard, Card, DataTable, Badge, Button } from '../../../shared/ui';
 import useCurrentUser from '../../user/hooks/useCurrentUser';
-import useOrderHistory from '../hooks/useOrderHistory'; // Assuming this exists or using mock
+import useOrderHistory from '../hooks/useOrderHistory';
 
 const CustomerDashboard = () => {
+	const navigate = useNavigate();
 	const { user } = useCurrentUser();
 	const { orders } = useOrderHistory();
 
 	const ordersList = orders || [];
+	const pendingStatuses = new Set(['pending', 'processing']);
 
 	const stats = [
 		{
@@ -28,7 +29,7 @@ const CustomerDashboard = () => {
 		},
 		{
 			title: 'Pending Orders',
-			value: ordersList.filter(o => o.status === 'pending' || o.status === 'processing').length.toString(),
+			value: ordersList.filter((o) => pendingStatuses.has(String(o.status || '').toLowerCase())).length.toString(),
 			icon: <FiClock />,
 			color: 'warning',
 			change: 'Expecting delivery'
@@ -47,7 +48,8 @@ const CustomerDashboard = () => {
 		date: new Date(o.createdAt).toLocaleDateString(),
 		total: `$${o.totalPrice?.amount || 0}`,
 		status: o.status,
-		statusColor: o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning'
+		statusColor: String(o.status || '').toLowerCase() === 'delivered' ? 'success' : String(o.status || '').toLowerCase() === 'cancelled' ? 'danger' : 'warning',
+		orderId: o._id
 	}));
 
 	const orderColumns = [
@@ -60,7 +62,11 @@ const CustomerDashboard = () => {
 		},
 		{
 			header: '',
-			render: () => <Button variant="ghost" size="sm">View</Button>
+			render: (row) => (
+				<Button variant="ghost" size="sm" onClick={() => navigate(`/customer/orderHistory?order=${row.orderId}`)}>
+					View
+				</Button>
+			)
 		}
 	];
 
@@ -81,7 +87,7 @@ const CustomerDashboard = () => {
 				<Card padding="none" className="lg:col-span-2 overflow-hidden">
 					<div className="p-6 border-b border-gray-100 flex items-center justify-between">
 						<h3 className="text-xl font-bold text-gray-900">Recent Orders</h3>
-						<Button variant="ghost" size="sm">View All</Button>
+						<Button variant="ghost" size="sm" onClick={() => navigate('/customer/orderHistory')}>View All</Button>
 					</div>
 					<DataTable columns={orderColumns} data={recentOrders} />
 				</Card>
@@ -89,13 +95,13 @@ const CustomerDashboard = () => {
 				<Card className="flex flex-col">
 					<h3 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
 					<div className="space-y-3 flex-1">
-						<Button variant="outline" fullWidth className="justify-start gap-3">
+						<Button variant="outline" fullWidth className="justify-start gap-3" onClick={() => navigate('/products')}>
 							<FiShoppingBag /> Continue Shopping
 						</Button>
-						<Button variant="outline" fullWidth className="justify-start gap-3">
+						<Button variant="outline" fullWidth className="justify-start gap-3" onClick={() => navigate('/customer/wishlist')}>
 							<FiHeart /> View Favorites
 						</Button>
-						<Button variant="outline" fullWidth className="justify-start gap-3">
+						<Button variant="outline" fullWidth className="justify-start gap-3" onClick={() => navigate('/customer/settings')}>
 							<FiSettings /> Account Settings
 						</Button>
 					</div>

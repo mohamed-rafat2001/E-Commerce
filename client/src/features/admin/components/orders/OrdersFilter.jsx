@@ -1,6 +1,13 @@
 import { Select } from '../../../../shared/ui/index.js';
 import { FiSearch } from 'react-icons/fi';
-import { statusOptions } from './orderConstants.js';
+
+const statusOptions = [
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Processing', label: 'Processing' },
+  { value: 'Shipped', label: 'Shipped' },
+  { value: 'Delivered', label: 'Delivered' },
+  { value: 'Cancelled', label: 'Cancelled' },
+];
 
 const OrdersFilter = ({ 
   searchQuery, 

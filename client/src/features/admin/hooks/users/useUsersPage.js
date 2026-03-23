@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import useAdminUsers from './useAdminUsers.js';
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUserMutations.js';
 import useCurrentUser from '../../../user/hooks/useCurrentUser.js';
-import { ITEMS_PER_PAGE } from '../../components/users/userConstants.js';
+
+const ITEMS_PER_PAGE = 10;
 
 const useUsersPage = () => {
   const navigate = useNavigate();

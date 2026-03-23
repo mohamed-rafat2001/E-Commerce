@@ -11,7 +11,6 @@ import useCartPage from '../hooks/useCartPage.js';
 const CartPage = () => {
     const {
         cartItems,
-        isLoading,
         calculations,
         handleQuantityChange,
         removeFromCart,
