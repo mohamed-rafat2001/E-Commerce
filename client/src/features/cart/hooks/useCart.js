@@ -1,29 +1,19 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showCart, updateCartItemQuantity, deleteFromCart, clearCart } from "../services/cart.js";
+import { getGuestCart, updateGuestCartQty, removeFromGuestCart, clearGuestCart } from "../services/guestCart.js";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
-import { useCallback, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
 
-import {
-	removeFromCart as reduxRemoveFromCart,
-	updateQuantity as reduxUpdateQuantity,
-	clearCart as reduxClearCart,
-	selectCartItems
-} from "../../../app/store/slices/cartSlice.js";
-
 /**
- * Unified cart hook — returns server cart if authenticated, Redux cart if not.
+ * Unified cart hook — returns server cart if authenticated, guest cart if not.
  * Includes all cart actions: add, remove, update, clear
  */
 export default function useCart() {
 	const { isAuthenticated, user } = useCurrentUser();
 	const userId = user?.userId?._id || user?._id;
+	const [guestCart, setGuestCart] = useState(null);
 	const queryClient = useQueryClient();
-	const dispatch = useDispatch();
-
-	// Get guest cart directly from Redux State
-	const reduxItems = useSelector(selectCartItems);
 
 	const {
 		data: response,
@@ -35,9 +25,27 @@ export default function useCart() {
 		enabled: !!userId,
 	});
 
-	// Provide a way to refresh the guest cart from UI if needed
+	// Load guest cart when not authenticated
+	useEffect(() => {
+		if (!isAuthenticated) {
+			setGuestCart(getGuestCart());
+
+			const handleGuestUpdate = () => {
+				setGuestCart(getGuestCart());
+			};
+
+			if (typeof window !== "undefined") {
+				window.addEventListener("guestCartUpdated", handleGuestUpdate);
+				return () => window.removeEventListener("guestCartUpdated", handleGuestUpdate);
+			}
+		}
+	}, [isAuthenticated]);
+
+	// Provide a way to refresh the guest cart from UI after local changes
 	const refreshGuestCart = useCallback(() => {
-		if (isAuthenticated) {
+		if (!isAuthenticated) {
+			setGuestCart(getGuestCart());
+		} else {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
 		}
 	}, [isAuthenticated, queryClient]);
@@ -81,9 +89,10 @@ export default function useCart() {
 				toast.error("Failed to remove item from cart");
 			});
 		} else {
-			dispatch(reduxRemoveFromCart(productId));
+			removeFromGuestCart(productId);
+			setGuestCart(getGuestCart());
 		}
-	}, [isAuthenticated, queryClient, userId, dispatch]);
+	}, [isAuthenticated, queryClient, userId]);
 
 	// Update quantity (auth + guest)
 	const updateQuantity = useCallback((productId, quantity) => {
@@ -135,9 +144,10 @@ export default function useCart() {
 				toast.error("Failed to update quantity");
 			});
 		} else {
-			dispatch(reduxUpdateQuantity({ id: productId, quantity }));
+			updateGuestCartQty(productId, quantity);
+			setGuestCart(getGuestCart());
 		}
-	}, [isAuthenticated, queryClient, userId, dispatch]);
+	}, [isAuthenticated, queryClient, userId]);
 
 	// Clear cart (auth + guest)
 	const clearCartAction = useCallback(() => {
@@ -174,13 +184,14 @@ export default function useCart() {
 				toast.error("Failed to clear cart");
 			});
 		} else {
-			dispatch(reduxClearCart());
+			clearGuestCart();
+			setGuestCart({ items: [], total: 0 });
 		}
-	}, [isAuthenticated, queryClient, userId, dispatch]);
+	}, [isAuthenticated, queryClient, userId]);
 
 	const cart = isAuthenticated
 		? response?.data?.data?.data || response?.data?.data || response?.data
-		: { items: reduxItems };
+		: guestCart;
 
 	const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
 

@@ -36,9 +36,17 @@ const PublicProductCard = ({ product }) => {
     const handleWishlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (!isAuthenticated) {
+            requireAuth({
+                message: "Sign in to save items to your wishlist",
+                redirectAfter: `/products/${productId}`,
+                onSuccessCallback: "wishlist:add",
+                callbackPayload: { productId }
+            });
+            return;
+        }
 
-
-        await toggleWishlist(productId, product);
+        await toggleWishlist(productId);
     };
 
     const allImages = [

@@ -11,7 +11,16 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
 
   const handleWishlistToggle = async (e) => {
     e.preventDefault();
-    await toggleWishlist(productId, { id: productId, name: productName, images });
+    if (!isAuthenticated) {
+      requireAuth({
+        message: "Sign in to save items to your wishlist",
+        redirectAfter: `/products/${productId}`,
+        onSuccessCallback: "wishlist:add",
+        callbackPayload: { productId }
+      });
+      return;
+    }
+    await toggleWishlist(productId);
   };
 
   const nextImage = () => setActiveIndex((prev) => (prev + 1) % images.length);

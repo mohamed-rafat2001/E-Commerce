@@ -5,7 +5,7 @@
 */
 import { useCallback } from "react";
 import { addToCart as addToCartApi } from "../services/cart.js";
-
+import { addToGuestCart } from "../services/guestCart.js";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
 import useCart from "./useCart.js";
@@ -13,12 +13,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { openAuthModal } from "../../../app/store/slices/authModalSlice.js";
 
-import { addToCart as reduxAddToCart } from "../../../app/store/slices/cartSlice.js";
-
 /**
  * Add to cart hook with guest/auth decision logic.
  * If authenticated → POST /api/v1/cart (MongoDB)
- * If guest → use Redux Toolkit
+ * If guest → addToGuestCart (localStorage)
  */
 export default function useAddToCart() {
 	const { isAuthenticated, user } = useCurrentUser();
@@ -100,12 +98,24 @@ export default function useAddToCart() {
 					throw err;
 				}
 			} else {
-				// Guest: use Redux
-				dispatch(reduxAddToCart({ ...productOrPayload, quantity }));
+				// Guest: use localStorage
+				addToGuestCart(productOrPayload, quantity);
+				refreshGuestCart();
+				const hasShownPrompt = localStorage.getItem("guest_cart_auth_prompt_shown") === "true";
+				if (!hasShownPrompt) {
+					dispatch(
+						openAuthModal({
+							message: "Sign in to complete your purchase",
+							redirectAfter: "/cart",
+							onSuccessCallback: "merge:guestCart",
+						})
+					);
+					localStorage.setItem("guest_cart_auth_prompt_shown", "true");
+				}
 				return Promise.resolve();
 			}
 		},
-		[dispatch, isAuthenticated, mutateAsync, queryClient, userId]
+		[dispatch, isAuthenticated, mutateAsync, refreshGuestCart, queryClient, userId]
 	);
 
 	return { error, data, addToCart, isLoading };

@@ -35,10 +35,20 @@ const WishlistButton = ({
 
         if (isLoading) return;
 
+        if (!isAuthenticated) {
+            requireAuth({
+                message: "Sign in to save items to your wishlist",
+                redirectAfter: `/products/${productId}`,
+                onSuccessCallback: "wishlist:add",
+                callbackPayload: { productId }
+            });
+            return;
+        }
+
         setIsAnimating(true);
 
         try {
-            await toggleWishlist(productId, product);
+            await toggleWishlist(productId);
 
             if (onSuccess) onSuccess(!isInList);
 

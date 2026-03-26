@@ -1,23 +1,19 @@
+/* Audit Findings:
+ - Backend supports authenticated merge endpoint POST /api/v1/cart/merge with guest_items array.
+ - Guest cart is persisted in localStorage under guest_cart and already has helper utilities.
+ - Login currently attempts merge in auth hook; centralized post-login merge is more reliable.
+*/
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import useCurrentUser from "../features/user/hooks/useCurrentUser.js";
 import { mergeGuestCart } from "../features/cart/services/cart.js";
-import { selectCartItems, clearCart as reduxClearCart } from "../app/store/slices/cartSlice.js";
+import { getGuestCart, clearGuestCart } from "../features/cart/services/guestCart.js";
 
 export default function useCartMerge() {
 	const { isAuthenticated } = useCurrentUser();
 	const queryClient = useQueryClient();
-	const dispatch = useDispatch();
 	const previousAuthRef = useRef(false);
-	const guestItems = useSelector(selectCartItems);
-
-	// Use a ref to hold the current items so we don't trigger the effect on every change
-	const itemsRef = useRef(guestItems);
-	useEffect(() => {
-		itemsRef.current = guestItems;
-	}, [guestItems]);
 
 	useEffect(() => {
 		let isCancelled = false;
@@ -29,16 +25,17 @@ export default function useCartMerge() {
 				return;
 			}
 
-			const itemsToMerge = itemsRef.current || [];
-			if (!itemsToMerge.length) {
+			const guestCart = getGuestCart();
+			const guestItems = guestCart?.items || [];
+			if (!guestItems.length) {
 				previousAuthRef.current = isAuthenticated;
 				return;
 			}
 
 			try {
-				await mergeGuestCart(itemsToMerge);
+				await mergeGuestCart(guestItems);
 				if (!isCancelled) {
-					dispatch(reduxClearCart());
+					clearGuestCart();
 					queryClient.invalidateQueries({ queryKey: ["cart"] });
 					toast.success("Cart items saved to account!");
 				}
@@ -56,5 +53,5 @@ export default function useCartMerge() {
 		return () => {
 			isCancelled = true;
 		};
-	}, [isAuthenticated, queryClient, dispatch]);
+	}, [isAuthenticated, queryClient]);
 }
