@@ -14,7 +14,7 @@ import useAuthGuard from '../../hooks/useAuthGuard.js';
  * Handles all states: default, hover, loading, added (filled)
  * Works for both authenticated and guest users
  */
-const WishlistButton = ({ 
+const WishlistButton = ({
     product,
     size = 'md',
     className = '',
@@ -32,33 +32,23 @@ const WishlistButton = ({
     const handleClick = useCallback(async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (isLoading) return;
 
-        if (!isAuthenticated) {
-            requireAuth({
-                message: "Sign in to save items to your wishlist",
-                redirectAfter: `/products/${productId}`,
-                onSuccessCallback: "wishlist:add",
-                callbackPayload: { productId }
-            });
-            return;
-        }
-
         setIsAnimating(true);
-        
+
         try {
-            await toggleWishlist(productId);
-            
+            await toggleWishlist(productId, product);
+
             if (onSuccess) onSuccess(!isInList);
-            
+
             // Reset animation after 1.5s
             setTimeout(() => {
                 setIsAnimating(false);
             }, 1500);
         } catch (error) {
             setIsAnimating(false);
-            
+
             if (onError) onError(error);
         }
     }, [isAuthenticated, isInList, isLoading, onError, onSuccess, productId, requireAuth, toggleWishlist]);
@@ -97,7 +87,7 @@ const WishlistButton = ({
             {isLoading ? (
                 <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
             ) : (
-                <FiHeart 
+                <FiHeart
                     className={`
                         ${iconSize[size]}
                         ${isInList ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}

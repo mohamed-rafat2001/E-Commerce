@@ -11,16 +11,7 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
 
   const handleWishlistToggle = async (e) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      requireAuth({
-        message: "Sign in to save items to your wishlist",
-        redirectAfter: `/products/${productId}`,
-        onSuccessCallback: "wishlist:add",
-        callbackPayload: { productId }
-      });
-      return;
-    }
-    await toggleWishlist(productId);
+    await toggleWishlist(productId, { id: productId, name: productName, images });
   };
 
   const nextImage = () => setActiveIndex((prev) => (prev + 1) % images.length);
@@ -44,7 +35,7 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
           className="w-full h-full object-cover transition-opacity duration-500 ease-in-out"
           key={activeIndex} // Force re-mount for opacity transition effect
         />
-        
+
         {/* Wishlist Button */}
         <button
           type="button"
@@ -52,8 +43,8 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
           className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-10"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <FiHeart 
-            className={`w-6 h-6 transition-colors duration-300 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-gray-600'}`} 
+          <FiHeart
+            className={`w-6 h-6 transition-colors duration-300 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-gray-600'}`}
           />
         </button>
 
@@ -80,24 +71,22 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
                 type="button"
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
-                className={`relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 border-2 ${
-                  isActive ? 'border-blue-600 shadow-lg scale-105' : 'border-transparent hover:border-gray-200'
-                }`}
+                className={`relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 border-2 ${isActive ? 'border-blue-600 shadow-lg scale-105' : 'border-transparent hover:border-gray-200'
+                  }`}
                 aria-label={`View image ${idx + 1} of ${images.length}`}
               >
                 <img src={img} alt={`${productName} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
               </button>
             );
           })}
-          
+
           {/* More images indicator */}
           {images.length > 4 && (
-            <button 
+            <button
               type="button"
               onClick={() => setActiveIndex(4)}
-              className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
-                activeIndex >= 4 ? 'border-blue-600' : 'border-transparent'
-              }`}
+              className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeIndex >= 4 ? 'border-blue-600' : 'border-transparent'
+                }`}
             >
               <img src={images[4]} alt="More images" className="w-full h-full object-cover blur-[2px]" />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">

@@ -5,10 +5,15 @@
 */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showWishList, addToWishlist as addToWishlistApi, deleteFromWishlist as deleteFromWishlistApi } from "../services/wishList.js";
-import { getGuestWishlist, isInGuestWishlist, removeFromGuestWishlist } from "../services/guestWishlist.js";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
+import {
+	addToWishList as reduxAddToWishlist,
+	deleteFromWishList as reduxDeleteFromWishlist,
+} from "../../../app/store/slices/wishList.js";
+import { openAuthModal } from "../../../app/store/slices/authModalSlice.js";
 
 /**
  * Get current user wishlist query
@@ -16,8 +21,11 @@ import toast from "react-hot-toast";
 export default function useWishlist() {
 	const { user, isAuthenticated } = useCurrentUser();
 	const userId = user?.userId?._id;
-	const [guestWishlist, setGuestWishlist] = useState(null);
 	const queryClient = useQueryClient();
+	const dispatch = useDispatch();
+
+	// Get guest wishlist directly from Redux State
+	const guestWishlistItems = useSelector((state) => state.wishListStore.items);
 
 	const {
 		data: response,
@@ -29,35 +37,9 @@ export default function useWishlist() {
 		enabled: !!userId,
 	});
 
-	useEffect(() => {
-		if (!userId) {
-			const loadGuestWishlist = () => {
-				const savedWishlist = localStorage.getItem("guest_wishlist");
-				if (savedWishlist) {
-					try {
-						setGuestWishlist(JSON.parse(savedWishlist));
-					} catch {
-						setGuestWishlist({ items: [] });
-					}
-				} else {
-					setGuestWishlist({ items: [] });
-				}
-			};
-
-			loadGuestWishlist();
-
-			if (typeof window !== "undefined") {
-				window.addEventListener("guestWishlistUpdated", loadGuestWishlist);
-				return () => window.removeEventListener("guestWishlistUpdated", loadGuestWishlist);
-			}
-		}
-	}, [userId]);
-
-	// Provide a way to refresh the guest wishlist from UI after local changes
+	// Provide a way to refresh the wishlist from UI after local changes
 	const refreshWishlist = useCallback(() => {
-		if (!isAuthenticated) {
-			setGuestWishlist(getGuestWishlist());
-		} else {
+		if (isAuthenticated) {
 			queryClient.invalidateQueries({ queryKey: ["wishlist"] });
 		}
 	}, [isAuthenticated, queryClient]);
@@ -73,14 +55,35 @@ export default function useWishlist() {
 				toast.error('Failed to remove from wishlist');
 			}
 		} else {
-			removeFromGuestWishlist(productId);
-			setGuestWishlist(getGuestWishlist());
+			dispatch(reduxDeleteFromWishlist({ id: productId }));
 		}
-	}, [isAuthenticated, queryClient]);
+	}, [isAuthenticated, queryClient, dispatch]);
 
-	const toggleWishlist = useCallback(async (productId) => {
+	const toggleWishlist = useCallback(async (productId, productData = null) => {
 		if (!isAuthenticated) {
-			return { requiresAuth: true };
+			// Guest: use Redux
+			const currentlyInWishlist = guestWishlistItems.some(item => (item.id || item._id) === productId);
+
+			if (currentlyInWishlist) {
+				dispatch(reduxDeleteFromWishlist({ id: productId }));
+			} else {
+				// Store full product details if provided, otherwise just ID
+				dispatch(reduxAddToWishlist(productData || { id: productId, _id: productId }));
+
+				// Show login prompt for guests
+				const hasShownPrompt = localStorage.getItem("guest_wishlist_auth_prompt_shown") === "true";
+				if (!hasShownPrompt) {
+					dispatch(
+						openAuthModal({
+							message: "Sign in to save items to your wishlist across devices",
+							redirectAfter: window.location.pathname,
+							onSuccessCallback: "merge:guestWishlist",
+						})
+					);
+					localStorage.setItem("guest_wishlist_auth_prompt_shown", "true");
+				}
+			}
+			return { success: true };
 		}
 
 		const queryKey = ["wishlist", userId];
@@ -127,7 +130,7 @@ export default function useWishlist() {
 			toast.error("Failed to update wishlist");
 			return { success: false };
 		}
-	}, [isAuthenticated, queryClient, userId]);
+	}, [isAuthenticated, queryClient, userId, dispatch, guestWishlistItems]);
 
 	// Check if product is in wishlist
 	const isInWishlist = useCallback((productId) => {
@@ -142,12 +145,12 @@ export default function useWishlist() {
 				return itemId === productId;
 			});
 		} else {
-			// For guests, check localStorage
-			return isInGuestWishlist(productId);
+			// For guests, check Redux
+			return guestWishlistItems.some(item => (item.id || item._id) === productId);
 		}
-	}, [isAuthenticated, response]);
+	}, [isAuthenticated, response, guestWishlistItems]);
 
-	const wishlist = userId ? (response?.data?.data?.wishlist || response?.data?.data) : guestWishlist;
+	const wishlist = isAuthenticated ? (response?.data?.data?.wishlist || response?.data?.data) : { items: guestWishlistItems };
 
 	return {
 		wishlist,
