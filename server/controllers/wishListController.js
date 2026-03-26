@@ -22,7 +22,7 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 		});
 	} else {
 		const itemIndex = doc.items.findIndex(
-			(id) => id.toString() === req.params.id
+			(item) => (item._id || item).toString() === req.params.id
 		);
 
 		if (itemIndex === -1) {
@@ -30,6 +30,9 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 		} else {
 			doc.items.splice(itemIndex, 1);
 		}
+
+		// If items are populated, we need to extract the IDs before saving
+		doc.items = doc.items.map(item => item._id || item);
 		await doc.save();
 	}
 	// check if doc created

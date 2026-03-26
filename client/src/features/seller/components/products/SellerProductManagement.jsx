@@ -159,7 +159,7 @@ export default function SellerProductManagement({
                             icon={FiLayers}
                             color="text-purple-600"
                         />
-                        <StatRow label="Store Performance" value={`${product.ratingAverage || '5.0'} Grade`} icon={FiGlobe} color="text-indigo-600" />
+                        <StatRow label="Store Performance" value={`${Number(product.ratingAverage || 0).toFixed(1)} Grade`} icon={FiGlobe} color="text-indigo-600" />
                         <StatRow label="Fulfillment Velocity" value="Real-time" icon={FiActivity} color="text-emerald-600" />
                     </div>
                 </div>

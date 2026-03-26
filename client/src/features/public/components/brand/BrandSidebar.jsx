@@ -1,5 +1,7 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { FiGrid, FiLayers, FiStar, FiInfo, FiCalendar, FiTag } from "react-icons/fi";
+import { getCategories } from "../../services/index.js";
 
 export default function BrandSidebar({
 	brand,
@@ -9,33 +11,36 @@ export default function BrandSidebar({
 	onSubCategorySelect,
 	onClearCategory,
 }) {
+	const { data: categoriesData } = useQuery({
+		queryKey: ["categories", "public", "all"],
+		queryFn: () => getCategories({ limit: 100 }),
+		staleTime: 5 * 60 * 1000,
+	});
+
 	const categoryGroups = useMemo(() => {
-		const subCategories = Array.isArray(brand?.subCategories) ? brand.subCategories : [];
+		const cats = categoriesData?.data?.data || [];
+		if (!Array.isArray(cats)) return [{ id: "", name: "All Collections", isNew: false, subItems: [] }];
+
 		const map = new Map();
 
-		subCategories.forEach((sub) => {
-			const parent = sub?.categoryId;
-			const parentId = parent?._id || parent?.id;
-			if (!parentId) return;
+		cats.forEach((cat) => {
+			const catId = cat?._id || cat?.id;
+			if (!catId) return;
 
-			if (!map.has(parentId)) {
-				map.set(parentId, {
-					id: parentId,
-					name: parent?.name || "Collection",
-					isNew: Boolean(parent?.isNew),
-					subItems: [],
-				});
-			}
-
-			map.get(parentId).subItems.push({
-				id: sub?._id || sub?.id,
-				name: sub?.name || "Sub Collection",
-				isNew: Boolean(sub?.isNew),
+			map.set(catId, {
+				id: catId,
+				name: cat?.name || "Collection",
+				isNew: Boolean(cat?.isNew),
+				subItems: (cat.subCategories || []).map(sub => ({
+					id: sub?._id || sub?.id,
+					name: sub?.name || "Sub Collection",
+					isNew: Boolean(sub?.isNew),
+				})),
 			});
 		});
 
 		return [{ id: "", name: "All Collections", isNew: false, subItems: [] }, ...Array.from(map.values())];
-	}, [brand]);
+	}, [categoriesData]);
 
 	const brandName = brand?.name || "Brand";
 	const description = brand?.description || "";

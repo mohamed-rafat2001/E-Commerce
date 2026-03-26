@@ -122,7 +122,8 @@ const PublicProductCard = ({ product }) => {
                     <div className="flex items-center gap-1.5">
                         <div className="flex items-center text-yellow-500">
                             <FiStar className="w-3.5 h-3.5 fill-current" />
-                            <span className="ml-1 text-sm font-bold text-gray-900">{product.ratingAverage || '4.8'}</span>
+                            <span className="ml-1 text-sm font-bold text-gray-900">{Number(product.ratingAverage || 0).toFixed(1)}</span>
+                            <span className="ml-1 text-xs text-gray-500">({product.ratingCount || 0})</span>
                         </div>
                     </div>
 

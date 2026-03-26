@@ -44,7 +44,7 @@ const FlashSaleCard = ({ product, index, onAddToCart }) => {
                             {product.brand?.name || 'Exclusive'}
                         </span>
                         <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs bg-amber-400/10 px-3 py-1.5 rounded-full border border-amber-400/20">
-                            <FiStar className="fill-current w-3 h-3" /> {product.ratingAverage || 4.8}
+                            <FiStar className="fill-current w-3 h-3" /> {Number(product.ratingAverage || 0).toFixed(1)}
                         </div>
                     </div>
 

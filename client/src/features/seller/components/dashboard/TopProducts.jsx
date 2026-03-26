@@ -55,7 +55,7 @@ const TopProducts = ({ products = [] }) => {
 									<div className="flex items-center gap-1">
 										<FiStar className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
 										<span className="text-xs text-gray-500 font-medium">
-											{product.ratingAverage || 'N/A'}
+											{product.ratingAverage ? Number(product.ratingAverage).toFixed(1) : 'N/A'}
 										</span>
 									</div>
 									<span className="text-gray-300 text-[8px]">•</span>

@@ -109,6 +109,8 @@ export const deleteFromDocList = (Model) =>
 
 		if (Model.modelName === "WishListModel") {
 			doc.items.pull(req.params.id);
+			// Also unwrap populated items to prevent Cast to ObjectId errors during save
+			doc.items = doc.items.map(item => item._id || item);
 		}
 
 		await doc.save();

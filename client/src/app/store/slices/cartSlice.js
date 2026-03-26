@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 const initialState = {
 	items: [], // Array of { id, name, price, quantity, color, size, material, image, ... }
 	promoCode: null,
@@ -52,6 +52,10 @@ export const { addToCart, removeFromCart, updateQuantity, applyPromoCode, clearC
 
 // Selectors
 export const selectCartItems = (state) => state.cartStore.items;
-export const selectPromoInfo = (state) => ({ code: state.cartStore.promoCode, discount: state.cartStore.discount });
+export const selectPromoInfo = createSelector(
+	(state) => state.cartStore.promoCode,
+	(state) => state.cartStore.discount,
+	(code, discount) => ({ code, discount })
+);
 
 export default cartSlice.reducer;

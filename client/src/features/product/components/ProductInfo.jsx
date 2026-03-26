@@ -41,7 +41,7 @@ const ProductInfo = ({ product }) => {
   const canAddToCart = useMemo(() => {
     const colorRequired = product.variants?.colors?.length > 0;
     const sizeRequired = product.variants?.sizes?.length > 0;
-    
+
     if (colorRequired && !selectedColor) return false;
     if (sizeRequired && !selectedSize) return false;
     return true;
@@ -55,16 +55,16 @@ const ProductInfo = ({ product }) => {
 
     try {
       await addToCart({
-      itemId: product._id,
-      productId: product._id,
-      name: product.name,
-      price: currentPrice,
-      imageUrl: product.coverImage?.secure_url || product.image?.secure_url,
-      color: selectedColor,
-      size: selectedSize,
-      quantity: 1,
-      brand: product.brandId?.name || product.brand?.name
-    }, 1);
+        itemId: product._id,
+        productId: product._id,
+        name: product.name,
+        price: currentPrice,
+        imageUrl: product.coverImage?.secure_url || product.image?.secure_url,
+        color: selectedColor,
+        size: selectedSize,
+        quantity: 1,
+        brand: product.brandId?.name || product.brand?.name
+      }, 1);
       toast.success('Added to cart!');
     } catch {
       toast.error('Failed to update cart');
@@ -90,9 +90,9 @@ const ProductInfo = ({ product }) => {
         <div className="flex items-center gap-2">
           <div className="flex items-center text-yellow-400">
             <FiStar className="fill-current w-4 h-4" />
-            <span className="ml-1 text-sm font-black text-gray-900">{product.ratingAverage || '4.9'}</span>
+            <span className="ml-1 text-sm font-black text-gray-900">{Number(product.ratingAverage || 0).toFixed(1)}</span>
           </div>
-          <span className="text-gray-400 text-xs font-bold">({product.numReviews || '128'} reviews)</span>
+          <span className="text-gray-400 text-xs font-bold">({product.ratingCount || product.numReviews || 0} reviews)</span>
         </div>
       </div>
 
@@ -122,15 +122,15 @@ const ProductInfo = ({ product }) => {
 
       {/* Selectors */}
       <div className="space-y-10 mb-12">
-        <ColorSelector 
-          colors={product.variants?.colors} 
-          selectedColor={selectedColor} 
-          onSelect={setSelectedColor} 
+        <ColorSelector
+          colors={product.variants?.colors}
+          selectedColor={selectedColor}
+          onSelect={setSelectedColor}
         />
-        
-        <SizeSelector 
-          sizes={product.variants?.sizes} 
-          selectedSize={selectedSize} 
+
+        <SizeSelector
+          sizes={product.variants?.sizes}
+          selectedSize={selectedSize}
           onSelect={setSelectedSize}
           onOpenSizeGuide={() => toast('Size Guide coming soon!')}
         />

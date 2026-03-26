@@ -41,14 +41,14 @@ export default function BrandsPage() {
 
 				<div role="list" aria-busy={isLoading ? "true" : "false"}>
 					{isLoading ? (
-						<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
-							{[...Array(6)].map((_, i) => (
-								<div key={i} aria-hidden="true" className="h-[350px] rounded-[2rem] bg-gray-100 animate-pulse" />
+						<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
+							{[...Array(10)].map((_, i) => (
+								<div key={i} aria-hidden="true" className="h-[280px] rounded-3xl bg-gray-100 animate-pulse" />
 							))}
 						</div>
 					) : brands.length > 0 ? (
 						<>
-							<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+							<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
 								{brands.map((brand) => (
 									<div key={brand._id || brand.id || brand.slug} role="listitem">
 										<BrandCard brand={brand} />
