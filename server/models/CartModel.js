@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { moneySchema } from "./commonSchemas.js";
+import ProductModel from "./ProductModel.js";
 
 const cartSchema = new mongoose.Schema(
 	{
@@ -36,44 +37,42 @@ cartSchema.pre(/^find/, function () {
 	});
 });
 
-cartSchema.pre("save", async function (next) {
+cartSchema.pre("save", async function () {
 	if (!this.isModified("items")) {
-		return next();
+		return;
 	}
 
-	try {
-		// Use populate to get product details directly
-		await this.populate("items.item");
+	let currency = "USD";
+	let grandTotal = 0;
 
-		let currency = "USD";
-		let grandTotal = 0;
+	for (const item of this.items) {
+		// Use lean() to bypass ProductModel's heavy pre-find hooks
+		// (which cascade populate reviews, brand, category, etc.)
+		const productId = item.item?._id || item.item;
+		if (!productId) continue;
 
-		for (const item of this.items) {
-			if (item.item && item.item.price) {
-				const unitPrice = item.item.price.amount;
-				const itemSubtotal = unitPrice * item.quantity;
+		const product = await ProductModel.findById(productId)
+			.select("price")
+			.lean();
 
-				// Set the item price to the subtotal for that quantity
-				item.price = {
-					amount: itemSubtotal,
-					currency: item.item.price.currency,
-				};
+		if (product && product.price) {
+			const unitPrice = product.price.amount;
+			const itemSubtotal = unitPrice * item.quantity;
 
-				currency = item.item.price.currency;
-				// Add this item's subtotal to the grand total
-				grandTotal += itemSubtotal;
-			}
+			item.price = {
+				amount: itemSubtotal,
+				currency: product.price.currency || "USD",
+			};
+
+			currency = product.price.currency || "USD";
+			grandTotal += itemSubtotal;
 		}
-
-		this.totalPrice = {
-			amount: grandTotal,
-			currency: currency,
-		};
-	} catch (error) {
-		return next(error);
 	}
 
-	next();
+	this.totalPrice = {
+		amount: grandTotal,
+		currency: currency,
+	};
 });
 
 export default mongoose.model("CartModel", cartSchema);

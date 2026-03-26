@@ -1,4 +1,4 @@
-import { getFunc } from "../../../shared/services/handlerFactory.js";
+import { getFunc, addFunc } from "../../../shared/services/handlerFactory.js";
 
 export const getBrands = (params = {}) => getFunc("brands/public", { params });
 
@@ -18,3 +18,13 @@ export const getCategoryById = (categoryId) =>
 	getFunc(`categories/${categoryId}`, {
 		params: { populate: "subCategories" },
 	});
+
+// Brand follow services
+export const toggleFollowBrand = (brandId) =>
+	addFunc(`brands/${brandId}/follow`);
+
+export const getFollowStatus = (brandId) =>
+	getFunc(`brands/${brandId}/follow/status`);
+
+export const getFollowersCount = (brandId) =>
+	getFunc(`brands/${brandId}/followers/count`);

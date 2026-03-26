@@ -1,4 +1,5 @@
 import BrandModel from "../models/BrandModel.js";
+import BrandFollowerModel from "../models/BrandFollowerModel.js";
 import SellerModel from "../models/SellerModel.js";
 import ProductModel from "../models/ProductModel.js";
 import { uploadSingleImage, uploadBrandImages, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
@@ -31,9 +32,15 @@ const invalidateBrandCache = async (brandId) => {
 // @route   GET /api/v1/brands/public
 // @access  Public
 export const getAllActiveBrands = catchAsync(async (req, res, next) => {
-	const query = BrandModel.find({ isActive: true });
+	// Get total count for pagination
+	const countQuery = BrandModel.find({ isActive: true });
+	const countFeatures = new APIFeatures(countQuery, req.query)
+		.filter()
+		.search(BrandModel.schema);
+	const total = await countFeatures.query.countDocuments();
 
-	// Apply API features (filtering, sorting, pagination, etc.)
+	// Fetch paginated brands
+	const query = BrandModel.find({ isActive: true });
 	const features = new APIFeatures(query, req.query)
 		.filter()
 		.sort()
@@ -41,10 +48,37 @@ export const getAllActiveBrands = catchAsync(async (req, res, next) => {
 		.search(BrandModel.schema)
 		.paginate();
 
-	const brands = await features.query;
+	const brands = await features.query.populate({
+		path: "products",
+		select: "_id",
+	});
 
-	// Send response
-	return sendResponse(res, 200, brands);
+	// Attach followers count to each brand
+	const brandsWithFollowers = await Promise.all(
+		brands.map(async (brand) => {
+			const brandObj = brand.toObject();
+			brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+			brandObj.productsCount = brandObj.products?.length || 0;
+			return brandObj;
+		})
+	);
+
+	const page = req.query.page * 1 || 1;
+	const limit = req.query.limit * 1 || 100;
+	const numberOfPages = Math.ceil(total / limit);
+
+	return res.status(200).json({
+		status: "success",
+		results: brandsWithFollowers.length,
+		total,
+		paginationResult: {
+			currentPage: page,
+			numberOfPages,
+			totalResults: total,
+			limit,
+		},
+		data: brandsWithFollowers,
+	});
 });
 
 // @desc    Get all brands for current seller
@@ -82,11 +116,20 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 		.search(BrandModel.schema);
 	const total = await totalFeatures.query.countDocuments();
 
+	// Attach followers count to each brand
+	const brandsWithFollowers = await Promise.all(
+		brands.map(async (brand) => {
+			const brandObj = brand.toObject();
+			brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+			return brandObj;
+		})
+	);
+
 	const responseData = {
 		status: "success",
-		results: brands.length,
+		results: brandsWithFollowers.length,
 		total,
-		data: brands
+		data: brandsWithFollowers
 	};
 
 	await setCache(cacheKey, responseData, 7200); // 2 hours TTL
@@ -118,8 +161,11 @@ export const getBrand = catchAsync(async (req, res, next) => {
 		return next(new appError("Brand not found", 404));
 	}
 
-	await setCache(cacheKey, brand, 7200); // 2 hours TTL
-	sendResponse(res, 200, brand);
+	const brandObj = brand.toObject();
+	brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+
+	await setCache(cacheKey, brandObj, 7200); // 2 hours TTL
+	sendResponse(res, 200, brandObj);
 });
 
 // @desc    Create new brand

@@ -130,20 +130,74 @@ const models = {
 	}
 };
 
+import BrandFollowerModel from "../models/BrandFollowerModel.js";
+
 export const resolveModel = (req, res, next, modelName) => {
 	if (!models[modelName]) {
 		return next(new appError(`Model ${modelName} not found`, 404));
 	}
 	req.Model = models[modelName].model;
+	req.modelName = modelName;
 	req.createFields = models[modelName].createFields;
 	req.updateFields = models[modelName].updateFields;
 	next();
 };
 
-export const getAll = (req, res, next) => {
+export const getAll = catchAsync(async (req, res, next) => {
+	// For brands, use custom handler that adds followersCount
+	if (req.modelName === "brands") {
+		const { default: APIFeatures } = await import("../utils/apiFeatures.js");
+
+		let filter = {};
+		const features = new APIFeatures(BrandModel.find(filter), req.query)
+			.filter()
+			.search(BrandModel.schema)
+			.sort()
+			.limitFields()
+			.paginate();
+
+		if (req.query.populate) {
+			let populateFields;
+			try {
+				if (req.query.populate.startsWith("{") || req.query.populate.startsWith("[")) {
+					populateFields = JSON.parse(req.query.populate);
+				} else {
+					populateFields = req.query.populate.split(",").join(" ");
+				}
+			} catch (e) {
+				populateFields = req.query.populate.split(",").join(" ");
+			}
+			features.query = features.query.populate(populateFields);
+		}
+
+		const docs = await features.query;
+
+		const countFeatures = new APIFeatures(BrandModel.find(filter), req.query)
+			.filter()
+			.search(BrandModel.schema);
+		const totalDocs = await countFeatures.query.countDocuments();
+
+		// Attach followers count
+		const brandsWithFollowers = await Promise.all(
+			docs.map(async (brand) => {
+				const brandObj = brand.toObject();
+				brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+				return brandObj;
+			})
+		);
+
+		return res.status(200).json({
+			status: "success",
+			results: brandsWithFollowers.length,
+			total: totalDocs,
+			data: brandsWithFollowers,
+		});
+	}
+
+	// Default: use generic handler
 	const fn = fetchAll(req.Model);
 	return fn(req, res, next);
-};
+});
 
 export const getOne = (req, res, next) => {
 	const fn = fetchById(req.Model);

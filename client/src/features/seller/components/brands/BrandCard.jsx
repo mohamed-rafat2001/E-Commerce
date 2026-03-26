@@ -14,7 +14,8 @@ import {
 	FiStar,
 	FiCheckCircle,
 	FiXCircle,
-	FiBox
+	FiBox,
+	FiUsers
 } from 'react-icons/fi';
 
 const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
@@ -103,6 +104,13 @@ const BrandCard = ({ brand, onEdit, onDelete, onLogoEdit }) => (
 						<FiBox className="w-3.5 h-3.5" />
 					</div>
 					<span>{brand.products?.length || 0} Products</span>
+				</div>
+
+				<div className="flex items-center gap-2.5 text-sm text-gray-500 group/item">
+					<div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center shrink-0 text-gray-400 group-hover/item:bg-indigo-50 group-hover/item:text-indigo-600 transition-colors">
+						<FiUsers className="w-3.5 h-3.5" />
+					</div>
+					<span>{brand.followersCount || 0} Followers</span>
 				</div>
 			</div>
 

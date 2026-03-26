@@ -1,8 +1,3 @@
-/* Pattern Summary:
-Modeled after features/product/hooks/useProductsPage.js and useProductFilters.js.
-This hook keeps URL-driven filters with paginated product queries and maps sort options
-to backend-compatible sort syntax while preserving shared query conventions.
-*/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getBrandProducts } from "../services/index.js";
@@ -21,6 +16,7 @@ export default function usePublicBrandProducts({ brandId, category, subCategory,
 			page,
 			limit,
 			sort: sortMap[sort] || sortMap.newest,
+			status: "active",
 		};
 
 		if (category) params.primaryCategory = category;
@@ -35,8 +31,20 @@ export default function usePublicBrandProducts({ brandId, category, subCategory,
 		keepPreviousData: true,
 	});
 
-	const products = useMemo(() => query.data?.data?.data || [], [query.data]);
-	const pagination = useMemo(() => query.data?.paginationResult || {}, [query.data]);
+	// Response shape: axios wraps in { data: { status, results, total, data: [...] } }
+	const apiData = useMemo(() => query.data?.data || {}, [query.data]);
+	const products = useMemo(() => apiData.data || [], [apiData]);
+
+	const total = apiData.total || 0;
+	const currentPage = page || 1;
+	const numberOfPages = Math.max(1, Math.ceil(total / limit));
+
+	const pagination = useMemo(() => ({
+		totalResults: total,
+		currentPage,
+		numberOfPages,
+		limit,
+	}), [total, currentPage, numberOfPages, limit]);
 
 	return {
 		...query,

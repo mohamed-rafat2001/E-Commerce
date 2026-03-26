@@ -5,7 +5,7 @@ used by existing public cards while adapting content for brand listings.
 */
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiStar, FiTag } from "react-icons/fi";
+import { FiStar, FiTag, FiUsers } from "react-icons/fi";
 
 export default function BrandCard({ brand }) {
 	const brandId = brand._id || brand.id || brand.slug;
@@ -74,10 +74,16 @@ export default function BrandCard({ brand }) {
 					</div>
 
 					<div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
-						<div className="flex items-center text-yellow-500">
-							<FiStar className="w-3.5 h-3.5 fill-current" />
-							<span className="ml-1 text-sm font-bold text-gray-900">{rating.toFixed(1)}</span>
-							<span className="ml-1 text-xs text-gray-500">({ratingCount})</span>
+						<div className="flex items-center gap-4">
+							<div className="flex items-center text-yellow-500">
+								<FiStar className="w-3.5 h-3.5 fill-current" />
+								<span className="ml-1 text-sm font-bold text-gray-900">{rating.toFixed(1)}</span>
+								<span className="ml-1 text-xs text-gray-500">({ratingCount})</span>
+							</div>
+							<div className="flex items-center text-gray-400">
+								<FiUsers className="w-3.5 h-3.5" />
+								<span className="ml-1 text-xs font-bold text-gray-600">{brand.followersCount || 0}</span>
+							</div>
 						</div>
 						<span className="rounded-full px-4 py-2 bg-gray-900 text-white text-[10px] uppercase font-black tracking-widest shadow-xl hover:bg-black transition-all active:scale-95">
 							View Brand

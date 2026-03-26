@@ -1,4 +1,4 @@
-import { FiTag, FiExternalLink, FiUser } from 'react-icons/fi';
+import { FiTag, FiExternalLink, FiUser, FiUsers } from 'react-icons/fi';
 import { LoadingSpinner } from '../../../../shared/ui/index.js';
 import Pagination from '../Pagination.jsx';
 
@@ -11,20 +11,21 @@ const BrandsTable = ({ brands, loading, total, page, totalPages, handlePageChang
             <tr className="bg-gray-50/50 border-b border-gray-100">
               <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4">Brand Details</th>
               <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4">Seller</th>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/6">Status</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/8">Followers</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/8">Status</th>
               <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/6">Created At</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {loading ? (
               <tr>
-                <td colSpan="5" className="p-8 text-center">
+                <td colSpan="6" className="p-8 text-center">
                   <LoadingSpinner size="sm" />
                 </td>
               </tr>
             ) : brands.length === 0 ? (
               <tr>
-                <td colSpan="5" className="p-12 text-center">
+                <td colSpan="6" className="p-12 text-center">
                   <div className="flex flex-col items-center justify-center text-gray-400">
                     <FiTag className="w-12 h-12 mb-3 text-gray-200" />
                     <p className="text-lg font-medium text-gray-900">No brands found</p>
@@ -78,11 +79,16 @@ const BrandsTable = ({ brands, loading, total, page, totalPages, handlePageChang
                     )}
                   </td>
                   <td className="p-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                      brand.isActive 
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                    <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                      <FiUsers className="w-4 h-4 text-gray-400" />
+                      <span className="font-semibold">{brand.followersCount || 0}</span>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${brand.isActive
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                         : 'bg-amber-50 text-amber-700 border-amber-100'
-                    }`}>
+                      }`}>
                       <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${brand.isActive ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
                       {brand.isActive ? 'Active' : 'Inactive'}
                     </span>
@@ -100,11 +106,11 @@ const BrandsTable = ({ brands, loading, total, page, totalPages, handlePageChang
           </tbody>
         </table>
       </div>
-      
+
       {/* Pagination */}
       {total > 0 && (
         <div className="p-4 border-t border-gray-100 bg-gray-50/30">
-          <Pagination 
+          <Pagination
             currentPage={page}
             totalPages={totalPages}
             onPageChange={handlePageChange}

@@ -1,8 +1,3 @@
-/* Pattern Summary:
-Modeled after features/product/pages/ProductDetailPage.jsx and ProductsPage.jsx.
-The page follows route-param driven data hooks, URL-based filters, and shared error/loading
-patterns while composing feature components for sidebar, hero, products, and newsletter sections.
-*/
 import { useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { FiAlertCircle } from "react-icons/fi";
@@ -12,6 +7,7 @@ import useAuthGuard from "../../../hooks/useAuthGuard.js";
 import { Button } from "../../../shared/ui/index.js";
 import usePublicBrand from "../hooks/usePublicBrand.js";
 import usePublicBrandProducts from "../hooks/usePublicBrandProducts.js";
+import useBrandFollow from "../hooks/useBrandFollow.js";
 import BrandHeroBanner from "../components/brand/BrandHeroBanner.jsx";
 import BrandSidebar from "../components/brand/BrandSidebar.jsx";
 import BrandProductsSection from "../components/brand/BrandProductsSection.jsx";
@@ -25,13 +21,17 @@ function BrandPageSkeleton() {
 					<div className="h-80 rounded-2xl bg-gray-100 animate-pulse" />
 				</div>
 				<div className="space-y-8">
-					<div className="h-[360px] rounded-3xl bg-gray-100 animate-pulse" />
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+					<div className="h-[320px] rounded-2xl bg-gray-100 animate-pulse" />
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						{[...Array(4)].map((_, idx) => (
-							<div key={idx} className="h-80 rounded-3xl bg-gray-100 animate-pulse" />
+							<div key={idx} className="h-24 rounded-xl bg-gray-100 animate-pulse" />
 						))}
 					</div>
-					<div className="h-64 rounded-3xl bg-gray-100 animate-pulse" />
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+						{[...Array(4)].map((_, idx) => (
+							<div key={idx} className="h-80 rounded-2xl bg-gray-100 animate-pulse" />
+						))}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -44,6 +44,7 @@ export default function BrandDetailPage() {
 	const { isAuthenticated } = useCurrentUser();
 	const { requireAuth } = useAuthGuard();
 	const { brand, isLoading: isBrandLoading, error: brandError, refetch: refetchBrand } = usePublicBrand(brandId);
+	const { isFollowing, followersCount, toggleFollow, isToggling } = useBrandFollow(brandId, isAuthenticated);
 
 	const filters = useMemo(
 		() => ({
@@ -68,8 +69,6 @@ export default function BrandDetailPage() {
 		sort: filters.sort,
 		page: filters.page,
 	});
-
-	const followUnavailable = true;
 
 	const setFilter = (key, value) => {
 		setSearchParams((prev) => {
@@ -101,9 +100,7 @@ export default function BrandDetailPage() {
 			requireAuth({ redirectAfter: `/brands/${brandId}` });
 			return;
 		}
-		if (followUnavailable) {
-			toast("Follow action is currently unavailable.");
-		}
+		toggleFollow();
 	};
 
 	if (isBrandLoading) return <BrandPageSkeleton />;
@@ -113,8 +110,8 @@ export default function BrandDetailPage() {
 		if (status === 404) {
 			return (
 				<div className="min-h-[70vh] flex items-center justify-center p-4">
-					<div className="rounded-3xl border border-gray-200 bg-white max-w-md w-full p-8 text-center">
-						<FiAlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+					<div className="rounded-2xl border border-gray-200 bg-white max-w-md w-full p-8 text-center shadow-sm">
+						<FiAlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
 						<h1 className="text-2xl font-black text-gray-900">Brand not found</h1>
 						<p className="text-gray-500 mt-2">The brand you're looking for doesn't exist or is no longer available.</p>
 						<Link to="/brands" className="inline-block mt-6">
@@ -127,8 +124,8 @@ export default function BrandDetailPage() {
 
 		return (
 			<div className="min-h-[70vh] flex items-center justify-center p-4">
-				<div className="rounded-3xl border border-rose-100 bg-rose-50 max-w-md w-full p-8 text-center">
-					<FiAlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
+				<div className="rounded-2xl border border-rose-200 bg-rose-50 max-w-md w-full p-8 text-center">
+					<FiAlertCircle className="w-12 h-12 text-rose-400 mx-auto mb-4" />
 					<h1 className="text-2xl font-black text-rose-700">Unable to load brand</h1>
 					<p className="text-rose-600/80 mt-2">Please check your connection and try again.</p>
 					<Button onClick={() => refetchBrand()} className="mt-6">
@@ -142,8 +139,8 @@ export default function BrandDetailPage() {
 	if (!brand) {
 		return (
 			<div className="min-h-[70vh] flex items-center justify-center p-4">
-				<div className="rounded-3xl border border-gray-200 bg-white max-w-md w-full p-8 text-center">
-					<FiAlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+				<div className="rounded-2xl border border-gray-200 bg-white max-w-md w-full p-8 text-center shadow-sm">
+					<FiAlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
 					<h1 className="text-2xl font-black text-gray-900">Brand not found</h1>
 					<Link to="/brands" className="inline-block mt-6">
 						<Button>Browse All Brands</Button>
@@ -170,7 +167,10 @@ export default function BrandDetailPage() {
 						brand={brand}
 						isAuthenticated={isAuthenticated}
 						onFollowAction={handleFollowAction}
-						followUnavailable={followUnavailable}
+						isFollowing={isFollowing}
+						followersCount={followersCount}
+						isToggling={isToggling}
+						productsCount={pagination?.totalResults}
 					/>
 					<BrandProductsSection
 						brand={brand}

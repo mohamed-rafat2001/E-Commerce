@@ -1,19 +1,14 @@
-/* Codebase Pattern Summary:
-Modeled after features/product/hooks/useProductsPage.js and features/product/hooks/useProductFilters.js.
-This hook keeps URL-driven filters via useSearchParams, wraps data fetching in React Query,
-and computes client-side filtering/sorting/pagination for the page layer.
-*/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getBrands } from "../services/index.js";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 9;
 
 const sortMapper = {
 	az: "name",
 	za: "-name",
-	popular: "-productsCount,-createdAt",
+	popular: "-ratingAverage,-ratingCount",
 	newest: "-createdAt",
 };
 
@@ -24,31 +19,34 @@ export default function usePublicBrandsPage() {
 		() => ({
 			search: searchParams.get("search") || "",
 			sort: searchParams.get("sort") || "newest",
+			category: searchParams.get("category") || "",
 			page: parseInt(searchParams.get("page"), 10) || 1,
 			limit: parseInt(searchParams.get("limit"), 10) || ITEMS_PER_PAGE,
 		}),
 		[searchParams]
 	);
 
+	const requestParams = useMemo(() => {
+		const params = {
+			sort: sortMapper[filters.sort] || sortMapper.newest,
+			page: filters.page,
+			limit: filters.limit,
+		};
+		if (filters.search) params.search = filters.search;
+		if (filters.category) params.primaryCategory = filters.category;
+		return params;
+	}, [filters]);
+
 	const { data, isLoading, error, refetch } = useQuery({
-		queryKey: ["brands", "public", { sort: filters.sort }],
-		queryFn: () => getBrands({ sort: sortMapper[filters.sort] || sortMapper.newest, limit: 200 }),
+		queryKey: ["brands", "public", requestParams],
+		queryFn: () => getBrands(requestParams),
 		keepPreviousData: true,
 	});
 
-	const allBrands = useMemo(() => data?.data?.data || [], [data]);
-
-	const filteredBrands = useMemo(() => {
-		const query = filters.search.trim().toLowerCase();
-		if (!query) return allBrands;
-		return allBrands.filter((brand) => (brand.name || "").toLowerCase().includes(query));
-	}, [allBrands, filters.search]);
-
-	const totalCount = filteredBrands.length;
-	const totalPages = Math.max(1, Math.ceil(totalCount / filters.limit));
-	const currentPage = Math.min(filters.page, totalPages);
-	const start = (currentPage - 1) * filters.limit;
-	const brands = filteredBrands.slice(start, start + filters.limit);
+	const brands = useMemo(() => data?.data?.data || [], [data]);
+	const totalCount = useMemo(() => data?.data?.total || data?.data?.paginationResult?.totalResults || 0, [data]);
+	const totalPages = useMemo(() => data?.data?.paginationResult?.numberOfPages || 1, [data]);
+	const currentPage = useMemo(() => data?.data?.paginationResult?.currentPage || 1, [data]);
 
 	const setFilter = (key, value) => {
 		setSearchParams((prev) => {
@@ -64,6 +62,7 @@ export default function usePublicBrandsPage() {
 	};
 
 	const clearSearch = () => setFilter("search", "");
+	const clearCategory = () => setFilter("category", "");
 
 	return {
 		brands,
@@ -76,5 +75,6 @@ export default function usePublicBrandsPage() {
 		refetch,
 		setFilter,
 		clearSearch,
+		clearCategory,
 	};
 }

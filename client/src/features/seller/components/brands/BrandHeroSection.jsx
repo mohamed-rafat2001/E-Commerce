@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiTag, FiStar, FiGlobe, FiExternalLink, FiMail, FiPhone, FiEdit2, FiArrowLeft, FiEye, FiTrash2 } from 'react-icons/fi';
+import { FiTag, FiStar, FiGlobe, FiExternalLink, FiMail, FiPhone, FiEdit2, FiArrowLeft, FiEye, FiTrash2, FiUsers } from 'react-icons/fi';
 
 const BrandHeroSection = ({
     brand, getBrandInitialLogo,
@@ -72,6 +72,11 @@ const BrandHeroSection = ({
                                 <FiStar className="mr-1.5 w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                 <span className="font-bold mr-1 text-white">{brand.ratingAverage || 0}</span>
                                 <span className="text-white/60">({brand.ratingCount || 0} reviews)</span>
+                            </span>
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-white/90">
+                                <FiUsers className="mr-1.5 w-3.5 h-3.5" />
+                                <span className="font-bold mr-1">{brand.followersCount || 0}</span>
+                                <span className="text-white/60">followers</span>
                             </span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-sm">{brand.name}</h1>

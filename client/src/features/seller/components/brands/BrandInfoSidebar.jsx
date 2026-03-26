@@ -1,4 +1,4 @@
-import { FiMail, FiPhone, FiCalendar, FiShare2 } from 'react-icons/fi';
+import { FiMail, FiPhone, FiCalendar, FiShare2, FiUsers } from 'react-icons/fi';
 
 const BrandInfoSidebar = ({ brand, onShareLink }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -31,6 +31,13 @@ const BrandInfoSidebar = ({ brand, onShareLink }) => (
                     <p className="text-sm font-medium text-gray-900">
                         {new Date(brand.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
+                </div>
+            </div>
+            <div className="flex items-start gap-3">
+                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0"><FiUsers className="w-4 h-4" /></div>
+                <div>
+                    <p className="text-xs text-gray-500 font-medium mb-0.5">Followers</p>
+                    <p className="text-sm font-medium text-gray-900">{brand.followersCount || 0}</p>
                 </div>
             </div>
             <div className="pt-2">

@@ -11,6 +11,12 @@ import {
 	deleteBrandLogo,
 	getAllActiveBrands,
 } from "../controllers/brandController.js";
+import {
+	toggleFollowBrand,
+	getFollowStatus,
+	getFollowersCount,
+	getFollowedBrands,
+} from "../controllers/brandFollowerController.js";
 import { uploadBrandImages, uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
 
 /**
@@ -22,6 +28,14 @@ import { uploadBrandImages, uploadSingleImage, setCloudinaryBody } from "../midd
 
 // Public routes (no auth required) - for landing page display
 router.get("/public", getAllActiveBrands); // Public brand list for home page
+
+// Public route - get followers count for a brand
+router.get("/:brandId/followers/count", getFollowersCount);
+
+// Protected routes for follow functionality (any authenticated user)
+router.post("/:brandId/follow", Protect, toggleFollowBrand);
+router.get("/:brandId/follow/status", Protect, getFollowStatus);
+router.get("/following/me", Protect, getFollowedBrands);
 
 // Protected routes (Seller only)
 router.use(Protect, restrictTo("Seller"));
