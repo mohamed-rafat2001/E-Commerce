@@ -106,7 +106,9 @@ const Header = ({ isPanel = false }) => {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between h-20">
 						{/* Logo & Brand */}
-						{!isPanel && (
+						{isPanel ? (
+							<div /> // Spacer for justify-between in panel view
+						) : (
 							<div className="flex items-center gap-8">
 								<Link to="/" className="flex items-center gap-2 group">
 									<span className="text-2xl font-black text-gray-900 font-display tracking-tighter">
@@ -152,53 +154,55 @@ const Header = ({ isPanel = false }) => {
 								</div>
 							)}
 
-							<div className="flex items-center gap-2">
-								{/* Wishlist */}
-								<div className="relative" ref={wishlistRef}>
-									<motion.button
-										onClick={() => {
-											setIsWishlistOpen(!isWishlistOpen);
-											setIsCartOpen(false);
-										}}
-										className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors"
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-									>
-										<HeartIcon className="w-5 h-5" />
-										{wishlistCount > 0 && (
-											<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
-												{wishlistCount}
-											</span>
-										)}
-									</motion.button>
-								</div>
+							{(userRole === 'Customer' || !isAuthenticated) && (
+								<div className="flex items-center gap-2">
+									{/* Wishlist */}
+									<div className="relative" ref={wishlistRef}>
+										<motion.button
+											onClick={() => {
+												setIsWishlistOpen(!isWishlistOpen);
+												setIsCartOpen(false);
+											}}
+											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+											whileHover={{ scale: 1.05 }}
+											whileTap={{ scale: 0.95 }}
+										>
+											<HeartIcon className="w-5 h-5" />
+											{wishlistCount > 0 && (
+												<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+													{wishlistCount}
+												</span>
+											)}
+										</motion.button>
+									</div>
 
-								{/* Cart */}
-								<div className="relative" ref={cartRef}>
-									<motion.button
-										onClick={() => {
-											setIsCartOpen(!isCartOpen);
-											setIsWishlistOpen(false);
-										}}
-										className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors"
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-									>
-										<StoreIcon className="w-5 h-5" />
-										{cartCount > 0 && (
-											<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
-												{cartCount}
-											</span>
-										)}
-									</motion.button>
+									{/* Cart */}
+									<div className="relative" ref={cartRef}>
+										<motion.button
+											onClick={() => {
+												setIsCartOpen(!isCartOpen);
+												setIsWishlistOpen(false);
+											}}
+											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+											whileHover={{ scale: 1.05 }}
+											whileTap={{ scale: 0.95 }}
+										>
+											<StoreIcon className="w-5 h-5" />
+											{cartCount > 0 && (
+												<span className="absolute top-1.5 right-1.5 w-4 h-4 bg-gray-900 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+													{cartCount}
+												</span>
+											)}
+										</motion.button>
+									</div>
 								</div>
-							</div>
+							)}
 
 							{isAuthenticated ? (
-								<div className="relative pl-3 border-l border-gray-100" ref={dropdownRef}>
+								<div className="relative" ref={dropdownRef}>
 									<button
 										onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors"
+										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
 									>
 										<Avatar
 											src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
@@ -249,7 +253,7 @@ const Header = ({ isPanel = false }) => {
 									</AnimatePresence>
 								</div>
 							) : (
-								<div className="flex items-center gap-3 pl-3 border-l border-gray-100 font-sans">
+								<div className="flex items-center gap-3 font-sans">
 									<Link to="/login">
 										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100">
 											Login

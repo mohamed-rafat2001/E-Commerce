@@ -1,14 +1,14 @@
 import React from 'react';
 
 const variants = {
-	primary: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 shadow-sm",
-	secondary: "bg-gray-100 text-gray-900 border border-gray-200 hover:bg-gray-200",
-	accent: "bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-100 shadow-sm",
-	outline: "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300",
-	ghost: "bg-transparent border border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900",
-	danger: "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100",
-	success: "bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100",
-	premium: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 shadow-lg"
+	primary: "bg-gray-100 text-gray-900 border border-gray-300 hover:bg-gray-900 hover:text-white shadow-sm",
+	secondary: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-100",
+	accent: "bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-900 hover:text-white shadow-sm",
+	outline: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900",
+	ghost: "bg-transparent border border-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+	danger: "bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white",
+	success: "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-600 hover:text-white",
+	premium: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-900 hover:text-white shadow-lg active:scale-95"
 };
 
 const sizes = {
