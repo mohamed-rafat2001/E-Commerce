@@ -18,11 +18,11 @@ const ProductSlider = ({ products }) => {
                         <p className="text-gray-500">Discover the most trending items in our global marketplace.</p>
                     </div>
                     <div className="flex gap-3">
-                        <button className="product-prev p-4 rounded-2xl bg-gray-50 text-gray-900 hover:bg-indigo-600 hover:text-white transition-all">
-                            <FiArrowLeft size={20} />
+                        <button className="product-prev p-3.5 rounded-2xl bg-[#0f172a] text-white hover:bg-white hover:text-[#0f172a] border border-[#0f172a] transition-all shadow-xl cursor-pointer">
+                            <FiArrowLeft className="w-5 h-5" />
                         </button>
-                        <button className="product-next p-4 rounded-2xl bg-gray-50 text-gray-900 hover:bg-indigo-600 hover:text-white transition-all">
-                            <FiArrowRight size={20} />
+                        <button className="product-next p-3.5 rounded-2xl bg-[#0f172a] text-white hover:bg-white hover:text-[#0f172a] border border-[#0f172a] transition-all shadow-xl cursor-pointer">
+                            <FiArrowRight className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

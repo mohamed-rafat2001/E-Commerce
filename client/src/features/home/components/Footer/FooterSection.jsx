@@ -87,7 +87,7 @@ const FooterSection = () => {
                     <div className="md:col-span-2">
                         <div className="flex items-center gap-3 mb-8">
                             <span className="text-3xl font-black tracking-tight text-white font-display">
-                                CuratorMarket
+                                ShopyNow
                             </span>
                         </div>
                         <p className="text-gray-400 text-lg leading-relaxed max-w-sm mb-8 opacity-70">

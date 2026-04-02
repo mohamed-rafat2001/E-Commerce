@@ -35,7 +35,11 @@ const FeaturedSmallCard = ({ product, index }) => {
                         ${product.price?.amount || product.price || 0}
                     </span>
                     <Link to={`/products/${product._id}`}>
-                        <Button className="!bg-indigo-600 !text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:!bg-indigo-700 shadow-lg transition-all border-none">
+                        <Button 
+                            variant="primary" 
+                            size="sm"
+                            className="px-6 py-3 shadow-lg"
+                        >
                             VIEW PRODUCT
                         </Button>
                     </Link>

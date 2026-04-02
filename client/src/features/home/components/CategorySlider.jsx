@@ -13,11 +13,11 @@ const CategorySlider = ({ categories }) => {
                         <p className="text-gray-500">Find exactly what you're looking for in our specialized collections.</p>
                     </div>
                     <div className="flex gap-2">
-                        <button className="category-prev p-3 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <FiArrowLeft />
+                        <button className="category-prev p-3.5 rounded-full bg-[#0f172a] text-white hover:bg-white hover:text-[#0f172a] border border-[#0f172a] transition-all shadow-xl cursor-pointer">
+                            <FiArrowLeft className="w-5 h-5" />
                         </button>
-                        <button className="category-next p-3 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <FiArrowRight />
+                        <button className="category-next p-3.5 rounded-full bg-[#0f172a] text-white hover:bg-white hover:text-[#0f172a] border border-[#0f172a] transition-all shadow-xl cursor-pointer">
+                            <FiArrowRight className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

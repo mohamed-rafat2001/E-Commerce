@@ -49,7 +49,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
             {!isMobile && (
                 <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-50">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-900">
                             <FiFilter className="w-4 h-4" />
                         </div>
                         Refine Search
@@ -75,7 +75,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                 setFilter('category', '');
                                 setFilter('subCategory', '');
                             }}
-                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-[#0f172a] text-white shadow-xl shadow-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                         >
                             All Pieces
                         </button>
@@ -88,7 +88,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                             setFilter('category', cat._id);
                                             setFilter('subCategory', ''); // Clear subcategory when changing category
                                         }}
-                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-[#0f172a] text-white shadow-xl shadow-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                                     >
                                         {cat.name}
                                     </button>
@@ -106,7 +106,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                                     <button
                                                         key={sub._id}
                                                         onClick={() => setFilter('subCategory', sub._id)}
-                                                        className={`w-full text-left px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filters.subCategory === sub._id ? 'text-indigo-600 bg-indigo-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
+                                                        className={`w-full text-left px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filters.subCategory === sub._id ? 'text-[#0f172a] bg-gray-100' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
                                                     >
                                                         — {sub.name}
                                                     </button>
@@ -131,7 +131,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                     name="min"
                                     defaultValue={filters['price[gte]']}
                                     placeholder="Min"
-                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-gray-100 transition-all outline-none appearance-none"
                                     onWheel={(e) => e.target.blur()}
                                 />
                             </div>
@@ -143,7 +143,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                     name="max"
                                     defaultValue={filters['price[lte]']}
                                     placeholder="Max"
-                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-gray-100 transition-all outline-none appearance-none"
                                     onWheel={(e) => e.target.blur()}
                                 />
                             </div>
@@ -171,11 +171,11 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                                     type="checkbox"
                                                     checked={isSelected}
                                                     onChange={() => handleBrandToggle(brand._id)}
-                                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-indigo-600 focus:ring-indigo-100 transition-all cursor-pointer appearance-none checked:bg-indigo-600 checked:border-indigo-600"
+                                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-[#0f172a] focus:ring-gray-100 transition-all cursor-pointer appearance-none checked:bg-[#0f172a] checked:border-[#0f172a]"
                                                 />
                                                 <FiX className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none rotate-45" />
                                             </div>
-                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-indigo-600' : 'text-gray-600'}`}>
+                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-[#0f172a]' : 'text-gray-600'}`}>
                                                 {brand.name}
                                             </span>
                                         </div>
@@ -262,9 +262,9 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
             onClick={onToggle}
             className="flex items-center justify-between w-full mb-5 cursor-pointer group"
         >
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-indigo-600 transition-colors">{title}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-amber-600 transition-colors">{title}</span>
             <div className={`transition-all duration-300 w-6 h-6 rounded-lg flex items-center justify-center group-hover:bg-gray-50 ${isOpen ? 'rotate-180' : ''}`}>
-                <FiChevronDown className="w-4 h-4 text-gray-400 group-hover:text-indigo-600" />
+                <FiChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-900" />
             </div>
         </button>
         <AnimatePresence initial={false}>

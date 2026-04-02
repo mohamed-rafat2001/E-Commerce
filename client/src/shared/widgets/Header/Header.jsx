@@ -112,7 +112,7 @@ const Header = ({ isPanel = false }) => {
 							<div className="flex items-center gap-8">
 								<Link to="/" className="flex items-center gap-2 group">
 									<span className="text-2xl font-black text-gray-900 font-display tracking-tighter">
-										CuratorMarket
+										ShopyNow
 									</span>
 								</Link>
 

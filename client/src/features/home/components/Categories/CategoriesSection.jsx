@@ -97,7 +97,7 @@ const CategoriesSection = () => {
                     />
                 </div>
 
-                <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {categories.slice(0, 8).map((category, idx) => (
                         <CategoryCard key={category._id} category={category} index={idx} />
                     ))}

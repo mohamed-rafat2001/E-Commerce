@@ -33,7 +33,7 @@ const TagInput = ({
 						}
 					}}
 				/>
-				<Button type="button" variant="secondary" onClick={onAdd} className="shrink-0 !rounded-xl">
+				<Button type="button" variant="primary" onClick={onAdd} className="shrink-0 !rounded-xl">
 					Add
 				</Button>
 			</div>

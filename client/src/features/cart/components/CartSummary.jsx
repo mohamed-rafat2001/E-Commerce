@@ -26,7 +26,7 @@ const CartSummary = ({ subtotal, shipping, total, onCheckout }) => (
                     Proceed to Checkout
                 </Button>
                 <Link to="/" className="block">
-                    <Button variant="secondary" fullWidth size="lg" className="py-6">Keep Shopping</Button>
+                    <Button variant="primary" fullWidth size="lg" className="py-6">Keep Shopping</Button>
                 </Link>
             </div>
         </Card>

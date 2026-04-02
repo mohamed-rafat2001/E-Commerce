@@ -295,7 +295,7 @@ const ProductCard = ({
           <div className="flex gap-2 pt-1">
             {onEdit && (
               <Button
-                variant="secondary"
+                variant="primary"
                 size="sm"
                 onClick={() => onEdit(product)}
                 icon={<FiEdit2 className="w-3.5 h-3.5" />}

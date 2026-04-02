@@ -97,7 +97,7 @@ export default function AuthModal() {
 				</button>
 
 				<div className="mb-6 flex items-center justify-center">
-					<span className="text-2xl font-black tracking-tight text-gray-900">CuratorMarket</span>
+					<span className="text-2xl font-black tracking-tight text-gray-900">ShopyNow</span>
 				</div>
 
 				<p className="mb-8 text-center text-sm font-medium leading-relaxed text-gray-600">

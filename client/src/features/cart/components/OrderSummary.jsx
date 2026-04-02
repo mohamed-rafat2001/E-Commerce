@@ -1,6 +1,6 @@
-import React from 'react';
 import PromoCodeInput from './PromoCodeInput.jsx';
 import { FiArrowRight, FiCheckCircle } from 'react-icons/fi';
+import { Button } from '../../../shared/ui/index.js';
 
 /**
  * OrderSummary Sidebar Card redesigned for the public cart page
@@ -53,15 +53,18 @@ const OrderSummary = ({ onCheckout, calculations }) => {
             </div>
 
             {/* Proceed to Checkout Button */}
-            <button
+            <Button
+                fullWidth
+                variant="premium"
+                size="lg"
                 onClick={onCheckout}
                 disabled={isEmpty}
-                aria-disabled={isEmpty}
-                className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-[#1E3A8A] text-white rounded-full text-base font-bold shadow-2xl shadow-blue-900/40 hover:bg-blue-900 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="py-5 text-base shadow-2xl group"
+                icon={<FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                iconPosition="right"
             >
                 Proceed to Checkout
-                <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </Button>
 
             {/* Secure Caption */}
             <p className="text-[10px] text-center font-black text-gray-300 uppercase tracking-widest flex items-center justify-center gap-1.5 flex-wrap">

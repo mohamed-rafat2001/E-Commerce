@@ -88,7 +88,7 @@ const PageNotFound = () => {
 						</Button>
 					</Link>
 					<Button
-						variant="secondary"
+						variant="primary"
 						size="lg"
 						onClick={() => window.history.back()}
 					>

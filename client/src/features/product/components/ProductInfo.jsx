@@ -6,6 +6,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiStar, FiShoppingBag } from 'react-icons/fi';
+import { Button } from '../../../shared/ui/index.js';
 import ColorSelector from './ColorSelector';
 import SizeSelector from './SizeSelector';
 import TrustBadges from './TrustBadges';
@@ -139,30 +140,36 @@ const ProductInfo = ({ product }) => {
       {/* CTA Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 mb-12">
         {isOutOfStock ? (
-          <button className="w-full py-5 rounded-full border-2 border-gray-900 text-gray-900 font-black uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all duration-300">
+          <Button
+            fullWidth
+            variant="outline"
+            size="lg"
+            className="py-5"
+          >
             Notify Me When Available
-          </button>
+          </Button>
         ) : (
           <>
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={handleAddToCart}
               disabled={isAdding || !canAddToCart}
+              isLoading={isAdding}
               title={!canAddToCart ? "Please select a color and size" : ""}
-              className={`flex-1 flex items-center justify-center gap-3 py-5 rounded-full bg-[#1E3A8A] text-white font-black uppercase tracking-widest transition-all duration-300 shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              className="flex-1 py-5"
+              icon={<FiShoppingBag className="w-5 h-5" />}
             >
-              {isAdding ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <FiShoppingBag className="w-5 h-5" />
-              )}
               Add to Cart
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
               onClick={handleBuyNow}
-              className="px-10 py-5 rounded-full border-2 border-gray-200 bg-white text-gray-900 font-black uppercase tracking-widest hover:border-gray-900 transition-all duration-300 hover:bg-gray-50"
+              className="px-10 py-5"
             >
               Buy Now
-            </button>
+            </Button>
           </>
         )}
       </div>

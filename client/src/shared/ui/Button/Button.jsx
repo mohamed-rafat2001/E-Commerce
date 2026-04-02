@@ -1,20 +1,20 @@
 import React from 'react';
 
 const variants = {
-	primary: "bg-gray-100 text-gray-900 border border-gray-300 hover:bg-gray-900 hover:text-white shadow-sm",
-	secondary: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-100",
-	accent: "bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-900 hover:text-white shadow-sm",
-	outline: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900",
-	ghost: "bg-transparent border border-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-	danger: "bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white",
-	success: "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-600 hover:text-white",
-	premium: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-900 hover:text-white shadow-lg active:scale-95"
+	primary: "bg-[#0f172a] text-white border border-[#0f172a] hover:bg-white hover:text-[#0f172a] shadow-2xl transition-all duration-300 uppercase font-black tracking-widest",
+	secondary: "bg-white text-[#0f172a] border border-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all duration-300 uppercase font-black tracking-widest",
+	accent: "bg-[#72F1DE] text-[#0f172a] border border-[#72F1DE] hover:bg-[#0f172a] hover:text-white hover:border-[#0f172a] shadow-lg transition-all duration-300 uppercase font-black tracking-widest",
+	outline: "bg-transparent border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all duration-300 uppercase font-black tracking-widest",
+	ghost: "bg-transparent text-[#64748b] hover:bg-slate-50 hover:text-[#0f172a] transition-all duration-200 font-bold",
+	danger: "bg-rose-500 text-white border border-rose-500 hover:bg-rose-600 shadow-sm uppercase font-black tracking-widest",
+	success: "bg-emerald-500 text-white border border-emerald-500 hover:bg-emerald-600 shadow-sm uppercase font-black tracking-widest",
+	premium: "bg-[#0f172a] text-white border border-[#0f172a] hover:bg-white hover:text-[#0f172a] shadow-[0_20px_40px_-15px_rgba(15,23,42,0.4)] transition-all duration-300 font-black uppercase tracking-[0.2em]"
 };
 
 const sizes = {
-	sm: "px-3 py-1.5 text-sm rounded-xl",
-	md: "px-4 py-2 text-sm rounded-xl",
-	lg: "px-6 py-3 text-base rounded-2xl",
+	sm: "px-4 py-2 text-xs rounded-full",
+	md: "px-6 py-2.5 text-sm rounded-full",
+	lg: "px-8 py-3.5 text-base rounded-full",
 };
 
 const Button = ({

@@ -180,7 +180,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={`absolute left-0 mt-3 max-h-[560px] bg-white rounded-2xl shadow-xl border border-gray-100 z-50 flex flex-col overflow-hidden
+						className={`absolute left-0 mt-3 max-h-[400px] bg-white rounded-2xl shadow-xl border border-gray-100 z-50 flex flex-col overflow-hidden
 							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
@@ -188,7 +188,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						{/* Invisible bridge to prevent mouse-leave when moving between trigger and menu */}
 						<div className="absolute top-[-12px] left-0 w-full h-[12px] -z-10" />
 						{!isSimple && (
-							<div className="p-4 border-b border-gray-50 sticky top-0 bg-white z-10">
+							<div className="p-3 border-b border-gray-50 sticky top-0 bg-white z-10">
 								<div className="relative">
 									<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 									<input
@@ -197,18 +197,18 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 										placeholder={`Search ${label.toLowerCase()}...`}
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
-										className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm
+										className="w-full pl-11 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm
 											focus:outline-none focus:ring-2 focus:ring-gray-900/5 transition-all font-medium placeholder-gray-400"
 									/>
 								</div>
 							</div>
 						)}
 
-						<div className={`flex-1 overflow-y-auto custom-scrollbar ${isSimple ? 'p-2' : 'p-4'}`}>
+						<div className={`flex-1 overflow-y-auto custom-scrollbar ${isSimple ? 'p-2' : 'p-3'}`}>
 							{filteredItems.length > 0 ? (
 								isCategoriesMenu ? (
-									<div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
-										<div className="border border-gray-100 rounded-2xl p-3 bg-gray-50/60 max-h-[420px] overflow-y-auto custom-scrollbar">
+									<div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
+										<div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto custom-scrollbar">
 											{filteredItems.map((item) => {
 												const itemId = item._id || item.id;
 												const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
@@ -217,7 +217,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 														key={itemId || item.name}
 														onMouseEnter={() => setActiveCategoryId(itemId)}
 														onClick={() => setActiveCategoryId(itemId)}
-														className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive
+														className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
 															? 'bg-white text-indigo-600 shadow-sm border border-indigo-100'
 															: 'text-gray-600 hover:bg-white hover:text-gray-900'
 															}`}
@@ -228,23 +228,23 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 											})}
 										</div>
 
-										<div className="border border-gray-100 rounded-2xl p-5 bg-white min-h-[260px] max-h-[420px] overflow-y-auto custom-scrollbar">
+										<div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto custom-scrollbar">
 											<div className="flex items-center justify-between mb-4">
-												<h3 className="text-sm font-black uppercase tracking-widest text-gray-900">
+												<h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
 													{activeCategory?.name || 'Category'}
 												</h3>
 												{activeCategory && getEntityId(activeCategory) && (
 													<Link
 														to={`/products?category=${encodeURIComponent(getEntityId(activeCategory))}`}
 														onClick={closeMenu}
-														className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
+														className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
 													>
 														View Category
 													</Link>
 												)}
 											</div>
 											{(activeCategory?.subCategories || []).length > 0 ? (
-												<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+												<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1.5">
 													{activeCategory.subCategories.map((sub) => {
 														const categoryId = getEntityId(activeCategory);
 														const subCategoryId = getEntityId(sub);
@@ -252,7 +252,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 															return (
 																<span
 																	key={sub._id || sub.id || sub.name}
-																	className="px-3 py-2 rounded-xl bg-gray-50 text-sm font-semibold text-gray-400 cursor-not-allowed"
+																	className="px-3 py-1.5 rounded-xl bg-gray-50 text-[11px] font-semibold text-gray-400 cursor-not-allowed"
 																>
 																	{sub.name}
 																</span>
@@ -263,7 +263,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 																key={sub._id || sub.id || sub.name}
 																to={`/products?category=${encodeURIComponent(categoryId)}&subCategory=${encodeURIComponent(subCategoryId)}`}
 																onClick={closeMenu}
-																className="px-3 py-2 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-sm font-semibold text-gray-700 hover:text-indigo-700 transition-all"
+																className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-[11px] font-semibold text-gray-700 hover:text-indigo-700 transition-all"
 															>
 																{sub.name}
 															</Link>
@@ -271,7 +271,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 													})}
 												</div>
 											) : (
-												<div className="text-sm text-gray-400 font-semibold py-8">
+												<div className="text-xs text-gray-400 font-semibold py-8 text-center">
 													No subcategories available
 												</div>
 											)}
@@ -279,7 +279,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 									</div>
 								) : isBrandsMenu ? (
 									<div className="space-y-4">
-										<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+										<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
 											{filteredItems.map((brand) => {
 												const brandId = getEntityId(brand);
 												const logo = brand.logo?.secure_url || brand.logo?.url || brand.logo;
@@ -288,45 +288,45 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 														key={brandId || brand.name}
 														to={brandId ? `/brands/${encodeURIComponent(brandId)}` : '/brands/all'}
 														onClick={closeMenu}
-														className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
+														className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
 													>
 														{logo ? (
-															<img src={logo} alt={brand.name} className="h-8 w-8 rounded-full object-cover border border-gray-100" />
+															<img src={logo} alt={brand.name} className="h-7 w-7 rounded-full object-cover border border-gray-100" />
 														) : (
-															<div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-500">
+															<div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-black text-gray-500">
 																{(brand.name || 'BR').slice(0, 2).toUpperCase()}
 															</div>
 														)}
-														<span className="text-sm font-bold text-gray-700 line-clamp-1">{brand.name}</span>
+														<span className="text-xs font-bold text-gray-700 line-clamp-1">{brand.name}</span>
 													</Link>
 												);
 											})}
 										</div>
 									</div>
 								) : (
-									<div className={`grid gap-3
+									<div className={`grid gap-2
 										${isSimple ? 'grid-cols-1' :
-											hasManyItems ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'
+											hasManyItems ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
 										}`}>
 										{filteredItems.map((item) => (
 											<Link
 												key={item.id || item._id || item.name}
 												to={resolveItemPath(item)}
 												onClick={closeMenu}
-												className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2.5' : 'p-3'}`}
+												className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2' : 'p-2.5'}`}
 												role="menuitem"
 											>
 												{item.icon && (
-													<span className="text-lg group-hover:scale-110 transition-transform duration-300">
+													<span className="text-base group-hover:scale-110 transition-transform duration-300">
 														{item.icon}
 													</span>
 												)}
 												<div className="flex flex-col">
-													<span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-sm">
+													<span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-xs">
 														{item.name}
 													</span>
 													{!isSimple && item.description && (
-														<span className="text-xs text-gray-400 font-medium line-clamp-1 group-hover:text-gray-500 transition-colors">
+														<span className="text-[10px] text-gray-400 font-medium line-clamp-1 group-hover:text-gray-500 transition-colors">
 															{item.description}
 														</span>
 													)}
@@ -336,23 +336,23 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 									</div>
 								)
 							) : (
-								<div className="py-10 text-center">
-									<div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-										<SearchIcon className="w-5 h-5 text-gray-300" />
+								<div className="py-8 text-center">
+									<div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+										<SearchIcon className="w-4 h-4 text-gray-300" />
 									</div>
-									<p className="text-sm font-bold text-gray-400">No results found for "{searchQuery}"</p>
+									<p className="text-xs font-bold text-gray-400">No results found</p>
 								</div>
 							)}
 						</div>
 
 						{!isSimple && (
-							<div className="p-4 border-t border-gray-50 bg-gray-50/50 sticky bottom-0 backdrop-blur-sm">
+							<div className="p-3 border-t border-gray-50 bg-gray-50/50 sticky bottom-0 backdrop-blur-sm">
 								<Link
 									to={viewAllPath}
 									onClick={closeMenu}
-									className="flex items-center justify-center w-full py-3 px-6 bg-gray-900 border border-gray-900
-										rounded-full text-[10px] font-black uppercase tracking-[0.16em] text-white hover:bg-black
-										transition-all duration-300 shadow-lg shadow-gray-200"
+									className="flex items-center justify-center w-full py-2.5 px-6 bg-[#0f172a] border border-[#0f172a]
+										rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-[#0f172a]
+										transition-all duration-300 shadow-xl"
 								>
 									View All {label}
 								</Link>
