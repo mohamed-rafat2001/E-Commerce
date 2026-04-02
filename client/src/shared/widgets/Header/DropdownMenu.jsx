@@ -17,25 +17,44 @@ import { ChevronDownIcon, SearchIcon } from '../../constants/icons.jsx';
  * @property {DropdownItem[]} items - The list of items to display in the dropdown.
  * @property {string} viewAllPath - The path to navigate to when clicking the "View All" CTA.
  * @property {string} basePath - The base URL path for individual item links.
+ * @property {boolean} [isSimple] - If true, displays a simpler, narrower dropdown without search.
  */
 
 /**
- * A scalable, accessible dropdown menu with search filtering and responsive grid layout.
+ * A scalable, accessible mega-menu dropdown with search filtering and responsive grid layout.
  *
  * @param {DropdownMenuProps} props
  * @returns {JSX.Element}
  */
-const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
+const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [isDesktop, setIsDesktop] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [activeCategoryId, setActiveCategoryId] = useState(null);
 	const containerRef = useRef(null);
 	const searchInputRef = useRef(null);
 	const menuRef = useRef(null);
+	const isCategoriesMenu = label.toLowerCase() === 'categories';
+	const isBrandsMenu = label.toLowerCase() === 'brands';
 
 	// Toggle dropdown
-	const toggleDropdown = () => setIsOpen((prev) => !prev);
+	const toggleDropdown = () => {
+		if (isDesktop) {
+			setIsOpen(true);
+			return;
+		}
+		setIsOpen((prev) => !prev);
+	};
 
 	// Close on outside click
+	useEffect(() => {
+		const mediaQuery = window.matchMedia('(min-width: 1024px)');
+		const apply = () => setIsDesktop(mediaQuery.matches);
+		apply();
+		mediaQuery.addEventListener('change', apply);
+		return () => mediaQuery.removeEventListener('change', apply);
+	}, []);
+
 	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -80,12 +99,14 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 
 		if (isOpen) {
 			document.addEventListener('keydown', handleKeyDown);
-			// Focus search input when opening
-			setTimeout(() => searchInputRef.current?.focus(), 100);
+			// Focus search input when opening if not simple
+			if (!isSimple) {
+				setTimeout(() => searchInputRef.current?.focus(), 100);
+			}
 		}
 
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [isOpen]);
+	}, [isOpen, isSimple]);
 
 	// Filter items based on search query
 	const filteredItems = useMemo(() => {
@@ -95,6 +116,12 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 		);
 	}, [items, searchQuery]);
 
+	useEffect(() => {
+		if (!isOpen || !isCategoriesMenu) return;
+		const firstId = filteredItems?.[0]?._id || filteredItems?.[0]?.id || null;
+		setActiveCategoryId((prev) => prev || firstId);
+	}, [filteredItems, isCategoriesMenu, isOpen]);
+
 	// Reset search when closing
 	useEffect(() => {
 		if (!isOpen) {
@@ -102,11 +129,39 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 		}
 	}, [isOpen]);
 
+	const hasManyItems = items.length > 8;
+	const activeCategory = useMemo(() => {
+		if (!isCategoriesMenu) return null;
+		return (
+			filteredItems.find((item) => (item._id || item.id) === activeCategoryId) ||
+			filteredItems[0] ||
+			null
+		);
+	}, [activeCategoryId, filteredItems, isCategoriesMenu]);
+
+	const getEntityId = (item) => item?._id || item?.id || null;
+
+	const resolveItemPath = (item) => {
+		if (item.path) return item.path;
+		const itemId = getEntityId(item);
+		const itemSlug = item.slug || itemId;
+		if (!itemSlug) return viewAllPath;
+		return `${basePath}/${itemSlug}`;
+	};
+
+	const closeMenu = () => setIsOpen(false);
+
 	return (
-		<div className="relative inline-block" ref={containerRef}>
+		<div
+			className="relative inline-block"
+			ref={containerRef}
+			onMouseEnter={isDesktop ? () => setIsOpen(true) : undefined}
+			onMouseLeave={isDesktop ? () => setIsOpen(false) : undefined}
+		>
 			{/* Dropdown Trigger */}
 			<button
 				onClick={toggleDropdown}
+				onFocus={isDesktop ? () => setIsOpen(true) : undefined}
 				aria-expanded={isOpen}
 				aria-haspopup="true"
 				className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none
@@ -118,7 +173,6 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 				/>
 			</button>
 
-			{/* Dropdown Content */}
 			<AnimatePresence>
 				{isOpen && (
 					<motion.div
@@ -126,70 +180,184 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath }) => {
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className="absolute left-0 mt-4 w-[90vw] md:w-[600px] lg:w-[800px] max-h-[500px]
-							bg-white rounded-[2rem] shadow-2xl border border-gray-100 z-50 flex flex-col overflow-hidden"
+						className={`absolute left-0 mt-3 max-h-[560px] bg-white rounded-2xl shadow-xl border border-gray-100 z-50 flex flex-col overflow-hidden
+							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
 					>
-						{/* Search Input */}
-						<div className="p-6 border-b border-gray-50 sticky top-0 bg-white z-10">
-							<div className="relative">
-								<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-								<input
-									ref={searchInputRef}
-									type="text"
-									placeholder={`Search ${label.toLowerCase()}...`}
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									className="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm
-										focus:outline-none focus:ring-2 focus:ring-gray-900/5 transition-all font-medium"
-								/>
-							</div>
-						</div>
-
-						{/* Items Grid */}
-						<div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-							{filteredItems.length > 0 ? (
-								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-									{filteredItems.map((item) => (
-										<Link
-											key={item.id}
-											to={`${basePath}/${item.slug}`}
-											onClick={() => setIsOpen(false)}
-											className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50
-												transition-all duration-200 group border border-transparent hover:border-gray-100"
-											role="menuitem"
-										>
-											{item.icon && (
-												<span className="text-lg group-hover:scale-110 transition-transform">
-													{item.icon}
-												</span>
-											)}
-											<span className="text-sm text-gray-600 group-hover:text-gray-900 font-bold">
-												{item.name}
-											</span>
-										</Link>
-									))}
+						{/* Invisible bridge to prevent mouse-leave when moving between trigger and menu */}
+						<div className="absolute top-[-12px] left-0 w-full h-[12px] -z-10" />
+						{!isSimple && (
+							<div className="p-4 border-b border-gray-50 sticky top-0 bg-white z-10">
+								<div className="relative">
+									<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+									<input
+										ref={searchInputRef}
+										type="text"
+										placeholder={`Search ${label.toLowerCase()}...`}
+										value={searchQuery}
+										onChange={(e) => setSearchQuery(e.target.value)}
+										className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm
+											focus:outline-none focus:ring-2 focus:ring-gray-900/5 transition-all font-medium placeholder-gray-400"
+									/>
 								</div>
+							</div>
+						)}
+
+						<div className={`flex-1 overflow-y-auto custom-scrollbar ${isSimple ? 'p-2' : 'p-4'}`}>
+							{filteredItems.length > 0 ? (
+								isCategoriesMenu ? (
+									<div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
+										<div className="border border-gray-100 rounded-2xl p-3 bg-gray-50/60 max-h-[420px] overflow-y-auto custom-scrollbar">
+											{filteredItems.map((item) => {
+												const itemId = item._id || item.id;
+												const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
+												return (
+													<button
+														key={itemId || item.name}
+														onMouseEnter={() => setActiveCategoryId(itemId)}
+														onClick={() => setActiveCategoryId(itemId)}
+														className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive
+															? 'bg-white text-indigo-600 shadow-sm border border-indigo-100'
+															: 'text-gray-600 hover:bg-white hover:text-gray-900'
+															}`}
+													>
+														{item.name}
+													</button>
+												);
+											})}
+										</div>
+
+										<div className="border border-gray-100 rounded-2xl p-5 bg-white min-h-[260px] max-h-[420px] overflow-y-auto custom-scrollbar">
+											<div className="flex items-center justify-between mb-4">
+												<h3 className="text-sm font-black uppercase tracking-widest text-gray-900">
+													{activeCategory?.name || 'Category'}
+												</h3>
+												{activeCategory && getEntityId(activeCategory) && (
+													<Link
+														to={`/products?category=${encodeURIComponent(getEntityId(activeCategory))}`}
+														onClick={closeMenu}
+														className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
+													>
+														View Category
+													</Link>
+												)}
+											</div>
+											{(activeCategory?.subCategories || []).length > 0 ? (
+												<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+													{activeCategory.subCategories.map((sub) => {
+														const categoryId = getEntityId(activeCategory);
+														const subCategoryId = getEntityId(sub);
+														if (!categoryId || !subCategoryId) {
+															return (
+																<span
+																	key={sub._id || sub.id || sub.name}
+																	className="px-3 py-2 rounded-xl bg-gray-50 text-sm font-semibold text-gray-400 cursor-not-allowed"
+																>
+																	{sub.name}
+																</span>
+															);
+														}
+														return (
+															<Link
+																key={sub._id || sub.id || sub.name}
+																to={`/products?category=${encodeURIComponent(categoryId)}&subCategory=${encodeURIComponent(subCategoryId)}`}
+																onClick={closeMenu}
+																className="px-3 py-2 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-sm font-semibold text-gray-700 hover:text-indigo-700 transition-all"
+															>
+																{sub.name}
+															</Link>
+														);
+													})}
+												</div>
+											) : (
+												<div className="text-sm text-gray-400 font-semibold py-8">
+													No subcategories available
+												</div>
+											)}
+										</div>
+									</div>
+								) : isBrandsMenu ? (
+									<div className="space-y-4">
+										<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+											{filteredItems.map((brand) => {
+												const brandId = getEntityId(brand);
+												const logo = brand.logo?.secure_url || brand.logo?.url || brand.logo;
+												return (
+													<Link
+														key={brandId || brand.name}
+														to={brandId ? `/brands/${encodeURIComponent(brandId)}` : '/brands/all'}
+														onClick={closeMenu}
+														className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
+													>
+														{logo ? (
+															<img src={logo} alt={brand.name} className="h-8 w-8 rounded-full object-cover border border-gray-100" />
+														) : (
+															<div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-500">
+																{(brand.name || 'BR').slice(0, 2).toUpperCase()}
+															</div>
+														)}
+														<span className="text-sm font-bold text-gray-700 line-clamp-1">{brand.name}</span>
+													</Link>
+												);
+											})}
+										</div>
+									</div>
+								) : (
+									<div className={`grid gap-3
+										${isSimple ? 'grid-cols-1' :
+											hasManyItems ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'
+										}`}>
+										{filteredItems.map((item) => (
+											<Link
+												key={item.id || item._id || item.name}
+												to={resolveItemPath(item)}
+												onClick={closeMenu}
+												className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2.5' : 'p-3'}`}
+												role="menuitem"
+											>
+												{item.icon && (
+													<span className="text-lg group-hover:scale-110 transition-transform duration-300">
+														{item.icon}
+													</span>
+												)}
+												<div className="flex flex-col">
+													<span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-sm">
+														{item.name}
+													</span>
+													{!isSimple && item.description && (
+														<span className="text-xs text-gray-400 font-medium line-clamp-1 group-hover:text-gray-500 transition-colors">
+															{item.description}
+														</span>
+													)}
+												</div>
+											</Link>
+										))}
+									</div>
+								)
 							) : (
-								<div className="py-12 text-center">
-									<p className="text-sm font-medium text-gray-400">No {label.toLowerCase()} found matching "{searchQuery}"</p>
+								<div className="py-10 text-center">
+									<div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+										<SearchIcon className="w-5 h-5 text-gray-300" />
+									</div>
+									<p className="text-sm font-bold text-gray-400">No results found for "{searchQuery}"</p>
 								</div>
 							)}
 						</div>
 
-						{/* Sticky Footer CTA */}
-						<div className="p-6 border-t border-gray-50 bg-gray-50 sticky bottom-0">
-							<Link
-								to={viewAllPath}
-								onClick={() => setIsOpen(false)}
-								className="flex items-center justify-center w-full py-4 px-6 bg-white border border-gray-100
-									rounded-full text-xs font-black uppercase tracking-widest text-gray-900 hover:bg-gray-900 hover:text-white
-									transition-all duration-300 shadow-sm"
-							>
-								View All {label}
-							</Link>
-						</div>
+						{!isSimple && (
+							<div className="p-4 border-t border-gray-50 bg-gray-50/50 sticky bottom-0 backdrop-blur-sm">
+								<Link
+									to={viewAllPath}
+									onClick={closeMenu}
+									className="flex items-center justify-center w-full py-3 px-6 bg-gray-900 border border-gray-900
+										rounded-full text-[10px] font-black uppercase tracking-[0.16em] text-white hover:bg-black
+										transition-all duration-300 shadow-lg shadow-gray-200"
+								>
+									View All {label}
+								</Link>
+							</div>
+						)}
 					</motion.div>
 				)}
 			</AnimatePresence>

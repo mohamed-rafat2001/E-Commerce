@@ -2,20 +2,31 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import Button from '../Button/Button.jsx';
+import { getLenis } from '../../../hooks/useLenis.js';
 
-const Pagination = ({ totalPages }) => {
+const Pagination = ({ totalPages, currentPage: propCurrentPage, onPageChange }) => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const urlPage = parseInt(searchParams.get("page")) || 1;
+    const currentPage = propCurrentPage !== undefined ? propCurrentPage : urlPage;
 
     const handlePageChange = (page) => {
         if (page < 1 || page > totalPages) return;
         
-        const newParams = new URLSearchParams(searchParams);
-        newParams.set("page", page);
-        setSearchParams(newParams);
+        if (onPageChange) {
+            onPageChange(page);
+        } else {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set("page", page);
+            setSearchParams(newParams);
+        }
         
         // Scroll to top of list
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const lenis = getLenis();
+        if (lenis) {
+            lenis.scrollTo(0, { duration: 1 });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     if (totalPages <= 1) return null;

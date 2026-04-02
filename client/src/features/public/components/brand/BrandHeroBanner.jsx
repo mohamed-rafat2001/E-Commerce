@@ -10,7 +10,6 @@ const formatCompactNumber = (value) => {
 
 export default function BrandHeroBanner({
 	brand,
-	isAuthenticated,
 	onFollowAction,
 	isFollowing,
 	followersCount,

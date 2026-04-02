@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { FiAlertCircle } from "react-icons/fi";
-import toast from "react-hot-toast";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import useAuthGuard from "../../../hooks/useAuthGuard.js";
 import { Button } from "../../../shared/ui/index.js";
@@ -165,7 +164,6 @@ export default function BrandDetailPage() {
 				<main>
 					<BrandHeroBanner
 						brand={brand}
-						isAuthenticated={isAuthenticated}
 						onFollowAction={handleFollowAction}
 						isFollowing={isFollowing}
 						followersCount={followersCount}
@@ -181,6 +179,7 @@ export default function BrandDetailPage() {
 						onRetry={() => refetchProducts()}
 						filters={filters}
 						onSortChange={(value) => setFilter("sort", value)}
+						onPageChange={(page) => setFilter("page", page)}
 						onClearCategory={handleClearCategory}
 					/>
 					<BrandNewsletterSection brand={brand} brandId={brandId} />

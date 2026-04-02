@@ -1,19 +1,20 @@
 import React from 'react';
 
 const variants = {
-	primary: "bg-primary text-white hover:bg-primary-dark shadow-sm",
-	accent: "bg-accent text-primary-950 hover:bg-accent-dark shadow-sm",
-	outline: "bg-white border border-primary text-primary hover:bg-primary-50",
-	ghost: "bg-white border border-transparent text-gray-600 hover:bg-gray-100",
-	danger: "bg-red-500 text-white hover:bg-red-600",
-	success: "bg-green-500 text-white hover:bg-green-600",
-	premium: "bg-linear-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg"
+	primary: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 shadow-sm",
+	secondary: "bg-gray-100 text-gray-900 border border-gray-200 hover:bg-gray-200",
+	accent: "bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-100 shadow-sm",
+	outline: "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300",
+	ghost: "bg-transparent border border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+	danger: "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100",
+	success: "bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100",
+	premium: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 shadow-lg"
 };
 
 const sizes = {
-	sm: "px-3 py-1.5 text-sm rounded-lg",
-	md: "px-4 py-2 text-sm rounded-lg",
-	lg: "px-6 py-3 text-base rounded-lg",
+	sm: "px-3 py-1.5 text-sm rounded-xl",
+	md: "px-4 py-2 text-sm rounded-xl",
+	lg: "px-6 py-3 text-base rounded-2xl",
 };
 
 const Button = ({
@@ -34,7 +35,7 @@ const Button = ({
 	return (
 		<button
 			disabled={disabled || activeLoading}
-			className={`inline-flex items-center justify-center font-medium transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
+			className={`inline-flex items-center justify-center font-semibold transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${fullWidth ? 'w-full' : ''} ${className}`}
 			{...props}
 		>
 			{activeLoading ? (

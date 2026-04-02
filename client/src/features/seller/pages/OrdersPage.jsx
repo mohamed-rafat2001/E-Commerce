@@ -91,14 +91,11 @@ const OrdersPage = () => {
 					<DataTable
 						columns={columns}
 						data={orders || []}
+						totalPages={totalPages}
 						emptyMessage="No orders found matching your criteria."
 					/>
 				)}
 			</Card>
-
-			<div className="mt-8">
-				<Pagination totalPages={totalPages} />
-			</div>
 		</div>
 	);
 };

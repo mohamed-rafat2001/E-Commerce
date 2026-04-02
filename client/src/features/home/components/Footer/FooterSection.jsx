@@ -8,7 +8,28 @@ import { prefersReducedMotion } from '../../../../utils/animations.js';
 
 const FooterSection = () => {
     const footerRef = useRef(null);
-    const linksRef = useRef(null);
+    const footerSections = [
+        {
+            title: 'Shop',
+            links: [
+                { label: 'All Products', to: '/products' },
+                { label: 'Brands', to: '/brands/all' },
+                { label: 'Categories', to: '/categories/all' },
+                { label: 'Cart', to: '/cart' },
+                { label: 'Wishlist', to: '/public-wishlist' },
+            ],
+        },
+        {
+            title: 'Account',
+            links: [
+                { label: 'Login', to: '/login' },
+                { label: 'Register', to: '/register' },
+                { label: 'Checkout', to: '/checkout' },
+                { label: 'Orders', to: '/orders' },
+                { label: 'Profile', to: '/profile' },
+            ],
+        },
+    ];
 
     useGSAP(() => {
         if (prefersReducedMotion()) return;
@@ -21,6 +42,7 @@ const FooterSection = () => {
                     footerRef.current,
                     { opacity: 0, y: 40 },
                     {
+                        immediateRender: false,
                         opacity: 1,
                         y: 0,
                         duration: 0.8,
@@ -33,12 +55,13 @@ const FooterSection = () => {
                 );
             }
 
-            const staggerLinks = linksRef.current?.querySelectorAll('a');
+            const staggerLinks = footerRef.current?.querySelectorAll('a');
             if (staggerLinks && staggerLinks.length) {
                 gsap.fromTo(
                     staggerLinks,
                     { opacity: 0, y: 10 },
                     {
+                        immediateRender: false,
                         opacity: 1,
                         y: 0,
                         duration: 0.6,
@@ -58,7 +81,7 @@ const FooterSection = () => {
     }, []);
 
     return (
-        <footer ref={footerRef} className="bg-gray-900 pt-24 pb-12 text-white overflow-hidden border-t border-white/5">
+        <footer ref={footerRef} className="bg-gray-900 pt-24 pb-12 text-white overflow-hidden border-t border-white/5 relative z-10">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-16 mb-20">
                     <div className="md:col-span-2">
@@ -72,34 +95,21 @@ const FooterSection = () => {
                         </p>
                         <div className="flex gap-4">
                             {[FiFacebook, FiTwitter, FiInstagram, FiLinkedin].map((Icon, i) => (
-                                <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-all duration-300 cursor-pointer">
+                                <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300 cursor-pointer">
                                     <Icon className="w-4 h-4" />
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {[
-                        {
-                            title: 'Marketplace',
-                            links: ['All Products', 'Seller Central', 'Customer Stories', 'Global Logistics'],
-                        },
-                        {
-                            title: 'Resources',
-                            links: ['Merchant API', 'Help Center', 'Safety Center', 'Brand Guidelines'],
-                        },
-                        {
-                            title: 'Legals',
-                            links: ['Terms of Service', 'Privacy Policy', 'Cookie Policy', 'Accessibility'],
-                        },
-                    ].map((section) => (
-                        <div key={section.title} ref={section.title === 'Legals' ? linksRef : null}>
+                    {footerSections.map((section) => (
+                        <div key={section.title}>
                             <h4 className="font-black mb-8 uppercase tracking-widest text-xs text-white/50">{section.title}</h4>
                             <ul className="space-y-4">
                                 {section.links.map((link) => (
-                                    <li key={link}>
-                                        <Link to="/" className="text-gray-400 hover:text-indigo-400 transition-colors font-medium">
-                                            {link}
+                                    <li key={link.label}>
+                                        <Link to={link.to} className="text-gray-400 hover:text-indigo-400 transition-colors font-medium">
+                                            {link.label}
                                         </Link>
                                     </li>
                                 ))}

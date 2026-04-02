@@ -7,7 +7,6 @@ import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiHeart } from 'react-icons/fi';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
-import useAuthGuard from '../../hooks/useAuthGuard.js';
 
 /**
  * Universal Wishlist heart icon button component
@@ -23,7 +22,6 @@ const WishlistButton = ({
 }) => {
     const [isAnimating, setIsAnimating] = useState(false);
     const { isInWishlist, toggleWishlist } = useWishlist();
-    const { isAuthenticated, requireAuth } = useAuthGuard();
 
     const productId = product._id || product.id || product.product_id;
     const isInList = isInWishlist(productId);
@@ -35,20 +33,10 @@ const WishlistButton = ({
 
         if (isLoading) return;
 
-        if (!isAuthenticated) {
-            requireAuth({
-                message: "Sign in to save items to your wishlist",
-                redirectAfter: `/products/${productId}`,
-                onSuccessCallback: "wishlist:add",
-                callbackPayload: { productId }
-            });
-            return;
-        }
-
         setIsAnimating(true);
 
         try {
-            await toggleWishlist(productId);
+            await toggleWishlist(product);
 
             if (onSuccess) onSuccess(!isInList);
 
@@ -61,7 +49,7 @@ const WishlistButton = ({
 
             if (onError) onError(error);
         }
-    }, [isAuthenticated, isInList, isLoading, onError, onSuccess, productId, requireAuth, toggleWishlist]);
+    }, [isInList, isLoading, onError, onSuccess, product, toggleWishlist]);
 
     // Size variants
     const sizeClasses = {

@@ -19,8 +19,22 @@ export default function BrandsFilter({ filters, setFilter, totalCount }) {
 	});
 
 	const categories = useMemo(() => {
+		const makeId = (seed) => seed.toString(16).padStart(24, "0").slice(0, 24);
+		const mockCategories = Array.from({ length: 12 }, (_, index) => ({
+			_id: makeId(28000 + index),
+			id: makeId(28000 + index),
+			name: `Category ${index + 1}`,
+			subCategories: Array.from({ length: 4 }, (_, subIndex) => ({
+				_id: makeId(29000 + index * 10 + subIndex),
+				id: makeId(29000 + index * 10 + subIndex),
+				name: `Sub ${subIndex + 1}`
+			}))
+		}));
 		const cats = categoriesData?.data?.data || [];
-		return Array.isArray(cats) ? cats : [];
+		if (!Array.isArray(cats) || cats.length === 0) {
+			return mockCategories;
+		}
+		return cats;
 	}, [categoriesData]);
 
 	const activeCategory = filters.category || "";

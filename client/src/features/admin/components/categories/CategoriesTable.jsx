@@ -1,4 +1,4 @@
-import { Button } from '../../../../shared/ui/index.js';
+import { Button, Pagination } from '../../../../shared/ui/index.js';
 import { CategoryIcon } from '../../../../shared/constants/icons.jsx';
 import CategoryRow from './CategoryRow.jsx';
 
@@ -69,54 +69,17 @@ const CategoriesTable = ({
 			
 			{/* Pagination */}
 			{totalPages > 1 && (
-				<div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
-					<div className="text-sm text-gray-500">
-						Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
-						<span className="font-medium">{Math.min(page * limit, total)}</span> of{' '}
-						<span className="font-medium">{total}</span> results
+				<div className="flex items-center justify-between px-6 py-8 border-t border-gray-100 bg-gray-50/50">
+					<div className="text-sm text-gray-500 font-medium font-sans uppercase tracking-[0.08em]">
+						Showing <span className="font-black text-gray-900">{(page - 1) * limit + 1}</span> to{' '}
+						<span className="font-black text-gray-900">{Math.min(page * limit, total)}</span> of{' '}
+						<span className="font-black text-gray-900">{total}</span> results
 					</div>
-					<div className="flex gap-2">
-						<Button 
-							variant="secondary" 
-							size="sm" 
-							onClick={() => setPage(p => Math.max(1, p - 1))}
-							disabled={page === 1}
-						>
-							Previous
-						</Button>
-						<div className="flex items-center gap-1">
-							{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-								let p = i + 1;
-								if (totalPages > 5 && page > 3) {
-									p = page - 2 + i;
-									if (p > totalPages) p = i + 1 + (totalPages - 5); 
-								}
-								if (p <= 0) p = i + 1; 
-								
-								return (
-									<button
-										key={p}
-										onClick={() => setPage(p)}
-										className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-											page === p 
-												? 'bg-indigo-600 text-white shadow-sm' 
-												: 'text-gray-600 hover:bg-gray-200'
-										}`}
-									>
-										{p}
-									</button>
-								);
-							})}
-						</div>
-						<Button 
-							variant="secondary" 
-							size="sm" 
-							onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-							disabled={page === totalPages}
-						>
-							Next
-						</Button>
-					</div>
+					<Pagination 
+						currentPage={page}
+						totalPages={totalPages}
+						onPageChange={setPage}
+					/>
 				</div>
 			)}
 		</div>

@@ -1,26 +1,19 @@
 import { useEffect, useState } from 'react';
 import { FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import useWishlist from '../../wishList/hooks/useWishlist.js';
-import useAuthGuard from '../../../hooks/useAuthGuard.js';
 
 const ProductGallery = ({ images = [], productName = "Product", productId }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const { isAuthenticated, requireAuth } = useAuthGuard();
   const isWishlisted = isInWishlist(productId);
 
   const handleWishlistToggle = async (e) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      requireAuth({
-        message: "Sign in to save items to your wishlist",
-        redirectAfter: `/products/${productId}`,
-        onSuccessCallback: "wishlist:add",
-        callbackPayload: { productId }
-      });
-      return;
-    }
-    await toggleWishlist(productId);
+    await toggleWishlist({
+      _id: productId,
+      name: productName,
+      coverImage: { secure_url: images[0] }
+    });
   };
 
   const nextImage = () => setActiveIndex((prev) => (prev + 1) % images.length);

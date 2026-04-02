@@ -1,6 +1,8 @@
 import { useSearchParams } from 'react-router-dom';
 import { useCallback, useMemo } from 'react';
 
+const isMongoId = (value) => /^[a-fA-F0-9]{24}$/.test(String(value || ''));
+
 export default function useProductFilters() {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -32,9 +34,9 @@ export default function useProductFilters() {
         };
 
         if (filters.search) params.search = filters.search;
-        if (filters.category) params.primaryCategory = filters.category;
-        if (filters.subCategory) params.subCategory = filters.subCategory;
-        if (filters.brandId) params.brandId = filters.brandId;
+        if (isMongoId(filters.category)) params.primaryCategory = filters.category;
+        if (isMongoId(filters.subCategory)) params.subCategory = filters.subCategory;
+        if (isMongoId(filters.brandId)) params.brandId = filters.brandId;
         if (filters['price[gte]']) params['price.amount[gte]'] = filters['price[gte]'];
         if (filters['price[lte]']) params['price.amount[lte]'] = filters['price[lte]'];
         if (filters['ratingAverage[gte]']) params['ratingAverage[gte]'] = filters['ratingAverage[gte]'];

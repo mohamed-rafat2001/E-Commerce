@@ -46,7 +46,15 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 	}, [isMobileMenuOpen]);
 
 	const staticLinks = [
-		{ name: 'New Arrivals', path: '/new-arrivals' },
+		{ name: 'All Products', path: '/products' },
+		{ name: 'Help', path: '/help', isHelp: true },
+	];
+
+	const helpLinks = [
+		{ name: 'Cart', path: '/cart' },
+		{ name: 'Wishlist', path: '/public-wishlist' },
+		{ name: 'Checkout', path: '/checkout' },
+		{ name: 'Orders', path: '/orders' },
 	];
 
 	return (
@@ -69,28 +77,39 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 
 				{/* Static Links */}
 				{staticLinks.map((link) => (
-					<NavLink
-						key={link.name}
-						to={link.path}
-						className={({ isActive }) => `
-							px-3 py-2 text-sm font-medium transition-all duration-200 relative
-							${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}
-						`}
-					>
-						{({ isActive }) => (
-							<>
-								{link.name}
-								{isActive && (
-									<motion.div
-										layoutId="nav-active-indicator"
-										className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full"
-										initial={false}
-										transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-									/>
-								)}
-							</>
-						)}
-					</NavLink>
+					link.isHelp ? (
+						<DropdownMenu
+							key={link.name}
+							label={link.name}
+							items={helpLinks}
+							basePath=""
+							viewAllPath="/help"
+							isSimple={true}
+						/>
+					) : (
+						<NavLink
+							key={link.name}
+							to={link.path}
+							className={({ isActive }) => `
+								px-3 py-2 text-sm font-medium transition-all duration-200 relative
+								${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}
+							`}
+						>
+							{({ isActive }) => (
+								<>
+									{link.name}
+									{isActive && (
+										<motion.div
+											layoutId="nav-active-indicator"
+											className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full"
+											initial={false}
+											transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+										/>
+									)}
+								</>
+							)}
+						</NavLink>
+					)
 				))}
 			</div>
 
@@ -145,7 +164,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 									<NavLink
 										to="/brands/all"
 										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-semibold transition-all
+											flex items-center px-4 py-3 rounded-xl font-bold transition-all
 											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
@@ -154,7 +173,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 									<NavLink
 										to="/categories/all"
 										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-semibold transition-all mt-1
+											flex items-center px-4 py-3 rounded-xl font-bold transition-all mt-1
 											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
@@ -162,18 +181,43 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 									</NavLink>
 								</div>
 
-								{staticLinks.map((link) => (
+								{staticLinks.filter(link => !link.isHelp).map((link) => (
 									<NavLink
 										key={link.name}
 										to={link.path}
 										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-semibold transition-all
+											flex items-center px-4 py-3 rounded-xl font-bold transition-all
 											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
 										`}
 									>
 										{link.name}
 									</NavLink>
 								))}
+
+								{/* Help Links on Mobile (as separate items for better accessibility) */}
+								<div className="pt-4 mt-4 border-t border-gray-100 space-y-1">
+									<NavLink
+										to="/help"
+										className={({ isActive }) => `
+											flex items-center px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest
+											${isActive ? 'text-gray-900' : 'text-gray-400 hover:text-gray-900'}
+										`}
+									>
+										Help Center
+									</NavLink>
+									{helpLinks.map((link) => (
+										<NavLink
+											key={link.name}
+											to={link.path}
+											className={({ isActive }) => `
+												flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all
+												${isActive ? 'text-gray-900' : 'text-gray-500 hover:bg-gray-50'}
+											`}
+										>
+											{link.name}
+										</NavLink>
+									))}
+								</div>
 							</div>
 
 							{/* Drawer Footer */}

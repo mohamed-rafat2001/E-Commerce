@@ -57,7 +57,11 @@ export default function CategoriesPage() {
 							</div>
 							{totalPages > 1 && (
 								<div className="mt-20 border-t border-gray-50 pt-10">
-									<Pagination totalPages={totalPages} />
+									<Pagination
+										currentPage={filters.page || 1}
+										totalPages={totalPages}
+										onPageChange={(page) => setFilter("page", page)}
+									/>
 								</div>
 							)}
 						</>

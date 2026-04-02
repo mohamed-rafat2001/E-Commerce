@@ -5,8 +5,10 @@ import { Header } from '../shared/widgets/Header/index.js';
 import useCurrentUser from '../features/user/hooks/useCurrentUser.js';
 import { roleThemes } from '../shared/constants/theme.js';
 import ScrollToTop from '../shared/components/ScrollToTop.jsx';
+import useLenis from '../hooks/useLenis.js';
 
 const DashboardLayout = () => {
+	useLenis();
 	const { userRole } = useCurrentUser();
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 

@@ -42,7 +42,6 @@ export default function BrandSidebar({
 		return [{ id: "", name: "All Collections", isNew: false, subItems: [] }, ...Array.from(map.values())];
 	}, [categoriesData]);
 
-	const brandName = brand?.name || "Brand";
 	const description = brand?.description || "";
 	const categoryName = brand?.primaryCategory?.name || "";
 	const memberSince = brand?.createdAt ? new Date(brand.createdAt).getFullYear() : "";

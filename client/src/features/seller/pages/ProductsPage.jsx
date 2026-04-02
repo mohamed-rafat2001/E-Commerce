@@ -81,7 +81,7 @@ const ProductsPage = () => {
 						</AnimatePresence>
 					</motion.div>
 					<div className="mt-10">
-						<Pagination totalPages={totalPages} />
+						<Pagination totalPages={totalPages} currentPage={undefined} /> {/* undefined will use URL params */}
 					</div>
 				</>
 			) : (

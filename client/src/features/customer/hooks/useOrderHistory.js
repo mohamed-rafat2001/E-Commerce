@@ -4,19 +4,23 @@ import { getOrdersForCustomer } from "../../../features/order/services/order.js"
 /**
  * Hook to get current customer's order history
  */
-export default function useOrderHistory() {
+export default function useOrderHistory(params = {}) {
 	const {
 		orders,
+		total,
+		totalPages,
 		isLoading,
 		error,
 		refetch,
 	} = useOrders({
-		queryFn: getOrdersForCustomer,
-		queryKey: ["orderHistory"],
+		queryFn: () => getOrdersForCustomer(params),
+		queryKey: ["orderHistory", params],
 	});
 
 	return {
 		orders,
+		total,
+		totalPages,
 		isLoading,
 		error,
 		refetch,

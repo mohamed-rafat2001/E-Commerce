@@ -251,12 +251,12 @@ const Header = ({ isPanel = false }) => {
 							) : (
 								<div className="flex items-center gap-3 pl-3 border-l border-gray-100 font-sans">
 									<Link to="/login">
-										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 bg-white border border-gray-100 hover:bg-gray-100">
+										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100">
 											Login
 										</Button>
 									</Link>
 									<Link to="/register">
-										<Button variant="primary" size="sm" className="rounded-full px-6 !bg-gray-900 !text-white !border-gray-900 shadow-xl hover:bg-black transition-all active:scale-95">
+										<Button variant="primary" size="sm" className="rounded-full px-6 shadow-xl hover:bg-black hover:text-white transition-all active:scale-95">
 											Get Started
 										</Button>
 									</Link>
@@ -287,8 +287,8 @@ const Header = ({ isPanel = false }) => {
 					<div className="flex flex-col gap-3">
 						<Button
 							fullWidth
-							variant="primary"
-							className="!bg-red-500 !text-white !border-red-500 rounded-full py-5 uppercase font-black tracking-widest text-xs shadow-2xl shadow-red-100"
+							variant="danger"
+							className="rounded-full py-5 uppercase font-black tracking-widest text-xs shadow-2xl shadow-red-100"
 							onClick={handleLogout}
 						>
 							Confirm Logout

@@ -26,6 +26,7 @@ export default function BrandProductsSection({
 	onRetry,
 	filters,
 	onSortChange,
+	onPageChange,
 	onClearCategory,
 }) {
 	const [showFilterPanel, setShowFilterPanel] = useState(false);
@@ -122,7 +123,11 @@ export default function BrandProductsSection({
 						</div>
 						{totalPages > 1 && (
 							<div className="mt-12">
-								<Pagination totalPages={totalPages} />
+								<Pagination
+									currentPage={filters.page || 1}
+									totalPages={totalPages}
+									onPageChange={onPageChange}
+								/>
 							</div>
 						)}
 					</>

@@ -5,7 +5,7 @@
 */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showWishList, addToWishlist as addToWishlistApi, deleteFromWishlist as deleteFromWishlistApi } from "../services/wishList.js";
-import { getGuestWishlist, isInGuestWishlist, removeFromGuestWishlist } from "../services/guestWishlist.js";
+import { addToGuestWishlist, getGuestWishlist, isInGuestWishlist, removeFromGuestWishlist } from "../services/guestWishlist.js";
 import useCurrentUser from "../../user/hooks/useCurrentUser.js";
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
  */
 export default function useWishlist() {
 	const { user, isAuthenticated } = useCurrentUser();
-	const userId = user?.userId?._id;
+	const userId = user?.userId?._id || user?._id;
 	const [guestWishlist, setGuestWishlist] = useState(null);
 	const queryClient = useQueryClient();
 
@@ -32,16 +32,7 @@ export default function useWishlist() {
 	useEffect(() => {
 		if (!userId) {
 			const loadGuestWishlist = () => {
-				const savedWishlist = localStorage.getItem("guest_wishlist");
-				if (savedWishlist) {
-					try {
-						setGuestWishlist(JSON.parse(savedWishlist));
-					} catch {
-						setGuestWishlist({ items: [] });
-					}
-				} else {
-					setGuestWishlist({ items: [] });
-				}
+				setGuestWishlist(getGuestWishlist());
 			};
 
 			loadGuestWishlist();
@@ -64,10 +55,11 @@ export default function useWishlist() {
 
 	// Remove from wishlist (auth + guest)
 	const removeFromWishlist = useCallback(async (productId) => {
+		if (!productId) return;
 		if (isAuthenticated) {
 			try {
 				await deleteFromWishlistApi(productId);
-				queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+				queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
 				toast.success('Removed from wishlist');
 			} catch {
 				toast.error('Failed to remove from wishlist');
@@ -76,11 +68,26 @@ export default function useWishlist() {
 			removeFromGuestWishlist(productId);
 			setGuestWishlist(getGuestWishlist());
 		}
-	}, [isAuthenticated, queryClient]);
+	}, [isAuthenticated, queryClient, userId]);
 
-	const toggleWishlist = useCallback(async (productId) => {
+	const toggleWishlist = useCallback(async (productOrId) => {
+		const productId = typeof productOrId === 'string' ? productOrId : (productOrId?._id || productOrId?.id);
+		const product = typeof productOrId === 'object' ? productOrId : { _id: productId };
+		if (!productId) return { success: false };
+
 		if (!isAuthenticated) {
-			return { requiresAuth: true };
+			// Guest: update localStorage
+			const alreadyIn = isInGuestWishlist(productId);
+
+			if (alreadyIn) {
+				removeFromGuestWishlist(productId);
+				toast.success("Removed from wishlist");
+			} else {
+				addToGuestWishlist(product);
+				toast.success("Added to wishlist!");
+			}
+			setGuestWishlist(getGuestWishlist());
+			return { success: true };
 		}
 
 		const queryKey = ["wishlist", userId];
@@ -89,7 +96,7 @@ export default function useWishlist() {
 		const previousItems = previousData?.items || [];
 		const currentlyInWishlist = previousItems.some((item) => {
 			const id = item?._id || item?.productId?._id || item?.productId || item;
-			return id === productId;
+			return String(id) === String(productId);
 		});
 
 		queryClient.setQueryData(queryKey, (old) => {
@@ -97,7 +104,7 @@ export default function useWishlist() {
 			const currentItems = wishlistData?.items || [];
 			const normalized = currentItems.map((item) => item?._id || item?.productId?._id || item?.productId || item);
 			const nextItems = currentlyInWishlist
-				? normalized.filter((id) => id !== productId)
+				? normalized.filter((id) => String(id) !== String(productId))
 				: [...normalized, productId];
 
 			return {
@@ -116,8 +123,12 @@ export default function useWishlist() {
 		});
 
 		try {
-			await addToWishlistApi(productId);
-			queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+			if (currentlyInWishlist) {
+				await deleteFromWishlistApi(productId);
+			} else {
+				await addToWishlistApi(productId);
+			}
+			queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
 			toast.success(currentlyInWishlist ? "Removed from wishlist" : "Added to wishlist!");
 			return { success: true };
 		} catch {
@@ -139,7 +150,7 @@ export default function useWishlist() {
 			// Check if any item's _id matches the productId
 			return items.some(item => {
 				const itemId = item._id || item.productId?._id || item.productId || item.product_id;
-				return itemId === productId;
+				return String(itemId) === String(productId);
 			});
 		} else {
 			// For guests, check localStorage
@@ -147,7 +158,7 @@ export default function useWishlist() {
 		}
 	}, [isAuthenticated, response]);
 
-	const wishlist = userId ? (response?.data?.data?.wishlist || response?.data?.data) : guestWishlist;
+	const wishlist = isAuthenticated ? (response?.data?.data?.wishlist || response?.data?.data) : guestWishlist;
 
 	return {
 		wishlist,

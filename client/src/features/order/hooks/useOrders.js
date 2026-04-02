@@ -22,9 +22,13 @@ export default function useOrders({
 	});
 
 	const orders = response?.data?.data || [];
+	const total = response?.data?.total || 0;
+	const totalPages = response?.data?.numberOfPages || 1;
 
 	return {
 		orders,
+		total,
+		totalPages,
 		isLoading,
 		error,
 		refetch,

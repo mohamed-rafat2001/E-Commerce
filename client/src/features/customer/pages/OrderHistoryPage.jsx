@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import useOrderHistory from '../hooks/useOrderHistory';
 import { PageHeader, Card, Badge, DataTable, Button, EmptyState, Skeleton } from '../../../shared/ui';
 import { OrderIcon } from '../../../shared/constants/icons.jsx';
 
+const ITEMS_PER_PAGE = 10;
+
 const OrderHistoryPage = () => {
-	const { orders, isLoading } = useOrderHistory();
-	const [activeTab, setActiveTab] = useState('All');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('status') || 'All';
+    const page = parseInt(searchParams.get('page')) || 1;
+
+	const { orders, total, totalPages, isLoading } = useOrderHistory({
+        status: activeTab === 'All' ? undefined : activeTab,
+        page,
+        limit: ITEMS_PER_PAGE
+    });
+
 	const tabs = ['All', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-
-	const ordersList = orders || [];
-
-	const filteredOrders = activeTab === 'All'
-		? ordersList
-		: ordersList.filter(order => order.status === activeTab);
 
 	const columns = [
 		{
@@ -56,6 +61,20 @@ const OrderHistoryPage = () => {
 		}
 	];
 
+    const handleTabChange = (tab) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (tab === 'All') newParams.delete('status');
+        else newParams.set('status', tab);
+        newParams.set('page', '1');
+        setSearchParams(newParams);
+    };
+
+    const handlePageChange = (newPage) => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', newPage.toString());
+        setSearchParams(newParams);
+    };
+
 	if (isLoading) {
 		return (
 			<div className="space-y-6">
@@ -78,7 +97,7 @@ const OrderHistoryPage = () => {
 				{tabs.map(tab => (
 					<button
 						key={tab}
-						onClick={() => setActiveTab(tab)}
+						onClick={() => handleTabChange(tab)}
 						className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all capitalize ${activeTab === tab
 							? 'bg-white text-indigo-600 shadow-sm'
 							: 'text-gray-500 hover:text-gray-700'
@@ -90,10 +109,13 @@ const OrderHistoryPage = () => {
 			</div>
 
 			<Card padding="none" className="overflow-hidden">
-				{filteredOrders.length > 0 ? (
+				{orders.length > 0 ? (
 					<DataTable
 						columns={columns}
-						data={filteredOrders}
+						data={orders}
+                        totalPages={totalPages}
+                        currentPage={page}
+                        onPageChange={handlePageChange}
 					/>
 				) : (
 					<div className="py-12">

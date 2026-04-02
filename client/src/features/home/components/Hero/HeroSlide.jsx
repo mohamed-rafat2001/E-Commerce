@@ -99,7 +99,7 @@ const HeroSlide = ({ slide }) => {
                             <Button onClick={() => navigate('/products')} variant="premium" size="lg" className="px-10">
                                 Shop Now
                             </Button>
-                            <Button onClick={() => navigate('/register')} variant="outline" size="lg" className="px-10 text-white border-white hover:bg-white/10">
+                            <Button onClick={() => navigate('/register')} variant="outline" size="lg" className="px-10">
                                 Sell With Us
                             </Button>
                         </div>

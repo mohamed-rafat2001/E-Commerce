@@ -80,10 +80,11 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                                 /* Wishlist Items List */
                                 <div className="space-y-4">
                                     {wishlistItems.map((item) => {
-                                        const product = item.productId || item;
+                                        const product = item.itemId || item.productId || item;
+                                        const keyId = product._id || product.id || item._id || item.product_id;
                                         return (
                                             <WishlistItemCard
-                                                key={product._id || item._id}
+                                                key={keyId}
                                                 product={product}
                                                 onClose={onClose}
                                             />

@@ -84,7 +84,7 @@ const CategoriesSection = () => {
     if (isLoading || !categories.length) return null;
 
     return (
-        <section ref={sectionRef} className="py-24 bg-gray-50">
+        <section ref={sectionRef} className="py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4">
                 <div ref={headerRef}>
                     <SectionTitle
@@ -92,7 +92,7 @@ const CategoriesSection = () => {
                     subtitle="Explore our vast selection of categories, handpicked for your lifestyle."
                     align="left"
                     actionLabel="View All Categories"
-                    actionLink="/products"
+                    actionLink="/categories/all"
                     className="mb-12"
                     />
                 </div>

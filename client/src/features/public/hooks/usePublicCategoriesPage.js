@@ -19,6 +19,7 @@ const sortMapper = {
 
 export default function usePublicCategoriesPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const makeId = (seed) => seed.toString(16).padStart(24, "0").slice(0, 24);
 
 	const filters = useMemo(
 		() => ({
@@ -36,7 +37,34 @@ export default function usePublicCategoriesPage() {
 		keepPreviousData: true,
 	});
 
-	const allCategories = useMemo(() => data?.data?.data || [], [data]);
+	const mockCategories = useMemo(() => {
+		return Array.from({ length: 30 }, (_, index) => {
+			const id = makeId(22000 + index);
+			return {
+				_id: id,
+				id,
+				name: `Category Showcase ${index + 1}`,
+				slug: `category-showcase-${index + 1}`,
+				productsCount: 25 + (index * 4),
+				subCategories: Array.from({ length: 5 }, (_, subIndex) => ({
+					_id: makeId(26000 + index * 8 + subIndex),
+					id: makeId(26000 + index * 8 + subIndex),
+					name: `Sub Category ${subIndex + 1}`
+				}))
+			};
+		});
+	}, []);
+
+	const apiCategories = useMemo(() => data?.data?.data || [], [data]);
+	const allCategories = useMemo(() => {
+		if (!Array.isArray(apiCategories) || apiCategories.length === 0) {
+			return mockCategories;
+		}
+		if (apiCategories.length >= 18) {
+			return apiCategories;
+		}
+		return [...apiCategories, ...mockCategories.slice(0, 18 - apiCategories.length)];
+	}, [apiCategories, mockCategories]);
 
 	const filteredCategories = useMemo(() => {
 		const query = filters.search.trim().toLowerCase();

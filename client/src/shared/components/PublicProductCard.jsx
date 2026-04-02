@@ -10,12 +10,10 @@ import { FiHeart, FiStar, FiShoppingBag } from 'react-icons/fi';
 import ProductCardGallery from '../../features/product/components/ProductCardGallery.jsx';
 import AddToCartButton from './AddToCartButton.jsx';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
-import useAuthGuard from '../../hooks/useAuthGuard.js';
 
 const PublicProductCard = ({ product }) => {
     const [isHovered, setIsHovered] = useState(false);
     const { isInWishlist, toggleWishlist } = useWishlist();
-    const { requireAuth, isAuthenticated } = useAuthGuard();
 
     const productId = product._id || product.id || product.product_id;
     const isWishlisted = isInWishlist(productId);
@@ -36,17 +34,7 @@ const PublicProductCard = ({ product }) => {
     const handleWishlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!isAuthenticated) {
-            requireAuth({
-                message: "Sign in to save items to your wishlist",
-                redirectAfter: `/products/${productId}`,
-                onSuccessCallback: "wishlist:add",
-                callbackPayload: { productId }
-            });
-            return;
-        }
-
-        await toggleWishlist(productId);
+        await toggleWishlist(product);
     };
 
     const allImages = [

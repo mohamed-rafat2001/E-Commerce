@@ -41,14 +41,14 @@ export default function BrandsPage() {
 
 				<div role="list" aria-busy={isLoading ? "true" : "false"}>
 					{isLoading ? (
-						<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
-							{[...Array(10)].map((_, i) => (
-								<div key={i} aria-hidden="true" className="h-[280px] rounded-3xl bg-gray-100 animate-pulse" />
+						<div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
+							{[...Array(12)].map((_, i) => (
+								<div key={i} aria-hidden="true" className="h-[200px] rounded-3xl bg-gray-100 animate-pulse" />
 							))}
 						</div>
 					) : brands.length > 0 ? (
 						<>
-							<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
+							<div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
 								{brands.map((brand) => (
 									<div key={brand._id || brand.id || brand.slug} role="listitem">
 										<BrandCard brand={brand} />
@@ -57,7 +57,11 @@ export default function BrandsPage() {
 							</div>
 							{totalPages > 1 && (
 								<div className="mt-20 border-t border-gray-50 pt-10">
-									<Pagination totalPages={totalPages} />
+									<Pagination
+										currentPage={filters.page || 1}
+										totalPages={totalPages}
+										onPageChange={(page) => setFilter("page", page)}
+									/>
 								</div>
 							)}
 						</>
