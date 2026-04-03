@@ -12,56 +12,13 @@ const ProductTabs = ({ product }) => {
 
     const tabs = [
         { id: 'details', label: 'Technical Specifications' },
-        { id: 'reviews', label: 'Curated Feedback' },
         { id: 'description', label: 'Product Story' },
+        { id: 'reviews', label: 'Curated Feedback' },
     ];
 
     return (
         <div className="mt-12 md:mt-20">
-            <div className="flex flex-col lg:flex-row gap-10 mb-20">
-                {/* Tech Specs (Left, 65%) */}
-                <div className="lg:w-[65%]">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8">Technical Specifications</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                        {/* Render product.specifications array if available */}
-                        {Array.isArray(product.specifications) && product.specifications.length > 0 ? (
-                            product.specifications.map((spec, idx) => (
-                                <SpecItem key={idx} label={spec.key || spec.label} value={spec.value} />
-                            ))
-                        ) : (
-                            <>
-                                <SpecItem label="CATEGORY" value={product.primaryCategory?.name || 'N/A'} />
-                                <SpecItem label="BRAND" value={product.brandId?.name || product.brand?.name || 'N/A'} />
-                                {product.weight && <SpecItem label="WEIGHT" value={product.weight} />}
-                                {product.dimensions && <SpecItem label="DIMENSIONS" value={product.dimensions} />}
-                                {product.materials && <SpecItem label="MATERIALS" value={product.materials} />}
-                                {product.sku && <SpecItem label="SKU" value={product.sku} />}
-                                <SpecItem label="AVAILABILITY" value={product.countInStock > 0 ? `${product.countInStock} In Stock` : 'Out of Stock'} />
-                                <SpecItem label="CONDITION" value={product.condition || 'New'} />
-                                {product.variants?.colors?.length > 0 && (
-                                    <SpecItem label="COLORS" value={product.variants.colors.map(c => typeof c === 'object' ? c.name : c).join(', ')} />
-                                )}
-                                {product.variants?.sizes?.length > 0 && (
-                                    <SpecItem label="SIZES" value={product.variants.sizes.map(s => typeof s === 'object' ? s.name || s.label : s).join(', ')} />
-                                )}
-                            </>
-                        )}
-                    </div>
-                </div>
 
-                {/* Product Highlights (Right, 35%) */}
-                <div className="lg:w-[35%] bg-primary rounded-2xl p-8 text-white relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <FiGlobe className="w-8 h-8 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">Product Highlights</h3>
-                        <p className="text-sm text-primary-100 leading-relaxed opacity-90">
-                            {product.highlights || product.shortDescription || product.description?.slice(0, 150) || 'A premium quality product curated for you. Designed with care and attention to detail.'}
-                        </p>
-                    </div>
-                    {/* Decorative pattern */}
-                    <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all duration-700"></div>
-                </div>
-            </div>
 
             {/* Tab Bar */}
             <div className="flex items-center justify-between border-b border-gray-100 mb-8 overflow-x-auto no-scrollbar">
@@ -114,24 +71,54 @@ const ProductTabs = ({ product }) => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="max-w-4xl"
+                            className="w-full"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <h4 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Category Info</h4>
-                                    <SpecRow label="Category" value={product.primaryCategory?.name || 'Uncategorized'} />
-                                    <SpecRow label="Subcategory" value={product.subCategory?.name || 'N/A'} />
-                                    <SpecRow label="Brand" value={product.brandId?.name || 'Generic'} />
+                            <div className="flex flex-col lg:flex-row gap-10">
+                                {/* Tech Specs (Left, 65%) */}
+                                <div className="lg:w-[65%]">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                        {/* Render product.specifications array if available */}
+                                        {Array.isArray(product.specifications) && product.specifications.length > 0 ? (
+                                            product.specifications.map((spec, idx) => (
+                                                <SpecItem key={idx} label={spec.key || spec.label} value={spec.value} />
+                                            ))
+                                        ) : (
+                                            <>
+                                                <SpecItem label="CATEGORY" value={product.primaryCategory?.name || 'N/A'} />
+                                                <SpecItem label="BRAND" value={product.brandId?.name || product.brand?.name || 'N/A'} />
+                                                {product.weight && <SpecItem label="WEIGHT" value={product.weight} />}
+                                                {product.dimensions && <SpecItem label="DIMENSIONS" value={product.dimensions} />}
+                                                {product.materials && <SpecItem label="MATERIALS" value={product.materials} />}
+                                                {product.sku && <SpecItem label="SKU" value={product.sku} />}
+                                                <SpecItem label="AVAILABILITY" value={product.countInStock > 0 ? `${product.countInStock} In Stock` : 'Out of Stock'} />
+                                                <SpecItem label="CONDITION" value={product.condition || 'New'} />
+                                                {product.variants?.colors?.length > 0 && (
+                                                    <SpecItem label="COLORS" value={product.variants.colors.map(c => typeof c === 'object' ? c.name : c).join(', ')} />
+                                                )}
+                                                {product.variants?.sizes?.length > 0 && (
+                                                    <SpecItem label="SIZES" value={product.variants.sizes.map(s => typeof s === 'object' ? s.name || s.label : s).join(', ')} />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <h4 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Stock & Logistics</h4>
-                                    <SpecRow label="SKU / ID" value={product._id?.slice(-8).toUpperCase()} />
-                                    <SpecRow label="Availability" value={product.countInStock > 0 ? 'In Stock' : 'Out of Stock'} />
-                                    <SpecRow label="Condition" value="New" />
+
+                                {/* Product Highlights (Right, 35%) */}
+                                <div className="lg:w-[35%] bg-primary rounded-2xl p-8 text-white relative overflow-hidden group">
+                                    <div className="relative z-10">
+                                        <FiGlobe className="w-8 h-8 mb-6" />
+                                        <h3 className="text-xl font-bold mb-3">Product Highlights</h3>
+                                        <p className="text-sm text-primary-100 leading-relaxed opacity-90">
+                                            {product.highlights || product.shortDescription || product.description?.slice(0, 150) || 'A premium quality product curated for you. Designed with care and attention to detail.'}
+                                        </p>
+                                    </div>
+                                    {/* Decorative pattern */}
+                                    <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all duration-700"></div>
                                 </div>
                             </div>
                         </motion.div>
                     )}
+
 
                     {/* Reviews Tab */}
                     {activeTab === 'reviews' && (

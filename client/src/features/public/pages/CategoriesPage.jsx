@@ -48,7 +48,9 @@ export default function CategoriesPage() {
 					<p className="text-gray-500 font-medium mt-2">Shop by the things that move you</p>
 				</div>
 
-				<CategoriesFilter filters={filters} setFilter={setFilter} totalCount={totalCount} />
+				<div className="sticky top-[80px] z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md py-4 mb-8 border-b border-gray-100 dark:border-gray-800 -mx-4 px-4 md:mx-0 md:px-0">
+					<CategoriesFilter filters={filters} setFilter={setFilter} totalCount={totalCount} />
+				</div>
 
 				<div role="list" aria-busy={isLoading ? "true" : "false"}>
 					{isLoading ? (

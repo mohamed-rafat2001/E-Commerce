@@ -224,9 +224,9 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={`absolute mt-3 max-h-[420px] bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[9999] flex flex-col overflow-hidden backdrop-blur-xl
-							${isSimple ? 'left-0' : isCategoriesMenu || isBrandsMenu ? 'left-1/2 -translate-x-1/2' : 'left-0'}
-							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
+						className={`${isSimple ? 'absolute left-0 top-full mt-3' : 'fixed top-[80px] left-1/2 -translate-x-1/2 mt-2'} 
+							max-h-[calc(100vh-100px)] lg:max-h-[600px] bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[9999] flex flex-col overflow-hidden backdrop-blur-xl
+							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[96vw] lg:w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[96vw] lg:w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
 						onMouseEnter={isDesktop ? clearCloseTimeout : undefined}

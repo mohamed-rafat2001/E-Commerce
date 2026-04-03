@@ -71,7 +71,7 @@ export default function useProductsPage() {
     const start = (Math.min(filters.page, effectiveTotalPages) - 1) * filters.limit;
     const paginatedMockProducts = filteredMockProducts.slice(start, start + filters.limit);
 
-    const products = isUsingMock ? paginatedMockProducts : mergedProducts;
+    const products = isUsingMock ? paginatedMockProducts : apiProducts;
     const totalCount = isUsingMock ? effectiveTotalCount : (responseData?.results || 0);
     const totalPages = isUsingMock ? effectiveTotalPages : (responseData?.pagination?.numberOfPages || 1);
 

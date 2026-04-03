@@ -116,7 +116,7 @@ export default function ProductsPage() {
 
 					<div className="flex-1">
 						{/* Grid Header */}
-						<div className="sticky top-24 z-20 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-md py-3 mb-8 border-b border-gray-100 dark:border-gray-700">
+						<div className="sticky top-[80px] z-20 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-md py-3 mb-8 border-b border-gray-100 dark:border-gray-700 -mx-4 px-4 md:mx-0 md:px-0">
 							<div className="flex items-center justify-between">
 							<p className="text-sm text-gray-400 font-medium tracking-tight">
 								Showing <span className="font-bold text-gray-900">{totalCount}</span> exquisite products
