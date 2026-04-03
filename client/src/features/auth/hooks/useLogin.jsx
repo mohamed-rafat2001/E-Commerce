@@ -25,6 +25,9 @@ export default function useLogin() {
 	} = useMutation({
 		mutationFn: LoginFunc,
 		onSuccess: async (data) => {
+			if (typeof window !== "undefined") {
+				localStorage.setItem("hasAuthSession", "1");
+			}
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
 			queryClient.invalidateQueries({ queryKey: ["wishlist"] });

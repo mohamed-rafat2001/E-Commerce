@@ -12,7 +12,7 @@ export const RegisterFunc = (Credentials) =>
 export const LogoutFunc = () => getFunc("authentications/logOut");
 
 // get user data
-export const getMeFunc = () => getFunc("authentications/me");
+export const getMeFunc = () => getFunc("authentications/me", { skipAuthRefresh: true });
 
 // update personal details func
 export const updatePersonalDetails = (data) =>

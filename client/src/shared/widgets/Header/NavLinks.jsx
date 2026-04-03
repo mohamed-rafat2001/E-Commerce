@@ -155,7 +155,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => setIsMobileMenuOpen(false)}
-							className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+							className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] lg:hidden"
 						/>
 
 						{/* Drawer Content */}
@@ -164,14 +164,14 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							animate={{ x: 0 }}
 							exit={{ x: '100%' }}
 							transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-							className="fixed right-0 top-0 h-full w-[280px] bg-white z-50 shadow-2xl lg:hidden flex flex-col"
+							className="fixed right-0 top-0 h-full w-[300px] bg-white dark:bg-gray-900 z-[130] shadow-2xl lg:hidden flex flex-col border-l border-gray-100 dark:border-gray-700"
 						>
 							{/* Drawer Header */}
-							<div className="flex items-center justify-between p-4 border-b border-gray-100">
-								<span className="text-lg font-black text-gray-900 tracking-tighter">ShopyNow</span>
+							<div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+								<span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tighter">ShopyNow</span>
 								<button
 									onClick={() => setIsMobileMenuOpen(false)}
-									className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors
+									className="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors
 										min-h-[44px] min-w-[44px] flex items-center justify-center"
 									aria-label="Close navigation"
 								>
@@ -180,11 +180,11 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							</div>
 
 							{/* Quick Access: Wishlist & Cart with badges */}
-							<div className="flex items-center gap-4 px-4 py-3 border-b border-gray-100 bg-gray-50">
+							<div className="flex items-center gap-4 px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
 								<NavLink
 									to="/public-wishlist"
 									onClick={() => setIsMobileMenuOpen(false)}
-									className="flex items-center gap-2 text-sm text-gray-700 font-medium min-h-[44px]"
+									className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 font-semibold min-h-[44px]"
 								>
 									<div className="relative">
 										<HeartIcon className="w-5 h-5" />
@@ -200,7 +200,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 								<NavLink
 									to="/cart"
 									onClick={() => setIsMobileMenuOpen(false)}
-									className="flex items-center gap-2 text-sm text-gray-700 font-medium min-h-[44px]"
+									className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 font-semibold min-h-[44px]"
 								>
 									<div className="relative">
 										<StoreIcon className="w-5 h-5" />
@@ -218,22 +218,22 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							{/* Drawer Links */}
 							<div className="flex-1 overflow-y-auto p-4 space-y-2">
 								{/* Direct Access to Main Lists on Mobile */}
-								<div className="pb-4 border-b border-gray-100 mb-4 space-y-3">
+								<div className="pb-4 border-b border-gray-100 dark:border-gray-700 mb-4 space-y-3">
 									<div className="space-y-1">
 										<NavLink
 											to="/brands/all"
 											onClick={() => setIsMobileMenuOpen(false)}
-											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-900 bg-gray-50 hover:bg-gray-100")}
+											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300" : "text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700")}
 										>
 											All Brands
 										</NavLink>
 										<div className="grid grid-cols-2 gap-1 px-2 pt-2">
-											{brands?.slice(0, 4)?.map(brand => (
+											{brands?.map(brand => (
 												<NavLink
 													key={brand.id || brand.name}
 													to={`/brands/${brand.id || brand._id || brand.slug}`}
 													onClick={() => setIsMobileMenuOpen(false)}
-													className="text-xs font-semibold text-gray-500 py-1.5 px-3 rounded-lg hover:text-indigo-600 hover:bg-indigo-50/50 line-clamp-1"
+													className="text-xs font-semibold text-gray-600 dark:text-gray-300 py-1.5 px-3 rounded-lg hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/15 line-clamp-1"
 												>
 													{brand.name}
 												</NavLink>
@@ -241,21 +241,21 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										</div>
 									</div>
 
-									<div className="space-y-1 pt-2 border-t border-gray-50">
+									<div className="space-y-1 pt-2 border-t border-gray-50 dark:border-gray-700">
 										<NavLink
 											to="/categories/all"
 											onClick={() => setIsMobileMenuOpen(false)}
-											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all mt-1 " + (isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-900 bg-gray-50 hover:bg-gray-100")}
+											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all mt-1 " + (isActive ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300" : "text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700")}
 										>
 											All Categories
 										</NavLink>
 										<div className="grid grid-cols-1 gap-1 px-2 pt-2">
-											{categories?.slice(0, 3)?.map(category => (
+											{categories?.map(category => (
 												<NavLink
 													key={category.id || category.name}
 													to={`/products?category=${category.id || category._id}`}
 													onClick={() => setIsMobileMenuOpen(false)}
-													className="text-xs font-semibold text-gray-500 py-1.5 px-3 rounded-lg hover:text-indigo-600 hover:bg-indigo-50/50"
+													className="text-xs font-semibold text-gray-600 dark:text-gray-300 py-1.5 px-3 rounded-lg hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/15"
 												>
 													{category.name}
 												</NavLink>
@@ -268,17 +268,17 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 									<NavLink
 										key={link.name}
 										to={link.path}
-										className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50")}
+										className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800")}
 									>
 										{link.name}
 									</NavLink>
 								))}
 
 								{/* Help Links on Mobile (as separate items for better accessibility) */}
-								<div className="pt-4 mt-4 border-t border-gray-100 space-y-1">
+								<div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700 space-y-1">
 									<NavLink
 										to="/help"
-										className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest " + (isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-900")}
+										className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest " + (isActive ? "text-gray-900 dark:text-gray-100" : "text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100")}
 									>
 										Help Center
 									</NavLink>
@@ -286,7 +286,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										<NavLink
 											key={link.name}
 											to={link.path}
-											className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all " + (isActive ? "text-gray-900" : "text-gray-500 hover:bg-gray-50")}
+											className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all " + (isActive ? "text-gray-900 dark:text-gray-100" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800")}
 										>
 											{link.name}
 										</NavLink>
@@ -295,13 +295,13 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							</div>
 
 							{/* Drawer Footer — Auth + Copyright */}
-							<div className="p-4 border-t border-gray-100 flex flex-col gap-2">
+							<div className="p-4 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 bg-white dark:bg-gray-900">
 								{isAuthenticated ? (
 									<Link
 										to={`/${userRole?.toLowerCase()}/dashboard`}
 										onClick={() => setIsMobileMenuOpen(false)}
-										className="w-full text-center py-3 px-4 rounded-xl bg-gray-900
-											text-white font-semibold text-sm hover:bg-gray-700 transition-colors min-h-[44px]
+										className="w-full text-center py-3 px-4 rounded-xl bg-gray-900 dark:bg-gray-100
+											text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[44px]
 											flex items-center justify-center"
 									>
 										My Dashboard
@@ -312,8 +312,8 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 											to="/login"
 											onClick={() => setIsMobileMenuOpen(false)}
 											className="w-full text-center py-3 px-4 rounded-xl border-2
-												border-gray-900 text-gray-900 font-semibold text-sm
-												hover:bg-gray-900 hover:text-white transition-colors min-h-[44px]
+												border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 font-semibold text-sm
+												hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900 transition-colors min-h-[44px]
 												flex items-center justify-center"
 										>
 											Login
@@ -321,15 +321,15 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										<Link
 											to="/register"
 											onClick={() => setIsMobileMenuOpen(false)}
-											className="w-full text-center py-3 px-4 rounded-xl bg-gray-900
-												text-white font-semibold text-sm hover:bg-gray-700 transition-colors min-h-[44px]
+											className="w-full text-center py-3 px-4 rounded-xl bg-gray-900 dark:bg-gray-100
+												text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[44px]
 												flex items-center justify-center"
 										>
 											Get Started
 										</Link>
 									</>
 								)}
-								<p className="text-center text-xs text-gray-400 mt-2">
+								<p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">
 									© {new Date().getFullYear()} ShopyNow
 								</p>
 							</div>

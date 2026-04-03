@@ -1,0 +1,16 @@
+{
+	"name": "ShopyNow",
+	"short_name": "ShopyNow",
+	"description": "Curated luxury fashion, tech, and home essentials.",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#0b1220",
+	"theme_color": "#111827",
+	"icons": [
+		{
+			"src": "/vite.svg",
+			"sizes": "any",
+			"type": "image/svg+xml"
+		}
+	]
+}

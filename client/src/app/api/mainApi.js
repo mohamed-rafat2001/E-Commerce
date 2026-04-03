@@ -1,8 +1,10 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1/";
+
 // Create axios instance with default config
 const mainApi = axios.create({
-	baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1/",
+	baseURL: API_BASE_URL,
 	withCredentials: true, // Required for httpOnly cookies
 });
 
@@ -16,15 +18,25 @@ mainApi.interceptors.response.use(
 	},
 	async (error) => {
 		const originalRequest = error.config;
+		const requestUrl = originalRequest?.url || "";
+		const isAuthRoute = requestUrl.includes("authentications/");
+		const isRefreshRoute = requestUrl.includes("authentications/refresh-token");
+		const shouldSkipRefresh = originalRequest?.skipAuthRefresh === true;
 
 		// If the error is 401 and not already retried
-		if (error.response?.status === 401 && !originalRequest._retry) {
+		if (
+			error.response?.status === 401 &&
+			!originalRequest?._retry &&
+			!isRefreshRoute &&
+			!shouldSkipRefresh &&
+			!isAuthRoute
+		) {
 			originalRequest._retry = true;
 
 			try {
 				// Attempt to refresh the token
 				await axios.post(
-					`${import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1/"}authentications/refresh-token`,
+					`${API_BASE_URL}authentications/refresh-token`,
 					{},
 					{ withCredentials: true }
 				);

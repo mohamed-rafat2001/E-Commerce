@@ -1,10 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
 import { getMeFunc } from "../../auth/services/auth.js";
 
 /**
  * Get current user query
  */
 export default function useCurrentUser() {
+	const shouldFetchUser = useMemo(() => {
+		if (typeof window === "undefined") return false;
+		const path = window.location.pathname;
+		const inProtectedArea =
+			path.startsWith("/admin") ||
+			path.startsWith("/seller") ||
+			path.startsWith("/customer") ||
+			path.startsWith("/checkout") ||
+			path.startsWith("/orders");
+		return localStorage.getItem("hasAuthSession") === "1" || inProtectedArea;
+	}, []);
+
 	const {
 		data: response,
 		isLoading,
@@ -12,6 +25,7 @@ export default function useCurrentUser() {
 	} = useQuery({
 		queryKey: ["user"],
 		queryFn: getMeFunc,
+		enabled: shouldFetchUser,
 		retry: (failureCount, error) => {
 			// Immediately stop retrying for auth errors (401, 403) or rate limiting (429)
 			if (
@@ -26,6 +40,7 @@ export default function useCurrentUser() {
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
+		retryOnMount: false,
 		// Ensure error state is caught immediately
 		throwOnError: false,
 	});
@@ -35,11 +50,22 @@ export default function useCurrentUser() {
 	// If there is an error (like 401), we are not authenticated
 	const isError = !!error;
 
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		if (user) {
+			localStorage.setItem("hasAuthSession", "1");
+			return;
+		}
+		if (error?.response?.status === 401 || error?.response?.status === 403) {
+			localStorage.removeItem("hasAuthSession");
+		}
+	}, [user, error]);
+
 	return {
 		isAuthenticated: !!user && !isError,
 		user,
 		userRole: user?.role || user?.userId?.role,
-		isLoading: isLoading && !isError,
+		isLoading: shouldFetchUser ? isLoading && !isError : false,
 		error,
 	};
 }

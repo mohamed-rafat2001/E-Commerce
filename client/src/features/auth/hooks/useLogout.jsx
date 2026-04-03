@@ -11,6 +11,9 @@ export default function useLogout() {
 	const { mutate: logout } = useMutation({
 		mutationFn: LogoutFunc,
 		onSuccess: () => {
+			if (typeof window !== "undefined") {
+				localStorage.removeItem("hasAuthSession");
+			}
 			queryClient.clear();
 			navigate("/login");
 			toast.success(
