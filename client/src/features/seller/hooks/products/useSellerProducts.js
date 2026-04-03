@@ -5,6 +5,7 @@ import { getMyProducts } from '../../../product/services/product.js';
 
 export default function useSellerProducts() {
     const [searchParams] = useSearchParams();
+    const paginationLimit = usePaginationLimit('SELLER_PRODUCTS');
 
     // Convert all search params to object
     const params = Object.fromEntries(searchParams.entries());
@@ -23,7 +24,7 @@ export default function useSellerProducts() {
 
     // Ensure defaults
     if (!params.page) params.page = 1;
-    if (!params.limit) params.limit = usePaginationLimit('SELLER_PRODUCTS');
+    if (!params.limit) params.limit = paginationLimit;
     if (!params.sort) params.sort = "-createdAt";
 
     const {

@@ -14,15 +14,17 @@ export default function usePublicBrandsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const makeId = (seed) => seed.toString(16).padStart(24, "0").slice(0, 24);
 
+	const paginationLimit = usePaginationLimit('PUBLIC_BRANDS');
+
 	const filters = useMemo(
 		() => ({
 			search: searchParams.get("search") || "",
 			sort: searchParams.get("sort") || "newest",
 			category: searchParams.get("category") || "",
 			page: parseInt(searchParams.get("page"), 10) || 1,
-			limit: usePaginationLimit('PUBLIC_BRANDS'),
+			limit: paginationLimit,
 		}),
-		[searchParams]
+		[searchParams, paginationLimit]
 	);
 
 	const requestParams = useMemo(() => {

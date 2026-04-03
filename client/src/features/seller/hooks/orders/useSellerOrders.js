@@ -5,13 +5,14 @@ import { getSellerOrders } from '../../../order/services/order.js';
 
 export default function useSellerOrders() {
     const [searchParams] = useSearchParams();
+    const paginationLimit = usePaginationLimit('SELLER_ORDERS');
     
     // Convert all search params to object
     const params = Object.fromEntries(searchParams.entries());
     
     // Ensure defaults
     if (!params.page) params.page = 1;
-    if (!params.limit) params.limit = usePaginationLimit('SELLER_ORDERS');
+    if (!params.limit) params.limit = paginationLimit;
     if (!params.sort) params.sort = "-createdAt";
 
     const { 
