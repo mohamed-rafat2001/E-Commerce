@@ -160,35 +160,57 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							{/* Drawer Links */}
 							<div className="flex-1 overflow-y-auto p-4 space-y-2">
 								{/* Direct Access to Main Lists on Mobile */}
-								<div className="pb-4 border-b border-gray-100 mb-4">
-									<NavLink
-										to="/brands/all"
-										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-bold transition-all
-											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
-										`}
-									>
-										Brands
-									</NavLink>
-									<NavLink
-										to="/categories/all"
-										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-bold transition-all mt-1
-											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
-										`}
-									>
-										Categories
-									</NavLink>
+								<div className="pb-4 border-b border-gray-100 mb-4 space-y-3">
+									<div className="space-y-1">
+										<NavLink
+											to="/brands/all"
+											onClick={() => setIsMobileMenuOpen(false)}
+											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-900 bg-gray-50 hover:bg-gray-100")}
+										>
+											All Brands
+										</NavLink>
+										<div className="grid grid-cols-2 gap-1 px-2 pt-2">
+											{brands?.slice(0, 4)?.map(brand => (
+												<NavLink
+													key={brand.id || brand.name}
+													to={`/brands/${brand.id || brand._id || brand.slug}`}
+													onClick={() => setIsMobileMenuOpen(false)}
+													className="text-xs font-semibold text-gray-500 py-1.5 px-3 rounded-lg hover:text-indigo-600 hover:bg-indigo-50/50 line-clamp-1"
+												>
+													{brand.name}
+												</NavLink>
+											))}
+										</div>
+									</div>
+
+									<div className="space-y-1 pt-2 border-t border-gray-50">
+										<NavLink
+											to="/categories/all"
+											onClick={() => setIsMobileMenuOpen(false)}
+											className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all mt-1 " + (isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-900 bg-gray-50 hover:bg-gray-100")}
+										>
+											All Categories
+										</NavLink>
+										<div className="grid grid-cols-1 gap-1 px-2 pt-2">
+											{categories?.slice(0, 3)?.map(category => (
+												<NavLink
+													key={category.id || category.name}
+													to={`/products?category=${category.id || category._id}`}
+													onClick={() => setIsMobileMenuOpen(false)}
+													className="text-xs font-semibold text-gray-500 py-1.5 px-3 rounded-lg hover:text-indigo-600 hover:bg-indigo-50/50"
+												>
+													{category.name}
+												</NavLink>
+											))}
+										</div>
+									</div>
 								</div>
 
 								{staticLinks.filter(link => !link.isHelp).map((link) => (
 									<NavLink
 										key={link.name}
 										to={link.path}
-										className={({ isActive }) => `
-											flex items-center px-4 py-3 rounded-xl font-bold transition-all
-											${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'}
-										`}
+										className={({ isActive }) => "flex items-center px-4 py-3 rounded-xl font-bold transition-all " + (isActive ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50")}
 									>
 										{link.name}
 									</NavLink>
@@ -198,10 +220,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 								<div className="pt-4 mt-4 border-t border-gray-100 space-y-1">
 									<NavLink
 										to="/help"
-										className={({ isActive }) => `
-											flex items-center px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest
-											${isActive ? 'text-gray-900' : 'text-gray-400 hover:text-gray-900'}
-										`}
+										className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest " + (isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-900")}
 									>
 										Help Center
 									</NavLink>
@@ -209,10 +228,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										<NavLink
 											key={link.name}
 											to={link.path}
-											className={({ isActive }) => `
-												flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all
-												${isActive ? 'text-gray-900' : 'text-gray-500 hover:bg-gray-50'}
-											`}
+											className={({ isActive }) => "flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all " + (isActive ? "text-gray-900" : "text-gray-500 hover:bg-gray-50")}
 										>
 											{link.name}
 										</NavLink>

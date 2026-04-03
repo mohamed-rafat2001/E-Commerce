@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useOrderHistory from '../hooks/useOrderHistory';
 import { PageHeader, Card, Badge, DataTable, Button, EmptyState, Skeleton } from '../../../shared/ui';
@@ -11,7 +11,7 @@ const OrderHistoryPage = () => {
     const activeTab = searchParams.get('status') || 'All';
     const page = parseInt(searchParams.get('page')) || 1;
 
-	const { orders, total, totalPages, isLoading } = useOrderHistory({
+	const { orders, totalPages, isLoading } = useOrderHistory({
         status: activeTab === 'All' ? undefined : activeTab,
         page,
         limit: ITEMS_PER_PAGE

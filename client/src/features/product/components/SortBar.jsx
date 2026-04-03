@@ -93,17 +93,19 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                         )}
                     </button>
 
-                    <div className="flex items-center">
+                    <div className="relative group">
                         <select
                             value={filters.sort}
                             onChange={(e) => setFilter('sort', e.target.value)}
-                            className="appearance-none bg-transparent pl-2 pr-8 py-1.5 text-sm font-bold text-gray-900 focus:outline-none cursor-pointer"
+                            className="appearance-none bg-white border border-gray-200 hover:border-gray-400 pl-5 pr-10 py-2.5 rounded-full text-sm font-bold text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-100 cursor-pointer shadow-sm transition-all"
                         >
                             {sortOptions.map(opt => (
                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                             ))}
                         </select>
-                        <FiChevronDown className="w-4 h-4 text-gray-400 -ml-6 pointer-events-none" />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-gray-900 transition-colors">
+                            <FiChevronDown className="w-4 h-4" />
+                        </div>
                     </div>
                 </div>
             </div>

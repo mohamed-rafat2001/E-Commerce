@@ -42,7 +42,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
 
     const sidebarClass = isMobile 
         ? "bg-white px-4 pb-10" 
-        : "bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 p-8 sticky top-28";
+        : "bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 p-8 sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto overscroll-contain custom-scrollbar";
 
     return (
         <div className={sidebarClass}>
@@ -69,7 +69,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
             <div className="space-y-10">
                 {/* Category Filter */}
                 <FilterSection title="Category" isOpen={openSections.category} onToggle={() => toggleSection('category')}>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-3 custom-scrollbar">
                         <button
                             onClick={() => {
                                 setFilter('category', '');

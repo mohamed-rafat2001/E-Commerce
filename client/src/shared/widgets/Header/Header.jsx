@@ -267,10 +267,12 @@ const Header = ({ isPanel = false }) => {
 								</div>
 							)}
 
-							{/* Mobile Menu Toggle - Only visible on small screens */}
-							<div className="lg:hidden pl-2 border-l border-gray-100">
-								<NavLinks categories={categories} brands={brands} />
-							</div>
+							{/* Mobile Menu Toggle - Only visible on small screens (Hidden in Panel) */}
+							{!isPanel && (
+								<div className="lg:hidden pl-2 border-l border-gray-100">
+									<NavLinks categories={categories} brands={brands} />
+								</div>
+							)}
 						</div>
 					</div>
 				</div>

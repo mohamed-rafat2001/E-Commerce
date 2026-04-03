@@ -7,6 +7,7 @@ import {
 	deleteOneByOwner,
 	getOneByOwner,
 } from "./handlerFactory.js";
+import { invalidateCacheForModel } from "../utils/cache.js";
 
 //  @desc  create wishlist and push products to it
 //  POST /api/v1/wishlist
@@ -37,6 +38,8 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 	}
 	// check if doc created
 	if (!doc) return next(new appError("doc not create", 400));
+	
+	await invalidateCacheForModel(WishListModel, doc);
 	sendResponse(res, 200, doc);
 });
 //  @desc  delete wishlist by owner "user"

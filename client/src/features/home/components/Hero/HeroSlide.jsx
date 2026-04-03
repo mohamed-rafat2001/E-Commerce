@@ -74,20 +74,20 @@ const HeroSlide = ({ slide }) => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
                 <div className="max-w-2xl text-white">
-                        <Badge variant="featured" className="mb-6 uppercase tracking-wider">
+                        <Badge variant="featured" className="mb-6 uppercase tracking-[0.2em] px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-black text-xs shadow-xl">
                             {slide.badge}
                         </Badge>
 
                         <h1
                             ref={titleRef}
-                            className="text-5xl md:text-7xl font-black font-display mb-6 leading-[1.1]"
+                            className="text-5xl md:text-7xl lg:text-[5rem] font-black font-display mb-6 leading-[1.05] tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-gray-400 drop-shadow-sm"
                         >
                             {slide.title}
                         </h1>
 
                         <p
                             ref={descRef}
-                            className="text-xl text-gray-200 mb-10 leading-relaxed font-body"
+                            className="text-lg md:text-2xl text-gray-200 mb-10 leading-relaxed font-medium max-w-xl drop-shadow"
                         >
                             {slide.description}
                         </p>

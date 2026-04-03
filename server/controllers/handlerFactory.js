@@ -114,6 +114,8 @@ export const deleteFromDocList = (Model) =>
 		}
 
 		await doc.save();
+		
+		await invalidateCacheForModel(Model, doc);
 		sendResponse(res, 200, doc);
 	});
 

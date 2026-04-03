@@ -204,11 +204,11 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 							</div>
 						)}
 
-						<div className={`flex-1 overflow-y-auto custom-scrollbar ${isSimple ? 'p-2' : 'p-3'}`}>
+						<div className={`flex-1 overflow-y-auto overscroll-contain custom-scrollbar ${isSimple ? 'p-2' : 'p-3'}`}>
 							{filteredItems.length > 0 ? (
 								isCategoriesMenu ? (
 									<div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
-										<div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto custom-scrollbar">
+										<div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
 											{filteredItems.map((item) => {
 												const itemId = item._id || item.id;
 												const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
@@ -228,7 +228,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 											})}
 										</div>
 
-										<div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto custom-scrollbar">
+										<div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
 											<div className="flex items-center justify-between mb-4">
 												<h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
 													{activeCategory?.name || 'Category'}
