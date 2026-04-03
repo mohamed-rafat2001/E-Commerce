@@ -1,60 +1,85 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import { LoadingSpinner } from "../../shared/ui/index.js";
 
-// Layouts
+// Layouts — loaded eagerly (needed for every page)
 import DashboardLayout from "../../layouts/DashboardLayout.jsx";
 import PublicLayout from "../../shared/layout/PublicLayout.jsx";
 
-// Pages - Public
-import { HomePage } from "../../features/home/pages/index.js";
-import { LoginPage, RegisterPage } from "../../features/auth/pages/index.js";
-import {
-	PublicWishlistPage,
-	BrandsPage as PublicBrandsPage,
-	CategoriesPage as PublicCategoriesPage,
-	BrandDetailPage,
-	CategoryProductsRedirectPage,
-} from "../../features/public/pages/index.js";
-import { CartPage } from "../../features/cart/pages/index.js";
+// ─── Lazy-loaded Pages ────────────────────────────────────────────
+// Code-splitting: each page component is loaded on demand as a separate chunk.
+// This reduces the initial bundle size dramatically.
 
-// Pages - Dashboard (Role-specific)
-import {
-	AdminDashboardPage,
-	UsersPage as AdminUsersPage,
-	UserDetailsPage,
-	ProductsPage as AdminProductsPage,
-	OrdersPage as AdminOrdersPage,
-	AnalyticsPage as AdminAnalyticsPage,
-	CategoriesAndSubCategoriesPage,
-	BrandsPage
-} from "../../features/admin/pages/index.js";
+// Public pages
+const HomePage = lazy(() => import("../../features/home/pages/HomePage.jsx"));
+const LoginPage = lazy(() => import("../../features/auth/pages/LoginPage.jsx"));
+const RegisterPage = lazy(() => import("../../features/auth/pages/RegisterPage.jsx"));
+const ProductsPage = lazy(() => import("../../features/product/pages/ProductsPage.jsx"));
+const ProductDetailPage = lazy(() => import("../../features/product/pages/ProductDetailPage.jsx"));
+const CartPage = lazy(() => import("../../features/cart/pages/CartPage.jsx"));
+const PublicWishlistPage = lazy(() => import("../../features/public/pages/PublicWishlistPage.jsx"));
+const PublicBrandsPage = lazy(() => import("../../features/public/pages/BrandsPage.jsx"));
+const PublicCategoriesPage = lazy(() => import("../../features/public/pages/CategoriesPage.jsx"));
+const BrandDetailPage = lazy(() => import("../../features/public/pages/BrandDetailPage.jsx"));
+const CategoryProductsRedirectPage = lazy(() => import("../../features/public/pages/CategoryProductsRedirectPage.jsx"));
 
-import {
-	SellerDashboardPage,
-	ProductsPage as SellerProductsPage,
-	OrdersPage as SellerOrdersPage,
-	AnalyticsPage as SellerAnalyticsPage,
-	BrandsManagementPage,
-	BrandDetailsPage,
-	SellerProductDetailPage,
-} from "../../features/seller/pages/index.js";
+// Admin pages
+const AdminDashboardPage = lazy(() => import("../../features/admin/pages/DashboardPage.jsx"));
+const AdminUsersPage = lazy(() => import("../../features/admin/pages/UsersPage.jsx"));
+const UserDetailsPage = lazy(() => import("../../features/admin/pages/UserDetailsPage.jsx"));
+const AdminProductsPage = lazy(() => import("../../features/admin/pages/ProductsPage.jsx"));
+const AdminOrdersPage = lazy(() => import("../../features/admin/pages/OrdersPage.jsx"));
+const AdminAnalyticsPage = lazy(() => import("../../features/admin/pages/AnalyticsPage.jsx"));
+const CategoriesAndSubCategoriesPage = lazy(() => import("../../features/admin/pages/CategoriesAndSubCategoriesPage.jsx"));
+const AdminBrandsPage = lazy(() => import("../../features/admin/pages/BrandsPage.jsx"));
 
-import {
-	CustomerDashboardPage,
-	ShippingAddressesPage,
-	PaymentMethodsPage,
-	OrderHistoryPage,
-	WishlistPage
-} from "../../features/customer/pages/index.js";
+// Seller pages
+const SellerDashboardPage = lazy(() => import("../../features/seller/pages/DashboardPage.jsx"));
+const SellerProductsPage = lazy(() => import("../../features/seller/pages/ProductsPage.jsx"));
+const SellerOrdersPage = lazy(() => import("../../features/seller/pages/OrdersPage.jsx"));
+const SellerAnalyticsPage = lazy(() => import("../../features/seller/pages/AnalyticsPage.jsx"));
+const BrandsManagementPage = lazy(() => import("../../features/seller/pages/BrandsManagementPage.jsx"));
+const SellerBrandDetailsPage = lazy(() => import("../../features/seller/pages/BrandDetailsPage.jsx"));
+const SellerProductDetailPage = lazy(() => import("../../features/product/pages/ManagementProductDetailPage.jsx"));
 
-// Pages - Shared
-import { PersonalDetailsPage } from "../../features/user/pages/index.js";
-import { SettingsPage } from "../../features/settings/pages/index.js";
-import { PlaceholderPage } from "../../shared/pages/index.js";
-import { ProductsPage, ProductDetailPage, ManagementProductDetailPage } from "../../features/product/pages/index.js";
+// Customer pages
+const CustomerDashboardPage = lazy(() => import("../../features/customer/pages/DashboardPage.jsx"));
+const ShippingAddressesPage = lazy(() => import("../../features/customer/pages/ShippingAddressesPage.jsx"));
+const PaymentMethodsPage = lazy(() => import("../../features/customer/pages/PaymentMethodsPage.jsx"));
+const OrderHistoryPage = lazy(() => import("../../features/customer/pages/OrderHistoryPage.jsx"));
+const CustomerWishlistPage = lazy(() => import("../../features/customer/pages/WishlistPage.jsx"));
 
-// UI Components
+// Shared pages
+const PersonalDetailsPage = lazy(() => import("../../features/user/pages/PersonalDetailsPage.jsx"));
+const SettingsPage = lazy(() => import("../../features/settings/pages/SettingsPage.jsx"));
+const PlaceholderPage = lazy(() => import("../../shared/pages/PlaceholderPage.jsx"));
+const ManagementProductDetailPage = lazy(() => import("../../features/product/pages/ManagementProductDetailPage.jsx"));
+
+// UI Components (lightweight, can be eagerly loaded)
 import PageNotFound from "../../shared/ui/PageNotFound.jsx";
+
+// Suspense wrapper with a centered spinner
+function SuspenseWrapper({ children }) {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-[60vh] flex items-center justify-center">
+					<LoadingSpinner size="xl" color="primary" />
+				</div>
+			}
+		>
+			{children}
+		</Suspense>
+	);
+}
+
+// Helper to wrap lazy components
+const S = (Component, props = {}) => (
+	<SuspenseWrapper>
+		<Component {...props} />
+	</SuspenseWrapper>
+);
 
 // Create app routing
 const router = createBrowserRouter([
@@ -62,28 +87,28 @@ const router = createBrowserRouter([
 	{
 		element: <PublicLayout />,
 		children: [
-			{ path: "/", element: <HomePage /> },
-			{ path: "/login", element: <LoginPage /> },
-			{ path: "/register", element: <RegisterPage /> },
-			{ path: "/cart", element: <CartPage /> },
-			{ path: "/public-cart", element: <CartPage /> },
-			{ path: "/public-wishlist", element: <PublicWishlistPage /> },
-			{ path: "/products", element: <ProductsPage /> },
-			{ path: "/products/:id", element: <ProductDetailPage /> },
-			{ path: "/brands", element: <PublicBrandsPage /> },
-			{ path: "/brands/all", element: <PublicBrandsPage /> },
-			{ path: "/brands/:brandId", element: <BrandDetailPage /> },
-			{ path: "/categories", element: <PublicCategoriesPage /> },
-			{ path: "/categories/all", element: <PublicCategoriesPage /> },
-			{ path: "/categories/:categoryId", element: <CategoryProductsRedirectPage /> },
+			{ path: "/", element: S(HomePage) },
+			{ path: "/login", element: S(LoginPage) },
+			{ path: "/register", element: S(RegisterPage) },
+			{ path: "/cart", element: S(CartPage) },
+			{ path: "/public-cart", element: S(CartPage) },
+			{ path: "/public-wishlist", element: S(PublicWishlistPage) },
+			{ path: "/products", element: S(ProductsPage) },
+			{ path: "/products/:id", element: S(ProductDetailPage) },
+			{ path: "/brands", element: S(PublicBrandsPage) },
+			{ path: "/brands/all", element: S(PublicBrandsPage) },
+			{ path: "/brands/:brandId", element: S(BrandDetailPage) },
+			{ path: "/categories", element: S(PublicCategoriesPage) },
+			{ path: "/categories/all", element: S(PublicCategoriesPage) },
+			{ path: "/categories/:categoryId", element: S(CategoryProductsRedirectPage) },
 			{
 				element: <ProtectedRoute />,
 				children: [
-					{ path: "/checkout", element: <PlaceholderPage title="Checkout" /> },
-					{ path: "/orders", element: <PlaceholderPage title="Orders" /> },
-					{ path: "/orders/:orderId", element: <PlaceholderPage title="Order Details" /> },
-					{ path: "/profile", element: <PlaceholderPage title="Profile" /> },
-					{ path: "/profile/edit", element: <PlaceholderPage title="Edit Profile" /> },
+					{ path: "/checkout", element: S(PlaceholderPage, { title: "Checkout" }) },
+					{ path: "/orders", element: S(PlaceholderPage, { title: "Orders" }) },
+					{ path: "/orders/:orderId", element: S(PlaceholderPage, { title: "Order Details" }) },
+					{ path: "/profile", element: S(PlaceholderPage, { title: "Profile" }) },
+					{ path: "/profile/edit", element: S(PlaceholderPage, { title: "Edit Profile" }) },
 				],
 			},
 		]
@@ -96,27 +121,18 @@ const router = createBrowserRouter([
 				path: "/admin",
 				element: <DashboardLayout />,
 				children: [
-					{
-						index: true,
-						element: <AdminDashboardPage />,
-					},
-					{
-						path: "dashboard",
-						element: <AdminDashboardPage />,
-					},
-					{
-						path: "personalDetails",
-						element: <PersonalDetailsPage />,
-					},
-					{ path: "settings", element: <SettingsPage /> },
-					{ path: "users", element: <AdminUsersPage /> },
-					{ path: "users/:userId", element: <UserDetailsPage /> },
-					{ path: "products", element: <AdminProductsPage /> },
-					{ path: "products/:id", element: <ManagementProductDetailPage viewerRole="admin" /> },
-					{ path: "orders", element: <AdminOrdersPage /> },
-					{ path: "analytics", element: <AdminAnalyticsPage /> },
-					{ path: "categories", element: <CategoriesAndSubCategoriesPage /> },
-					{ path: "brands", element: <BrandsPage /> },
+					{ index: true, element: S(AdminDashboardPage) },
+					{ path: "dashboard", element: S(AdminDashboardPage) },
+					{ path: "personalDetails", element: S(PersonalDetailsPage) },
+					{ path: "settings", element: S(SettingsPage) },
+					{ path: "users", element: S(AdminUsersPage) },
+					{ path: "users/:userId", element: S(UserDetailsPage) },
+					{ path: "products", element: S(AdminProductsPage) },
+					{ path: "products/:id", element: S(ManagementProductDetailPage, { viewerRole: "admin" }) },
+					{ path: "orders", element: S(AdminOrdersPage) },
+					{ path: "analytics", element: S(AdminAnalyticsPage) },
+					{ path: "categories", element: S(CategoriesAndSubCategoriesPage) },
+					{ path: "brands", element: S(AdminBrandsPage) },
 				],
 			},
 		],
@@ -130,26 +146,16 @@ const router = createBrowserRouter([
 				path: "/seller",
 				element: <DashboardLayout />,
 				children: [
-					{
-						index: true,
-						element: <SellerDashboardPage />,
-					},
-					{
-						path: "dashboard",
-						element: <SellerDashboardPage />,
-					},
-					{
-						path: "personalDetails",
-						element: <PersonalDetailsPage />,
-					},
-					{ path: "settings", element: <SettingsPage /> },
-					{ path: "inventory", element: <SellerProductsPage /> },
-					{ path: "inventory/:id", element: <ManagementProductDetailPage viewerRole="seller" /> },
-					{ path: "orders", element: <SellerOrdersPage /> },
-					{ path: "brands", element: <BrandsManagementPage /> },
-					{ path: "brands/:id", element: <BrandDetailsPage /> },
-					{ path: "analytics", element: <SellerAnalyticsPage /> },
-
+					{ index: true, element: S(SellerDashboardPage) },
+					{ path: "dashboard", element: S(SellerDashboardPage) },
+					{ path: "personalDetails", element: S(PersonalDetailsPage) },
+					{ path: "settings", element: S(SettingsPage) },
+					{ path: "inventory", element: S(SellerProductsPage) },
+					{ path: "inventory/:id", element: S(ManagementProductDetailPage, { viewerRole: "seller" }) },
+					{ path: "orders", element: S(SellerOrdersPage) },
+					{ path: "brands", element: S(BrandsManagementPage) },
+					{ path: "brands/:id", element: S(SellerBrandDetailsPage) },
+					{ path: "analytics", element: S(SellerAnalyticsPage) },
 				],
 			},
 		],
@@ -163,46 +169,20 @@ const router = createBrowserRouter([
 				path: "/customer",
 				element: <DashboardLayout />,
 				children: [
-					{
-						index: true,
-						element: <CustomerDashboardPage />,
-					},
-					{
-						path: "dashboard",
-						element: <CustomerDashboardPage />,
-					},
-					{
-						path: "personalDetails",
-						element: <PersonalDetailsPage />,
-					},
-					{
-						path: "shippingAddresses",
-						element: <ShippingAddressesPage />,
-					},
-					{
-						path: "paymentMethods",
-						element: <PaymentMethodsPage />,
-					},
-					{
-						path: "orderHistory",
-						element: <OrderHistoryPage />,
-					},
-					{ path: "products/:id", element: <ProductDetailPage /> },
-					{
-						path: "cart",
-						element: <CartPage />
-					},
-					{
-						path: "wishlist",
-						element: <WishlistPage />
-					},
-					{ path: "settings", element: <SettingsPage /> },
+					{ index: true, element: S(CustomerDashboardPage) },
+					{ path: "dashboard", element: S(CustomerDashboardPage) },
+					{ path: "personalDetails", element: S(PersonalDetailsPage) },
+					{ path: "shippingAddresses", element: S(ShippingAddressesPage) },
+					{ path: "paymentMethods", element: S(PaymentMethodsPage) },
+					{ path: "orderHistory", element: S(OrderHistoryPage) },
+					{ path: "products/:id", element: S(ProductDetailPage) },
+					{ path: "cart", element: S(CartPage) },
+					{ path: "wishlist", element: S(CustomerWishlistPage) },
+					{ path: "settings", element: S(SettingsPage) },
 				],
 			},
 		],
 	},
-
-
 
 	// Page Not Found Route (Catch-all)
 	{

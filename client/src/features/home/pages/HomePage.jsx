@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO, { schemas } from '../../../shared/components/SEO.jsx';
 import {
 	HeroSection,
 	FeaturesStrip,
@@ -15,45 +16,68 @@ import {
 } from '../components';
 
 const HomePage = () => {
-    
+	const jsonLd = [
+		schemas.webSite(),
+		schemas.organization(),
+	];
 
 	return (
 		<>
+			<SEO
+				title="Home"
+				description="Discover curated luxury fashion, tech gadgets, and home essentials at ShopyNow. Premium products, unbeatable prices, and fast delivery."
+				canonical="/"
+				jsonLd={jsonLd}
+			/>
 			<main>
-				{/* 3. Hero Section */}
+				{/* Hero Section */}
 				<HeroSection />
 
-				{/* 4. Features Trust Strip (Immediately after Hero) */}
+				{/* Features Trust Strip */}
 				<FeaturesStrip />
 
-				{/* 5. Brands Section */}
-				<BrandsSection />
+				{/* Brands Section */}
+				<section aria-label="Featured brands">
+					<BrandsSection />
+				</section>
 
-				{/* 6. Categories Section */}
-				<CategoriesSection />
+				{/* Categories Section */}
+				<section aria-label="Shop by category">
+					<CategoriesSection />
+				</section>
 
-				{/* 7. Flash Sale Section (With Countdown) */}
-				<FlashSaleSection />
+				{/* Flash Sale Section */}
+				<section aria-label="Flash sale deals">
+					<FlashSaleSection />
+				</section>
 
-				{/* 8. New Arrivals (Products Grid) */}
-				<ProductsSection />
+				{/* New Arrivals */}
+				<section aria-label="New product arrivals">
+					<ProductsSection />
+				</section>
 
-				{/* 9. Best Sellers Section (With Tabs) */}
-				<BestSellersSection />
+				{/* Best Sellers */}
+				<section aria-label="Best selling products">
+					<BestSellersSection />
+				</section>
 
-				{/* 10. Featured Picks (Asymmetric Grid) */}
-				<FeaturedSection />
+				{/* Featured Picks */}
+				<section aria-label="Featured picks">
+					<FeaturedSection />
+				</section>
 
-				{/* 11. What Our Community Says (Testimonials) */}
-				<TestimonialsSection />
+				{/* Testimonials */}
+				<section aria-label="Customer testimonials">
+					<TestimonialsSection />
+				</section>
 
-				{/* 12. Stats / Social Proof Numbers */}
+				{/* Stats */}
 				<StatsSection />
 
-				{/* 13. Seller CTA Banner */}
+				{/* Seller CTA */}
 				<SellerCtaBanner />
 
-				{/* 14. Newsletter Section */}
+				{/* Newsletter */}
 				<NewsletterSection />
 			</main>
 		</>

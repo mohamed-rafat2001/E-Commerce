@@ -11,6 +11,8 @@ import BrandHeroBanner from "../components/brand/BrandHeroBanner.jsx";
 import BrandSidebar from "../components/brand/BrandSidebar.jsx";
 import BrandProductsSection from "../components/brand/BrandProductsSection.jsx";
 import BrandNewsletterSection from "../components/brand/BrandNewsletterSection.jsx";
+import SEO from "../../../shared/components/SEO.jsx";
+import Breadcrumbs from "../../../shared/components/Breadcrumbs.jsx";
 
 function BrandPageSkeleton() {
 	return (
@@ -108,83 +110,118 @@ export default function BrandDetailPage() {
 		const status = brandError?.response?.status;
 		if (status === 404) {
 			return (
-				<div className="min-h-[70vh] flex items-center justify-center p-4">
+				<main className="min-h-[70vh] flex items-center justify-center p-4">
 					<div className="rounded-2xl border border-gray-200 bg-white max-w-md w-full p-8 text-center shadow-sm">
-						<FiAlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+						<FiAlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" aria-hidden="true" />
 						<h1 className="text-2xl font-black text-gray-900">Brand not found</h1>
 						<p className="text-gray-500 mt-2">The brand you're looking for doesn't exist or is no longer available.</p>
-						<Link to="/brands" className="inline-block mt-6">
+						<Link to="/brands" className="inline-block mt-6" aria-label="Browse all brands">
 							<Button>Browse All Brands</Button>
 						</Link>
 					</div>
-				</div>
+				</main>
 			);
 		}
 
 		return (
-			<div className="min-h-[70vh] flex items-center justify-center p-4">
+			<main className="min-h-[70vh] flex items-center justify-center p-4">
 				<div className="rounded-2xl border border-rose-200 bg-rose-50 max-w-md w-full p-8 text-center">
-					<FiAlertCircle className="w-12 h-12 text-rose-400 mx-auto mb-4" />
+					<FiAlertCircle className="w-12 h-12 text-rose-400 mx-auto mb-4" aria-hidden="true" />
 					<h1 className="text-2xl font-black text-rose-700">Unable to load brand</h1>
 					<p className="text-rose-600/80 mt-2">Please check your connection and try again.</p>
 					<Button onClick={() => refetchBrand()} className="mt-6">
 						Try Again
 					</Button>
 				</div>
-			</div>
+			</main>
 		);
 	}
 
 	if (!brand) {
 		return (
-			<div className="min-h-[70vh] flex items-center justify-center p-4">
-				<div className="rounded-2xl border border-gray-200 bg-white max-w-md w-full p-8 text-center shadow-sm">
-					<FiAlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+			<main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
+				<FiAlertCircle className="w-16 h-16 text-gray-300 mb-4" aria-hidden="true" />
+				<div className="text-center">
 					<h1 className="text-2xl font-black text-gray-900">Brand not found</h1>
-					<Link to="/brands" className="inline-block mt-6">
+					<Link to="/brands" className="inline-block mt-6" aria-label="Browse all brands">
 						<Button>Browse All Brands</Button>
 					</Link>
 				</div>
-			</div>
+			</main>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-white">
-			<div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-8 md:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
-				<BrandSidebar
-					brand={brand}
-					activeCategory={filters.category}
-					activeSubCategory={filters.subCategory}
-					onCategorySelect={handleCategorySelect}
-					onSubCategorySelect={handleSubCategorySelect}
-					onClearCategory={handleClearCategory}
-				/>
+		<main className="min-h-screen bg-white" itemScope itemType="https://schema.org/Organization">
+			<SEO
+				title={`${brand.name} — Official Brand Store`}
+				description={brand.description?.slice(0, 155) || `Shop ${brand.name} products at ShopyNow. Discover the latest collection, exclusive deals, and premium quality.`}
+				canonical={`/brands/${brandId}`}
+				ogImage={brand.coverImage?.secure_url || brand.logo?.secure_url}
+				jsonLd={{
+					'@context': 'https://schema.org',
+					'@type': 'Organization',
+					name: brand.name,
+					description: brand.description,
+					logo: brand.logo?.secure_url,
+					url: `https://shopynow.com/brands/${brandId}`,
+				}}
+			/>
+			
+			<nav aria-label="Breadcrumb" className="max-w-screen-2xl mx-auto px-4 md:px-6 py-8 md:py-12">
+				<Breadcrumbs items={[
+					{ name: 'Home', url: '/' },
+					{ name: 'Brands', url: '/brands' },
+					{ name: brand.name },
+				]} />
+			</nav>
 
-				<main>
-					<BrandHeroBanner
-						brand={brand}
-						onFollowAction={handleFollowAction}
-						isFollowing={isFollowing}
-						followersCount={followersCount}
-						isToggling={isToggling}
-						productsCount={pagination?.totalResults}
-					/>
-					<BrandProductsSection
-						brand={brand}
-						products={products}
-						pagination={pagination}
-						isLoading={isProductsLoading}
-						error={productsError}
-						onRetry={() => refetchProducts()}
-						filters={filters}
-						onSortChange={(value) => setFilter("sort", value)}
-						onPageChange={(page) => setFilter("page", page)}
-						onClearCategory={handleClearCategory}
-					/>
-					<BrandNewsletterSection brand={brand} brandId={brandId} />
-				</main>
+			<div className="max-w-screen-2xl mx-auto px-4 md:px-6 pb-8 md:pb-12 grid lg:grid-cols-[220px_1fr] gap-8">
+				<aside aria-label="Brand category filters" className="hidden lg:block relative">
+					<div className="sticky top-24">
+						<BrandSidebar
+							brand={brand}
+							activeCategory={filters.category}
+							activeSubCategory={filters.subCategory}
+							onCategorySelect={handleCategorySelect}
+							onSubCategorySelect={handleSubCategorySelect}
+							onClearCategory={handleClearCategory}
+						/>
+					</div>
+				</aside>
+
+				<article className="flex flex-col gap-8 md:gap-12 min-w-0" aria-label={`${brand.name} detail content`}>
+					<section aria-label="Brand introductory banner">
+						<BrandHeroBanner
+							brand={brand}
+							onFollowAction={handleFollowAction}
+							isFollowing={isFollowing}
+							followersCount={followersCount}
+							isToggling={isToggling}
+							productsCount={pagination?.totalResults}
+						/>
+					</section>
+
+					<section aria-label="Products offered by brand">
+						<BrandProductsSection
+							brand={brand}
+							products={products}
+							pagination={pagination}
+							isLoading={isProductsLoading}
+							error={productsError}
+							onRetry={() => refetchProducts()}
+							filters={filters}
+							onSortChange={(value) => setFilter("sort", value)}
+							onPageChange={(page) => setFilter("page", page)}
+							onClearCategory={handleClearCategory}
+						/>
+					</section>
+
+					<section aria-label="Brand newsletter subscription">
+						<BrandNewsletterSection brand={brand} brandId={brandId} />
+					</section>
+				</article>
 			</div>
-		</div>
+		</main>
 	);
 }

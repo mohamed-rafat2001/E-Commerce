@@ -1,6 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTION 6: RESPONSIVE DESIGN — Mobile-first CSS approach
+   Base styles target mobile, min-width queries scale up.
+   
+   Breakpoints:
+   - Mobile:   < 768px    (base styles)
+   - Tablet:   >= 768px   (min-width: 768px)
+   - Desktop:  >= 1024px  (min-width: 1024px)
+   - Wide:     >= 1280px  (min-width: 1280px)
+   ═══════════════════════════════════════════════════════════════════ */
 
 @layer base {
 	* {
@@ -8,8 +18,10 @@
 	}
 
 	html {
-		overflow-x: clip; /* Prefer clip to avoid breaking sticky headers */
-		/* native smooth scroll removed to avoid conflict with Lenis */
+		overflow-x: clip;
+		/* font-display: swap is handled in the Google Fonts URL */
+		/* Use dvh for mobile-friendly viewport height */
+		--vh-full: 100dvh;
 	}
 
 	html.lenis,
@@ -40,8 +52,42 @@
 
 	body {
 		@apply bg-gray-50 text-gray-900 antialiased;
-		min-height: 100vh;
+		min-height: 100dvh; /* Use dynamic viewport height for mobile */
 		overflow-x: hidden;
+		/* Minimum 16px base font prevents iOS auto-zoom on inputs */
+		font-size: 16px;
+	}
+
+	/* Fluid typography using clamp() */
+	h1 { font-size: clamp(1.75rem, 4vw, 3.5rem); }
+	h2 { font-size: clamp(1.375rem, 3vw, 2.25rem); }
+	h3 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+	p, li { font-size: clamp(0.875rem, 2vw, 1.125rem); }
+
+	/* Touch targets: minimum 44x44px for all interactive elements on mobile */
+	@media (max-width: 767px) {
+		button,
+		a,
+		[role="button"],
+		input[type="checkbox"],
+		input[type="radio"],
+		select {
+			min-height: 44px;
+			min-width: 44px;
+		}
+
+		/* Prevent iOS auto-zoom on input focus */
+		input,
+		select,
+		textarea {
+			font-size: 16px !important;
+		}
+	}
+
+	/* Responsive images — never overflow container */
+	img {
+		max-width: 100%;
+		height: auto;
 	}
 
 	/* Custom scrollbar */
@@ -69,6 +115,42 @@
 }
 
 @layer components {
+	/* ═══════════════════════════════════════════════════════════════
+	   Responsive Product Grid
+	   Mobile: 1 col | Tablet: 2 cols | Desktop: 3-4 cols
+	   Uses auto-fill with minmax for fluid behavior
+	   ═══════════════════════════════════════════════════════════════ */
+	.product-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 640px) {
+		.product-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.product-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 2rem;
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.product-grid {
+			grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		}
+	}
+
+	/* Product image aspect ratio (prevents CLS) */
+	.product-image {
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+		width: 100%;
+	}
 
 	/* Sidebar navigation links */
 	.side-Nav-Links {
@@ -279,5 +361,13 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 3;
+	}
+
+	/* Dynamic viewport height utilities */
+	.min-h-dvh {
+		min-height: 100dvh;
+	}
+	.h-dvh {
+		height: 100dvh;
 	}
 }
