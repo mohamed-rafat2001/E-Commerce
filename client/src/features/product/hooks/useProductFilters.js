@@ -7,6 +7,8 @@ const isMongoId = (value) => /^[a-fA-F0-9]{24}$/.test(String(value || ''));
 export default function useProductFilters() {
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const paginationLimit = usePaginationLimit('PUBLIC_PRODUCTS');
+
     // Parse current filters from URL
     const filters = useMemo(() => {
         const parsed = {
@@ -19,12 +21,12 @@ export default function useProductFilters() {
             'ratingAverage[gte]': searchParams.get('ratingAverage[gte]') || '',
             subCategory: searchParams.get('subCategory') || '',
             page: parseInt(searchParams.get('page')) || 1,
-            limit: usePaginationLimit('PUBLIC_PRODUCTS'),
+            limit: paginationLimit,
             inStock: searchParams.get('inStock') === 'true'
         };
 
         return parsed;
-    }, [searchParams]);
+    }, [searchParams, paginationLimit]);
 
     // Build the query object for the API
     const apiParams = useMemo(() => {

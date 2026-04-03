@@ -21,14 +21,16 @@ export default function usePublicCategoriesPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const makeId = (seed) => seed.toString(16).padStart(24, "0").slice(0, 24);
 
+	const paginationLimit = usePaginationLimit('PUBLIC_CATEGORIES');
+
 	const filters = useMemo(
 		() => ({
 			search: searchParams.get("search") || "",
 			sort: searchParams.get("sort") || "newest",
 			page: parseInt(searchParams.get("page"), 10) || 1,
-			limit: usePaginationLimit('PUBLIC_CATEGORIES'),
+			limit: paginationLimit,
 		}),
-		[searchParams]
+		[searchParams, paginationLimit]
 	);
 
 	const { data, isLoading, error, refetch } = useQuery({
