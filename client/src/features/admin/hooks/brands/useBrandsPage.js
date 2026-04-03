@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import usePaginationLimit from '../../../../shared/hooks/usePaginationLimit.js';
 import useAdminBrands from './useAdminBrands.js';
 
 const useBrandsPage = () => {
@@ -9,7 +10,7 @@ const useBrandsPage = () => {
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   
   const page = parseInt(searchParams.get('page')) || 1;
-  const limit = parseInt(searchParams.get('limit')) || 10;
+  const limit = usePaginationLimit('PANEL_BRANDS');
 
   const { brands, total, loading, refetch } = useAdminBrands();
   

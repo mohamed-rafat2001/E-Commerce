@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
+import usePaginationLimit from "../../../../shared/hooks/usePaginationLimit.js";
 import { getAllBrands } from "../../services/admin.js";
 
 const useAdminBrands = () => {
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page")) || 1;
-  const limit = parseInt(searchParams.get("limit")) || 10;
+  const limit = usePaginationLimit('PANEL_BRANDS');
   const search = searchParams.get("search") || "";
   const sort = searchParams.get("sort") || "-createdAt";
 

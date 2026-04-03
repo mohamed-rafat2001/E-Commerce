@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import usePaginationLimit from '../../../../shared/hooks/usePaginationLimit.js';
 import useCategories from './useCategories.js';
 import useAddCategory from './useAddCategory.js';
 import useUpdateCategory from './useUpdateCategory.js';
@@ -10,7 +11,8 @@ const useCategoriesPage = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [debouncedSearch, setDebouncedSearch] = useState('');
 	const [page, setPage] = useState(1);
-	const [limit, setLimit] = useState(10);
+	const defaultLimit = usePaginationLimit('PANEL_CATEGORIES');
+	const [limit, setLimit] = useState(defaultLimit);
 	
 	// Modal and selection state
 	const [selectedCategory, setSelectedCategory] = useState(null);
