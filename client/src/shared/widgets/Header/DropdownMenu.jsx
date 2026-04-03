@@ -205,144 +205,30 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						)}
 
 						<div className={`flex-1 overflow-y-auto overscroll-contain custom-scrollbar ${isSimple ? 'p-2' : 'p-3'}`}>
-							{filteredItems.length > 0 ? (
-								isCategoriesMenu ? (
-									<div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
-										<div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
-											{filteredItems.map((item) => {
-												const itemId = item._id || item.id;
-												const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
-												return (
-													<button
-														key={itemId || item.name}
-														onMouseEnter={() => setActiveCategoryId(itemId)}
-														onClick={() => setActiveCategoryId(itemId)}
-														className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
-															? 'bg-white text-indigo-600 shadow-sm border border-indigo-100'
-															: 'text-gray-600 hover:bg-white hover:text-gray-900'
-															}`}
-													>
-														{item.name}
-													</button>
-												);
-											})}
-										</div>
-
-										<div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
-											<div className="flex items-center justify-between mb-4">
-												<h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
-													{activeCategory?.name || 'Category'}
-												</h3>
-												{activeCategory && getEntityId(activeCategory) && (
-													<Link
-														to={`/products?category=${encodeURIComponent(getEntityId(activeCategory))}`}
-														onClick={closeMenu}
-														className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
-													>
-														View Category
-													</Link>
-												)}
-											</div>
-											{(activeCategory?.subCategories || []).length > 0 ? (
-												<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1.5">
-													{activeCategory.subCategories.map((sub) => {
-														const categoryId = getEntityId(activeCategory);
-														const subCategoryId = getEntityId(sub);
-														if (!categoryId || !subCategoryId) {
-															return (
-																<span
-																	key={sub._id || sub.id || sub.name}
-																	className="px-3 py-1.5 rounded-xl bg-gray-50 text-[11px] font-semibold text-gray-400 cursor-not-allowed"
-																>
-																	{sub.name}
-																</span>
-															);
-														}
-														return (
-															<Link
-																key={sub._id || sub.id || sub.name}
-																to={`/products?category=${encodeURIComponent(categoryId)}&subCategory=${encodeURIComponent(subCategoryId)}`}
-																onClick={closeMenu}
-																className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-[11px] font-semibold text-gray-700 hover:text-indigo-700 transition-all"
-															>
-																{sub.name}
-															</Link>
-														);
-													})}
-												</div>
-											) : (
-												<div className="text-xs text-gray-400 font-semibold py-8 text-center">
-													No subcategories available
-												</div>
-											)}
-										</div>
-									</div>
+								{/* Content Routing based on Menu Type */}
+								{isCategoriesMenu ? (
+									<CategoriesGrid 
+                                        filteredItems={filteredItems} 
+                                        activeCategory={activeCategory} 
+                                        setActiveCategoryId={setActiveCategoryId} 
+                                        closeMenu={closeMenu} 
+                                        getEntityId={getEntityId} 
+                                    />
 								) : isBrandsMenu ? (
-									<div className="space-y-4">
-										<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
-											{filteredItems.map((brand) => {
-												const brandId = getEntityId(brand);
-												const logo = brand.logo?.secure_url || brand.logo?.url || brand.logo;
-												return (
-													<Link
-														key={brandId || brand.name}
-														to={brandId ? `/brands/${encodeURIComponent(brandId)}` : '/brands/all'}
-														onClick={closeMenu}
-														className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
-													>
-														{logo ? (
-															<img src={logo} alt={brand.name} className="h-7 w-7 rounded-full object-cover border border-gray-100" />
-														) : (
-															<div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-black text-gray-500">
-																{(brand.name || 'BR').slice(0, 2).toUpperCase()}
-															</div>
-														)}
-														<span className="text-xs font-bold text-gray-700 line-clamp-1">{brand.name}</span>
-													</Link>
-												);
-											})}
-										</div>
-									</div>
+									<BrandsGrid 
+                                        filteredItems={filteredItems} 
+                                        closeMenu={closeMenu} 
+                                        getEntityId={getEntityId} 
+                                    />
 								) : (
-									<div className={`grid gap-2
-										${isSimple ? 'grid-cols-1' :
-											hasManyItems ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
-										}`}>
-										{filteredItems.map((item) => (
-											<Link
-												key={item.id || item._id || item.name}
-												to={resolveItemPath(item)}
-												onClick={closeMenu}
-												className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2' : 'p-2.5'}`}
-												role="menuitem"
-											>
-												{item.icon && (
-													<span className="text-base group-hover:scale-110 transition-transform duration-300">
-														{item.icon}
-													</span>
-												)}
-												<div className="flex flex-col">
-													<span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-xs">
-														{item.name}
-													</span>
-													{!isSimple && item.description && (
-														<span className="text-[10px] text-gray-400 font-medium line-clamp-1 group-hover:text-gray-500 transition-colors">
-															{item.description}
-														</span>
-													)}
-												</div>
-											</Link>
-										))}
-									</div>
-								)
-							) : (
-								<div className="py-8 text-center">
-									<div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
-										<SearchIcon className="w-4 h-4 text-gray-300" />
-									</div>
-									<p className="text-xs font-bold text-gray-400">No results found</p>
-								</div>
-							)}
+									<SimpleList 
+                                        filteredItems={filteredItems} 
+                                        resolveItemPath={resolveItemPath} 
+                                        closeMenu={closeMenu} 
+                                        isSimple={isSimple} 
+                                        hasManyItems={hasManyItems} 
+                                    />
+								)}
 						</div>
 
 						{!isSimple && (
@@ -379,6 +265,157 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 			`}</style>
 		</div>
 	);
+};
+
+/* --- Sub Components --- */
+
+const EmptyState = () => (
+    <div className="py-8 text-center">
+        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+            <SearchIcon className="w-4 h-4 text-gray-300" />
+        </div>
+        <p className="text-xs font-bold text-gray-400">No results found</p>
+    </div>
+);
+
+const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, closeMenu, getEntityId }) => {
+    if (filteredItems.length === 0) return <EmptyState />;
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
+            <div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
+                {filteredItems.map((item) => {
+                    const itemId = item._id || item.id;
+                    const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
+                    return (
+                        <button
+                            key={itemId || item.name}
+                            onMouseEnter={() => setActiveCategoryId(itemId)}
+                            onClick={() => setActiveCategoryId(itemId)}
+                            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
+                                ? 'bg-white text-indigo-600 shadow-sm border border-indigo-100'
+                                : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                }`}
+                        >
+                            {item.name}
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
+                        {activeCategory?.name || 'Category'}
+                    </h3>
+                    {activeCategory && getEntityId(activeCategory) && (
+                        <Link
+                            to={`/products?category=${encodeURIComponent(getEntityId(activeCategory))}`}
+                            onClick={closeMenu}
+                            className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
+                        >
+                            View Category
+                        </Link>
+                    )}
+                </div>
+                {(activeCategory?.subCategories || []).length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1.5">
+                        {activeCategory.subCategories.map((sub) => {
+                            const categoryId = getEntityId(activeCategory);
+                            const subCategoryId = getEntityId(sub);
+                            if (!categoryId || !subCategoryId) {
+                                return (
+                                    <span
+                                        key={sub._id || sub.id || sub.name}
+                                        className="px-3 py-1.5 rounded-xl bg-gray-50 text-[11px] font-semibold text-gray-400 cursor-not-allowed"
+                                    >
+                                        {sub.name}
+                                    </span>
+                                );
+                            }
+                            return (
+                                <Link
+                                    key={sub._id || sub.id || sub.name}
+                                    to={`/products?category=${encodeURIComponent(categoryId)}&subCategory=${encodeURIComponent(subCategoryId)}`}
+                                    onClick={closeMenu}
+                                    className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-[11px] font-semibold text-gray-700 hover:text-indigo-700 transition-all"
+                                >
+                                    {sub.name}
+                                </Link>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="text-xs text-gray-400 font-semibold py-8 text-center">
+                        No subcategories available
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const BrandsGrid = ({ filteredItems, closeMenu, getEntityId }) => {
+    if (filteredItems.length === 0) return <EmptyState />;
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                {filteredItems.map((brand) => {
+                    const brandId = getEntityId(brand);
+                    const logo = brand.logo?.secure_url || brand.logo?.url || brand.logo;
+                    return (
+                        <Link
+                            key={brandId || brand.name}
+                            to={brandId ? `/brands/${encodeURIComponent(brandId)}` : '/brands/all'}
+                            onClick={closeMenu}
+                            className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
+                        >
+                            {logo ? (
+                                <img src={logo} alt={brand.name} className="h-7 w-7 rounded-full object-cover border border-gray-100" />
+                            ) : (
+                                <div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-black text-gray-500">
+                                    {(brand.name || 'BR').slice(0, 2).toUpperCase()}
+                                </div>
+                            )}
+                            <span className="text-xs font-bold text-gray-700 line-clamp-1">{brand.name}</span>
+                        </Link>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+const SimpleList = ({ filteredItems, resolveItemPath, closeMenu, isSimple, hasManyItems }) => {
+    if (filteredItems.length === 0) return <EmptyState />;
+    return (
+        <div className={`grid gap-2 ${isSimple ? 'grid-cols-1' : hasManyItems ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+            {filteredItems.map((item) => (
+                <Link
+                    key={item.id || item._id || item.name}
+                    to={resolveItemPath(item)}
+                    onClick={closeMenu}
+                    className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2' : 'p-2.5'}`}
+                    role="menuitem"
+                >
+                    {item.icon && (
+                        <span className="text-base group-hover:scale-110 transition-transform duration-300">
+                            {item.icon}
+                        </span>
+                    )}
+                    <div className="flex flex-col">
+                        <span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-xs">
+                            {item.name}
+                        </span>
+                        {!isSimple && item.description && (
+                            <span className="text-[10px] text-gray-400 font-medium line-clamp-1 group-hover:text-gray-500 transition-colors">
+                                {item.description}
+                            </span>
+                        )}
+                    </div>
+                </Link>
+            ))}
+        </div>
+    );
 };
 
 export default DropdownMenu;

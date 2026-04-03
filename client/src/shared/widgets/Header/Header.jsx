@@ -96,7 +96,7 @@ const Header = ({ isPanel = false }) => {
 
 	return (
 		<motion.header
-			className={`sticky top-0 z-40 w-full ${isPanel ? 'bg-transparent' : ''}`}
+			className={`fixed top-0 left-0 right-0 z-50 w-full ${isPanel ? 'bg-transparent' : ''}`}
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
 			transition={{ type: 'spring', stiffness: 260, damping: 20 }}
