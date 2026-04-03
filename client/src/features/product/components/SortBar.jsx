@@ -1,10 +1,25 @@
-import { FiX, FiFilter, FiChevronDown } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiX, FiFilter, FiChevronDown, FiCheck } from 'react-icons/fi';
 import useCategories from '../../home/hooks/useCategories.js';
 import useBrands from '../../home/hooks/useBrands.js';
 
 export default function SortBar({ totalCount, filters, setFilter, clearFilters, onMobileFilterClick }) {
     const { categories } = useCategories();
     const { originalBrands: brands } = useBrands();
+    const { originalBrands: brands } = useBrands();
+
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const sortRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (sortRef.current && !sortRef.current.contains(event.target)) {
+                setIsSortOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const activeFilters = [];
     if (filters.category) {
@@ -93,19 +108,35 @@ export default function SortBar({ totalCount, filters, setFilter, clearFilters, 
                         )}
                     </button>
 
-                    <div className="relative group">
-                        <select
-                            value={filters.sort}
-                            onChange={(e) => setFilter('sort', e.target.value)}
-                            className="appearance-none bg-white border border-gray-200 hover:border-gray-400 pl-5 pr-10 py-2.5 rounded-full text-sm font-bold text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-100 cursor-pointer shadow-sm transition-all"
+                    <div className="relative group" ref={sortRef}>
+                        <button
+                            onClick={() => setIsSortOpen(!isSortOpen)}
+                            className="flex items-center justify-between min-w-[180px] bg-white border border-gray-200 hover:border-gray-900 px-5 py-2.5 rounded-full text-sm font-bold text-gray-900 shadow-sm transition-all"
                         >
-                            {sortOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-gray-900 transition-colors">
-                            <FiChevronDown className="w-4 h-4" />
-                        </div>
+                            <span className="truncate pr-4">
+                                {sortOptions.find(opt => opt.value === filters.sort)?.label || 'Sort By'}
+                            </span>
+                            <FiChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isSortOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                {sortOptions.map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        onClick={() => {
+                                            setFilter('sort', opt.value);
+                                            setIsSortOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors flex items-center justify-between
+                                            ${filters.sort === opt.value ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                    >
+                                        {opt.label}
+                                        {filters.sort === opt.value && <FiCheck className="w-4 h-4 text-indigo-600" />}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
