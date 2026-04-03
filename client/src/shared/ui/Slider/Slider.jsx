@@ -147,10 +147,10 @@ const Slider = ({
         {/* Custom Navigation Buttons (Default ones if no custom selectors provided) */}
         {navigation && slidesCount > 1 && !nextEl && (
           <>
-            <button className="custom-swiper-prev absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl flex items-center justify-center text-gray-900 opacity-0 group-hover/slider:opacity-100 -translate-x-4 group-hover/slider:translate-x-0 transition-all duration-500 hover:bg-black hover:text-white group/btn">
+            <button className="custom-swiper-prev absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl flex items-center justify-center text-gray-900 opacity-100 transition-all duration-500 hover:bg-black hover:text-white group/btn">
               <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6 group-hover/btn:-translate-x-0.5 transition-transform" />
             </button>
-            <button className="custom-swiper-next absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl flex items-center justify-center text-gray-900 opacity-0 group-hover/slider:opacity-100 translate-x-4 group-hover/slider:translate-x-0 transition-all duration-500 hover:bg-black hover:text-white group/btn">
+            <button className="custom-swiper-next absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl flex items-center justify-center text-gray-900 opacity-100 transition-all duration-500 hover:bg-black hover:text-white group/btn">
               <FiChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover/btn:translate-x-0.5 transition-transform" />
             </button>
           </>

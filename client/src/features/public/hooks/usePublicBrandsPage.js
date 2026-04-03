@@ -1,10 +1,4 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
-import { getBrands } from "../services/index.js";
-
-const ITEMS_PER_PAGE = 9;
-
+import usePaginationLimit from "../../../shared/hooks/usePaginationLimit.js";
 const sortMapper = {
 	az: "name",
 	za: "-name",
@@ -22,7 +16,7 @@ export default function usePublicBrandsPage() {
 			sort: searchParams.get("sort") || "newest",
 			category: searchParams.get("category") || "",
 			page: parseInt(searchParams.get("page"), 10) || 1,
-			limit: parseInt(searchParams.get("limit"), 10) || ITEMS_PER_PAGE,
+			limit: usePaginationLimit('PUBLIC_BRANDS'),
 		}),
 		[searchParams]
 	);

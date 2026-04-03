@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useCallback, useMemo } from 'react';
+import usePaginationLimit from '../../../shared/hooks/usePaginationLimit.js';
 
 const isMongoId = (value) => /^[a-fA-F0-9]{24}$/.test(String(value || ''));
 
@@ -18,7 +19,7 @@ export default function useProductFilters() {
             'ratingAverage[gte]': searchParams.get('ratingAverage[gte]') || '',
             subCategory: searchParams.get('subCategory') || '',
             page: parseInt(searchParams.get('page')) || 1,
-            limit: parseInt(searchParams.get('limit')) || 6,
+            limit: usePaginationLimit('PUBLIC_PRODUCTS'),
             inStock: searchParams.get('inStock') === 'true'
         };
 
