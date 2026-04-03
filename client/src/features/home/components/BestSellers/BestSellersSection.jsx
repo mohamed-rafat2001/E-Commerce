@@ -1,99 +1,87 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useBestSellers, useCategories } from '../../hooks';
+import { useBestSellers } from '../../hooks';
 import { PublicProductCard, PublicProductCardSkeleton } from '../../../../shared';
-import { SectionTitle } from '../../../../shared/ui';
+import { SectionTitle, Slider } from '../../../../shared/ui';
 
 const BestSellersSection = () => {
-    const { categories, isLoading: categoriesLoading } = useCategories();
-    const { filteredProducts, isLoading: productsLoading, activeTab, setActiveTab } = useBestSellers();
-
-    const tabs = ["All", ...categories.map(c => c.name)];
-    const isLoading = productsLoading || categoriesLoading;
+    const { products, isLoading, error } = useBestSellers();
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-16 md:py-20 xl:py-24 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
-                {/* Header Section */}
-                <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-10 mb-16 px-1">
+                <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-14 px-1">
                     <div className="flex-1">
                         <SectionTitle
                             title="Best Sellers"
                             subtitle="The most loved products from our entire collection, proven by thousands of verified reviews."
                             align="left"
-                            className="!mb-0"
+                            className="!mb-0 max-w-3xl"
                         />
                     </div>
-
-                    <div className="flex flex-col items-start lg:items-end gap-6 w-full lg:w-auto shrink-0">
-                        <Link to="/products?sort=-sold" className="text-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] hover:text-black transition-all flex items-center gap-2 group">
-                            View All Picks <span className="group-hover:translate-x-1 transition-transform">→</span>
-                        </Link>
-
-                        {/* Tabs Navigation */}
-                        <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-2xl border border-gray-100/50 w-full lg:w-auto overflow-x-auto no-scrollbar shadow-sm">
-                            {categoriesLoading ? (
-                                [...Array(5)].map((_, i) => (
-                                    <div key={i} className="h-10 w-24 bg-gray-200 animate-pulse rounded-xl" />
-                                ))
-                            ) : (
-                                tabs.map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab
-                                            ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20'
-                                            : 'text-gray-400 hover:text-gray-700 hover:bg-white'
-                                            }`}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                    <Link to="/products?sort=-sold" className="text-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] hover:text-gray-900 transition-all flex items-center gap-2 group shrink-0">
+                        View All Picks <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </Link>
                 </div>
 
-                {/* Products Grid with AnimatePresence */}
-                <div className="relative min-h-[400px]">
-                    {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                            {[...Array(8)].map((_, i) => (
-                                <PublicProductCardSkeleton key={`skeleton-${i}`} />
+                <div className="relative">
+                    {isLoading && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 min-h-[300px]">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={`skeleton-${i}`} className="rounded-3xl border border-gray-100 bg-white/70 p-3">
+                                    <PublicProductCardSkeleton />
+                                </div>
                             ))}
                         </div>
-                    ) : (
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            <motion.div
-                                key={activeTab}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ duration: 0.5, ease: 'easeOut' }}
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
+                    )}
+
+                    {!isLoading && !error && products.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 18 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.2 }}
+                            transition={{ duration: 0.45, ease: 'easeOut' }}
+                            className="rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 bg-white/70 dark:bg-gray-900/60 p-3 md:p-4 shadow-sm"
+                        >
+                            <Slider
+                                navigation={false}
+                                pagination={{ clickable: true, dynamicBullets: true }}
+                                autoplay={products.length > 2}
+                                autoplayDelay={3600}
+                                loop={products.length > 4}
+                                speed={700}
+                                slidesPerView={1.12}
+                                spaceBetween={14}
+                                breakpoints={{
+                                    480: { slidesPerView: 1.35, spaceBetween: 16 },
+                                    640: { slidesPerView: 1.8, spaceBetween: 16 },
+                                    768: { slidesPerView: 2.2, spaceBetween: 18 },
+                                    1024: { slidesPerView: 2.8, spaceBetween: 20 },
+                                    1280: { slidesPerView: 3.4, spaceBetween: 22 },
+                                }}
+                                swiperClassName="!pb-12"
                             >
-                                {filteredProducts.length > 0 ? (
-                                    filteredProducts.map((product) => (
-                                        <div key={product._id} className="relative group flex">
-                                            <div className="w-full flex">
-                                                <PublicProductCard product={product} />
-                                            </div>
-                                            {/* Best Seller Gold Badge Overlay */}
-                                            <div className="absolute top-4 left-4 z-20 pointer-events-none">
-                                                <div className="flex items-center gap-1.5 bg-amber-400 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg transform -rotate-1 shadow-amber-400/20">
-                                                    🏆 Best Seller
-                                                </div>
+                                {products.map((product) => (
+                                    <div key={product._id} className="relative h-full">
+                                        <div className="h-full rounded-[1.75rem] border border-gray-100 bg-white dark:bg-gray-900 p-3 md:p-4">
+                                            <PublicProductCard product={product} />
+                                        </div>
+                                        <div className="absolute top-6 left-6 z-20 pointer-events-none">
+                                            <div className="flex items-center gap-1.5 bg-amber-400 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-400/20">
+                                                🏆 Best Seller
                                             </div>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="col-span-full py-20 text-center">
-                                        <p className="text-gray-400 font-medium text-lg">No best sellers found in "{activeTab}" category yet.</p>
                                     </div>
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
+                                ))}
+                            </Slider>
+                        </motion.div>
+                    )}
+
+                    {!isLoading && (error || products.length === 0) && (
+                        <div className="py-14 text-center rounded-3xl border border-gray-100 bg-white/70 dark:bg-gray-900/60">
+                            <p className="text-gray-500 font-medium text-base md:text-lg">No best sellers are available right now.</p>
+                        </div>
                     )}
                 </div>
             </div>

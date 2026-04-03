@@ -34,6 +34,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 	const containerRef = useRef(null);
 	const searchInputRef = useRef(null);
 	const menuRef = useRef(null);
+	const closeTimeoutRef = useRef(null);
 	const isCategoriesMenu = label.toLowerCase() === 'categories';
 	const isBrandsMenu = label.toLowerCase() === 'brands';
 
@@ -47,10 +48,30 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 		return () => { document.body.style.overflow = ''; };
 	}, [isOpen]);
 
-	// Toggle dropdown
+	const clearCloseTimeout = () => {
+		if (closeTimeoutRef.current) {
+			clearTimeout(closeTimeoutRef.current);
+			closeTimeoutRef.current = null;
+		}
+	};
+
+	const openDropdown = () => {
+		clearCloseTimeout();
+		setIsOpen(true);
+	};
+
+	const scheduleCloseDropdown = () => {
+		clearCloseTimeout();
+		closeTimeoutRef.current = setTimeout(() => setIsOpen(false), 180);
+	};
+
+	useEffect(() => {
+		return () => clearCloseTimeout();
+	}, []);
+
 	const toggleDropdown = () => {
 		if (isDesktop) {
-			setIsOpen(true);
+			openDropdown();
 			return;
 		}
 		setIsOpen((prev) => !prev);
@@ -166,8 +187,8 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 		<div
 			className="relative inline-block"
 			ref={containerRef}
-			onMouseEnter={isDesktop ? () => setIsOpen(true) : undefined}
-			onMouseLeave={isDesktop ? () => setIsOpen(false) : undefined}
+			onMouseEnter={isDesktop ? openDropdown : undefined}
+			onMouseLeave={isDesktop ? scheduleCloseDropdown : undefined}
 		>
 			{/* Dropdown Trigger */}
 			<button
@@ -176,11 +197,11 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 				aria-expanded={isOpen}
 				aria-haspopup="true"
 				className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none
-					${isOpen ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}
+					${isOpen ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'}`}
 			>
 				{label}
 				<ChevronDownIcon
-					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-gray-900' : 'text-gray-400'}`}
+					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}
 				/>
 			</button>
 
@@ -193,7 +214,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
-							className="fixed inset-0 bg-black/10 z-[9998]"
+							className="fixed inset-0 bg-black/25 z-[9998]"
 							onClick={closeMenu}
 							aria-hidden="true"
 						/>
@@ -203,25 +224,28 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={`absolute left-0 mt-3 max-h-[400px] bg-white rounded-2xl shadow-xl border border-gray-100 z-[9999] flex flex-col overflow-hidden
+						className={`absolute mt-3 max-h-[420px] bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[9999] flex flex-col overflow-hidden backdrop-blur-xl
+							${isSimple ? 'left-0' : isCategoriesMenu || isBrandsMenu ? 'left-1/2 -translate-x-1/2' : 'left-0'}
 							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
+						onMouseEnter={isDesktop ? clearCloseTimeout : undefined}
+						onMouseLeave={isDesktop ? scheduleCloseDropdown : undefined}
 					>
 						{/* Invisible bridge to prevent mouse-leave when moving between trigger and menu */}
 						<div className="absolute top-[-12px] left-0 w-full h-[12px] -z-10" />
 						{!isSimple && (
-							<div className="p-3 border-b border-gray-50 sticky top-0 bg-white z-10">
+							<div className="p-3 border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white/95 dark:bg-gray-900/95 z-10">
 								<div className="relative">
-									<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+									<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
 									<input
 										ref={searchInputRef}
 										type="text"
 										placeholder={`Search ${label.toLowerCase()}...`}
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
-										className="w-full pl-11 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm
-											focus:outline-none focus:ring-2 focus:ring-gray-900/5 transition-all font-medium placeholder-gray-400"
+										className="w-full pl-11 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm text-gray-800 dark:text-gray-100
+											focus:outline-none focus:ring-2 focus:ring-gray-900/5 dark:focus:ring-white/10 transition-all font-medium placeholder-gray-400 dark:placeholder-gray-500"
 									/>
 								</div>
 							</div>
@@ -255,12 +279,12 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						</div>
 
 						{!isSimple && (
-							<div className="p-3 border-t border-gray-50 bg-gray-50/50 sticky bottom-0 backdrop-blur-sm">
+							<div className="p-3 border-t border-gray-50 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/40 sticky bottom-0 backdrop-blur-sm">
 								<Link
 									to={viewAllPath}
 									onClick={closeMenu}
-									className="flex items-center justify-center w-full py-2.5 px-6 bg-[#0f172a] border border-[#0f172a]
-										rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-[#0f172a]
+									className="flex items-center justify-center w-full py-2.5 px-6 bg-gray-900 dark:bg-gray-100 border border-gray-900 dark:border-gray-100
+										rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-white dark:text-gray-900 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white
 										transition-all duration-300 shadow-xl"
 								>
 									View All {label}
@@ -295,18 +319,18 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 
 const EmptyState = () => (
     <div className="py-8 text-center">
-        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
-            <SearchIcon className="w-4 h-4 text-gray-300" />
+        <div className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
+            <SearchIcon className="w-4 h-4 text-gray-300 dark:text-gray-500" />
         </div>
-        <p className="text-xs font-bold text-gray-400">No results found</p>
+        <p className="text-xs font-bold text-gray-400 dark:text-gray-500">No results found</p>
     </div>
 );
 
 const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, closeMenu, getEntityId }) => {
     if (filteredItems.length === 0) return <EmptyState />;
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
-            <div className="border border-gray-100 rounded-2xl p-2 bg-gray-50/60 max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
+            <div className="border border-gray-100 dark:border-gray-700 rounded-2xl p-2 bg-gray-50/60 dark:bg-gray-800/60 max-h-[290px] overflow-y-auto overscroll-contain custom-scrollbar">
                 {filteredItems.map((item) => {
                     const itemId = item._id || item.id;
                     const isActive = (activeCategory?._id || activeCategory?.id) === itemId;
@@ -314,10 +338,11 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                         <button
                             key={itemId || item.name}
                             onMouseEnter={() => setActiveCategoryId(itemId)}
+                            onFocus={() => setActiveCategoryId(itemId)}
                             onClick={() => setActiveCategoryId(itemId)}
                             className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
-                                ? 'bg-white text-indigo-600 shadow-sm border border-indigo-100'
-                                : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                ? 'bg-white dark:bg-gray-900 text-indigo-600 shadow-sm border border-indigo-100 dark:border-indigo-500/30'
+                                : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-100'
                                 }`}
                         >
                             {item.name}
@@ -326,16 +351,16 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                 })}
             </div>
 
-            <div className="border border-gray-100 rounded-2xl p-4 bg-white min-h-[200px] max-h-[280px] overflow-y-auto overscroll-contain custom-scrollbar">
+            <div className="border border-gray-100 dark:border-gray-700 rounded-2xl p-4 bg-white dark:bg-gray-900 min-h-[220px] max-h-[290px] overflow-y-auto overscroll-contain custom-scrollbar">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-gray-100">
                         {activeCategory?.name || 'Category'}
                     </h3>
                     {activeCategory && getEntityId(activeCategory) && (
                         <Link
                             to={`/products?category=${encodeURIComponent(getEntityId(activeCategory))}`}
                             onClick={closeMenu}
-                            className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800"
+                            className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 dark:hover:text-indigo-300"
                         >
                             View Category
                         </Link>
@@ -350,7 +375,7 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                                 return (
                                     <span
                                         key={sub._id || sub.id || sub.name}
-                                        className="px-3 py-1.5 rounded-xl bg-gray-50 text-[11px] font-semibold text-gray-400 cursor-not-allowed"
+                                        className="px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 text-[11px] font-semibold text-gray-400 dark:text-gray-500 cursor-not-allowed"
                                     >
                                         {sub.name}
                                     </span>
@@ -361,7 +386,7 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                                     key={sub._id || sub.id || sub.name}
                                     to={`/products?category=${encodeURIComponent(categoryId)}&subCategory=${encodeURIComponent(subCategoryId)}`}
                                     onClick={closeMenu}
-                                    className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 text-[11px] font-semibold text-gray-700 hover:text-indigo-700 transition-all"
+                                    className="px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/15 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-500/30 text-[11px] font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
                                 >
                                     {sub.name}
                                 </Link>
@@ -369,7 +394,7 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                         })}
                     </div>
                 ) : (
-                    <div className="text-xs text-gray-400 font-semibold py-8 text-center">
+                    <div className="text-xs text-gray-400 dark:text-gray-500 font-semibold py-8 text-center">
                         No subcategories available
                     </div>
                 )}
@@ -382,7 +407,7 @@ const BrandsGrid = ({ filteredItems, closeMenu, getEntityId }) => {
     if (filteredItems.length === 0) return <EmptyState />;
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {filteredItems.map((brand) => {
                     const brandId = getEntityId(brand);
                     const logo = brand.logo?.secure_url || brand.logo?.url || brand.logo;
@@ -391,16 +416,16 @@ const BrandsGrid = ({ filteredItems, closeMenu, getEntityId }) => {
                             key={brandId || brand.name}
                             to={brandId ? `/brands/${encodeURIComponent(brandId)}` : '/brands/all'}
                             onClick={closeMenu}
-                            className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/50 transition-all"
+                            className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 hover:border-indigo-100 dark:hover:border-indigo-500/30 hover:bg-indigo-50/60 dark:hover:bg-indigo-500/15 transition-all"
                         >
                             {logo ? (
-                                <img src={logo} alt={brand.name} className="h-7 w-7 rounded-full object-cover border border-gray-100" />
+                                <img src={logo} alt={brand.name} className="h-8 w-8 rounded-full object-cover border border-gray-100 dark:border-gray-700" />
                             ) : (
-                                <div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-black text-gray-500">
+                                <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[9px] font-black text-gray-500 dark:text-gray-300">
                                     {(brand.name || 'BR').slice(0, 2).toUpperCase()}
                                 </div>
                             )}
-                            <span className="text-xs font-bold text-gray-700 line-clamp-1">{brand.name}</span>
+                            <span className="text-xs font-bold text-gray-700 dark:text-gray-200 line-clamp-1">{brand.name}</span>
                         </Link>
                     );
                 })}

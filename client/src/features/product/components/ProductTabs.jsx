@@ -21,24 +21,41 @@ const ProductTabs = ({ product }) => {
             <div className="flex flex-col lg:flex-row gap-10 mb-20">
                 {/* Tech Specs (Left, 65%) */}
                 <div className="lg:w-[65%]">
-                    <h3 className="text-xl font-bold text-gray-900 mb-8">Technical Specifications</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8">Technical Specifications</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                        <SpecItem label="DIMENSIONS" value={product.dimensions || "14\" x 6\" x 18\" (Adjustable)"} />
-                        <SpecItem label="LIGHT SOURCE" value={product.lightSource || "High-CRI Multi-Spectrum LED"} />
-                        <SpecItem label="MATERIALS" value={product.materials || "Anodized Aluminum, Silicone"} />
-                        <SpecItem label="POWER" value={product.power || "USB-C PD 60W Compatible"} />
-                        <SpecItem label="KELVIN RANGE" value={product.kelvinRange || "2700K - 6500K (Continuous)"} />
-                        <SpecItem label="BRIGHTNESS" value={product.brightness || "Up to 1200 Lumens"} />
+                        {/* Render product.specifications array if available */}
+                        {Array.isArray(product.specifications) && product.specifications.length > 0 ? (
+                            product.specifications.map((spec, idx) => (
+                                <SpecItem key={idx} label={spec.key || spec.label} value={spec.value} />
+                            ))
+                        ) : (
+                            <>
+                                <SpecItem label="CATEGORY" value={product.primaryCategory?.name || 'N/A'} />
+                                <SpecItem label="BRAND" value={product.brandId?.name || product.brand?.name || 'N/A'} />
+                                {product.weight && <SpecItem label="WEIGHT" value={product.weight} />}
+                                {product.dimensions && <SpecItem label="DIMENSIONS" value={product.dimensions} />}
+                                {product.materials && <SpecItem label="MATERIALS" value={product.materials} />}
+                                {product.sku && <SpecItem label="SKU" value={product.sku} />}
+                                <SpecItem label="AVAILABILITY" value={product.countInStock > 0 ? `${product.countInStock} In Stock` : 'Out of Stock'} />
+                                <SpecItem label="CONDITION" value={product.condition || 'New'} />
+                                {product.variants?.colors?.length > 0 && (
+                                    <SpecItem label="COLORS" value={product.variants.colors.map(c => typeof c === 'object' ? c.name : c).join(', ')} />
+                                )}
+                                {product.variants?.sizes?.length > 0 && (
+                                    <SpecItem label="SIZES" value={product.variants.sizes.map(s => typeof s === 'object' ? s.name || s.label : s).join(', ')} />
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 
-                {/* Sustainable Design (Right, 35%) */}
+                {/* Product Highlights (Right, 35%) */}
                 <div className="lg:w-[35%] bg-primary rounded-2xl p-8 text-white relative overflow-hidden group">
                     <div className="relative z-10">
                         <FiGlobe className="w-8 h-8 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">Sustainable Design</h3>
+                        <h3 className="text-xl font-bold mb-3">Product Highlights</h3>
                         <p className="text-sm text-primary-100 leading-relaxed opacity-90">
-                            98% recyclable components. We believe a beautiful product shouldn't cost the Earth.
+                            {product.highlights || product.shortDescription || product.description?.slice(0, 150) || 'A premium quality product curated for you. Designed with care and attention to detail.'}
                         </p>
                     </div>
                     {/* Decorative pattern */}

@@ -21,7 +21,7 @@ function RegisterPage() {
 				accentColor="indigo"
 			/>
 
-			<div className="flex-1 flex justify-center items-center p-4 w-full lg:w-1/2 h-full overflow-y-auto">
+			<div className="flex-1 flex justify-center items-start p-4 pt-20 md:pt-24 lg:pt-20 w-full lg:w-1/2 h-full overflow-y-auto">
 				<motion.div
 					initial={{ opacity: 0, x: -20 }}
 					animate={{ opacity: 1, x: 0 }}

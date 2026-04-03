@@ -14,7 +14,7 @@ const sortOptions = [
 
 export default function CategoriesFilter({ filters, setFilter, totalCount }) {
 	return (
-		<div className="border-b border-gray-100 pb-8 mb-10">
+		<div className="sticky top-24 z-20 border-b border-gray-100 dark:border-gray-700 pb-8 mb-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md pt-2">
 			<div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
 				<div className="flex-1">
 					<label htmlFor="categories-search" className="sr-only">
