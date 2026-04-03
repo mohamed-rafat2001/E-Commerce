@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
+import usePaginationLimit from '../../../../shared/hooks/usePaginationLimit.js';
 import { getSellerOrders } from '../../../order/services/order.js';
 
 export default function useSellerOrders() {
@@ -10,7 +11,7 @@ export default function useSellerOrders() {
     
     // Ensure defaults
     if (!params.page) params.page = 1;
-    if (!params.limit) params.limit = 10;
+    if (!params.limit) params.limit = usePaginationLimit('SELLER_ORDERS');
     if (!params.sort) params.sort = "-createdAt";
 
     const { 

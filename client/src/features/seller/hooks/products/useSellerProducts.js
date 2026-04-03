@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
+import usePaginationLimit from '../../../../shared/hooks/usePaginationLimit.js';
 import { getMyProducts } from '../../../product/services/product.js';
 
 export default function useSellerProducts() {
@@ -22,7 +23,7 @@ export default function useSellerProducts() {
 
     // Ensure defaults
     if (!params.page) params.page = 1;
-    if (!params.limit) params.limit = 6;
+    if (!params.limit) params.limit = usePaginationLimit('SELLER_PRODUCTS');
     if (!params.sort) params.sort = "-createdAt";
 
     const {

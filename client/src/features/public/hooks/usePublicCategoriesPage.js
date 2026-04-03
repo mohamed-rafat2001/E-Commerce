@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getCategories } from "../services/index.js";
 
-const ITEMS_PER_PAGE = 6;
+import usePaginationLimit from "../../../shared/hooks/usePaginationLimit.js";
 
 const sortMapper = {
 	az: "name",
@@ -26,7 +26,7 @@ export default function usePublicCategoriesPage() {
 			search: searchParams.get("search") || "",
 			sort: searchParams.get("sort") || "newest",
 			page: parseInt(searchParams.get("page"), 10) || 1,
-			limit: parseInt(searchParams.get("limit"), 10) || ITEMS_PER_PAGE,
+			limit: usePaginationLimit('PUBLIC_CATEGORIES'),
 		}),
 		[searchParams]
 	);

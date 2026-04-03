@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getReview, addReview } from "../services/review.js";
 import useMutationFactory from "../../../shared/hooks/useMutationFactory.jsx";
+import usePaginationLimit from "../../../shared/hooks/usePaginationLimit.js";
 
 export default function useProductReviews(productId) {
     const [page, setPage] = useState(1);
-    const limit = 5;
+    const limit = usePaginationLimit('PUBLIC_REVIEWS');
 
     const { data: response, isLoading: isFetching, error: fetchError } = useQuery({
         queryKey: ["reviews", productId, page],

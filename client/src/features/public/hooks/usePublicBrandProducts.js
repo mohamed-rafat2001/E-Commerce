@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import usePaginationLimit from "../../../shared/hooks/usePaginationLimit.js";
 import { useQuery } from "@tanstack/react-query";
 import { getBrandProducts } from "../services/index.js";
 
@@ -9,7 +10,8 @@ const sortMap = {
 	popular: "-ratingAverage",
 };
 
-export default function usePublicBrandProducts({ brandId, category, subCategory, sort, page, limit = 12 }) {
+export default function usePublicBrandProducts({ brandId, category, subCategory, sort, page, limit: propLimit }) {
+	const limit = propLimit || usePaginationLimit('PUBLIC_PRODUCTS');
 	const requestParams = useMemo(() => {
 		const params = {
 			brandId,

@@ -8,6 +8,7 @@ import {
     updateBrandLogo 
 } from '../../services/seller.js';
 import useToast from '../../../../shared/hooks/useToast.js';
+import usePaginationLimit from '../../../../shared/hooks/usePaginationLimit.js';
 
 const useSellerBrands = () => {
     const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ const useSellerBrands = () => {
 
     // Get pagination params from URL
     const page = parseInt(searchParams.get("page")) || 1;
-    const limit = parseInt(searchParams.get("limit")) || 2;
+    const limit = usePaginationLimit('SELLER_BRANDS');
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "-createdAt";
 
