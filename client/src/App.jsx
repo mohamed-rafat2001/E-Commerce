@@ -12,6 +12,7 @@ import router from "./app/routes/router.jsx";
 import queryClient from "./shared/utils/queryClient.js";
 import { Toaster } from "react-hot-toast";
 import AuthModal from "./components/auth/AuthModal.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import useCartMerge from "./hooks/useCartMerge.js";
 
 function AppBoot() {
@@ -28,6 +29,7 @@ function App() {
 	return (
 		<HelmetProvider>
 			<div className="min-h-screen bg-gray-50">
+				<ErrorBoundary>
 				<QueryClientProvider client={queryClient}>
 					<ReactQueryDevtools initialIsOpen={false} />
 					<AppBoot />
@@ -63,6 +65,7 @@ function App() {
 						reverseOrder={false}
 					/>
 				</QueryClientProvider>
+				</ErrorBoundary>
 			</div>
 		</HelmetProvider>
 	);

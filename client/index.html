@@ -26,8 +26,11 @@
 		<meta name="twitter:description" content="Discover curated luxury fashion, tech gadgets, and home essentials at ShopyNow." />
 		<meta name="twitter:image" content="https://shopynow.com/assets/images/og-default.jpg" />
 
-		<!-- Favicon -->
+		<!-- Favicon & PWA -->
+		<meta name="theme-color" content="#111827" />
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.json" />
 
 		<!-- Preconnect to critical third-party origins (eliminates DNS+TCP+TLS overhead) -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
@@ -44,6 +47,7 @@
 		<link rel="stylesheet" href="./index.css" />
 	</head>
 	<body>
+		<noscript>You need JavaScript enabled to use ShopyNow.</noscript>
 		<div id="root"></div>
 		<script type="module" src="/src/main.jsx"></script>
 	</body>

@@ -166,6 +166,7 @@ const Header = ({ isPanel = false }) => {
 											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
+											aria-label="Wishlist"
 										>
 											<HeartIcon className="w-5 h-5" />
 											{wishlistCount > 0 && (
@@ -186,6 +187,7 @@ const Header = ({ isPanel = false }) => {
 											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
+											aria-label="Shopping cart"
 										>
 											<StoreIcon className="w-5 h-5" />
 											{cartCount > 0 && (
@@ -203,6 +205,7 @@ const Header = ({ isPanel = false }) => {
 									<button
 										onClick={() => setIsDropdownOpen(!isDropdownOpen)}
 										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+										aria-label="User profile menu"
 									>
 										<Avatar
 											src={user?.userId?.profileImg?.secure_url || user?.profileImg?.secure_url}
@@ -253,7 +256,7 @@ const Header = ({ isPanel = false }) => {
 									</AnimatePresence>
 								</div>
 							) : (
-								<div className="flex items-center gap-3 font-sans">
+								<div className="hidden md:flex items-center gap-3 font-sans">
 									<Link to="/login">
 										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100">
 											Login

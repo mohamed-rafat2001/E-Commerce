@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MenuIcon, CloseIcon } from '../../constants/icons.jsx';
+import { MenuIcon, CloseIcon, HeartIcon, StoreIcon, HomeIcon } from '../../constants/icons.jsx';
 import DropdownMenu from './DropdownMenu.jsx';
+import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
+import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
+import useCart from '../../../features/cart/hooks/useCart.js';
 
 /**
  * @typedef {Object} NavLinkItem
@@ -29,10 +32,26 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 	const location = useLocation();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+	// User, wishlist, cart data for mobile drawer
+	const { user, isAuthenticated, userRole } = useCurrentUser();
+	const { cartItemCount } = useCart();
+	const { wishlist } = useWishlist();
+	const wishlistCount = wishlist?.items?.length || 0;
+
 	// Close mobile menu on route change
 	useEffect(() => {
 		setIsMobileMenuOpen(false);
 	}, [location.pathname]);
+
+	// Lock body scroll when mobile menu is open
+	useEffect(() => {
+		if (isMobileMenuOpen) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+		}
+		return () => { document.body.style.overflow = ''; };
+	}, [isMobileMenuOpen]);
 
 	// Close mobile menu on Escape key
 	useEffect(() => {
@@ -117,7 +136,8 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 			<div className="lg:hidden">
 				<button
 					onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-					className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
+					className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none
+						min-h-[44px] min-w-[44px] flex items-center justify-center"
 					aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
 					aria-expanded={isMobileMenuOpen}
 				>
@@ -148,13 +168,51 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 						>
 							{/* Drawer Header */}
 							<div className="flex items-center justify-between p-4 border-b border-gray-100">
-								<span className="text-lg font-bold text-gray-800">Navigation</span>
+								<span className="text-lg font-black text-gray-900 tracking-tighter">ShopyNow</span>
 								<button
 									onClick={() => setIsMobileMenuOpen(false)}
-									className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+									className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors
+										min-h-[44px] min-w-[44px] flex items-center justify-center"
+									aria-label="Close navigation"
 								>
-									<CloseIcon className="w-6 h-6" />
+									<CloseIcon className="w-5 h-5" />
 								</button>
+							</div>
+
+							{/* Quick Access: Wishlist & Cart with badges */}
+							<div className="flex items-center gap-4 px-4 py-3 border-b border-gray-100 bg-gray-50">
+								<NavLink
+									to="/public-wishlist"
+									onClick={() => setIsMobileMenuOpen(false)}
+									className="flex items-center gap-2 text-sm text-gray-700 font-medium min-h-[44px]"
+								>
+									<div className="relative">
+										<HeartIcon className="w-5 h-5" />
+										{wishlistCount > 0 && (
+											<span className="absolute -top-1 -right-1.5 bg-gray-900 text-white text-[10px]
+												w-4 h-4 rounded-full flex items-center justify-center font-bold">
+												{wishlistCount}
+											</span>
+										)}
+									</div>
+									Wishlist
+								</NavLink>
+								<NavLink
+									to="/cart"
+									onClick={() => setIsMobileMenuOpen(false)}
+									className="flex items-center gap-2 text-sm text-gray-700 font-medium min-h-[44px]"
+								>
+									<div className="relative">
+										<StoreIcon className="w-5 h-5" />
+										{cartItemCount > 0 && (
+											<span className="absolute -top-1 -right-1.5 bg-gray-900 text-white text-[10px]
+												w-4 h-4 rounded-full flex items-center justify-center font-bold">
+												{cartItemCount}
+											</span>
+										)}
+									</div>
+									Cart
+								</NavLink>
 							</div>
 
 							{/* Drawer Links */}
@@ -236,9 +294,44 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 								</div>
 							</div>
 
-							{/* Drawer Footer */}
-							<div className="p-4 bg-gray-50 text-center">
-								<p className="text-xs text-gray-400">© 2024 E-Commerce Store</p>
+							{/* Drawer Footer — Auth + Copyright */}
+							<div className="p-4 border-t border-gray-100 flex flex-col gap-2">
+								{isAuthenticated ? (
+									<Link
+										to={`/${userRole?.toLowerCase()}/dashboard`}
+										onClick={() => setIsMobileMenuOpen(false)}
+										className="w-full text-center py-3 px-4 rounded-xl bg-gray-900
+											text-white font-semibold text-sm hover:bg-gray-700 transition-colors min-h-[44px]
+											flex items-center justify-center"
+									>
+										My Dashboard
+									</Link>
+								) : (
+									<>
+										<Link
+											to="/login"
+											onClick={() => setIsMobileMenuOpen(false)}
+											className="w-full text-center py-3 px-4 rounded-xl border-2
+												border-gray-900 text-gray-900 font-semibold text-sm
+												hover:bg-gray-900 hover:text-white transition-colors min-h-[44px]
+												flex items-center justify-center"
+										>
+											Login
+										</Link>
+										<Link
+											to="/register"
+											onClick={() => setIsMobileMenuOpen(false)}
+											className="w-full text-center py-3 px-4 rounded-xl bg-gray-900
+												text-white font-semibold text-sm hover:bg-gray-700 transition-colors min-h-[44px]
+												flex items-center justify-center"
+										>
+											Get Started
+										</Link>
+									</>
+								)}
+								<p className="text-center text-xs text-gray-400 mt-2">
+									© {new Date().getFullYear()} ShopyNow
+								</p>
 							</div>
 						</motion.div>
 					</>

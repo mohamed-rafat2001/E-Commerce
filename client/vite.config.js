@@ -26,9 +26,11 @@ export default defineConfig(({ mode }) => ({
 					// Routing
 					'vendor-router': ['react-router-dom'],
 					// Animations (heavy, defer loading)
-					'vendor-animations': ['framer-motion'],
+					'vendor-animations': ['framer-motion', 'gsap', '@gsap/react', 'lenis'],
+					// Sliders
+					'vendor-slider': ['swiper'],
 					// Icons
-					'vendor-icons': ['react-icons', '@fortawesome/fontawesome-free'],
+					'vendor-icons': ['react-icons'],
 					// UI libs
 					'vendor-ui': ['react-hot-toast', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
 					// State management + data fetching

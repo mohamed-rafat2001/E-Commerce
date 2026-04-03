@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDownIcon, SearchIcon } from '../../constants/icons.jsx';
@@ -37,6 +37,16 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 	const isCategoriesMenu = label.toLowerCase() === 'categories';
 	const isBrandsMenu = label.toLowerCase() === 'brands';
 
+	// Lock body scroll when dropdown is open to prevent scroll bug
+	useEffect(() => {
+		if (isOpen) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+		}
+		return () => { document.body.style.overflow = ''; };
+	}, [isOpen]);
+
 	// Toggle dropdown
 	const toggleDropdown = () => {
 		if (isDesktop) {
@@ -46,7 +56,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 		setIsOpen((prev) => !prev);
 	};
 
-	// Close on outside click
+	// Detect desktop vs mobile
 	useEffect(() => {
 		const mediaQuery = window.matchMedia('(min-width: 1024px)');
 		const apply = () => setIsDesktop(mediaQuery.matches);
@@ -55,6 +65,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 		return () => mediaQuery.removeEventListener('change', apply);
 	}, []);
 
+	// Close on outside click
 	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -175,12 +186,24 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 
 			<AnimatePresence>
 				{isOpen && (
+					<>
+					{/* Full-screen overlay to prevent background interaction */}
+					{!isSimple && (
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="fixed inset-0 bg-black/10 z-[9998]"
+							onClick={closeMenu}
+							aria-hidden="true"
+						/>
+					)}
 					<motion.div
 						initial={{ opacity: 0, y: -8 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={`absolute left-0 mt-3 max-h-[400px] bg-white rounded-2xl shadow-xl border border-gray-100 z-50 flex flex-col overflow-hidden
+						className={`absolute left-0 mt-3 max-h-[400px] bg-white rounded-2xl shadow-xl border border-gray-100 z-[9999] flex flex-col overflow-hidden
 							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
@@ -245,6 +268,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 							</div>
 						)}
 					</motion.div>
+					</>
 				)}
 			</AnimatePresence>
 

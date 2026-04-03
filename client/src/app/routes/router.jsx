@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./ProtectedRoute.jsx";
-import { LoadingSpinner } from "../../shared/ui/index.js";
+import PageSkeleton from "../../shared/ui/PageSkeleton/PageSkeleton.jsx";
 
 // Layouts — loaded eagerly (needed for every page)
 import DashboardLayout from "../../layouts/DashboardLayout.jsx";
@@ -62,13 +62,7 @@ import PageNotFound from "../../shared/ui/PageNotFound.jsx";
 // Suspense wrapper with a centered spinner
 function SuspenseWrapper({ children }) {
 	return (
-		<Suspense
-			fallback={
-				<div className="min-h-[60vh] flex items-center justify-center">
-					<LoadingSpinner size="xl" color="primary" />
-				</div>
-			}
-		>
+		<Suspense fallback={<PageSkeleton />}>
 			{children}
 		</Suspense>
 	);

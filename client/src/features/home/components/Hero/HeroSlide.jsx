@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Badge } from '../../../../shared/ui';
+import OptimizedImage from '../../../../shared/components/OptimizedImage.jsx';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { prefersReducedMotion } from '../../../../utils/animations.js';
@@ -62,13 +63,17 @@ const HeroSlide = ({ slide }) => {
     }, []);
 
     return (
-        <div ref={containerRef} className="relative h-full w-full flex items-center">
-            {/* Background Image Container */}
-            <div
-                ref={bgRef}
-                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat will-change-transform"
-                style={{ backgroundImage: `url("${imageUrl}")` }}
-            >
+        <div ref={containerRef} className="relative h-full w-full flex items-center overflow-hidden">
+            {/* Background Image Container optimized for LCP */}
+            <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
+                <OptimizedImage
+                    src={imageUrl}
+                    alt={slide.title}
+                    priority={true}
+                    width={1920}
+                    height={1080}
+                    className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-black/50" />
             </div>
 

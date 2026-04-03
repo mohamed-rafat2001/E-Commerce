@@ -112,6 +112,35 @@
 	::selection {
 		@apply bg-indigo-500 text-white;
 	}
+
+	/* ═══════════════════════════════════════════════════════════════
+	   Focus-visible styles for keyboard accessibility.
+	   Only shows focus ring for keyboard navigation, not mouse clicks.
+	   ═══════════════════════════════════════════════════════════════ */
+	:focus-visible {
+		outline: 2px solid #4f46e5;
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+
+	/* Remove the default focus outline (we use focus-visible instead) */
+	:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	/* ═══════════════════════════════════════════════════════════════
+	   Reduced motion — disable animations for users who prefer it.
+	   ═══════════════════════════════════════════════════════════════ */
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
 }
 
 @layer components {
