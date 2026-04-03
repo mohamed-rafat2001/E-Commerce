@@ -121,15 +121,13 @@ export default function BrandProductsSection({
 								</div>
 							))}
 						</div>
-						{totalPages > 1 && (
-							<div className="mt-12">
-								<Pagination
-									currentPage={filters.page || 1}
-									totalPages={totalPages}
-									onPageChange={onPageChange}
-								/>
-							</div>
-						)}
+						<div className="mt-12">
+							<Pagination
+								currentPage={filters.page || 1}
+								totalPages={totalPages}
+								onPageChange={onPageChange}
+							/>
+						</div>
 					</>
 				) : (
 					<EmptyState
