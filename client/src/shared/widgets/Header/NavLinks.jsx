@@ -116,7 +116,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							to={link.path}
 							className={({ isActive }) => `
 								px-3 py-2 text-sm font-medium transition-all duration-200 relative
-								${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}
+								${isActive ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}
 							`}
 						>
 							{({ isActive }) => (

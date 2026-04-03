@@ -443,7 +443,7 @@ const SimpleList = ({ filteredItems, resolveItemPath, closeMenu, isSimple, hasMa
                     key={item.id || item._id || item.name}
                     to={resolveItemPath(item)}
                     onClick={closeMenu}
-                    className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 ${isSimple ? 'p-2' : 'p-2.5'}`}
+                    className={`flex items-center gap-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 group border border-transparent hover:border-gray-100 dark:hover:border-gray-700 ${isSimple ? 'p-2' : 'p-2.5'}`}
                     role="menuitem"
                 >
                     {item.icon && (
@@ -452,7 +452,7 @@ const SimpleList = ({ filteredItems, resolveItemPath, closeMenu, isSimple, hasMa
                         </span>
                     )}
                     <div className="flex flex-col">
-                        <span className="text-gray-600 group-hover:text-gray-900 font-bold transition-colors text-xs">
+                        <span className="text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 font-bold transition-colors text-xs">
                             {item.name}
                         </span>
                         {!isSimple && item.description && (
