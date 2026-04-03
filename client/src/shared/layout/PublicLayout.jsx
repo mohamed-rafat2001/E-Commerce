@@ -6,12 +6,14 @@ import useLenis from '../../hooks/useLenis.js';
 const PublicLayout = () => {
     useLenis();
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-dvh bg-white flex flex-col">
             <Header />
-            <main>
+            <main className="flex-1">
                 <Outlet />
             </main>
-            <FooterSection />
+            <footer role="contentinfo">
+                <FooterSection />
+            </footer>
         </div>
     );
 };

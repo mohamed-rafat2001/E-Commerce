@@ -2,16 +2,20 @@
  - Public product cards currently allow guest wishlist via localStorage.
  - New workflow requires auth prompt for wishlist intent, with post-login resume.
  - Cart add supports guest flow separately and remains available without forced redirect.
+ - Wrapped with React.memo to prevent unnecessary re-renders in list context.
+ - Added aria-labels for accessibility.
 */
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHeart, FiStar, FiShoppingBag } from 'react-icons/fi';
 import ProductCardGallery from '../../features/product/components/ProductCardGallery.jsx';
 import AddToCartButton from './AddToCartButton.jsx';
 import useWishlist from '../../features/wishList/hooks/useWishlist.js';
+import queryClient from '../../shared/utils/queryClient.js';
+import { getProduct } from '../../features/product/services/product.js';
 
-const PublicProductCard = ({ product }) => {
+const PublicProductCard = memo(function PublicProductCard({ product }) {
     const [isHovered, setIsHovered] = useState(false);
     const { isInWishlist, toggleWishlist } = useWishlist();
 
@@ -23,6 +27,8 @@ const PublicProductCard = ({ product }) => {
     const hasDiscount = oldPrice > price;
     const discountPercent = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
+    const brandName = product.brandId?.name || product.brand?.name || 'Curated Design';
+
     // Badges
     let badge = null;
     if (product.countInStock === 0) {
@@ -31,11 +37,26 @@ const PublicProductCard = ({ product }) => {
         badge = <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">-{discountPercent}%</span>;
     }
 
-    const handleWishlistToggle = async (e) => {
+    const handleWishlistToggle = useCallback(async (e) => {
         e.preventDefault();
         e.stopPropagation();
         await toggleWishlist(product);
-    };
+    }, [toggleWishlist, product]);
+
+    // Prefetch product detail on hover (React Query Section 5)
+    const handleMouseEnter = useCallback(() => {
+        setIsHovered(true);
+        // Prefetch the product detail page data
+        queryClient.prefetchQuery({
+            queryKey: ['product', productId],
+            queryFn: () => getProduct(productId),
+            staleTime: 1000 * 60 * 5, // 5 minutes
+        });
+    }, [productId]);
+
+    const handleMouseLeave = useCallback(() => {
+        setIsHovered(false);
+    }, []);
 
     const allImages = [
         product.coverImage?.secure_url,
@@ -50,12 +71,16 @@ const PublicProductCard = ({ product }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="group flex flex-col h-full font-sans"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             {/* Image Area */}
             <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6">
-                <Link to={`/products/${productId}`} className="block w-full h-full">
+                <Link
+                    to={`/products/${productId}`}
+                    className="block w-full h-full"
+                    aria-label={`View ${product.name} by ${brandName}`}
+                >
                     <div data-card-image className="w-full h-full transform group-hover:scale-110 transition-transform duration-700 ease-out will-change-transform">
                         <ProductCardGallery
                             images={allImages}
@@ -76,13 +101,13 @@ const PublicProductCard = ({ product }) => {
                     </div>
                 )}
 
-
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlistToggle}
                     className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
+                    aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
                 >
-                    <FiHeart className={`w-4.5 h-4.5 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                    <FiHeart className={`w-4.5 h-4.5 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} aria-hidden="true" />
                 </button>
             </div>
 
@@ -90,7 +115,7 @@ const PublicProductCard = ({ product }) => {
             <div className="px-1 flex flex-col flex-1">
                 {/* Brand */}
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">
-                    {product.brandId?.name || product.brand?.name || 'Curated Design'}
+                    {brandName}
                 </span>
 
                 {/* Title and Price */}
@@ -100,7 +125,7 @@ const PublicProductCard = ({ product }) => {
                             {product.name}
                         </h3>
                     </Link>
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="text-xl font-bold text-gray-900" aria-label={`Price: $${price.toFixed(0)}`}>
                         ${price.toFixed(0)}
                     </span>
                 </div>
@@ -108,8 +133,8 @@ const PublicProductCard = ({ product }) => {
                 {/* Rating & Actions */}
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
                     <div className="flex items-center gap-1.5">
-                        <div className="flex items-center text-yellow-500">
-                            <FiStar className="w-3.5 h-3.5 fill-current" />
+                        <div className="flex items-center text-yellow-500" aria-label={`Rating: ${Number(product.ratingAverage || 0).toFixed(1)} out of 5 with ${product.ratingCount || 0} reviews`}>
+                            <FiStar className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
                             <span className="ml-1 text-sm font-bold text-gray-900">{Number(product.ratingAverage || 0).toFixed(1)}</span>
                             <span className="ml-1 text-xs text-gray-500">({product.ratingCount || 0})</span>
                         </div>
@@ -125,6 +150,6 @@ const PublicProductCard = ({ product }) => {
             </div>
         </motion.div>
     );
-};
+});
 
 export default PublicProductCard;

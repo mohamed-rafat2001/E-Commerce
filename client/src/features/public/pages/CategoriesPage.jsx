@@ -7,6 +7,8 @@ import { FiFrown, FiSearch } from "react-icons/fi";
 import { Button, EmptyState, Pagination } from "../../../shared/ui/index.js";
 import { CategoriesFilter, CategoryCard } from "../components/index.js";
 import { usePublicCategoriesPage } from "../hooks/index.js";
+import SEO from "../../../shared/components/SEO.jsx";
+import Breadcrumbs from "../../../shared/components/Breadcrumbs.jsx";
 
 export default function CategoriesPage() {
 	const { categories, totalCount, totalPages, filters, isLoading, error, refetch, setFilter, clearSearch } =
@@ -30,8 +32,17 @@ export default function CategoriesPage() {
 
 	return (
 		<div className="min-h-screen bg-white font-sans">
+			<SEO
+				title="All Categories — Browse Collections"
+				description="Navigate explicitly curated categories to find the exact luxury item, high-tech piece, or apparel mapping your style."
+				canonical="/categories"
+			/>
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-16">
-				<div className="flex flex-col gap-2 mb-8">
+				<Breadcrumbs items={[
+					{ name: 'Home', url: '/' },
+					{ name: 'Categories' },
+				]} />
+				<div className="flex flex-col gap-2 mb-8 mt-4">
 					<span className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Curated Collection</span>
 					<h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight">All Categories</h1>
 					<p className="text-gray-500 font-medium mt-2">Shop by the things that move you</p>

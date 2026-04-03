@@ -1,0 +1,22 @@
+# ShopyNow robots.txt
+User-agent: *
+
+# Allow product and brand pages (high-value for SEO)
+Allow: /products
+Allow: /brands
+Allow: /categories
+
+# Disallow private/transactional pages
+Disallow: /cart
+Disallow: /public-cart
+Disallow: /checkout
+Disallow: /admin
+Disallow: /seller
+Disallow: /customer
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://shopynow.com/sitemap.xml
