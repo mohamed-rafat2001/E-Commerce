@@ -23,10 +23,10 @@ const NewsletterSection = lazy(() => import('../components/Newsletter/Newsletter
 const SectionFallback = () => (
 	<div className="w-full py-12 animate-pulse">
 		<div className="max-w-7xl mx-auto px-4 space-y-4">
-			<div className="h-6 w-48 bg-gray-200 rounded" />
+			<div className="h-6 w-48 bg-gray-200 dark:bg-gray-800 rounded" />
 			<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
 				{[...Array(4)].map((_, i) => (
-					<div key={i} className="h-48 bg-gray-200 rounded-xl" />
+					<div key={i} className="h-48 bg-gray-200 dark:bg-gray-800 rounded-xl" />
 				))}
 			</div>
 		</div>

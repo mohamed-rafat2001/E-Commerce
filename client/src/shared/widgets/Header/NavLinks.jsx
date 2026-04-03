@@ -33,7 +33,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 	// User, wishlist, cart data for mobile drawer
-	const { user, isAuthenticated, userRole } = useCurrentUser();
+	const { isAuthenticated, userRole } = useCurrentUser();
 	const { cartItemCount } = useCart();
 	const { wishlist } = useWishlist();
 	const wishlistCount = wishlist?.items?.length || 0;

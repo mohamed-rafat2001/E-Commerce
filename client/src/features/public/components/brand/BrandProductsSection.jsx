@@ -45,7 +45,7 @@ export default function BrandProductsSection({
 	return (
 		<section>
 			{/* Section header with filter tabs */}
-			<div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8">
+			<div className="sticky top-24 z-20 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-700 py-4 mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
 				<div>
 					<div className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.2em]">Current Collection</div>
 					<h2 className="text-xl md:text-2xl font-black text-gray-900 mt-1">
@@ -63,7 +63,7 @@ export default function BrandProductsSection({
 								onClick={() => tab.value ? onSortChange(tab.value) : onSortChange("newest")}
 								className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${filters.sort === tab.value || (!tab.value && filters.sort === "newest")
 										? "bg-gray-900 border-gray-900 text-white"
-										: "bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300"
+										: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600"
 									}`}
 							>
 								{tab.label}
@@ -76,7 +76,7 @@ export default function BrandProductsSection({
 						<button
 							type="button"
 							onClick={() => setShowFilterPanel((prev) => !prev)}
-							className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-all bg-white"
+							className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600 transition-all bg-white dark:bg-gray-800"
 							aria-label="Sort products"
 						>
 							<FiFilter className="w-3.5 h-3.5" />
@@ -85,7 +85,7 @@ export default function BrandProductsSection({
 						</button>
 
 						{showFilterPanel && (
-							<div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-xl p-2 z-20">
+							<div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-2 z-20">
 								{sortOptions.map((option) => (
 									<button
 										key={option.value}
@@ -96,7 +96,7 @@ export default function BrandProductsSection({
 										}}
 										className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all ${filters.sort === option.value
 												? "bg-gray-900 text-white font-bold"
-												: "text-gray-600 hover:bg-gray-50 font-medium"
+												: "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
 											}`}
 									>
 										{option.label}

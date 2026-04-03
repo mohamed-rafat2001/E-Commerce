@@ -58,7 +58,7 @@ export default function ProductsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-white font-sans">
+		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans transition-colors">
 			<SEO
 				title="Products — Browse Our Curated Collection"
 				description="Browse our curated collection of premium products. Filter by category, brand, price, and more. Free shipping on orders over $50."
@@ -105,7 +105,7 @@ export default function ProductsPage() {
 			<div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
 				<div className="flex flex-col lg:flex-row gap-12">
 					{/* Desktop Filters Sidebar */}
-					<aside className="hidden lg:block w-80 shrink-0" aria-label="Product filters">
+					<aside className="hidden lg:block w-80 shrink-0 lg:sticky lg:top-28 self-start h-fit" aria-label="Product filters">
 						<FiltersSidebar
 							filters={filters}
 							setFilter={setFilter}
@@ -195,16 +195,16 @@ export default function ProductsPage() {
 							animate={{ x: 0 }}
 							exit={{ x: '100%' }}
 							transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-							className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-[101] shadow-2xl p-0 flex flex-col"
+							className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-900 z-[101] shadow-2xl p-0 flex flex-col"
 							role="dialog"
 							aria-modal="true"
 							aria-label="Filter products"
 						>
-							<div className="flex items-center justify-between p-8 border-b border-gray-50">
+							<div className="flex items-center justify-between p-8 border-b border-gray-50 dark:border-gray-700">
 								<h2 className="text-2xl font-black text-gray-900 tracking-tight">Refine Collection</h2>
 								<button
 									onClick={closeMobileFilters}
-									className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+									className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
 									aria-label="Close filters panel"
 								>
 									<FiX className="w-5 h-5" aria-hidden="true" />
@@ -221,7 +221,7 @@ export default function ProductsPage() {
 								/>
 							</div>
 
-							<div className="p-8 border-t border-gray-50 bg-white/80 backdrop-blur-sm grid grid-cols-2 gap-4">
+							<div className="p-8 border-t border-gray-50 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm grid grid-cols-2 gap-4">
 								<button
 									onClick={handleClearAndClose}
 									className="w-full py-4 rounded-2xl border-2 border-gray-100 text-gray-900 text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all"

@@ -41,15 +41,15 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
     };
 
     const sidebarClass = isMobile 
-        ? "bg-white px-4 pb-10" 
-        : "bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 p-8 sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto overscroll-contain custom-scrollbar";
+        ? "bg-white dark:bg-gray-900 px-4 pb-10" 
+        : "bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-100/50 dark:shadow-black/20 p-8 sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto overscroll-contain custom-scrollbar";
 
     return (
         <div className={sidebarClass}>
             {!isMobile && (
-                <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-50">
+                <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-50 dark:border-gray-700">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-900">
+                        <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-gray-100">
                             <FiFilter className="w-4 h-4" />
                         </div>
                         Refine Search
@@ -75,7 +75,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                 setFilter('category', '');
                                 setFilter('subCategory', '');
                             }}
-                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-[#0f172a] text-white shadow-xl shadow-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-gray-900 text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
                         >
                             All Pieces
                         </button>
@@ -88,7 +88,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                             setFilter('category', cat._id);
                                             setFilter('subCategory', ''); // Clear subcategory when changing category
                                         }}
-                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-[#0f172a] text-white shadow-xl shadow-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-gray-900 text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
                                     >
                                         {cat.name}
                                     </button>
@@ -106,7 +106,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                                     <button
                                                         key={sub._id}
                                                         onClick={() => setFilter('subCategory', sub._id)}
-                                                        className={`w-full text-left px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filters.subCategory === sub._id ? 'text-[#0f172a] bg-gray-100' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
+                                                        className={`w-full text-left px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filters.subCategory === sub._id ? 'text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                                                     >
                                                         — {sub.name}
                                                     </button>
@@ -131,7 +131,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                     name="min"
                                     defaultValue={filters['price[gte]']}
                                     placeholder="Min"
-                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-gray-100 transition-all outline-none appearance-none"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none text-xs font-bold text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all outline-none appearance-none"
                                     onWheel={(e) => e.target.blur()}
                                 />
                             </div>
@@ -143,14 +143,14 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                     name="max"
                                     defaultValue={filters['price[lte]']}
                                     placeholder="Max"
-                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 border-none text-xs font-bold text-gray-900 focus:ring-2 focus:ring-gray-100 transition-all outline-none appearance-none"
+                                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none text-xs font-bold text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all outline-none appearance-none"
                                     onWheel={(e) => e.target.blur()}
                                 />
                             </div>
                         </div>
                         <button
                             type="submit"
-                            className="w-full py-4 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:shadow-xl hover:shadow-gray-200 transition-all duration-300 active:scale-95"
+                            className="w-full py-4 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black dark:hover:bg-white hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-900/40 transition-all duration-300 active:scale-95"
                         >
                             Update Range
                         </button>
@@ -164,18 +164,18 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                             {brands.map(brand => {
                                 const isSelected = (filters.brandId || '').split(',').includes(brand._id);
                                 return (
-                                    <label key={brand._id} className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-indigo-50/50' : 'hover:bg-gray-50'}`}>
+                                    <label key={brand._id} className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-indigo-50/50 dark:bg-indigo-500/15' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                                         <div className="flex items-center gap-3">
                                             <div className="relative flex items-center justify-center">
                                                 <input
                                                     type="checkbox"
                                                     checked={isSelected}
                                                     onChange={() => handleBrandToggle(brand._id)}
-                                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-[#0f172a] focus:ring-gray-100 transition-all cursor-pointer appearance-none checked:bg-[#0f172a] checked:border-[#0f172a]"
+                                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all cursor-pointer appearance-none checked:bg-gray-900 dark:checked:bg-gray-100 checked:border-gray-900 dark:checked:border-gray-100"
                                                 />
                                                 <FiX className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none rotate-45" />
                                             </div>
-                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-[#0f172a]' : 'text-gray-600'}`}>
+                                            <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-300'}`}>
                                                 {brand.name}
                                             </span>
                                         </div>
@@ -192,13 +192,13 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                         {[4, 3, 2, 1].map(rating => {
                             const isSelected = filters['ratingAverage[gte]'] === String(rating);
                             return (
-                                <label key={rating} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-amber-50/50' : 'hover:bg-gray-50'}`}>
+                                <label key={rating} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${isSelected ? 'bg-amber-50/50 dark:bg-amber-500/15' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                                     <input
                                         type="radio"
                                         name="rating"
                                         checked={isSelected}
                                         onChange={() => setFilter('ratingAverage[gte]', String(rating))}
-                                        className="w-5 h-5 text-amber-500 border-2 border-gray-200 focus:ring-amber-100 transition-all cursor-pointer"
+                                        className="w-5 h-5 text-amber-500 border-2 border-gray-200 dark:border-gray-600 focus:ring-amber-100 dark:focus:ring-amber-500/30 transition-all cursor-pointer"
                                     />
                                     <div className="flex items-center gap-2">
                                         <div className="flex gap-1">
@@ -218,14 +218,14 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
 
                 {/* Availability Filter */}
                 <FilterSection title="Stock Status" isOpen={openSections.availability} onToggle={() => toggleSection('availability')}>
-                    <label className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${filters.inStock ? 'bg-emerald-50/50' : 'hover:bg-gray-50'}`}>
+                    <label className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${filters.inStock ? 'bg-emerald-50/50 dark:bg-emerald-500/15' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                         <div className="flex items-center gap-3">
                             <div className="relative flex items-center justify-center">
                                 <input
                                     type="checkbox"
                                     checked={!!filters.inStock}
                                     onChange={(e) => setFilter('inStock', e.target.checked ? 'true' : '')}
-                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 text-emerald-500 focus:ring-emerald-100 transition-all cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500"
+                                    className="peer w-5 h-5 rounded-md border-2 border-gray-200 dark:border-gray-600 text-emerald-500 focus:ring-emerald-100 dark:focus:ring-emerald-500/30 transition-all cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500"
                                 />
                                 <div className="absolute w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                             </div>
@@ -262,8 +262,8 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
             onClick={onToggle}
             className="flex items-center justify-between w-full mb-5 cursor-pointer group"
         >
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-amber-600 transition-colors">{title}</span>
-            <div className={`transition-all duration-300 w-6 h-6 rounded-lg flex items-center justify-center group-hover:bg-gray-50 ${isOpen ? 'rotate-180' : ''}`}>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 dark:text-gray-100 group-hover:text-amber-600 transition-colors">{title}</span>
+            <div className={`transition-all duration-300 w-6 h-6 rounded-lg flex items-center justify-center group-hover:bg-gray-50 dark:group-hover:bg-gray-800 ${isOpen ? 'rotate-180' : ''}`}>
                 <FiChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-900" />
             </div>
         </button>

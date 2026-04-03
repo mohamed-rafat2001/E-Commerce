@@ -13,7 +13,7 @@ const DashboardLayout = () => {
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
 	return (
-		<div className="min-h-screen bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 font-sans">
+		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans bg-linear-to-br from-gray-50 via-gray-100 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
 			<ScrollToTop />
 			{/* Decorative background elements */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">

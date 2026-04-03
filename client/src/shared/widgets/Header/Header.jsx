@@ -18,6 +18,7 @@ import {
 } from '../../constants/icons.jsx';
 import CartDrawer from '../../components/CartDrawer.jsx';
 import WishlistDrawer from '../../components/WishlistDrawer.jsx';
+import ThemeToggle from '../../components/ThemeToggle.jsx';
 
 const Header = ({ isPanel = false }) => {
 	const { userRole, user, isAuthenticated } = useCurrentUser();
@@ -96,22 +97,22 @@ const Header = ({ isPanel = false }) => {
 
 	return (
 		<motion.header
-			className={`fixed top-0 left-0 right-0 z-50 w-full ${isPanel ? 'bg-transparent' : ''}`}
+			className={`${isPanel ? 'sticky top-0' : 'fixed top-0 left-0 right-0'} z-50 w-full`}
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
 			transition={{ type: 'spring', stiffness: 260, damping: 20 }}
 		>
 			{/* Glassmorphism header */}
-			<div className={`${isPanel ? 'bg-white/40' : 'bg-white/80'} backdrop-blur-xl border-b border-gray-100/50 shadow-sm`}>
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div className={`${isPanel ? 'bg-white/70 dark:bg-gray-900/70 border-b border-gray-100/70 dark:border-gray-700/70' : 'bg-white/80 dark:bg-gray-900/80 border-b border-gray-100/50 dark:border-gray-800/50'} backdrop-blur-xl shadow-sm transition-colors duration-300`}>
+				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isPanel ? 'pt-4' : ''}`}>
 					<div className="flex items-center justify-between h-20">
 						{/* Logo & Brand */}
 						{isPanel ? (
-							<div /> // Spacer for justify-between in panel view
+							<div />
 						) : (
 							<div className="flex items-center gap-8">
 								<Link to="/" className="flex items-center gap-2 group">
-									<span className="text-2xl font-black text-gray-900 font-display tracking-tighter">
+									<span className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tighter">
 										ShopyNow
 									</span>
 								</Link>
@@ -125,6 +126,7 @@ const Header = ({ isPanel = false }) => {
 
 						{/* Right hand Side: Search + Icons */}
 						<div className="flex items-center gap-6">
+							<ThemeToggle />
 							{/* Search Bar - hidden on mobile */}
 							{!isPanel && (
 								<div className="hidden xl:flex w-full min-w-[300px]">
@@ -132,9 +134,9 @@ const Header = ({ isPanel = false }) => {
 										<input
 											type="text"
 											placeholder="Search curated findings..."
-											className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 border-0 rounded-2xl
-												text-sm text-gray-700 placeholder:text-gray-400
-												focus:ring-2 focus:ring-gray-900/5 focus:bg-white
+											className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 dark:bg-gray-800/80 border-0 rounded-2xl
+												text-sm text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500
+												focus:ring-2 focus:ring-gray-900/5 dark:focus:ring-white/5 focus:bg-white dark:focus:bg-gray-900
 												transition-all duration-300 outline-none font-medium"
 										/>
 										<svg
@@ -163,7 +165,7 @@ const Header = ({ isPanel = false }) => {
 												setIsWishlistOpen(!isWishlistOpen);
 												setIsCartOpen(false);
 											}}
-											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
 											aria-label="Wishlist"
@@ -184,7 +186,7 @@ const Header = ({ isPanel = false }) => {
 												setIsCartOpen(!isCartOpen);
 												setIsWishlistOpen(false);
 											}}
-											className="relative p-2.5 text-gray-700 bg-white border border-gray-100 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
 											aria-label="Shopping cart"
@@ -204,7 +206,7 @@ const Header = ({ isPanel = false }) => {
 								<div className="relative" ref={dropdownRef}>
 									<button
 										onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+										className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
 										aria-label="User profile menu"
 									>
 										<Avatar
@@ -219,7 +221,7 @@ const Header = ({ isPanel = false }) => {
 												initial={{ opacity: 0, y: 10, scale: 0.95 }}
 												animate={{ opacity: 1, y: 0, scale: 1 }}
 												exit={{ opacity: 0, y: 10, scale: 0.95 }}
-												className="absolute right-0 mt-2 w-64 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden font-sans"
+												className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-gray-700 py-3 z-[60] overflow-hidden font-sans"
 											>
 												<div className="px-6 py-4 border-b border-gray-50 mb-2">
 													<p className="text-sm font-black text-gray-900 truncate">{fullName}</p>
@@ -238,7 +240,6 @@ const Header = ({ isPanel = false }) => {
 													</div>
 													<span className="font-bold">Settings</span>
 												</Link>
-
 												<div className="px-3 mt-2">
 													<button
 														onClick={() => {

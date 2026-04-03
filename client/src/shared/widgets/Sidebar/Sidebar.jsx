@@ -178,7 +178,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 					${
 						linkActive
 							? 'text-white shadow-lg'
-							: 'text-gray-600 hover:bg-gray-100/80 hover:text-indigo-600'
+							: 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400'
 					}
 				`}
 				style={({ isActive: linkActive }) =>
@@ -216,7 +216,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 						<div className="relative z-10 flex-1 min-w-0">
 							<span
 								className={`block font-medium truncate ${
-									linkActive ? 'text-white' : 'text-gray-700'
+									linkActive ? 'text-white' : 'text-gray-700 dark:text-gray-200'
 								}`}
 							>
 								{item.label}
@@ -225,7 +225,7 @@ const NavItem = ({ item, index, roleTheme }) => {
 								className={`block text-xs truncate ${
 									linkActive
 										? 'text-white/80'
-										: 'text-gray-400 group-hover:text-gray-500'
+										: 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400'
 								}`}
 							>
 								{item.description}
@@ -254,7 +254,7 @@ const SidebarBrand = ({ userRole }) => {
 	return (
 		<Link to="/">
 			<motion.div
-				className="p-6 border-b border-gray-100 flex items-center gap-3 group cursor-pointer"
+				className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 group cursor-pointer"
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 			>
@@ -267,7 +267,7 @@ const SidebarBrand = ({ userRole }) => {
 					E
 				</motion.div>
 				<div className="flex flex-col">
-					<span className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors tracking-tight">
+					<span className="text-xl font-bold text-gray-800 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight">
 						E-Commerce
 					</span>
 					<span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
@@ -291,16 +291,16 @@ const Sidebar = () => {
 		<>
 			{/* Mobile menu button */}
 			<motion.button
-				className="fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg 
+				className="fixed top-4 left-4 z-50 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg 
 					md:hidden flex items-center justify-center"
 				onClick={() => setIsMobileOpen(!isMobileOpen)}
 				whileHover={{ scale: 1.05 }}
 				whileTap={{ scale: 0.95 }}
 			>
 				{isMobileOpen ? (
-					<CloseIcon className="w-6 h-6 text-gray-600" />
+					<CloseIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
 				) : (
-					<MenuIcon className="w-6 h-6 text-gray-600" />
+					<MenuIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
 				)}
 			</motion.button>
 
@@ -321,8 +321,8 @@ const Sidebar = () => {
 			<motion.aside
 				className={`
 					fixed md:sticky top-0 left-0 h-screen z-40
-					bg-white/95 backdrop-blur-xl shadow-xl md:shadow-lg
-					border-r border-gray-100 flex flex-col
+					bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl md:shadow-lg
+					border-r border-gray-100 dark:border-gray-800 flex flex-col
 					transition-all duration-300
 
 					${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}

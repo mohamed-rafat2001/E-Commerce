@@ -1,20 +1,20 @@
 import React from 'react';
 
 const variants = {
-	primary: "bg-[#0f172a] text-white border border-[#0f172a] hover:bg-white hover:text-[#0f172a] shadow-2xl transition-all duration-300 uppercase font-black tracking-widest",
-	secondary: "bg-white text-[#0f172a] border border-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all duration-300 uppercase font-black tracking-widest",
-	accent: "bg-[#72F1DE] text-[#0f172a] border border-[#72F1DE] hover:bg-[#0f172a] hover:text-white hover:border-[#0f172a] shadow-lg transition-all duration-300 uppercase font-black tracking-widest",
-	outline: "bg-transparent border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all duration-300 uppercase font-black tracking-widest",
-	ghost: "bg-transparent text-[#64748b] hover:bg-slate-50 hover:text-[#0f172a] transition-all duration-200 font-bold",
-	danger: "bg-rose-500 text-white border border-rose-500 hover:bg-rose-600 shadow-sm uppercase font-black tracking-widest",
-	success: "bg-emerald-500 text-white border border-emerald-500 hover:bg-emerald-600 shadow-sm uppercase font-black tracking-widest",
-	premium: "bg-[#0f172a] text-white border border-[#0f172a] hover:bg-white hover:text-[#0f172a] shadow-[0_20px_40px_-15px_rgba(15,23,42,0.4)] transition-all duration-300 font-black uppercase tracking-[0.2em]"
+	primary: "bg-gray-900 text-white hover:bg-gray-800 dark:bg-primary-500 dark:hover:bg-primary-400 dark:text-white shadow-xl transition-all duration-300 uppercase font-black tracking-widest",
+	secondary: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 transition-all duration-300 uppercase font-black tracking-widest",
+	accent: "bg-accent text-gray-900 border border-accent hover:bg-gray-900 hover:text-white dark:bg-accent-dark dark:hover:bg-white dark:hover:text-gray-900 shadow-lg transition-all duration-300 uppercase font-black tracking-widest",
+	outline: "bg-transparent border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-all duration-300 uppercase font-black tracking-widest",
+	ghost: "bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white transition-all duration-200 font-bold",
+	danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 shadow-sm uppercase font-black tracking-widest",
+	success: "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 shadow-sm uppercase font-black tracking-widest",
+	premium: "bg-gray-900 text-white hover:bg-gray-800 dark:bg-primary-600 dark:hover:bg-primary-500 shadow-xl transition-all duration-300 font-black uppercase tracking-[0.2em]"
 };
 
 const sizes = {
-	sm: "px-4 py-2 text-xs rounded-full",
-	md: "px-6 py-2.5 text-sm rounded-full",
-	lg: "px-8 py-3.5 text-base rounded-full",
+	sm: "px-4 py-2 text-xs rounded-full min-h-[44px]",
+	md: "px-6 py-2.5 text-sm rounded-full min-h-[44px]",
+	lg: "px-8 py-3.5 text-base rounded-full min-h-[44px]",
 };
 
 const Button = ({

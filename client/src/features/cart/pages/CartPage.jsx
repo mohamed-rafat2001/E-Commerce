@@ -23,14 +23,14 @@ const CartPage = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white font-sans">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
                 {/* Header Section */}
                 <header className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black text-[#0f172a] tracking-tight mb-3">
+                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3">
                         Your Cart
                     </h1>
-                    <p className="text-gray-500 font-medium text-lg tracking-tight">
+                    <p className="text-gray-500 dark:text-gray-400 font-medium text-lg tracking-tight">
                         Review your selected pieces before finishing.
                     </p>
                 </header>

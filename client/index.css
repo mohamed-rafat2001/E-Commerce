@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 6: RESPONSIVE DESIGN — Mobile-first CSS approach
+  RESPONSIVE DESIGN — Mobile-first CSS approach
    Base styles target mobile, min-width queries scale up.
    
    Breakpoints:
@@ -22,6 +22,33 @@
 		/* font-display: swap is handled in the Google Fonts URL */
 		/* Use dvh for mobile-friendly viewport height */
 		--vh-full: 100dvh;
+		--color-bg-page: #f8fafc;
+		--color-bg-surface: #ffffff;
+		--color-bg-muted: #eef2f7;
+		--color-bg-soft: #e2e8f0;
+		--color-border: #d6deea;
+		--color-text-primary: #0f172a;
+		--color-text-secondary: #334155;
+		--color-text-muted: #475569;
+		--color-text-subtle: #64748b;
+		--color-scrollbar-track: #e2e8f0;
+		--color-scrollbar-thumb: #94a3b8;
+		--color-scrollbar-thumb-hover: #64748b;
+	}
+
+	html.dark {
+		--color-bg-page: #0b1220;
+		--color-bg-surface: #111827;
+		--color-bg-muted: #1f2937;
+		--color-bg-soft: #334155;
+		--color-border: #334155;
+		--color-text-primary: #f8fafc;
+		--color-text-secondary: #e2e8f0;
+		--color-text-muted: #cbd5e1;
+		--color-text-subtle: #94a3b8;
+		--color-scrollbar-track: #1f2937;
+		--color-scrollbar-thumb: #475569;
+		--color-scrollbar-thumb-hover: #64748b;
 	}
 
 	html.lenis,
@@ -51,21 +78,37 @@
 	}
 
 	body {
-		@apply bg-gray-50 text-gray-900 antialiased;
-		min-height: 100dvh; /* Use dynamic viewport height for mobile */
+		@apply antialiased transition-colors duration-300;
+		background-color: var(--color-bg-page);
+		color: var(--color-text-primary);
+		min-height: 100dvh;
+		/* Use dynamic viewport height for mobile */
 		overflow-x: hidden;
 		/* Minimum 16px base font prevents iOS auto-zoom on inputs */
 		font-size: 16px;
 	}
 
 	/* Fluid typography using clamp() */
-	h1 { font-size: clamp(1.75rem, 4vw, 3.5rem); }
-	h2 { font-size: clamp(1.375rem, 3vw, 2.25rem); }
-	h3 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
-	p, li { font-size: clamp(0.875rem, 2vw, 1.125rem); }
+	h1 {
+		font-size: clamp(1.75rem, 4vw, 3.5rem);
+	}
+
+	h2 {
+		font-size: clamp(1.375rem, 3vw, 2.25rem);
+	}
+
+	h3 {
+		font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+	}
+
+	p,
+	li {
+		font-size: clamp(0.875rem, 2vw, 1.125rem);
+	}
 
 	/* Touch targets: minimum 44x44px for all interactive elements on mobile */
 	@media (max-width: 767px) {
+
 		button,
 		a,
 		[role="button"],
@@ -97,15 +140,17 @@
 	}
 
 	::-webkit-scrollbar-track {
-		@apply bg-gray-100 rounded-full;
+		background-color: var(--color-scrollbar-track);
+		border-radius: 9999px;
 	}
 
 	::-webkit-scrollbar-thumb {
-		@apply bg-gray-300 rounded-full;
+		background-color: var(--color-scrollbar-thumb);
+		border-radius: 9999px;
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		@apply bg-gray-400;
+		background-color: var(--color-scrollbar-thumb-hover);
 	}
 
 	/* Selection styling */
@@ -118,8 +163,7 @@
 	   Only shows focus ring for keyboard navigation, not mouse clicks.
 	   ═══════════════════════════════════════════════════════════════ */
 	:focus-visible {
-		outline: 2px solid #4f46e5;
-		outline-offset: 2px;
+		@apply outline-none ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-900;
 		border-radius: 4px;
 	}
 
@@ -132,6 +176,7 @@
 	   Reduced motion — disable animations for users who prefer it.
 	   ═══════════════════════════════════════════════════════════════ */
 	@media (prefers-reduced-motion: reduce) {
+
 		*,
 		*::before,
 		*::after {
@@ -144,6 +189,7 @@
 }
 
 @layer components {
+
 	/* ═══════════════════════════════════════════════════════════════
 	   Responsive Product Grid
 	   Mobile: 1 col | Tablet: 2 cols | Desktop: 3-4 cols
@@ -376,6 +422,7 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 1;
+		line-clamp: 1;
 	}
 
 	.line-clamp-2 {
@@ -383,6 +430,7 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 	}
 
 	.line-clamp-3 {
@@ -390,13 +438,44 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 3;
+		line-clamp: 3;
 	}
 
 	/* Dynamic viewport height utilities */
 	.min-h-dvh {
 		min-height: 100dvh;
 	}
+
 	.h-dvh {
 		height: 100dvh;
 	}
+}
+
+/* Dark Mode Overrides — apply safe defaults for common utilities across components */
+@layer base {
+	.bg-white { background-color: var(--color-bg-surface); }
+	.bg-gray-50 { background-color: var(--color-bg-page); }
+	.bg-gray-100 { background-color: var(--color-bg-muted); }
+	.bg-gray-200 { background-color: var(--color-bg-soft); }
+	.bg-slate-50 { background-color: var(--color-bg-page); }
+	.bg-slate-100 { background-color: var(--color-bg-muted); }
+	.bg-slate-200 { background-color: var(--color-bg-soft); }
+	.border-gray-50,
+	.border-gray-100,
+	.border-gray-200,
+	.border-gray-300 { border-color: var(--color-border); }
+	.border-slate-100,
+	.border-slate-200,
+	.border-slate-300 { border-color: var(--color-border); }
+	.text-gray-900 { color: var(--color-text-primary); }
+	.text-gray-800,
+	.text-gray-700 { color: var(--color-text-secondary); }
+	.text-gray-600,
+	.text-gray-500 { color: var(--color-text-muted); }
+	.text-gray-400 { color: var(--color-text-subtle); }
+	.text-slate-900 { color: var(--color-text-primary); }
+	.text-slate-700,
+	.text-slate-600 { color: var(--color-text-secondary); }
+	.text-slate-500,
+	.text-slate-400 { color: var(--color-text-muted); }
 }

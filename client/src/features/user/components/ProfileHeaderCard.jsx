@@ -3,7 +3,7 @@ import { Card, Button, Avatar, Badge, Dropdown } from '../../../shared/ui/index.
 
 const ProfileHeaderCard = ({ roleTheme, userData, fullName, userRole, isEditing, setIsEditing, setIsUploadModalOpen, setIsDeleteModalOpen }) => (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card variant="elevated" padding="p-0" className="relative">
+        <Card variant="elevated" padding="p-0" className="relative overflow-visible">
             <div className="h-32 sm:h-40 rounded-t-2xl overflow-hidden" style={{ background: roleTheme.gradient }}>
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-white/20" />
@@ -27,6 +27,7 @@ const ProfileHeaderCard = ({ roleTheme, userData, fullName, userRole, isEditing,
                             }
                             align="center"
                             width="w-56"
+                            className="z-[70]"
                         >
                             <Dropdown.Item icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>} onClick={() => setIsUploadModalOpen(true)}>Upload Profile Image</Dropdown.Item>
                             <Dropdown.Divider />
@@ -34,9 +35,9 @@ const ProfileHeaderCard = ({ roleTheme, userData, fullName, userRole, isEditing,
                         </Dropdown>
                     </div>
                     <div className="text-center sm:text-left flex-1">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{fullName}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{fullName}</h1>
                         <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
-                            <Badge variant="primary" className="bg-indigo-50 text-indigo-700">{userRole}</Badge>
+                            <Badge variant="primary" className="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200">{userRole}</Badge>
                         </div>
                     </div>
                     <Button variant={isEditing ? 'danger' : 'outline'} onClick={() => setIsEditing(!isEditing)}>

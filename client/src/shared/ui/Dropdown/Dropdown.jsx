@@ -47,8 +47,8 @@ const Dropdown = ({
 						exit={{ opacity: 0, scale: 0.95, y: 10 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
 						className={`absolute z-50 mt-2 ${width} ${alignments[align]} 
-							rounded-2xl shadow-xl border border-gray-100 
-							overflow-hidden backdrop-blur-xl bg-white/95`}
+							rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700
+							overflow-hidden backdrop-blur-xl bg-white/95 dark:bg-gray-800/95`}
 					>
 						<div className="py-1" onClick={() => setIsOpen(false)}>
 							{children}
@@ -68,9 +68,9 @@ const DropdownItem = ({
 	disabled = false 
 }) => {
 	const variants = {
-		default: 'text-gray-700 hover:bg-gray-50',
-		danger: 'text-red-600 hover:bg-red-50',
-		primary: 'text-indigo-600 hover:bg-indigo-50',
+		default: 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700',
+		danger: 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30',
+		primary: 'text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30',
 	};
 
 	return (
@@ -86,7 +86,7 @@ const DropdownItem = ({
 	);
 };
 
-const DropdownDivider = () => <div className="h-px bg-gray-100 my-1" />;
+const DropdownDivider = () => <div className="h-px bg-gray-100 dark:bg-gray-700 my-1" />;
 
 Dropdown.Item = DropdownItem;
 Dropdown.Divider = DropdownDivider;

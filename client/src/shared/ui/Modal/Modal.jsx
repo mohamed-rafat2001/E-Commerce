@@ -57,19 +57,19 @@ const Modal = ({
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
-						className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden z-10`}
+						className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden z-10 transition-colors`}
 					>
 						{(title || showClose) && (
-							<div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+							<div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
 								{title && (
-									<h3 className="text-lg font-semibold text-gray-900 truncate">
+									<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
 										{title}
 									</h3>
 								)}
 								{showClose && (
 									<button
 										onClick={onClose}
-										className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 ml-auto"
+										className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ml-auto"
 									>
 										<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -84,7 +84,7 @@ const Modal = ({
 						</div>
 
 						{footer && (
-							<div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 shrink-0 rounded-b-2xl">
+							<div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 shrink-0 rounded-b-2xl">
 								{footer}
 							</div>
 						)}

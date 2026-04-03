@@ -1,53 +1,72 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 
 let exportedLenis = null;
 
-export default function useLenis() {
-  const lenisRef = useRef(null);
-  const location = useLocation();
+export default function useLenis({ smooth = false } = {}) {
+	const location = useLocation();
+	const lenisRef = useRef(null);
 
-  useGSAP(() => {
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
+	const scroller = useMemo(
+		() => ({
+			scrollTo: (target, options = {}) => {
+				const top = typeof target === "number" ? target : 0;
+				const immediate = options.immediate === true;
+				window.scrollTo({
+					top,
+					left: 0,
+					behavior: immediate ? "auto" : "smooth",
+				});
+			},
+		}),
+		[]
+	);
 
-    const lenis = new Lenis({
-      duration: 1.4,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 0.8,
-      touchMultiplier: 1.5,
-    });
+	useEffect(() => {
+		if (!smooth) return;
+		if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			return;
+		}
 
-    lenisRef.current = lenis;
-    exportedLenis = lenis;
+		const lenis = new Lenis({
+			duration: 1.15,
+			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+			orientation: "vertical",
+			smoothWheel: true,
+			wheelMultiplier: 0.8,
+			touchMultiplier: 1.2,
+		});
 
-    const tick = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+		lenisRef.current = lenis;
+		const tick = (time) => lenis.raf(time * 1000);
+		gsap.ticker.add(tick);
+		gsap.ticker.lagSmoothing(0);
 
-    return () => {
-      gsap.ticker.remove(tick);
-      lenis.destroy();
-      lenisRef.current = null;
-      exportedLenis = null;
-    };
-  }, []);
+		return () => {
+			gsap.ticker.remove(tick);
+			lenis.destroy();
+			lenisRef.current = null;
+		};
+	}, [smooth]);
 
-  useEffect(() => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    }
-  }, [location.pathname]);
+	useEffect(() => {
+		exportedLenis = lenisRef.current || scroller;
+		return () => {
+			exportedLenis = null;
+		};
+	}, [scroller, smooth]);
 
-  return lenisRef;
+	useEffect(() => {
+		if (lenisRef.current) {
+			lenisRef.current.scrollTo(0, { immediate: true });
+			return;
+		}
+		scroller.scrollTo(0, { immediate: true });
+	}, [location.pathname, scroller, smooth]);
+
+	return lenisRef.current || scroller;
 }
 
 export const getLenis = () => exportedLenis;

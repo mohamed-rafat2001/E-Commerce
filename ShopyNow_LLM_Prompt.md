@@ -1,15 +1,4 @@
-# ShopyNow — Full LLM Prompt for Performance, SEO, Responsive & Bug Fixes
 
-> **Stack:** React + Vite (JavaScript) · Tailwind CSS · Redux Toolkit · TanStack React Query · Axios · React Router DOM v6  
-> **Server:** Node.js · Express · MongoDB · Redis · JWT · Helmet  
-> **Panels:** Customer · Seller · Admin  
-> **Current Lighthouse:** Performance 12–31 · Accessibility 88–90 · Best Practices 96 · SEO 83–100
-
----
-
-## Master Prompt (paste into Cursor / ChatGPT / any LLM)
-
-```
 You are an expert React/Vite engineer. I have a MERN e-commerce app called "ShopyNow"
 with this exact tech stack:
 

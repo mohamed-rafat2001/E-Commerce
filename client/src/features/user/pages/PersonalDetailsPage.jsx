@@ -50,15 +50,15 @@ const PersonalDetailsPage = () => {
 					<Card className="h-full">
 						<Card.Header><Card.Title>Account Overview</Card.Title></Card.Header>
 						<Card.Content className="space-y-4">
-							<div className="p-4 rounded-xl bg-gray-50">
+							<div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40">
 								<p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Member Since</p>
 								<p className="text-gray-900 font-medium mt-1">{page.memberSince}</p>
 							</div>
-							<div className="p-4 rounded-xl bg-gray-50">
+							<div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40">
 								<p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Account Status</p>
 								<div className="flex items-center gap-2 mt-1">
 									<div className={`w-2 h-2 rounded-full ${page.userData?.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`} />
-									<p className="text-gray-900 font-medium capitalize">{page.userData?.status || 'active'}</p>
+									<p className="text-gray-900 dark:text-gray-100 font-medium capitalize">{page.userData?.status || 'active'}</p>
 								</div>
 							</div>
 						</Card.Content>

@@ -26,7 +26,7 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <LoadingSpinner size="xl" color="primary" />
       </div>
     );
@@ -34,10 +34,10 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-center px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-300 text-center px-4">
         <div className="max-w-md">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <p className="text-gray-500 mb-8">The product you are looking for might have been removed or is temporarily unavailable.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Product Not Found</h1>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">The product you are looking for might have been removed or is temporarily unavailable.</p>
           <button
             onClick={() => navigate('/products')}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-all"
@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
   const productSchema = schemas.product(product);
 
   return (
-    <article className="min-h-screen bg-white" itemScope itemType="https://schema.org/Product">
+    <article className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300" itemScope itemType="https://schema.org/Product">
       <SEO
         title={`${product.name} — ${brandName}`}
         description={`Buy ${product.name} by ${brandName} for $${price.toFixed(2)}. ${product.description?.slice(0, 120) || 'Premium quality, fast delivery.'}`}
@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
         {!isRelatedLoading && relatedProducts?.length > 0 && (
           <section className="mt-20" aria-label="Related products">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">You Might Also Like</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">You Might Also Like</h2>
               <Link
                 to={`/products?category=${categoryId}`}
                 className="text-primary text-sm font-semibold hover:underline"

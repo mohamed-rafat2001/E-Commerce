@@ -21,7 +21,7 @@ const Card = ({
 	return (
 		<div
 			onClick={onClick}
-			className={`bg-white rounded-3xl border border-gray-100 shadow-xl shadow-slate-200/40 overflow-hidden ${hoverStyles} ${className}`}>
+			className={`bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-slate-200/40 dark:shadow-black/20 overflow-hidden transition-colors ${hoverStyles} ${className}`}>
 			<div className={paddingClass}>
 				{children}
 			</div>
@@ -30,13 +30,13 @@ const Card = ({
 };
 
 export const Header = ({ children, className = "" }) => (
-	<div className={`px-6 py-5 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between ${className}`}>
+	<div className={`px-6 py-5 border-b border-gray-50 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20 flex items-center justify-between ${className}`}>
 		{children}
 	</div>
 );
 
 export const Title = ({ children, className = "" }) => (
-	<h3 className={`text-xl font-bold text-gray-900 font-display ${className}`}>
+	<h3 className={`text-xl font-bold text-gray-900 dark:text-gray-100 font-display ${className}`}>
 		{children}
 	</h3>
 );
@@ -48,7 +48,7 @@ export const Content = ({ children, className = "", padding = "p-6" }) => (
 );
 
 export const Footer = ({ children, className = "" }) => (
-	<div className={`px-6 py-4 bg-gray-50/30 ${className}`}>
+	<div className={`px-6 py-4 bg-gray-50/30 dark:bg-gray-900/20 ${className}`}>
 		{children}
 	</div>
 );

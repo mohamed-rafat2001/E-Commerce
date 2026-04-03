@@ -75,7 +75,7 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
             onMouseLeave={handleMouseLeave}
         >
             {/* Image Area */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 mb-6">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-gray-100 dark:bg-gray-800 mb-6">
                 <Link
                     to={`/products/${productId}`}
                     className="block w-full h-full"
@@ -114,29 +114,29 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
             {/* Product Info Section */}
             <div className="px-1 flex flex-col flex-1">
                 {/* Brand */}
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">
+                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">
                     {brandName}
                 </span>
 
                 {/* Title and Price */}
                 <div className="flex justify-between items-start gap-4 mb-3">
                     <Link to={`/products/${productId}`} className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight group-hover:text-primary transition-colors">
                             {product.name}
                         </h3>
                     </Link>
-                    <span className="text-xl font-bold text-gray-900" aria-label={`Price: $${price.toFixed(0)}`}>
+                    <span className="text-xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Price: $${price.toFixed(0)}`}>
                         ${price.toFixed(0)}
                     </span>
                 </div>
 
                 {/* Rating & Actions */}
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50 dark:border-gray-800">
                     <div className="flex items-center gap-1.5">
                         <div className="flex items-center text-yellow-500" aria-label={`Rating: ${Number(product.ratingAverage || 0).toFixed(1)} out of 5 with ${product.ratingCount || 0} reviews`}>
                             <FiStar className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
-                            <span className="ml-1 text-sm font-bold text-gray-900">{Number(product.ratingAverage || 0).toFixed(1)}</span>
-                            <span className="ml-1 text-xs text-gray-500">({product.ratingCount || 0})</span>
+                            <span className="ml-1 text-sm font-bold text-gray-900 dark:text-gray-100">{Number(product.ratingAverage || 0).toFixed(1)}</span>
+                            <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">({product.ratingCount || 0})</span>
                         </div>
                     </div>
 
@@ -144,7 +144,7 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
                         product={product}
                         variant="primary"
                         showText={true}
-                        className="!rounded-full px-6 py-2.5 !bg-gray-900 !text-white !border-gray-900 text-[10px] uppercase font-black tracking-widest shadow-xl hover:bg-black transition-all active:scale-95"
+                        className="!rounded-full px-6 py-2.5 !bg-gray-900 dark:!bg-primary-500 !text-white !border-gray-900 dark:!border-primary-500 text-[10px] uppercase font-black tracking-widest shadow-xl hover:bg-black dark:hover:!bg-primary-400 transition-all active:scale-95 min-h-[36px]"
                     />
                 </div>
             </div>

@@ -31,18 +31,18 @@ const slidesConfig = [
 
 const HeroSection = () => {
     return (
-        <section className="relative h-[90vh] w-full bg-gray-900">
+        <section className="relative h-dvh min-h-dvh w-full bg-gray-900">
             <Slider
                 effect="fade"
-                speed={1000}
-                autoplay={{ delay: 5000, disableOnInteraction: false }}
+                speed={700}
+                autoplay={{ delay: 6000, disableOnInteraction: true, pauseOnMouseEnter: true }}
                 loop={true}
                 pagination={{ clickable: true }}
                 className="h-full w-full"
                 swiperClassName="h-full w-full"
             >
-                {slidesConfig.map(slide => (
-                    <HeroSlide key={slide.id} slide={slide} />
+                {slidesConfig.map((slide, index) => (
+                    <HeroSlide key={slide.id} slide={slide} priority={index === 0} />
                 ))}
             </Slider>
         </section>

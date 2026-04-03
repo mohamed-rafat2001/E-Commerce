@@ -16,7 +16,7 @@ import Breadcrumbs from "../../../shared/components/Breadcrumbs.jsx";
 
 function BrandPageSkeleton() {
 	return (
-		<div className="min-h-screen bg-white">
+		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 			<div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-8 md:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
 				<div className="hidden lg:block">
 					<div className="h-80 rounded-2xl bg-gray-100 animate-pulse" />
@@ -152,7 +152,7 @@ export default function BrandDetailPage() {
 	}
 
 	return (
-		<main className="min-h-screen bg-white" itemScope itemType="https://schema.org/Organization">
+		<main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300" itemScope itemType="https://schema.org/Organization">
 			<SEO
 				title={`${brand.name} — Official Brand Store`}
 				description={brand.description?.slice(0, 155) || `Shop ${brand.name} products at ShopyNow. Discover the latest collection, exclusive deals, and premium quality.`}

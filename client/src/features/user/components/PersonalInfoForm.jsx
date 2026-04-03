@@ -20,7 +20,7 @@ const PersonalInfoForm = ({ profileForm, isEditing, isUpdating, onSubmit, onCanc
                             <Input label="Phone Number" disabled={!isEditing || isUpdating} error={errors.phoneNumber?.message} {...register('phoneNumber', { required: 'Phone number is required' })} />
                         </div>
                         {isEditing && (
-                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
                                 <Button variant="ghost" type="button" onClick={() => { onCancelEdit(); reset(); }} disabled={isUpdating}>Cancel</Button>
                                 <Button variant="primary" type="submit" isLoading={isUpdating}>Save Changes</Button>
                             </motion.div>
