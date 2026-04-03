@@ -29,7 +29,7 @@ const Pagination = ({ totalPages, currentPage: propCurrentPage, onPageChange }) 
         }
     };
 
-    if (totalPages <= 1) return null;
+
 
     // Generate page numbers to show
     const getPageNumbers = () => {

@@ -45,11 +45,11 @@ const BestSellersSection = () => {
                             className="rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 bg-white/70 dark:bg-gray-900/60 p-3 md:p-4 shadow-sm"
                         >
                             <Slider
-                                navigation={false}
+                                navigation={true}
                                 pagination={{ clickable: true, dynamicBullets: true }}
-                                autoplay={products.length > 2}
+                                autoplay={true}
                                 autoplayDelay={3600}
-                                loop={products.length > 4}
+                                loop={true}
                                 speed={700}
                                 slidesPerView={1.12}
                                 spaceBetween={14}

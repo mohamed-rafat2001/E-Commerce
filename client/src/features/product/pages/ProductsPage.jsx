@@ -154,15 +154,13 @@ export default function ProductsPage() {
 								</div>
 
 								{/* Pagination */}
-								{totalPages > 1 && (
-									<nav className="mt-20 border-t border-gray-50 pt-10" aria-label="Products pagination">
-										<Pagination
-											currentPage={currentPage}
-											totalPages={totalPages}
-											onPageChange={handlePageChange}
-										/>
-									</nav>
-								)}
+								<nav className="mt-20 border-t border-gray-50 pt-10" aria-label="Products pagination">
+									<Pagination
+										currentPage={currentPage}
+										totalPages={totalPages}
+										onPageChange={handlePageChange}
+									/>
+								</nav>
 							</>
 						) : (
 							<EmptyState
