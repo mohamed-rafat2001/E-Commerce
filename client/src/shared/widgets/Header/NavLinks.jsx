@@ -160,7 +160,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => setIsMobileMenuOpen(false)}
-							className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] lg:hidden"
+							className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] lg:hidden"
 						/>
 
 						{/* Drawer Content */}
@@ -169,7 +169,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							animate={{ x: 0 }}
 							exit={{ x: '100%' }}
 							transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-							className="fixed right-0 top-0 h-full w-[320px] max-w-[92vw] bg-white dark:bg-gray-900 z-[130] shadow-2xl lg:hidden flex flex-col border-l border-gray-100 dark:border-gray-700"
+							className="fixed right-0 top-0 h-screen w-[320px] max-w-[92vw] bg-white dark:bg-gray-900 z-[1000] shadow-[0_0_50px_rgba(0,0,0,0.3)] lg:hidden flex flex-col border-l border-gray-100 dark:border-gray-700 overflow-hidden"
 						>
 							{/* Drawer Header */}
 							<div className="shrink-0 flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
@@ -229,7 +229,6 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 									{ name: 'Brands', path: '/brands/all' },
 									{ name: 'Categories', path: '/categories/all' },
 									{ name: 'Products', path: '/products' },
-									{ name: 'Help', path: '/help' },
 								].map((link) => (
 									<NavLink
 										key={link.name}

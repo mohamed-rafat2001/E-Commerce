@@ -9,6 +9,7 @@ import useCart from '../../../features/cart/hooks/useCart.js';
 import NavLinks from './NavLinks.jsx';
 import useCategories from '../../../features/home/hooks/useCategories.js';
 import useBrands from '../../../features/home/hooks/useBrands.js';
+import { getLenis } from '../../../hooks/useLenis.js';
 import {
 	StoreIcon,
 	HeartIcon,
@@ -77,14 +78,19 @@ const Header = ({ isPanel = false }) => {
 
 	useEffect(() => {
 		const isAnyDrawerOpen = isCartOpen || isWishlistOpen;
+		const lenis = getLenis();
+
 		if (!isAnyDrawerOpen) {
 			document.body.style.overflow = '';
 			document.body.style.paddingRight = '';
+			if (lenis && typeof lenis.start === 'function') lenis.start();
 			return;
 		}
 
 		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 		document.body.style.overflow = 'hidden';
+		if (lenis && typeof lenis.stop === 'function') lenis.stop();
+		
 		if (scrollbarWidth > 0) {
 			document.body.style.paddingRight = `${scrollbarWidth}px`;
 		}
@@ -92,6 +98,7 @@ const Header = ({ isPanel = false }) => {
 		return () => {
 			document.body.style.overflow = '';
 			document.body.style.paddingRight = '';
+			if (lenis && typeof lenis.start === 'function') lenis.start();
 		};
 	}, [isCartOpen, isWishlistOpen]);
 
@@ -113,7 +120,7 @@ const Header = ({ isPanel = false }) => {
 							<div className="flex items-center gap-3 xl:gap-8 min-w-0">
 								<Link to="/" className="flex items-center gap-2 group">
 									<img src="/logo.png" alt="ShopyNow Logo" className="h-8 w-auto mix-blend-multiply dark:mix-blend-normal object-contain" />
-									<span className="hidden xl:inline text-2xl font-black text-gray-900 dark:text-white font-display tracking-tighter">
+									<span className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-display tracking-tightest">
 										ShopyNow
 									</span>
 								</Link>

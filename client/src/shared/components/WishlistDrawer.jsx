@@ -26,7 +26,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[140]"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
                     />
 
                     {/* Drawer */}
@@ -36,16 +36,16 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 shadow-2xl z-[150] flex flex-col border-l border-gray-100 dark:border-gray-700"
+                        className="fixed top-0 right-0 h-screen w-full max-w-md bg-white dark:bg-gray-900 shadow-[0_0_50px_rgba(0,0,0,0.3)] z-[1000] flex flex-col border-l border-gray-100 dark:border-gray-700 overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <h2 className="text-2xl font-bold text-gray-900">My Wishlist</h2>
+                        <div className="sticky top-0 z-20 flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">My Wishlist</h2>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors group"
                             >
-                                <FiX className="w-6 h-6 text-gray-600" />
+                                <FiX className="w-5 h-5 text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white" />
                             </button>
                         </div>
 
@@ -96,7 +96,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         {wishlistItems.length > 0 && (
-                            <div className="border-t border-gray-100 p-6 bg-gray-50">
+                            <div className="border-t border-gray-100 dark:border-gray-800 p-6 bg-white dark:bg-gray-900">
                                 <Button
                                     onClick={() => {
                                         onClose();
@@ -105,8 +105,9 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                                     variant="outline"
                                     size="lg"
                                     fullWidth
+                                    className="rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
                                 >
-                                    View Full Wishlist
+                                    Explore Full Wishlist
                                 </Button>
                             </div>
                         )}
@@ -132,47 +133,50 @@ const WishlistItemCard = ({ product, onClose }) => {
     };
 
     return (
-        <div className="flex gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+        <div className="relative flex gap-4 bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300 group">
             {/* Product Image */}
             <Link
                 to={`/products/${product._id || product.id || product.product_id}`}
                 onClick={onClose}
-                className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 block"
+                className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900 block border border-gray-50 dark:border-gray-800"
             >
                 <img
                     src={image}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
             </Link>
 
             {/* Product Details */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-8">
                 <Link
                     to={`/products/${product._id || product.id || product.product_id}`}
                     onClick={onClose}
-                    className="font-semibold text-gray-900 truncate block hover:text-indigo-600 transition-colors"
+                    className="font-bold text-gray-900 dark:text-white truncate block hover:text-indigo-600 transition-colors text-sm"
                 >
                     {product.name}
                 </Link>
-                <p className="text-indigo-600 font-bold mt-1">${typeof price === 'number' ? price.toFixed(2) : price}</p>
+                <p className="text-indigo-600 dark:text-indigo-400 font-extrabold text-lg mt-0.5">${typeof price === 'number' ? price.toFixed(2) : price}</p>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-3">
                     <AddToCartButton
                         product={product}
                         size="sm"
                         showText={true}
-                        className="flex-1 !text-[10px] !py-2 !rounded-full !bg-gray-900 !text-white !border-gray-900 uppercase font-black tracking-widest"
+                        className="flex-1 rounded-full uppercase font-bold tracking-wider text-[10px] shadow-sm hover:shadow-md active:scale-95"
                     />
-                    <button
-                        onClick={handleRemove}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                        <FiTrash2 className="w-4 h-4" />
-                    </button>
                 </div>
             </div>
+
+            {/* Remove Button - Top Right */}
+            <button
+                onClick={handleRemove}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-full transition-all duration-300"
+                aria-label="Remove from wishlist"
+            >
+                <FiTrash2 className="w-4 h-4" />
+            </button>
         </div>
     );
 };
