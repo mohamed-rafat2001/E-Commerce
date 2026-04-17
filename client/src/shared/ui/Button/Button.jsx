@@ -21,9 +21,9 @@ const variantTextColors = {
 };
 
 const sizes = {
-	sm: "px-4 py-2 text-xs rounded-full min-h-[44px]",
-	md: "px-6 py-2.5 text-sm rounded-full min-h-[44px]",
-	lg: "px-8 py-3.5 text-base rounded-full min-h-[44px]",
+	sm: "px-3 py-1.5 text-xs rounded-full min-h-[32px]",
+	md: "px-5 py-2 text-sm rounded-full min-h-[36px]",
+	lg: "px-6 py-2 text-base rounded-full min-h-[40px]",
 };
 
 const Button = ({

@@ -22,11 +22,11 @@ const CartSummary = ({ subtotal, shipping, total, onCheckout }) => (
                 </div>
             </div>
             <div className="space-y-4">
-                <Button fullWidth size="lg" className="py-6 font-black text-lg shadow-indigo-200 shadow-2xl" onClick={onCheckout}>
+                <Button fullWidth size="lg" className="font-black text-lg shadow-indigo-200 shadow-2xl" onClick={onCheckout}>
                     Proceed to Checkout
                 </Button>
                 <Link to="/" className="block">
-                    <Button variant="primary" fullWidth size="lg" className="py-6">Keep Shopping</Button>
+                    <Button variant="primary" fullWidth size="lg" className="">Keep Shopping</Button>
                 </Link>
             </div>
         </Card>

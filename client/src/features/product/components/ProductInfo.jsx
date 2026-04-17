@@ -144,7 +144,7 @@ const ProductInfo = ({ product }) => {
             fullWidth
             variant="outline"
             size="lg"
-            className="py-5"
+            className="py-3"
           >
             Notify Me When Available
           </Button>
@@ -157,7 +157,7 @@ const ProductInfo = ({ product }) => {
               disabled={isAdding || !canAddToCart}
               isLoading={isAdding}
               title={!canAddToCart ? "Please select a color and size" : ""}
-              className="flex-1 py-5"
+              className="flex-1"
               icon={<FiShoppingBag className="w-5 h-5" />}
             >
               Add to Cart
@@ -166,7 +166,7 @@ const ProductInfo = ({ product }) => {
               variant="primary"
               size="lg"
               onClick={handleBuyNow}
-              className="px-10 py-5"
+              className="px-10"
             >
               Buy Now
             </Button>

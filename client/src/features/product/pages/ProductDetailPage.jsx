@@ -81,14 +81,14 @@ export default function ProductDetailPage() {
         {/* Breadcrumb with JSON-LD */}
         <Breadcrumbs items={breadcrumbItems} />
 
-        <div className="flex flex-col lg:flex-row gap-10 xl:gap-16">
-          {/* Image Gallery (Left, 45%) */}
-          <div className="lg:w-[45%]">
+        <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 lg:justify-center">
+          {/* Image Gallery (Left) */}
+          <div className="lg:w-[40%]">
             <ProductGallery images={gallery} productName={product.name} productId={product._id} />
           </div>
 
-          {/* Product Info (Right, 55%) */}
-          <div className="lg:w-[55%]">
+          {/* Product Info (Right) */}
+          <div className="lg:w-[40%]">
             <ProductInfo product={product} />
           </div>
         </div>

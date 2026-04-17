@@ -59,7 +59,7 @@ const OrderSummary = ({ onCheckout, calculations }) => {
                 size="lg"
                 onClick={onCheckout}
                 disabled={isEmpty}
-                className="py-5 text-base shadow-2xl group"
+                className="text-base shadow-2xl group"
                 icon={<FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                 iconPosition="right"
             >
