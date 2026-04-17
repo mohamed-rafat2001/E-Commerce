@@ -47,7 +47,7 @@ const HeroSlide = ({ slide, priority = false }) => {
                                 onClick={() => navigate('/register')}
                                 variant="outline"
                                 size="lg"
-                                className="px-10 !text-white !border-white hover:!bg-white hover:text-gray-900"
+                                className="px-10 !text-white !border-white hover:!bg-white hover:!text-gray-900"
                             >
                                 Sell With Us
                             </Button>
