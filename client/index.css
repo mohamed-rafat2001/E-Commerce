@@ -195,6 +195,17 @@
 			scroll-behavior: auto !important;
 		}
 	}
+
+	/* ═══════════════════════════════════════════════════════════════
+	   Scroll-linked effects optimization — helps prevent jitter
+	   with custom scroll libraries like Lenis.
+	   ═══════════════════════════════════════════════════════════════ */
+	.sticky,
+	.fixed {
+		backface-visibility: hidden;
+		transform: translateZ(0);
+		will-change: transform;
+	}
 }
 
 @layer components {
