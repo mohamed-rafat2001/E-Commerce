@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Badge } from '../../../../shared/ui';
 import OptimizedImage from '../../../../shared/components/OptimizedImage.jsx';
@@ -44,7 +43,12 @@ const HeroSlide = ({ slide, priority = false }) => {
                             <Button onClick={() => navigate('/products')} variant="premium" size="lg" className="px-10">
                                 Shop Now
                             </Button>
-                            <Button onClick={() => navigate('/register')} variant="outline" size="lg" className="px-10">
+                            <Button
+                                onClick={() => navigate('/register')}
+                                variant="outline"
+                                size="lg"
+                                className="px-10 !text-white !border-white hover:!bg-white hover:text-gray-900"
+                            >
                                 Sell With Us
                             </Button>
                         </div>

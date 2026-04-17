@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDownIcon, SearchIcon } from '../../constants/icons.jsx';
@@ -38,15 +38,15 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 	const isCategoriesMenu = label.toLowerCase() === 'categories';
 	const isBrandsMenu = label.toLowerCase() === 'brands';
 
-	// Lock body scroll when dropdown is open to prevent scroll bug
+	// Avoid locking page scroll for desktop hover menus.
 	useEffect(() => {
-		if (isOpen) {
+		if (isOpen && !isDesktop && !isSimple) {
 			document.body.style.overflow = 'hidden';
 		} else {
 			document.body.style.overflow = '';
 		}
 		return () => { document.body.style.overflow = ''; };
-	}, [isOpen]);
+	}, [isOpen, isDesktop, isSimple]);
 
 	const clearCloseTimeout = () => {
 		if (closeTimeoutRef.current) {
@@ -196,12 +196,12 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 				onFocus={isDesktop ? () => setIsOpen(true) : undefined}
 				aria-expanded={isOpen}
 				aria-haspopup="true"
-				className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none
-					${isOpen ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'}`}
+				className={`inline-flex items-center gap-1 h-10 px-2.5 xl:px-3.5 rounded-xl text-xs xl:text-sm font-semibold leading-none whitespace-nowrap select-none transition-colors duration-150 focus:outline-none
+					${isOpen ? 'text-gray-900 dark:text-gray-100 bg-gray-100/80 dark:bg-gray-800/70' : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100/70 dark:hover:bg-gray-800/60'}`}
 			>
 				{label}
 				<ChevronDownIcon
-					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}
+					className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-500'}`}
 				/>
 			</button>
 
@@ -209,7 +209,7 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 				{isOpen && (
 					<>
 					{/* Full-screen overlay to prevent background interaction */}
-					{!isSimple && (
+					{!isSimple && !isDesktop && (
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
@@ -220,12 +220,12 @@ const DropdownMenu = ({ label, items, viewAllPath, basePath, isSimple = false })
 						/>
 					)}
 					<motion.div
-						initial={{ opacity: 0, y: -8 }}
+						initial={{ opacity: 0, y: -6 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -8 }}
-						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={`${isSimple ? 'absolute left-0 top-full mt-3' : 'fixed top-[80px] left-1/2 -translate-x-1/2 mt-2'} 
-							max-h-[calc(100vh-100px)] lg:max-h-[600px] bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[9999] flex flex-col overflow-hidden backdrop-blur-xl
+						exit={{ opacity: 0, y: -4 }}
+						transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+						className={`${isSimple ? 'absolute left-0 top-full mt-3' : isDesktop ? 'fixed top-[72px] left-1/2 -translate-x-1/2' : 'absolute left-0 top-full mt-3'} 
+							max-h-[calc(100vh-100px)] lg:max-h-[600px] bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[9999] flex flex-col overflow-hidden backdrop-blur-xl will-change-transform
 							${isSimple ? 'w-52' : isCategoriesMenu ? 'w-[96vw] lg:w-[92vw] max-w-6xl' : isBrandsMenu ? 'w-[96vw] lg:w-[92vw] max-w-5xl' : 'w-[88vw] md:w-[460px] lg:w-[540px]'}`}
 						ref={menuRef}
 						role="menu"
@@ -340,7 +340,7 @@ const CategoriesGrid = ({ filteredItems, activeCategory, setActiveCategoryId, cl
                             onMouseEnter={() => setActiveCategoryId(itemId)}
                             onFocus={() => setActiveCategoryId(itemId)}
                             onClick={() => setActiveCategoryId(itemId)}
-                            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
+                            className={`w-full appearance-none border border-transparent text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-indigo-300 ${isActive
                                 ? 'bg-white dark:bg-gray-900 text-indigo-600 shadow-sm border border-indigo-100 dark:border-indigo-500/30'
                                 : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-100'
                                 }`}

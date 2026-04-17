@@ -40,9 +40,9 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
         setFilter('brandId', newBrands.join(','));
     };
 
-    const sidebarClass = isMobile 
-        ? "bg-white dark:bg-gray-900 px-4 pb-10" 
-        : "bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-100/50 dark:shadow-black/20 p-8 sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto overscroll-contain custom-scrollbar";
+    const sidebarClass = isMobile
+        ? "bg-white dark:bg-gray-900 px-4 pb-10"
+        : "bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-100/50 dark:shadow-black/20 p-8 h-full overflow-y-auto overscroll-contain custom-scrollbar";
 
     return (
         <div className={sidebarClass}>
@@ -75,7 +75,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                 setFilter('category', '');
                                 setFilter('subCategory', '');
                             }}
-                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-gray-900 text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
+                            className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${!filters.category ? 'bg-gray-900 !text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:!text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
                         >
                             All Pieces
                         </button>
@@ -88,7 +88,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                                             setFilter('category', cat._id);
                                             setFilter('subCategory', ''); // Clear subcategory when changing category
                                         }}
-                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-gray-900 text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
+                                        className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${isCategoryActive ? 'bg-gray-900 !text-white shadow-xl shadow-gray-200 dark:bg-gray-100 dark:!text-gray-900 dark:shadow-gray-900/40' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}`}
                                     >
                                         {cat.name}
                                     </button>
@@ -150,7 +150,7 @@ export default function FiltersSidebar({ filters, setFilter, clearFilters, hasAc
                         </div>
                         <button
                             type="submit"
-                            className="w-full py-4 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black dark:hover:bg-white hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-900/40 transition-all duration-300 active:scale-95"
+                            className="w-full py-4 rounded-xl bg-gray-900 dark:bg-gray-100 !text-white dark:!text-gray-900 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black dark:hover:bg-white hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-900/40 transition-all duration-300 active:scale-95"
                         >
                             Update Range
                         </button>

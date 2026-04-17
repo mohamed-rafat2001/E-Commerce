@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MenuIcon, CloseIcon, HeartIcon, StoreIcon, HomeIcon } from '../../constants/icons.jsx';
+import { MenuIcon, CloseIcon, HeartIcon, StoreIcon } from '../../constants/icons.jsx';
 import DropdownMenu from './DropdownMenu.jsx';
 import useCurrentUser from '../../../features/user/hooks/useCurrentUser.js';
 import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
@@ -84,7 +84,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 	return (
 		<nav className="flex items-center" aria-label="Main Navigation">
 			{/* Desktop Navigation */}
-			<div className="hidden lg:flex items-center gap-1 xl:gap-4">
+			<div className="hidden lg:flex items-center gap-1 xl:gap-2">
 				{/* Dropdowns */}
 				<DropdownMenu
 					label="Brands"
@@ -115,8 +115,8 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							key={link.name}
 							to={link.path}
 							className={({ isActive }) => `
-								px-3 py-2 text-sm font-medium transition-all duration-200 relative
-								${isActive ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}
+								inline-flex items-center h-10 px-2.5 xl:px-3.5 rounded-xl text-xs xl:text-sm font-semibold leading-none whitespace-nowrap select-none transition-all duration-150 relative
+								${isActive ? 'text-gray-900 dark:text-gray-100 bg-gray-100/70 dark:bg-gray-800/60' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/60 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800/60'}
 							`}
 						>
 							{({ isActive }) => (
@@ -169,7 +169,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 							animate={{ x: 0 }}
 							exit={{ x: '100%' }}
 							transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-							className="fixed right-0 top-0 h-full w-[300px] bg-white dark:bg-gray-900 z-[130] shadow-2xl lg:hidden flex flex-col border-l border-gray-100 dark:border-gray-700"
+							className="fixed right-0 top-0 h-full w-[320px] max-w-[92vw] bg-white dark:bg-gray-900 z-[130] shadow-2xl lg:hidden flex flex-col border-l border-gray-100 dark:border-gray-700"
 						>
 							{/* Drawer Header */}
 							<div className="shrink-0 flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
@@ -236,7 +236,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										to={link.path}
 										onClick={() => setIsMobileMenuOpen(false)}
 										className={({ isActive }) =>
-											"flex items-center px-4 py-3 rounded-xl font-bold transition-all " +
+											"flex items-center min-h-[48px] px-4 py-3 rounded-xl text-sm font-bold transition-all " +
 											(isActive
 												? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300"
 												: "text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700")
@@ -254,7 +254,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 										to={`/${userRole?.toLowerCase()}/dashboard`}
 										onClick={() => setIsMobileMenuOpen(false)}
 										className="w-full text-center py-3 px-4 rounded-xl bg-gray-900 dark:bg-gray-100
-											text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[44px]
+											text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[48px]
 											flex items-center justify-center"
 									>
 										My Dashboard
@@ -266,7 +266,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 											onClick={() => setIsMobileMenuOpen(false)}
 											className="w-full text-center py-3 px-4 rounded-xl border-2
 												border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 font-semibold text-sm
-												hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900 transition-colors min-h-[44px]
+												hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900 transition-colors min-h-[48px]
 												flex items-center justify-center"
 										>
 											Login
@@ -275,7 +275,7 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 											to="/register"
 											onClick={() => setIsMobileMenuOpen(false)}
 											className="w-full text-center py-3 px-4 rounded-xl bg-gray-900 dark:bg-gray-100
-												text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[44px]
+												text-white dark:text-gray-900 font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors min-h-[48px]
 												flex items-center justify-center"
 										>
 											Get Started

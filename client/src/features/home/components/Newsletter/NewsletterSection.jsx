@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSend, FiCheckCircle } from 'react-icons/fi';
 import { Button } from '../../../../shared/ui';
@@ -51,7 +51,7 @@ const NewsletterSection = () => {
                                     />
                                     <Button
                                         type="submit"
-                                        className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-indigo-50 font-black px-10 py-5 rounded-2xl shadow-xl flex items-center justify-center gap-2"
+                                        className="w-full sm:w-auto !bg-white !text-indigo-600 hover:!bg-indigo-50 font-black px-10 py-5 rounded-2xl shadow-xl flex items-center justify-center gap-2"
                                     >
                                         Subscribe <FiSend />
                                     </Button>

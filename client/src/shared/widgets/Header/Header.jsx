@@ -104,16 +104,16 @@ const Header = ({ isPanel = false }) => {
 		>
 			{/* Glassmorphism header */}
 			<div className={`${isPanel ? 'bg-white/70 dark:bg-gray-900/70 border-b border-gray-100/70 dark:border-gray-700/70' : 'bg-white/80 dark:bg-gray-900/80 border-b border-gray-100/50 dark:border-gray-800/50'} backdrop-blur-xl shadow-sm transition-colors duration-300`}>
-				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 ${isPanel ? 'pt-4' : ''}`}>
-					<div className="flex items-center justify-between h-20">
+				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-5 xl:px-10 ${isPanel ? 'pt-4' : ''}`}>
+					<div className="flex items-center justify-between h-18 xl:h-20 gap-3 xl:gap-4">
 						{/* Logo & Brand */}
 						{isPanel ? (
 							<div />
 						) : (
-							<div className="flex items-center gap-8">
+							<div className="flex items-center gap-3 xl:gap-8 min-w-0">
 								<Link to="/" className="flex items-center gap-2 group">
 									<img src="/logo.png" alt="ShopyNow Logo" className="h-8 w-auto mix-blend-multiply dark:mix-blend-normal object-contain" />
-									<span className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tighter">
+									<span className="hidden xl:inline text-2xl font-black text-gray-900 dark:text-white font-display tracking-tighter">
 										ShopyNow
 									</span>
 								</Link>
@@ -126,11 +126,11 @@ const Header = ({ isPanel = false }) => {
 						)}
 
 						{/* Right hand Side: Search + Icons */}
-						<div className="flex items-center gap-6">
+						<div className="flex items-center gap-1.5 lg:gap-2 xl:gap-3 shrink-0">
 							<ThemeToggle />
 							{/* Search Bar - hidden on mobile */}
 							{!isPanel && (
-								<div className="hidden xl:flex w-full min-w-[300px]">
+								<div className="hidden 2xl:flex w-full min-w-[260px]">
 									<div className="relative w-full">
 										<input
 											type="text"
@@ -158,7 +158,7 @@ const Header = ({ isPanel = false }) => {
 							)}
 
 							{(userRole === 'Customer' || !isAuthenticated) && (
-								<div className="flex items-center gap-2">
+								<div className="flex items-center gap-1.5 xl:gap-2">
 									{/* Wishlist */}
 									<div className="relative" ref={wishlistRef}>
 										<motion.button
@@ -166,7 +166,7 @@ const Header = ({ isPanel = false }) => {
 												setIsWishlistOpen(!isWishlistOpen);
 												setIsCartOpen(false);
 											}}
-											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
+											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
 											aria-label="Wishlist"
@@ -187,7 +187,7 @@ const Header = ({ isPanel = false }) => {
 												setIsCartOpen(!isCartOpen);
 												setIsWishlistOpen(false);
 											}}
-											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
+											className="relative p-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
 											whileHover={{ scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
 											aria-label="Shopping cart"
@@ -258,14 +258,22 @@ const Header = ({ isPanel = false }) => {
 									</AnimatePresence>
 								</div>
 							) : (
-								<div className="hidden md:flex items-center gap-3 font-sans">
+								<div className="hidden md:flex items-center gap-1.5 xl:gap-2 font-sans shrink-0">
 									<Link to="/login">
-										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100 whitespace-nowrap">
+										<Button
+											variant="ghost"
+											size="sm"
+											className="rounded-full px-3.5 lg:px-4 xl:px-5 text-xs xl:text-sm font-semibold leading-none tracking-normal !text-gray-900 dark:!text-gray-100 hover:text-gray-900 border border-gray-300 dark:border-gray-700 whitespace-nowrap min-w-[84px] xl:min-w-[92px]"
+										>
 											Login
 										</Button>
 									</Link>
 									<Link to="/register">
-										<Button variant="primary" size="sm" className="rounded-full px-6 shadow-xl hover:bg-black hover:text-white transition-all active:scale-95 whitespace-nowrap">
+										<Button
+											variant="primary"
+											size="sm"
+											className="rounded-full px-3.5 lg:px-4 xl:px-5 text-xs xl:text-sm leading-none tracking-[0.08em] !text-white shadow-xl hover:bg-black hover:text-white transition-all active:scale-95 whitespace-nowrap min-w-[108px] xl:min-w-[120px]"
+										>
 											Get Started
 										</Button>
 									</Link>

@@ -1,14 +1,23 @@
-import React from 'react';
-
 const variants = {
-	primary: "bg-gray-900 text-white hover:bg-gray-800 dark:bg-primary-500 dark:hover:bg-primary-400 dark:text-white shadow-xl transition-all duration-300 uppercase font-black tracking-widest",
-	secondary: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 transition-all duration-300 uppercase font-black tracking-widest",
-	accent: "bg-accent text-gray-900 border border-accent hover:bg-gray-900 hover:text-white dark:bg-accent-dark dark:hover:bg-white dark:hover:text-gray-900 shadow-lg transition-all duration-300 uppercase font-black tracking-widest",
-	outline: "bg-transparent border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-all duration-300 uppercase font-black tracking-widest",
-	ghost: "bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white transition-all duration-200 font-bold",
-	danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 shadow-sm uppercase font-black tracking-widest",
-	success: "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 shadow-sm uppercase font-black tracking-widest",
-	premium: "bg-gray-900 text-white hover:bg-gray-800 dark:bg-primary-600 dark:hover:bg-primary-500 shadow-xl transition-all duration-300 font-black uppercase tracking-[0.2em]"
+	primary: "bg-gray-900 hover:bg-gray-800 hover:text-white dark:bg-primary-500 dark:hover:bg-primary-400 dark:hover:text-white shadow-xl transition-all duration-300 uppercase font-black tracking-widest",
+	secondary: "bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white transition-all duration-300 uppercase font-black tracking-widest",
+	accent: "bg-accent border border-accent hover:bg-gray-900 hover:text-white dark:bg-accent-dark dark:hover:bg-white dark:hover:text-gray-900 shadow-lg transition-all duration-300 uppercase font-black tracking-widest",
+	outline: "bg-transparent border-2 border-gray-900 hover:bg-gray-900 hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-gray-900 transition-all duration-300 uppercase font-black tracking-widest",
+	ghost: "bg-transparent hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-all duration-200 font-bold",
+	danger: "bg-red-600 hover:bg-red-700 hover:text-white dark:bg-red-500 dark:hover:bg-red-600 dark:hover:text-white shadow-sm uppercase font-black tracking-widest",
+	success: "bg-emerald-600 hover:bg-emerald-700 hover:text-white dark:bg-emerald-500 dark:hover:bg-emerald-600 dark:hover:text-white shadow-sm uppercase font-black tracking-widest",
+	premium: "bg-gray-900 hover:bg-gray-800 hover:text-white dark:bg-primary-600 dark:hover:bg-primary-500 dark:hover:text-white shadow-xl transition-all duration-300 font-black uppercase tracking-[0.2em]"
+};
+
+const variantTextColors = {
+	primary: "text-white dark:text-white",
+	secondary: "text-gray-900 dark:text-white",
+	accent: "text-gray-900 dark:text-white",
+	outline: "text-gray-900 dark:text-white",
+	ghost: "text-gray-600 dark:text-gray-300",
+	danger: "text-white dark:text-white",
+	success: "text-white dark:text-white",
+	premium: "text-white dark:text-white"
 };
 
 const sizes = {
@@ -31,11 +40,21 @@ const Button = ({
 	...props
 }) => {
 	const activeLoading = isLoading || loading;
+	const isBaseTextColorToken = (token) =>
+		/^!?text-(?:white|black|transparent|current|primary|accent|(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3})$/.test(token);
+	const hasCustomBaseTextColor = className
+		.split(/\s+/)
+		.some((token) => {
+			if (!token) return false;
+			if (token.includes(':')) return false; // ignore hover:, dark:, md:, etc.
+			return isBaseTextColorToken(token);
+		});
+	const resolvedTextColor = hasCustomBaseTextColor ? '' : (variantTextColors[variant] || variantTextColors.primary);
 
 	return (
 		<button
 			disabled={disabled || activeLoading}
-			className={`inline-flex items-center justify-center font-semibold transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${fullWidth ? 'w-full' : ''} ${className}`}
+			className={`inline-flex items-center justify-center font-semibold transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant] || variants.primary} ${resolvedTextColor} ${sizes[size] || sizes.md} ${fullWidth ? 'w-full' : ''} ${className}`}
 			{...props}
 		>
 			{activeLoading ? (
