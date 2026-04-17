@@ -104,15 +104,15 @@ const Header = ({ isPanel = false }) => {
 
 	return (
 		<motion.header
-			className={`${isPanel ? 'sticky top-0' : 'fixed top-0 left-0 right-0'} z-50 w-full`}
+			className={`${isPanel ? 'fixed top-0 right-0 md:left-72 lg:left-80' : 'fixed top-0 left-0 right-0'} z-50 w-auto`}
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
 			transition={{ type: 'spring', stiffness: 260, damping: 20 }}
 		>
 			{/* Glassmorphism header */}
 			<div className={`${isPanel ? 'bg-white/70 dark:bg-gray-900/70 border-b border-gray-100/70 dark:border-gray-700/70' : 'bg-white/80 dark:bg-gray-900/80 border-b border-gray-100/50 dark:border-gray-800/50'} backdrop-blur-xl shadow-sm transition-colors duration-300`}>
-				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-5 xl:px-10 ${isPanel ? 'pt-4' : ''}`}>
-					<div className="flex items-center justify-between h-18 xl:h-20 gap-3 xl:gap-4">
+				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-5 xl:px-10 ${isPanel ? 'pt-0' : ''}`}>
+					<div className="flex items-center justify-between h-[88px] gap-3 xl:gap-4">
 						{/* Logo & Brand */}
 						{isPanel ? (
 							<div />

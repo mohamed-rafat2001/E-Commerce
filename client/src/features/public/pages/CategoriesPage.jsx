@@ -37,7 +37,7 @@ export default function CategoriesPage() {
 				description="Navigate explicitly curated categories to find the exact luxury item, high-tech piece, or apparel mapping your style."
 				canonical="/categories"
 			/>
-			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-16">
+			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-8 pb-16">
 				<Breadcrumbs items={[
 					{ name: 'Home', url: '/' },
 					{ name: 'Categories' },

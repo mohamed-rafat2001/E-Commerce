@@ -254,7 +254,7 @@ const SidebarBrand = ({ userRole }) => {
 	return (
 		<Link to="/">
 			<motion.div
-				className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 group cursor-pointer"
+				className="h-[88px] px-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 group cursor-pointer"
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 			>
@@ -327,7 +327,7 @@ const Sidebar = () => {
 					w-80 md:w-72 lg:w-80
 				`}
 				style={{
-					borderRadius: '0 24px 24px 0',
+					borderRadius: '0 0 24px 0',
 				}}
 			>
 				{/* Brand */}

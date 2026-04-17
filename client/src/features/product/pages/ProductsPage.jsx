@@ -67,7 +67,7 @@ export default function ProductsPage() {
 			<ScrollToTop />
 
 			{/* Page Header */}
-			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-12 md:pt-20">
+			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-8">
 				<Breadcrumbs items={breadcrumbItems} />
 				<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-10">
 					<div className="flex flex-col gap-2">

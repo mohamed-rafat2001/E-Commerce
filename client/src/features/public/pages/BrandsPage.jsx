@@ -37,7 +37,7 @@ export default function BrandsPage() {
 				description="Explore our complete, curated collection of the world's most innovative and luxurious brands."
 				canonical="/brands"
 			/>
-			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-16">
+			<div className="max-w-screen-xl mx-auto px-4 md:px-6 pt-6 md:pt-8 pb-16">
 				<Breadcrumbs items={[
 					{ name: 'Home', url: '/' },
 					{ name: 'Brands' },

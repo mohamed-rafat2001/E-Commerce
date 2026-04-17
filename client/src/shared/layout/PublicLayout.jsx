@@ -8,7 +8,7 @@ const PublicLayout = () => {
     return (
         <div className="min-h-dvh bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
             <Header />
-            <main className="flex-1">
+            <main className="flex-1 pt-[88px]">
                 <Outlet />
             </main>
             <footer role="contentinfo">
