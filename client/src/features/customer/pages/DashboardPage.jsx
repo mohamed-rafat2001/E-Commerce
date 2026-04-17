@@ -2,12 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { FiShoppingBag, FiHeart, FiClock, FiSettings } from 'react-icons/fi';
 import { PageHeader, StatCard, Card, DataTable, Badge, Button } from '../../../shared/ui';
 import useCurrentUser from '../../user/hooks/useCurrentUser';
-import useOrderHistory from '../hooks/useOrderHistory';
+import useOrderHistory from '../hooks/useOrderHistory.js';
+import useWishlist from '../../wishList/hooks/useWishlist.js';
 
 const CustomerDashboard = () => {
 	const navigate = useNavigate();
 	const { user } = useCurrentUser();
 	const { orders } = useOrderHistory();
+	const { wishlistItems } = useWishlist();
 
 	const ordersList = orders || [];
 	const pendingStatuses = new Set(['pending', 'processing']);
@@ -22,7 +24,7 @@ const CustomerDashboard = () => {
 		},
 		{
 			title: 'Wishlist Items',
-			value: '8',
+			value: (wishlistItems?.length || 0).toString(),
 			icon: <FiHeart />,
 			color: 'accent',
 			change: 'Updated today'
@@ -73,7 +75,7 @@ const CustomerDashboard = () => {
 	return (
 		<div className="space-y-8">
 			<PageHeader
-				title={`Welcome back, ${user?.firstName || 'User'}!`}
+				title={`Welcome back, ${user?.firstName || user?.userId?.firstName || 'User'}!`}
 				subtitle="Here's a quick overview of your account activity and recent purchases."
 			/>
 

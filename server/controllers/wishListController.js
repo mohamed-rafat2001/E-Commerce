@@ -29,7 +29,10 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 		if (itemIndex === -1) {
 			doc.items.push(req.params.id);
 		} else {
-			doc.items.splice(itemIndex, 1);
+			// Only toggle off if we are not forcing an add (e.g. merging from guest wishlist where we only want to ensure it's saved)
+			if (req.query.forceAdd !== 'true') {
+				doc.items.splice(itemIndex, 1);
+			}
 		}
 
 		// If items are populated, we need to extract the IDs before saving
@@ -39,6 +42,7 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 	// check if doc created
 	if (!doc) return next(new appError("doc not create", 400));
 	
+	// Pre-emptively clear cache before sending response
 	await invalidateCacheForModel(WishListModel, doc);
 	sendResponse(res, 200, doc);
 });

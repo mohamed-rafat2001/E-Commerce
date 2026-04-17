@@ -27,6 +27,7 @@ export default function useLogin() {
 		onSuccess: async (data) => {
 			if (typeof window !== "undefined") {
 				localStorage.setItem("hasAuthSession", "1");
+				window.dispatchEvent(new Event("authStateChanged"));
 			}
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 			queryClient.invalidateQueries({ queryKey: ["cart"] });

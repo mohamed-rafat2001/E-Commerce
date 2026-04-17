@@ -49,7 +49,7 @@ const BestSellersSection = () => {
                                 pagination={{ clickable: true, dynamicBullets: true }}
                                 autoplay={true}
                                 autoplayDelay={3600}
-                                loop={true}
+                                loop={products.length > 3}
                                 speed={700}
                                 slidesPerView={1.12}
                                 spaceBetween={14}

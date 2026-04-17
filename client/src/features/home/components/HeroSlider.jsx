@@ -11,7 +11,7 @@ const HeroSlider = ({ slides }) => {
                 autoplay={{ delay: 5000 }}
                 pagination={{ clickable: true, dynamicBullets: true }}
                 navigation={true}
-                loop={true}
+                loop={slides?.length > 1}
                 className="h-full w-full"
                 swiperClassName="h-full w-full"
             >

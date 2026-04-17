@@ -30,11 +30,11 @@ const ProductGallery = ({ images = [], productName = "Product", productId }) => 
   return (
     <div className="space-y-6">
       {/* Main Image Container */}
-      <div className="relative aspect-square rounded-[2.5rem] bg-gray-50 overflow-hidden group shadow-sm border border-gray-100">
+      <div className="relative aspect-square max-h-[450px] lg:max-h-[550px] mx-auto w-full md:w-4/5 lg:w-full rounded-[2.5rem] bg-gray-50 overflow-hidden group shadow-sm border border-gray-100 flex items-center justify-center">
         <img
           src={mainImage}
           alt={productName}
-          className="w-full h-full object-cover transition-opacity duration-500 ease-in-out"
+          className="w-full h-full object-contain p-4 mix-blend-multiply transition-opacity duration-500 ease-in-out"
           key={activeIndex} // Force re-mount for opacity transition effect
         />
 

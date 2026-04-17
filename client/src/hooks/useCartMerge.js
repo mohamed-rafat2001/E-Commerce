@@ -25,26 +25,27 @@ export default function useCartMerge() {
 				return;
 			}
 
+			previousAuthRef.current = true;
+
 			const guestCart = getGuestCart();
 			const guestItems = guestCart?.items || [];
-			if (!guestItems.length) {
-				previousAuthRef.current = isAuthenticated;
-				return;
-			}
+			if (!guestItems.length) return;
 
+            clearGuestCart();
+            
 			try {
-				await mergeGuestCart(guestItems);
-				if (!isCancelled) {
-					clearGuestCart();
-					queryClient.invalidateQueries({ queryKey: ["cart"] });
-					toast.success("Cart items saved to account!");
-				}
+				const newCart = await mergeGuestCart(guestItems);
+                
+                // Immediately update local cache to prevent React Query race conditions
+                const userId = queryClient.getQueryData(["user"])?.data?.data?.user?._id;
+                if (userId && newCart) {
+                    queryClient.setQueryData(["cart", userId], newCart);
+                }
+                
+                queryClient.invalidateQueries({ queryKey: ["cart"] });
+                toast.success("Cart items saved to account!");
 			} catch {
-				if (!isCancelled) {
-					toast.error("Failed to update cart");
-				}
-			} finally {
-				previousAuthRef.current = isAuthenticated;
+                toast.error("Failed to update cart");
 			}
 		};
 

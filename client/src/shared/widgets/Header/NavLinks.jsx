@@ -173,7 +173,10 @@ const NavLinks = ({ brands = [], categories = [] }) => {
 						>
 							{/* Drawer Header */}
 							<div className="shrink-0 flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
-								<span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tighter">ShopyNow</span>
+								<div className="flex items-center gap-2">
+									<img src="/logo.png" alt="ShopyNow Logo" className="h-6 w-auto mix-blend-multiply dark:mix-blend-normal object-contain" />
+									<span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tighter">ShopyNow</span>
+								</div>
 								<button
 									onClick={() => setIsMobileMenuOpen(false)}
 									className="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors

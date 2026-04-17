@@ -104,7 +104,7 @@ const Header = ({ isPanel = false }) => {
 		>
 			{/* Glassmorphism header */}
 			<div className={`${isPanel ? 'bg-white/70 dark:bg-gray-900/70 border-b border-gray-100/70 dark:border-gray-700/70' : 'bg-white/80 dark:bg-gray-900/80 border-b border-gray-100/50 dark:border-gray-800/50'} backdrop-blur-xl shadow-sm transition-colors duration-300`}>
-				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isPanel ? 'pt-4' : ''}`}>
+				<div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 ${isPanel ? 'pt-4' : ''}`}>
 					<div className="flex items-center justify-between h-20">
 						{/* Logo & Brand */}
 						{isPanel ? (
@@ -112,6 +112,7 @@ const Header = ({ isPanel = false }) => {
 						) : (
 							<div className="flex items-center gap-8">
 								<Link to="/" className="flex items-center gap-2 group">
+									<img src="/logo.png" alt="ShopyNow Logo" className="h-8 w-auto mix-blend-multiply dark:mix-blend-normal object-contain" />
 									<span className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tighter">
 										ShopyNow
 									</span>

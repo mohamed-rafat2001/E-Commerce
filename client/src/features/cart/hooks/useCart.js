@@ -204,7 +204,7 @@ export default function useCart() {
 	}, [cartItems]);
 
 	const cartItemCount = useMemo(() => {
-		return cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+		return cartItems.length;
 	}, [cartItems]);
 
 	return {

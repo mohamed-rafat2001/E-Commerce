@@ -49,8 +49,7 @@ const DashboardLayout = () => {
 				{/* Sidebar */}
 				<Sidebar />
 
-				{/* Main content area */}
-				<main className="flex-1 min-h-screen md:ml-0 min-w-0 overflow-x-hidden">
+				<main className="flex-1 min-h-screen md:ml-72 lg:ml-80 min-w-0 overflow-x-hidden">
 					{/* Header */}
 					<Header isPanel={true} />
 

@@ -36,7 +36,7 @@ const HeroSection = () => {
                 effect="fade"
                 speed={700}
                 autoplay={{ delay: 6000, disableOnInteraction: true, pauseOnMouseEnter: true }}
-                loop={true}
+                loop={slidesConfig?.length > 1}
                 pagination={{ clickable: true }}
                 className="h-full w-full"
                 swiperClassName="h-full w-full"

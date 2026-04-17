@@ -97,9 +97,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             ) : (
                                 /* Cart Items List */
                                 <div className="space-y-4">
-                                    {cartItems.map((item) => {
+                                    {cartItems.map((item, index) => {
                                         const product = item.item || item.itemId || item.productId || item;
-                                        const productId = product?._id || product?.id || item.product_id;
+                                        const productId = product?._id || product?.id || item.product_id || item._id || `cart-drawer-${index}`;
                                         return <CartItemCard key={productId} item={item} onClose={onClose} />;
                                     })}
                                 </div>

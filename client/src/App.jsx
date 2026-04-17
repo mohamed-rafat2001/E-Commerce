@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import AuthModal from "./components/auth/AuthModal.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import useCartMerge from "./hooks/useCartMerge.js";
+import useWishlistMerge from "./hooks/useWishlistMerge.js";
 
 const ReactQueryDevtools = import.meta.env.DEV
 	? lazy(() =>
@@ -25,6 +26,7 @@ const ReactQueryDevtools = import.meta.env.DEV
 
 function AppBoot() {
 	useCartMerge();
+	useWishlistMerge();
 	return (
 		<>
 			<RouterProvider router={router} />

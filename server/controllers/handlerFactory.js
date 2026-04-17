@@ -160,7 +160,7 @@ export const getOneByOwner = (Model) =>
 		}
 
 		let doc;
-		if (req.params.id === "user") {
+		if (!req.params.id || req.params.id === "user") {
 			doc = await Model.findOne({ userId });
 		} else {
 			doc = await Model.findOne({ _id: req.params.id, userId });

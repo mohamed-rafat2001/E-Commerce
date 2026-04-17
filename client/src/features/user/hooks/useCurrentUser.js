@@ -1,12 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState, useCallback } from "react";
 import { getMeFunc } from "../../auth/services/auth.js";
 
 /**
  * Get current user query
  */
 export default function useCurrentUser() {
-	const shouldFetchUser = useMemo(() => {
+	const queryClient = useQueryClient();
+
+	const [shouldFetchUser, setShouldFetchUser] = useState(() => {
 		if (typeof window === "undefined") return false;
 		const path = window.location.pathname;
 		const inProtectedArea =
@@ -16,7 +18,29 @@ export default function useCurrentUser() {
 			path.startsWith("/checkout") ||
 			path.startsWith("/orders");
 		return localStorage.getItem("hasAuthSession") === "1" || inProtectedArea;
-	}, []);
+	});
+
+	// Listen for auth state changes (login/logout events)
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+
+		const handleAuthChange = () => {
+			const hasSession = localStorage.getItem("hasAuthSession") === "1";
+			setShouldFetchUser(hasSession);
+			if (hasSession) {
+				queryClient.invalidateQueries({ queryKey: ["user"] });
+			}
+		};
+
+		window.addEventListener("authStateChanged", handleAuthChange);
+		window.addEventListener("storage", (e) => {
+			if (e.key === "hasAuthSession") handleAuthChange();
+		});
+
+		return () => {
+			window.removeEventListener("authStateChanged", handleAuthChange);
+		};
+	}, [queryClient]);
 
 	const {
 		data: response,
@@ -38,7 +62,7 @@ export default function useCurrentUser() {
 		},
 		staleTime: 5 * 60 * 1000,
 		refetchOnWindowFocus: false,
-		refetchOnMount: false,
+		refetchOnMount: true,
 		refetchOnReconnect: false,
 		retryOnMount: false,
 		// Ensure error state is caught immediately
@@ -58,6 +82,7 @@ export default function useCurrentUser() {
 		}
 		if (error?.response?.status === 401 || error?.response?.status === 403) {
 			localStorage.removeItem("hasAuthSession");
+			setShouldFetchUser(false);
 		}
 	}, [user, error]);
 
@@ -69,3 +94,4 @@ export default function useCurrentUser() {
 		error,
 	};
 }
+

@@ -86,6 +86,7 @@ const FooterSection = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-16 mb-20">
                     <div className="md:col-span-2">
                         <div className="flex items-center gap-3 mb-8">
+                            <img src="/logo.png" alt="ShopyNow Logo" className="h-10 w-auto object-contain brightness-0 invert" />
                             <span className="text-3xl font-black tracking-tight text-white font-display">
                                 ShopyNow
                             </span>

@@ -42,8 +42,9 @@ const CartPage = () => {
                         {/* Left Column: Cart Items List */}
                         <div className="flex-1 w-full space-y-4">
                             <AnimatePresence mode="popLayout">
-                                {cartItems.map((item) => {
-                                    const keyId = item.id || item._id;
+                                {cartItems.map((item, index) => {
+                                    const product = item.item || item.itemId || item.productId || item;
+                                    const keyId = product?._id || product?.id || item.product_id || item._id || `cart-item-${index}`;
                                     return (
                                         <motion.div
                                             key={keyId}

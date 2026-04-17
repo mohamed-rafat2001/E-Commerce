@@ -10,7 +10,7 @@ const BrandSlider = ({ brands }) => {
                 <Slider
                     spaceBetween={50}
                     slidesPerView={2}
-                    loop={true}
+                    loop={brands?.length > 6}
                     speed={3000}
                     navigation={false}
                     autoplay={{

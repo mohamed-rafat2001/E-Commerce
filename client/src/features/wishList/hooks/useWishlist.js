@@ -61,8 +61,16 @@ export default function useWishlist() {
 				await deleteFromWishlistApi(productId);
 				queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
 				toast.success('Removed from wishlist');
-			} catch {
-				toast.error('Failed to remove from wishlist');
+			} catch (err) {
+				// If 401/403, session expired — fall back to guest removal
+				if (err?.response?.status === 401 || err?.response?.status === 403) {
+					queryClient.invalidateQueries({ queryKey: ["user"] });
+					removeFromGuestWishlist(productId);
+					setGuestWishlist(getGuestWishlist());
+					toast.success('Removed from wishlist');
+				} else {
+					toast.error('Failed to remove from wishlist');
+				}
 			}
 		} else {
 			removeFromGuestWishlist(productId);
@@ -92,7 +100,7 @@ export default function useWishlist() {
 
 		const queryKey = ["wishlist", userId];
 		const previousWishlist = queryClient.getQueryData(queryKey);
-		const previousData = previousWishlist?.data?.data?.wishlist || previousWishlist?.data?.data || { items: [] };
+		const previousData = previousWishlist?.data?.data || { items: [] };
 		const previousItems = previousData?.items || [];
 		const currentlyInWishlist = previousItems.some((item) => {
 			const id = item?._id || item?.productId?._id || item?.productId || item;
@@ -100,7 +108,7 @@ export default function useWishlist() {
 		});
 
 		queryClient.setQueryData(queryKey, (old) => {
-			const wishlistData = old?.data?.data?.wishlist || old?.data?.data || { items: [] };
+			const wishlistData = old?.data?.data || { items: [] };
 			const currentItems = wishlistData?.items || [];
 			const normalized = currentItems.map((item) => item?._id || item?.productId?._id || item?.productId || item);
 			const nextItems = currentlyInWishlist
@@ -112,11 +120,8 @@ export default function useWishlist() {
 				data: {
 					...(old?.data || {}),
 					data: {
-						...(old?.data?.data || {}),
-						wishlist: {
-							...(wishlistData || {}),
-							items: nextItems,
-						},
+						...(wishlistData || {}),
+						items: nextItems,
 					},
 				},
 			};
@@ -131,9 +136,23 @@ export default function useWishlist() {
 			queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
 			toast.success(currentlyInWishlist ? "Removed from wishlist" : "Added to wishlist!");
 			return { success: true };
-		} catch {
+		} catch (err) {
 			if (previousWishlist) {
 				queryClient.setQueryData(queryKey, previousWishlist);
+			}
+			// If 401/403, session expired — fall back to guest wishlist and reset auth state
+			if (err?.response?.status === 401 || err?.response?.status === 403) {
+				queryClient.invalidateQueries({ queryKey: ["user"] });
+				const alreadyIn = isInGuestWishlist(productId);
+				if (alreadyIn) {
+					removeFromGuestWishlist(productId);
+					toast.success("Removed from wishlist");
+				} else {
+					addToGuestWishlist(product);
+					toast.success("Added to wishlist!");
+				}
+				setGuestWishlist(getGuestWishlist());
+				return { success: true };
 			}
 			toast.error("Failed to update wishlist");
 			return { success: false };
@@ -144,12 +163,13 @@ export default function useWishlist() {
 	const isInWishlist = useCallback((productId) => {
 		if (isAuthenticated) {
 			// For auth users, check the loaded wishlist data
-			const wishlistData = response?.data?.data?.wishlist || response?.data?.data;
+			const wishlistData = response?.data?.data;
 			const items = wishlistData?.items || [];
 
 			// Check if any item's _id matches the productId
+			// Items are populated product documents from the server
 			return items.some(item => {
-				const itemId = item._id || item.productId?._id || item.productId || item.product_id;
+				const itemId = item?._id || item?.productId?._id || item?.productId || item?.product_id || item;
 				return String(itemId) === String(productId);
 			});
 		} else {
@@ -158,7 +178,7 @@ export default function useWishlist() {
 		}
 	}, [isAuthenticated, response]);
 
-	const wishlist = isAuthenticated ? (response?.data?.data?.wishlist || response?.data?.data) : guestWishlist;
+	const wishlist = isAuthenticated ? response?.data?.data : guestWishlist;
 
 	return {
 		wishlist,
