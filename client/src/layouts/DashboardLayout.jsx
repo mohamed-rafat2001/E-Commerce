@@ -8,7 +8,7 @@ import ScrollToTop from '../shared/components/ScrollToTop.jsx';
 import useLenis from '../hooks/useLenis.js';
 
 const DashboardLayout = () => {
-	useLenis();
+	useLenis({ smooth: true });
 	const { userRole } = useCurrentUser();
 	const roleTheme = roleThemes[userRole] || roleThemes.Customer;
 
