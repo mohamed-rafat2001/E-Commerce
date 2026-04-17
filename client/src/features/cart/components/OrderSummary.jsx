@@ -7,11 +7,11 @@ import { Button } from '../../../shared/ui/index.js';
  * @param {function} onCheckout - Action to perform on checkout click
  * @param {object} calculations - Financial calculations passed from parent
  */
-const OrderSummary = ({ onCheckout, calculations }) => {
+const OrderSummary = ({ onCheckout, calculations, isPanel = false }) => {
     const isEmpty = calculations.subtotal === 0;
 
     return (
-        <div className="sticky top-24 bg-white p-8 rounded-3xl border border-gray-100 shadow-xl space-y-8 h-fit">
+        <div className={`${isPanel ? 'sticky top-28 p-6' : 'sticky top-24 p-8'} bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl space-y-6 h-fit`}>
             <h2 className="text-xl font-bold text-gray-900 tracking-tight">Order Summary</h2>
 
             {/* Promo Code Section */}

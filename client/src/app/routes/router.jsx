@@ -170,7 +170,7 @@ const router = createBrowserRouter([
 					{ path: "paymentMethods", element: S(PaymentMethodsPage) },
 					{ path: "orderHistory", element: S(OrderHistoryPage) },
 					{ path: "products/:id", element: S(ProductDetailPage) },
-					{ path: "cart", element: S(CartPage) },
+					{ path: "cart", element: S(CartPage, { isPanel: true }) },
 					{ path: "wishlist", element: S(CustomerWishlistPage) },
 					{ path: "settings", element: S(SettingsPage) },
 				],

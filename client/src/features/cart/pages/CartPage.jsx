@@ -4,11 +4,12 @@ import OrderSummary from '../components/OrderSummary.jsx';
 import EmptyCart from '../components/EmptyCart.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartPage from '../hooks/useCartPage.js';
+import { PageHeader } from '../../../shared/ui/index.js';
 
 /**
  * Public Cart Page - Production-grade React component adhering to user spec
  */
-const CartPage = () => {
+const CartPage = ({ isPanel = false }) => {
     const {
         cartItems,
         calculations,
@@ -23,22 +24,29 @@ const CartPage = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
+        <div className={isPanel ? "font-sans min-h-[calc(100vh-200px)]" : "min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans"}>
+            <div className={isPanel ? "max-w-7xl mx-auto" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20"}>
                 {/* Header Section */}
-                <header className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3">
-                        Your Cart
-                    </h1>
-                    <p className="text-gray-500 dark:text-gray-400 font-medium text-lg tracking-tight">
-                        Review your selected pieces before finishing.
-                    </p>
-                </header>
+                {isPanel ? (
+                    <PageHeader 
+                        title="Your Cart"
+                        subtitle="Review your selected pieces before finishing."
+                    />
+                ) : (
+                    <header className="mb-12">
+                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3">
+                            Your Cart
+                        </h1>
+                        <p className="text-gray-500 dark:text-gray-400 font-medium text-lg tracking-tight">
+                            Review your selected pieces before finishing.
+                        </p>
+                    </header>
+                )}
 
                 {cartItems.length === 0 ? (
                     <EmptyCart />
                 ) : (
-                    <div className="flex flex-col lg:flex-row gap-12 items-start">
+                    <div className={isPanel ? "flex flex-col lg:flex-row gap-8 items-start" : "flex flex-col lg:flex-row gap-12 items-start"}>
                         {/* Left Column: Cart Items List */}
                         <div className="flex-1 w-full space-y-4">
                             <AnimatePresence mode="popLayout">
@@ -70,6 +78,7 @@ const CartPage = () => {
                             <OrderSummary
                                 onCheckout={handleCheckout}
                                 calculations={calculations}
+                                isPanel={isPanel}
                             />
                         </aside>
                     </div>
