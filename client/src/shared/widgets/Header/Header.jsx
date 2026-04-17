@@ -260,12 +260,12 @@ const Header = ({ isPanel = false }) => {
 							) : (
 								<div className="hidden md:flex items-center gap-3 font-sans">
 									<Link to="/login">
-										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100">
+										<Button variant="ghost" size="sm" className="rounded-full px-6 font-bold text-gray-700 hover:text-gray-900 border border-gray-100 whitespace-nowrap">
 											Login
 										</Button>
 									</Link>
 									<Link to="/register">
-										<Button variant="primary" size="sm" className="rounded-full px-6 shadow-xl hover:bg-black hover:text-white transition-all active:scale-95">
+										<Button variant="primary" size="sm" className="rounded-full px-6 shadow-xl hover:bg-black hover:text-white transition-all active:scale-95 whitespace-nowrap">
 											Get Started
 										</Button>
 									</Link>
