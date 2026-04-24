@@ -6,6 +6,7 @@ import OrderItemsModel from "../models/OrderItemsModel.js";
 import SellerModel from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
 import { validateCartForCheckout } from "./cartService.js";
+import { enrichProductsWithDiscounts, resolveShippingDiscount, incrementUsage } from "./discountService.js";
 
 // Shipping fee thresholds
 const SHIPPING_FREE_THRESHOLD = 500;
@@ -81,6 +82,12 @@ const processOrderCreation = async ({
         throw new appError(stockErrors.join("; "), 400);
     }
 
+    // Enrich all locked products with live discount info
+    const enrichedProductArr = await enrichProductsWithDiscounts(Object.values(productDataMap));
+    enrichedProductArr.forEach(p => {
+        productDataMap[p._id.toString()] = p;
+    });
+
     // Step 4 — Group items by seller
     const itemsBySeller = {};
 
@@ -97,10 +104,20 @@ const processOrderCreation = async ({
             itemsBySeller[sellerUserId] = [];
         }
 
+        // Calculate unit price considering the active discount
+        const originalUnitPrice = product.price?.amount || 0;
+        const unitPrice = product.activeDiscount ? product.activeDiscount.discountedPrice : originalUnitPrice;
+        const discountSavings = (originalUnitPrice - unitPrice) * cartItem.quantity;
+        
         itemsBySeller[sellerUserId].push({
             item: productId,
             quantity: cartItem.quantity,
-            price: cartItem.price || { amount: (product.price?.amount || 0) * cartItem.quantity, currency: product.price?.currency || "USD" },
+            price: { amount: originalUnitPrice * cartItem.quantity, currency: product.price?.currency || "USD" },
+            appliedUnitPrice: unitPrice,
+            productOriginalPrice: originalUnitPrice,
+            discountSavings,
+            activeDiscount: product.activeDiscount,
+            productObj: product,
             productName: product.name,
             productImage: product.coverImage,
         });
@@ -117,15 +134,53 @@ const processOrderCreation = async ({
 
         const sellerId = seller ? seller._id : sellerUserId;
 
-        // Calculate subtotal from item prices
+        // Calculate subtotal from original item prices
         const currency = items[0]?.price?.currency || "USD";
-        const subtotal = items.reduce(
+        const totalOriginalPrice = items.reduce(
             (sum, item) => sum + (item.price?.amount || 0),
             0
         );
 
-        const shippingFee = calculateShippingFee(subtotal);
+        // Gather total item savings and applied discount IDs
+        let itemSavings = 0;
+        const appliedDiscounts = new Set();
+        
+        items.forEach(item => {
+            itemSavings += item.discountSavings || 0;
+            if (item.activeDiscount?.discountId) {
+                appliedDiscounts.add(item.activeDiscount.discountId.toString());
+            }
+        });
+
+        const subtotal = totalOriginalPrice - itemSavings;
+
+        // Resolve shipping discount for this seller's part of the order
+        const productsInOrder = items.map(i => i.productObj);
+        const resolvedShippingDiscount = await resolveShippingDiscount(productsInOrder, subtotal);
+        
+        let shippingFee = calculateShippingFee(subtotal);
+        let shippingSavings = 0;
+
+        if (resolvedShippingDiscount) {
+            appliedDiscounts.add(resolvedShippingDiscount.discount._id.toString());
+            if (resolvedShippingDiscount.type === "free_shipping") {
+                shippingSavings = shippingFee;
+                shippingFee = 0;
+            } else if (resolvedShippingDiscount.type === "shipping_discount") {
+                shippingSavings = Math.min(shippingFee, resolvedShippingDiscount.shippingSavings);
+                shippingFee = Math.max(0, shippingFee - shippingSavings);
+            }
+        }
+
         const orderId = new mongoose.Types.ObjectId();
+
+        // Register Usage for Discounts
+        if (appliedDiscounts.size > 0) {
+            for (const dId of appliedDiscounts) {
+                // Background increment is fine here, or await it
+                incrementUsage(dId).catch(console.error);
+            }
+        }
 
         const orderItemsDoc = await OrderItemsModel.create(
             [
@@ -150,7 +205,10 @@ const processOrderCreation = async ({
             paymentMethod,
             shippingPrice: { amount: shippingFee, currency },
             taxPrice: { amount: 0, currency },
-            itemsPrice: { amount: subtotal, currency },
+            itemsPrice: { amount: totalOriginalPrice, currency },
+            discountAmount: { amount: itemSavings, currency },
+            shippingDiscountAmount: { amount: shippingSavings, currency },
+            appliedDiscounts: Array.from(appliedDiscounts),
             totalPrice: { amount: subtotal + shippingFee, currency },
             status: "Pending",
             isPaid: false,

@@ -13,6 +13,7 @@ import {
 	invalidateCacheForModel
 } from "../utils/cache.js";
 import { validateProductReferences } from "../utils/productValidation.js";
+import { enrichProductsWithDiscounts } from "../services/discountService.js";
 
 // ===================================================================
 // Generic CRUD Factory Controllers
@@ -239,8 +240,13 @@ export const getById = (Model) =>
 			if (cached) return sendResponse(res, 200, cached);
 		}
 
-		const doc = await Model.findById(req.params.id);
+		let doc = await Model.findById(req.params.id);
 		if (!doc) return next(new appError("Document not found", 404));
+
+		if (Model.modelName === "ProductModel") {
+			const enriched = await enrichProductsWithDiscounts([doc]);
+			doc = enriched[0];
+		}
 
 		if (cacheKey && config) {
 			await setCache(cacheKey, doc, config.ttl);
@@ -299,11 +305,16 @@ export const getAll = (Model) =>
 			.search(Model.schema);
 		const totalDocs = await countFeatures.query.countDocuments();
 
+		let finalDocs = docs;
+		if (Model.modelName === "ProductModel") {
+			finalDocs = await enrichProductsWithDiscounts(docs);
+		}
+
 		const responseData = {
 			status: "success",
-			results: docs.length,
+			results: finalDocs.length,
 			total: totalDocs,
-			data: docs,
+			data: finalDocs,
 		};
 
 		if (cacheKey && config) {

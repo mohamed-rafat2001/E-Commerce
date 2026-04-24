@@ -63,6 +63,10 @@ const OrdersPage = lazy(() => import("../../features/order/pages/OrdersPage.jsx"
 const OrderDetailPage = lazy(() => import("../../features/order/pages/OrderDetailPage.jsx"));
 const OrderSuccessPage = lazy(() => import("../../features/order/pages/OrderSuccessPage.jsx"));
 
+// Discount pages
+const SellerDiscountsPage = lazy(() => import("../../features/discount/pages/SellerDiscountsPage.jsx"));
+const AdminDiscountsPage = lazy(() => import("../../features/discount/pages/AdminDiscountsPage.jsx"));
+
 // UI Components (lightweight, can be eagerly loaded)
 import PageNotFound from "../../shared/ui/PageNotFound.jsx";
 
@@ -136,6 +140,7 @@ const router = createBrowserRouter([
 					{ path: "analytics", element: S(AdminAnalyticsPage) },
 					{ path: "categories", element: S(CategoriesAndSubCategoriesPage) },
 					{ path: "brands", element: S(AdminBrandsPage) },
+					{ path: "discounts", element: S(AdminDiscountsPage) },
 				],
 			},
 		],
@@ -159,6 +164,7 @@ const router = createBrowserRouter([
 					{ path: "brands", element: S(BrandsManagementPage) },
 					{ path: "brands/:id", element: S(SellerBrandDetailsPage) },
 					{ path: "analytics", element: S(SellerAnalyticsPage) },
+					{ path: "discounts", element: S(SellerDiscountsPage) },
 				],
 			},
 		],

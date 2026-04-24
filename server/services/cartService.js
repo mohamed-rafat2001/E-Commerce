@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import CartModel from "../models/CartModel.js";
 import ProductModel from "../models/ProductModel.js";
 import appError from "../utils/appError.js";
+import { enrichProductsWithDiscounts } from "./discountService.js";
 
 /**
  * Get the user's cart, enriched with live product availability data.
@@ -16,10 +17,27 @@ export const getCart = async (userId) => {
         };
     }
 
+    // Extract populated products to enrich them with discounts
+    const productsToEnrich = cart.items.map(item => item.item).filter(Boolean);
+    const enrichedProducts = await enrichProductsWithDiscounts(productsToEnrich);
+    
+    // Map the enriched products by ID
+    const enrichedProductMap = {};
+    for (const p of enrichedProducts) {
+        enrichedProductMap[p._id.toString()] = p;
+    }
+
     // Enrich each item with live product data
     const enrichedItems = cart.items.map((cartItem) => {
-        const product = cartItem.item; // populated by pre-find hook
+        let product = cartItem.item; // populated by pre-find hook
+        if (product && product._id) {
+            // Swap out the plain product for the discount-enriched product
+            product = enrichedProductMap[product._id.toString()] || product;
+        }
+
         const itemObj = cartItem.toObject ? cartItem.toObject() : { ...cartItem };
+        // Attach the enriched product representation exactly where the frontend expects
+        itemObj.item = product;
 
         if (!product || !product._id) {
             // Product was deleted

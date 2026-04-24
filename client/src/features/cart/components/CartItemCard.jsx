@@ -9,7 +9,11 @@ import QuantityStepper from './QuantityStepper.jsx';
 const CartItemCard = ({ item, onRemove, onUpdateQuantity }) => {
     const product = item.item || item.itemId || item.productId || item;
     const productId = product?._id || product?.id || item.product_id || item.id;
-    const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
+    
+    const activeDiscount = product?.activeDiscount;
+    const basePrice = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
+    const unitPrice = activeDiscount ? activeDiscount.discountedPrice : basePrice;
+
     const name = product?.name || item.name;
     const image = product?.coverImage?.secure_url || product?.image?.secure_url || product?.image || item.image || "/placeholder-product.png";
 
@@ -68,8 +72,18 @@ const CartItemCard = ({ item, onRemove, onUpdateQuantity }) => {
 
                         {/* Item Total Price */}
                         <div className="text-right">
+                            {activeDiscount && (
+                                <div className="flex items-center justify-end gap-2 mb-0.5">
+                                    <span className="text-xs font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                                        {activeDiscount.badge}
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-400 line-through">
+                                        ${(basePrice * item.quantity).toFixed(2)}
+                                    </span>
+                                </div>
+                            )}
                             <p className="text-xl font-bold text-blue-600 tracking-tight">
-                                ${(price * item.quantity).toFixed(2)}
+                                ${(unitPrice * item.quantity).toFixed(2)}
                             </p>
                         </div>
                     </div>

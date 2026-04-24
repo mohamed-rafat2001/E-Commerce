@@ -9,6 +9,7 @@ import WishListModel from "../models/WishListModel.js";
 import ReviewsModel from "../models/ReviewsModel.js";
 import OrderModel from "../models/OrderModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
+import DiscountModel from "../models/DiscountModel.js";
 import appError from "../utils/appError.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -127,7 +128,20 @@ const models = {
 		model: OrderModel,
 		createFields: ["status", "isPaid", "paymentMethod"],
 		updateFields: ["status", "isPaid", "paymentMethod"],
-	}
+	},
+	discounts: {
+		model: DiscountModel,
+		createFields: [
+			"name", "description", "type", "value", "maxDiscountAmount",
+			"minOrderValue", "scope", "targetIds", "priority",
+			"startDate", "endDate", "isActive", "usageLimit",
+		],
+		updateFields: [
+			"name", "description", "type", "value", "maxDiscountAmount",
+			"minOrderValue", "scope", "targetIds", "priority",
+			"startDate", "endDate", "isActive", "usageLimit",
+		],
+	},
 };
 
 import BrandFollowerModel from "../models/BrandFollowerModel.js";

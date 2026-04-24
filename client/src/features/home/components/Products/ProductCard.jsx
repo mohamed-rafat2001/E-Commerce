@@ -16,6 +16,13 @@ const ProductCard = ({ product, index }) => {
     ].filter(Boolean);
     const productId = product._id || product.id || product.product_id;
 
+    // Handle Active Discount formatting
+    const activeDiscount = product.activeDiscount;
+    const price = activeDiscount ? activeDiscount.discountedPrice : (typeof product.price === 'object' ? product.price.amount : (product.price || 0));
+    const oldPrice = activeDiscount ? activeDiscount.originalPrice : (typeof product.oldPrice === 'object' ? product.oldPrice.amount : product.oldPrice);
+    const hasDiscount = oldPrice > price || !!activeDiscount;
+    const badgeText = activeDiscount ? activeDiscount.badge : `-${product.discount}%`;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -39,7 +46,7 @@ const ProductCard = ({ product, index }) => {
 
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
                         {product.isNew && <Badge variant="new">New</Badge>}
-                        {product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
+                        {(product.discount > 0 || activeDiscount) && <Badge variant="sale">{badgeText}</Badge>}
                     </div>
 
                     <div className="absolute top-4 right-4 z-10">
@@ -77,11 +84,11 @@ const ProductCard = ({ product, index }) => {
                     </Link>
                     <div className="flex items-center gap-3">
                         <span className="text-2xl font-black text-indigo-600">
-                            ${typeof product.price === 'object' ? product.price.amount : product.price}
+                            ${price.toFixed(2)}
                         </span>
-                        {product.oldPrice && (
+                        {hasDiscount && oldPrice > 0 && (
                             <span className="text-gray-400 line-through text-sm font-medium">
-                                ${typeof product.oldPrice === 'object' ? product.oldPrice.amount : product.oldPrice}
+                                ${oldPrice.toFixed(2)}
                             </span>
                         )}
                     </div>

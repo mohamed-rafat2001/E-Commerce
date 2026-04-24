@@ -11,6 +11,7 @@ import {
 import { getCache, setCache } from "../utils/cache.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
+import { enrichProductsWithDiscounts } from "../services/discountService.js";
 
 //  @desc   add new product
 // @Route  POST /api/v1/products
@@ -82,11 +83,13 @@ export const getProductsByBrand = catchAsync(async (req, res, next) => {
 	const cached = await getCache(cacheKey);
 	if (cached) return sendResponse(res, 200, cached);
 
-	const products = await ProductModel.find({
+	let products = await ProductModel.find({
 		brandId,
 		status: "active"
 	}).populate("subCategory", "name categoryId")
 		.populate("primaryCategory", "name");
+
+	products = await enrichProductsWithDiscounts(products);
 
 	await setCache(cacheKey, products, 600); // 10 minutes
 	sendResponse(res, 200, products);

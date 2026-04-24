@@ -46,6 +46,32 @@ const orderSchema = new mongoose.Schema(
 		itemsPrice: moneySchema,
 		taxPrice: moneySchema,
 		shippingPrice: moneySchema,
+		discountAmount: {
+			type: new mongoose.Schema(
+				{
+					amount: { type: Number, default: 0, min: 0 },
+					currency: { type: String, default: "USD", trim: true, uppercase: true },
+				},
+				{ _id: false }
+			),
+			default: () => ({ amount: 0, currency: "USD" }),
+		},
+		shippingDiscountAmount: {
+			type: new mongoose.Schema(
+				{
+					amount: { type: Number, default: 0, min: 0 },
+					currency: { type: String, default: "USD", trim: true, uppercase: true },
+				},
+				{ _id: false }
+			),
+			default: () => ({ amount: 0, currency: "USD" }),
+		},
+		appliedDiscounts: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "DiscountModel",
+			},
+		],
 		totalPrice: moneySchema,
 		isPaid: {
 			type: Boolean,

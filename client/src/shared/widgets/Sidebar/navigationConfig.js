@@ -26,6 +26,7 @@ export const roleNavigationConfig = {
         { label: 'Brands', path: 'brands', icon: TagIcon, description: 'Manage brands' },
         { label: 'Orders', path: 'orders', icon: OrderIcon, description: 'All order history' },
         { label: 'Analytics', path: 'analytics', icon: AnalyticsIcon, description: 'Sales & metrics' },
+        { label: 'Discounts', path: 'discounts', icon: TagIcon, description: 'Promotions & offers' },
     ],
     Seller: [
         { label: 'Dashboard', path: 'dashboard', icon: DashboardIcon, description: 'Store overview' },
@@ -34,6 +35,7 @@ export const roleNavigationConfig = {
         { label: 'Inventory', path: 'inventory', icon: ProductIcon, description: 'Manage listings' },
         { label: 'Orders', path: 'orders', icon: OrderIcon, description: 'Customer orders' },
         { label: 'Analytics', path: 'analytics', icon: AnalyticsIcon, description: 'Sales performance' },
+        { label: 'Discounts', path: 'discounts', icon: TagIcon, description: 'Promotions & sales' },
     ],
     Customer: [
         { label: 'Dashboard', path: 'dashboard', icon: DashboardIcon, description: 'Overview & statistics' },

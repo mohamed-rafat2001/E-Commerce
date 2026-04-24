@@ -22,10 +22,14 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
     const productId = product._id || product.id || product.product_id;
     const isWishlisted = isInWishlist(productId);
 
-    const price = typeof product.price === 'object' ? product.price.amount : (product.price || 0);
-    const oldPrice = typeof product.price?.oldAmount === 'number' ? product.price.oldAmount : (product.oldPrice?.amount || product.oldPrice);
-    const hasDiscount = oldPrice > price;
-    const discountPercent = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+    const activeDiscount = product.activeDiscount;
+    const price = activeDiscount ? activeDiscount.discountedPrice : (typeof product.price === 'object' ? product.price.amount : (product.price || 0));
+    const oldPrice = activeDiscount ? activeDiscount.originalPrice : (typeof product.price?.oldAmount === 'number' ? product.price.oldAmount : (product.oldPrice?.amount || product.oldPrice));
+
+    const hasDiscount = oldPrice > price || !!activeDiscount;
+    const discountPercent = activeDiscount && activeDiscount.type === 'percentage' 
+        ? activeDiscount.value 
+        : (hasDiscount && oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0);
 
     const brandName = product.brandId?.name || product.brand?.name || 'Curated Design';
 
@@ -33,6 +37,12 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
     let badge = null;
     if (product.countInStock === 0) {
         badge = <span className="bg-gray-800 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Out of Stock</span>;
+    } else if (activeDiscount) {
+        badge = (
+            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
+                {activeDiscount.badge}
+            </span>
+        );
     } else if (hasDiscount) {
         badge = <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">-{discountPercent}%</span>;
     }
@@ -96,7 +106,7 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
                 {badge && (
                     <div className="absolute top-6 left-6 z-10">
                         <div className="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
-                            {product.countInStock === 0 ? 'Out of Stock' : (hasDiscount ? `-${discountPercent}%` : 'New Arrival')}
+                            {product.countInStock === 0 ? 'Out of Stock' : (activeDiscount ? activeDiscount.badge : (hasDiscount ? `-${discountPercent}%` : 'New Arrival'))}
                         </div>
                     </div>
                 )}
@@ -125,9 +135,16 @@ const PublicProductCard = memo(function PublicProductCard({ product }) {
                             {product.name}
                         </h3>
                     </Link>
-                    <span className="text-xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Price: $${price.toFixed(0)}`}>
-                        ${price.toFixed(0)}
-                    </span>
+                    <div className="flex flex-col items-end">
+                        <span className="text-xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Price: $${price.toFixed(0)}`}>
+                            ${price.toFixed(0)}
+                        </span>
+                        {(hasDiscount || activeDiscount) && oldPrice > 0 && (
+                            <span className="text-sm font-medium text-gray-400 line-through" aria-label={`Original Price: $${oldPrice.toFixed(0)}`}>
+                                ${oldPrice.toFixed(0)}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Rating & Actions */}
