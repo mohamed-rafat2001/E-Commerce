@@ -8,7 +8,8 @@ import ProductTabs from '../components/ProductTabs.jsx';
 import useProductDetailPage from '../hooks/useProductDetailPage.js';
 import useRelatedProducts from '../hooks/useRelatedProducts.js';
 import { PublicProductCard } from '../../../shared/index.js';
-import SEO, { schemas } from '../../../shared/components/SEO.jsx';
+import SEO from '../../../shared/components/SEO.jsx';
+import { schemas } from '../../../shared/components/SEOSchemas.js';
 import Breadcrumbs from '../../../shared/components/Breadcrumbs.jsx';
 
 export default function ProductDetailPage() {

@@ -23,7 +23,7 @@ const NavLinks = () => {
     const { originalBrands: brands = [] } = useBrands();
     const { user, isAuthenticated, userRole } = useCurrentUser();
     const { items: wishlistItems = [] } = useWishlist(user?._id) || {};
-    const { cartItems = [], cartItemCount = 0 } = useCart();
+    const { cartItemCount = 0 } = useCart();
 
     // Mapping static configurations
     const navConfig = {

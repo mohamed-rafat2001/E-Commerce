@@ -7,9 +7,9 @@ import EmptyState from './EmptyState.jsx';
  * BrandsGrid - Refactored Mega-menu display for Brands
  */
 const BrandsGrid = memo(({ filteredItems, closeMenu, getEntityId }) => {
-    if (filteredItems.length === 0) return <EmptyState />;
-    
     const [hoveredId, setHoveredId] = useState(null);
+
+    if (filteredItems.length === 0) return <EmptyState />;
 
     return (
         <div className="space-y-4">

@@ -7,6 +7,18 @@ const orderSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
 		},
+		guestEmail: {
+			type: String,
+			trim: true,
+		},
+		guestName: {
+			type: String,
+			trim: true,
+		},
+		guestPhone: {
+			type: String,
+			trim: true,
+		},
 		sellerIds: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

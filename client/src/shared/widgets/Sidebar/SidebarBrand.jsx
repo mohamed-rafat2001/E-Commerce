@@ -1,13 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { roleThemes } from '../../constants/theme.js';
 
 /**
  * SidebarBrand - Dashboard branding section with role indicators
  */
 const SidebarBrand = ({ userRole }) => {
-    const roleTheme = roleThemes[userRole] || roleThemes.Customer;
-
     return (
         <Link to="/">
             <motion.div

@@ -34,6 +34,41 @@ export const checkout = catchAsync(async (req, res, next) => {
 	});
 });
 
+// @desc    Guest Checkout — create orders from provided cart items (no auth)
+// @access  Public
+export const guestCheckout = catchAsync(async (req, res, next) => {
+	const { shippingAddress, paymentMethod, notes, cartItems, guestEmail, guestName, guestPhone } = req.body;
+
+	if (!paymentMethod) {
+		return next(new appError("Payment method is required", 400));
+	}
+	if (!shippingAddress) {
+		return next(new appError("Shipping address is required", 400));
+	}
+	if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+		return next(new appError("Cart items are required for guest checkout", 400));
+	}
+	if (!guestEmail) {
+		return next(new appError("Email is required for guest checkout", 400));
+	}
+
+	const orders = await orderService.createOrdersFromGuestCart({
+		cartItems,
+		shippingAddress,
+		paymentMethod,
+		notes,
+		guestEmail,
+		guestName,
+		guestPhone,
+	});
+
+	res.status(201).json({
+		status: "success",
+		results: orders.length,
+		data: orders,
+	});
+});
+
 // @desc    Get logged-in customer's orders (with status filter and pagination)
 // @access  Private/Customer
 export const getMyOrders = catchAsync(async (req, res, next) => {

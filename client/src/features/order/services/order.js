@@ -4,6 +4,9 @@ import { addFunc, getFunc, updateFunc } from "../../../shared/services/handlerFa
 // Checkout — create orders from cart
 export const checkoutOrder = (orderData) => addFunc("orders/checkout", orderData);
 
+// Guest Checkout — create orders from provided cart items (no auth)
+export const guestCheckoutOrder = (orderData) => addFunc("orders/guest-checkout", orderData);
+
 // Get orders for customer (owner)
 export const getOrdersForCustomer = (params) =>
 	getFunc("orders/myorders", { params });

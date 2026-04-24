@@ -6,34 +6,16 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCart from './useCart';
-import useCurrentUser from '../../user/hooks/useCurrentUser.js';
-import useAuthGuard from '../../../hooks/useAuthGuard.js';
+import { calculateOrderTotals } from '../../order/utils/orderCalculations.js';
 
 const useCartPage = () => {
     const { cart, isLoading, updateQuantity, removeFromCart, clearCart: clearCartAction } = useCart();
-    const { isAuthenticated } = useCurrentUser();
-    const { requireAuth } = useAuthGuard();
     const navigate = useNavigate();
 
     const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
     const isLoadingItems = isLoading;
 
-    const calculations = useMemo(() => {
-        const subtotal = cartItems.reduce((acc, item) => {
-            const product = item.item || item.itemId || item.productId || item;
-            const price = typeof product.price === 'object' ? product.price.amount : (product.price || item.price || 0);
-            return acc + (price * (item.quantity || 1));
-        }, 0);
-
-        // Standardized financial logic
-        const discountAmount = 0; // Promo logic can be added here later
-        const taxableAmount = subtotal - discountAmount;
-        const tax = taxableAmount * 0.08;
-        const shipping = subtotal === 0 ? 0 : (subtotal > 500 ? 0 : 25);
-        const total = taxableAmount + tax + shipping;
-
-        return { subtotal, discountAmount, tax, shipping, total };
-    }, [cartItems]);
+    const calculations = useMemo(() => calculateOrderTotals(cartItems), [cartItems]);
 
     const handleQuantityChange = (productId, delta) => {
         const item = cartItems.find(i => {
@@ -49,14 +31,7 @@ const useCartPage = () => {
     };
 
     const handleCheckout = () => {
-        if (!isAuthenticated) {
-            requireAuth({
-                message: "You need an account to place an order",
-                redirectAfter: "/checkout",
-            });
-        } else {
-            navigate('/checkout');
-        }
+        navigate('/checkout');
     };
 
     return {

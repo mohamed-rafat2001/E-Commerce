@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiChevronRight, FiHome } from 'react-icons/fi';
-import { schemas } from './SEO.jsx';
+import { schemas } from './SEOSchemas.js';
 import { Helmet } from 'react-helmet-async';
 
 /**

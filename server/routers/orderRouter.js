@@ -1,6 +1,7 @@
 import express from "express";
 import {
 	checkout,
+	guestCheckout,
 	getMyOrders,
 	getMyOrder,
 	cancelOrder,
@@ -20,6 +21,51 @@ const router = express.Router();
  *   description: Order management API
  */
 
+// ========== PUBLIC ROUTES (no auth required) ==========
+
+/**
+ * @swagger
+ * /api/v1/orders/guest-checkout:
+ *   post:
+ *     summary: Guest checkout — create orders from provided cart items (no auth)
+ *     tags: [Orders]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [paymentMethod, shippingAddress, cartItems, guestEmail]
+ *             properties:
+ *               paymentMethod:
+ *                 type: string
+ *                 enum: [card, paypal, bank_transfer, cash_on_delivery, wallet]
+ *               shippingAddress:
+ *                 type: object
+ *               cartItems:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: string
+ *                     quantity:
+ *                       type: number
+ *               guestEmail:
+ *                 type: string
+ *               guestName:
+ *                 type: string
+ *               guestPhone:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Guest orders created successfully
+ */
+router.route("/guest-checkout").post(guestCheckout);
+
+// ========== PROTECTED ROUTES (auth required) ==========
 router.use(Protect);
 
 // ========== CUSTOMER ROUTES ==========

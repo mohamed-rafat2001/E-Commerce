@@ -37,6 +37,139 @@ const generateOrderNumber = () => {
 };
 
 /**
+ * Shared Helper: Process validated items, handle atomic inventory decrement, grouping by seller, and order creation.
+ */
+const processOrderCreation = async ({
+    validatedItems,
+    shippingAddress,
+    paymentMethod,
+    session,
+    userId,
+    guestEmail,
+    guestName,
+    guestPhone,
+}) => {
+    // Step 3 — Atomic inventory decrement
+    const stockErrors = [];
+    const productDataMap = {};
+
+    for (const { item, quantity } of validatedItems) {
+        const productId = item._id ? item._id.toString() : item.toString();
+
+        const updatedProduct = await ProductModel.findOneAndUpdate(
+            {
+                _id: productId,
+                countInStock: { $gte: quantity },
+            },
+            {
+                $inc: { countInStock: -quantity },
+            },
+            { new: true, session }
+        ).lean();
+
+        if (!updatedProduct) {
+            stockErrors.push(
+                `Insufficient stock for product "${productId}" (requested: ${quantity})`
+            );
+        } else {
+            productDataMap[productId] = updatedProduct;
+        }
+    }
+
+    if (stockErrors.length > 0) {
+        await session.abortTransaction();
+        throw new appError(stockErrors.join("; "), 400);
+    }
+
+    // Step 4 — Group items by seller
+    const itemsBySeller = {};
+
+    for (const cartItem of validatedItems) {
+        const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
+        const product = productDataMap[productId];
+
+        // Get the product's owner (seller) userId
+        const sellerUserId = product.userId?.toString();
+
+        if (!sellerUserId) continue;
+
+        if (!itemsBySeller[sellerUserId]) {
+            itemsBySeller[sellerUserId] = [];
+        }
+
+        itemsBySeller[sellerUserId].push({
+            item: productId,
+            quantity: cartItem.quantity,
+            price: cartItem.price || { amount: (product.price?.amount || 0) * cartItem.quantity, currency: product.price?.currency || "USD" },
+            productName: product.name,
+            productImage: product.coverImage,
+        });
+    }
+
+    // Step 5 — Build and save each order
+    const createdOrders = [];
+
+    for (const [sellerUserId, items] of Object.entries(itemsBySeller)) {
+        // Find the SellerModel document for this user (or fallback)
+        const seller = await SellerModel.findOne({ userId: sellerUserId })
+            .session(session)
+            .lean();
+
+        const sellerId = seller ? seller._id : sellerUserId;
+
+        // Calculate subtotal from item prices
+        const currency = items[0]?.price?.currency || "USD";
+        const subtotal = items.reduce(
+            (sum, item) => sum + (item.price?.amount || 0),
+            0
+        );
+
+        const shippingFee = calculateShippingFee(subtotal);
+        const orderId = new mongoose.Types.ObjectId();
+
+        const orderItemsDoc = await OrderItemsModel.create(
+            [
+                {
+                    orderId,
+                    sellerId,
+                    items: items.map((item) => ({
+                        item: item.item,
+                        quantity: item.quantity,
+                        price: item.price,
+                    })),
+                },
+            ],
+            { session }
+        );
+
+        const orderData = {
+            _id: orderId,
+            sellerIds: [sellerId],
+            items: [orderItemsDoc[0]._id],
+            shippingAddress,
+            paymentMethod,
+            shippingPrice: { amount: shippingFee, currency },
+            taxPrice: { amount: 0, currency },
+            itemsPrice: { amount: subtotal, currency },
+            totalPrice: { amount: subtotal + shippingFee, currency },
+            status: "Pending",
+            isPaid: false,
+            isDelivered: false,
+        };
+
+        if (userId) orderData.userId = userId;
+        if (guestEmail) orderData.guestEmail = guestEmail;
+        if (guestName) orderData.guestName = guestName;
+        if (guestPhone) orderData.guestPhone = guestPhone;
+
+        const [order] = await OrderModel.create([orderData], { session });
+        createdOrders.push(order);
+    }
+
+    return createdOrders;
+};
+
+/**
  * Create orders from the user's cart — the core checkout function.
  * All-or-nothing MongoDB transaction.
  */
@@ -55,125 +188,13 @@ export const createOrdersFromCart = async (
     session.startTransaction();
 
     try {
-        // Step 3 — Atomic inventory decrement
-        const stockErrors = [];
-        const productDataMap = {};
-
-        for (const cartItem of cart.items) {
-            const productId =
-                cartItem.item?._id?.toString() || cartItem.item?.toString();
-
-            const updatedProduct = await ProductModel.findOneAndUpdate(
-                {
-                    _id: productId,
-                    countInStock: { $gte: cartItem.quantity },
-                },
-                {
-                    $inc: { countInStock: -cartItem.quantity },
-                },
-                { new: true, session }
-            ).lean();
-
-            if (!updatedProduct) {
-                stockErrors.push(
-                    `Insufficient stock for product "${productId}" (requested: ${cartItem.quantity})`
-                );
-            } else {
-                productDataMap[productId] = updatedProduct;
-            }
-        }
-
-        if (stockErrors.length > 0) {
-            await session.abortTransaction();
-            throw new appError(stockErrors.join("; "), 400);
-        }
-
-        // Step 4 — Group items by seller
-        // Each product's seller is product.userId (the user who created the product)
-        const itemsBySeller = {};
-
-        for (const cartItem of cart.items) {
-            const productId =
-                cartItem.item?._id?.toString() || cartItem.item?.toString();
-            const product = productDataMap[productId];
-
-            // Get the product's owner (seller) userId
-            const sellerUserId = product.userId?.toString();
-
-            if (!sellerUserId) continue;
-
-            if (!itemsBySeller[sellerUserId]) {
-                itemsBySeller[sellerUserId] = [];
-            }
-
-            itemsBySeller[sellerUserId].push({
-                item: productId,
-                quantity: cartItem.quantity,
-                price: cartItem.price, // price snapshot locked at cart-add time
-                productName: product.name,
-                productImage: product.coverImage,
-            });
-        }
-
-        // Step 5 — Build and save each order
-        const createdOrders = [];
-
-        for (const [sellerUserId, items] of Object.entries(itemsBySeller)) {
-            // Find the SellerModel document for this user
-            const seller = await SellerModel.findOne({ userId: sellerUserId })
-                .session(session)
-                .lean();
-
-            const sellerId = seller ? seller._id : sellerUserId;
-
-            // Calculate subtotal from item price snapshots
-            const currency = items[0]?.price?.currency || "USD";
-            const subtotal = items.reduce(
-                (sum, item) => sum + (item.price?.amount || 0),
-                0
-            );
-
-            const shippingFee = calculateShippingFee(subtotal);
-
-            // Create the order ID first
-            const orderId = new mongoose.Types.ObjectId();
-
-            // Create OrderItems document for this seller
-            const orderItemsDoc = await OrderItemsModel.create(
-                [
-                    {
-                        orderId,
-                        sellerId,
-                        items: items.map((item) => ({
-                            item: item.item,
-                            quantity: item.quantity,
-                            price: item.price,
-                        })),
-                    },
-                ],
-                { session }
-            );
-
-            // Create the Order document
-            const orderData = {
-                _id: orderId,
-                userId,
-                sellerIds: [sellerId],
-                items: [orderItemsDoc[0]._id],
-                shippingAddress,
-                paymentMethod,
-                shippingPrice: { amount: shippingFee, currency },
-                taxPrice: { amount: 0, currency },
-                itemsPrice: { amount: subtotal, currency },
-                totalPrice: { amount: subtotal + shippingFee, currency },
-                status: "Pending",
-                isPaid: false,
-                isDelivered: false,
-            };
-
-            const [order] = await OrderModel.create([orderData], { session });
-            createdOrders.push(order);
-        }
+        const createdOrders = await processOrderCreation({
+            validatedItems: cart.items,
+            shippingAddress,
+            paymentMethod,
+            session,
+            userId,
+        });
 
         // Step 6 — Clear the cart inside the same transaction
         await CartModel.updateOne(
@@ -193,6 +214,96 @@ export const createOrdersFromCart = async (
         return createdOrders;
     } catch (error) {
         // Rollback on any error
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
+        throw error;
+    } finally {
+        session.endSession();
+    }
+};
+
+/**
+ * Create orders from guest cart items — no userId required.
+ * Uses the same seller-grouping and transaction logic as authenticated checkout.
+ * 
+ * @param {Object} params
+ * @param {Array} params.cartItems - Array of { product_id, quantity }
+ * @param {Object} params.shippingAddress
+ * @param {string} params.paymentMethod
+ * @param {string} params.notes
+ * @param {string} params.guestEmail
+ * @param {string} params.guestName
+ * @param {string} params.guestPhone
+ */
+export const createOrdersFromGuestCart = async ({
+    cartItems,
+    shippingAddress,
+    paymentMethod,
+    notes,
+    guestEmail,
+    guestName,
+    guestPhone,
+}) => {
+    // Step 1 — Validate all cart items exist and are in stock
+    const errors = [];
+    const validatedItems = [];
+
+    for (const cartItem of cartItems) {
+        const productId = cartItem.product_id || cartItem.productId || cartItem._id;
+        const quantity = Number(cartItem.quantity) || 1;
+
+        const product = await ProductModel.findById(productId).lean();
+
+        if (!product) {
+            errors.push(`Product "${productId}" not found`);
+            continue;
+        }
+        if (product.status !== "active") {
+            errors.push(`Product "${product.name}" is no longer available`);
+            continue;
+        }
+        if (product.countInStock <= 0) {
+            errors.push(`Product "${product.name}" is out of stock`);
+            continue;
+        }
+        if (quantity > product.countInStock) {
+            errors.push(
+                `Product "${product.name}" — requested ${quantity} but only ${product.countInStock} available`
+            );
+            continue;
+        }
+
+        validatedItems.push({ item: productId, quantity, product });
+    }
+
+    if (errors.length > 0) {
+        throw new appError(errors.join("; "), 400);
+    }
+    if (validatedItems.length === 0) {
+        throw new appError("No valid items to checkout", 400);
+    }
+
+    // Step 2 — Open MongoDB transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const createdOrders = await processOrderCreation({
+            validatedItems,
+            shippingAddress,
+            paymentMethod,
+            session,
+            guestEmail,
+            guestName,
+            guestPhone,
+        });
+
+        // Step 6 — Commit transaction (no cart to clear for guests)
+        await session.commitTransaction();
+
+        return createdOrders;
+    } catch (error) {
         if (session.inTransaction()) {
             await session.abortTransaction();
         }

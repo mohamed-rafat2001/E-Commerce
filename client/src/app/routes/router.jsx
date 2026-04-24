@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./ProtectedRoute.jsx";
@@ -56,6 +57,12 @@ const SettingsPage = lazy(() => import("../../features/settings/pages/SettingsPa
 const PlaceholderPage = lazy(() => import("../../shared/pages/PlaceholderPage.jsx"));
 const ManagementProductDetailPage = lazy(() => import("../../features/product/pages/ManagementProductDetailPage.jsx"));
 
+// Order pages
+const CheckoutPage = lazy(() => import("../../features/order/pages/CheckoutPage.jsx"));
+const OrdersPage = lazy(() => import("../../features/order/pages/OrdersPage.jsx"));
+const OrderDetailPage = lazy(() => import("../../features/order/pages/OrderDetailPage.jsx"));
+const OrderSuccessPage = lazy(() => import("../../features/order/pages/OrderSuccessPage.jsx"));
+
 // UI Components (lightweight, can be eagerly loaded)
 import PageNotFound from "../../shared/ui/PageNotFound.jsx";
 
@@ -95,12 +102,14 @@ const router = createBrowserRouter([
 			{ path: "/categories", element: S(PublicCategoriesPage) },
 			{ path: "/categories/all", element: S(PublicCategoriesPage) },
 			{ path: "/categories/:categoryId", element: S(CategoryProductsRedirectPage) },
+			// Checkout + success are accessible to both guests and logged-in users
+			{ path: "/checkout", element: S(CheckoutPage) },
+			{ path: "/order-success", element: S(OrderSuccessPage) },
 			{
 				element: <ProtectedRoute />,
 				children: [
-					{ path: "/checkout", element: S(PlaceholderPage, { title: "Checkout" }) },
-					{ path: "/orders", element: S(PlaceholderPage, { title: "Orders" }) },
-					{ path: "/orders/:orderId", element: S(PlaceholderPage, { title: "Order Details" }) },
+					{ path: "/orders", element: S(OrdersPage) },
+					{ path: "/orders/:orderId", element: S(OrderDetailPage) },
 					{ path: "/profile", element: S(PlaceholderPage, { title: "Profile" }) },
 					{ path: "/profile/edit", element: S(PlaceholderPage, { title: "Edit Profile" }) },
 				],

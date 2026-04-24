@@ -11,7 +11,8 @@ const sortMap = {
 };
 
 export default function usePublicBrandProducts({ brandId, category, subCategory, sort, page, limit: propLimit }) {
-	const limit = propLimit || usePaginationLimit('PUBLIC_PRODUCTS');
+	const defaultLimit = usePaginationLimit('PUBLIC_PRODUCTS');
+	const limit = propLimit || defaultLimit;
 	const requestParams = useMemo(() => {
 		const params = {
 			brandId,

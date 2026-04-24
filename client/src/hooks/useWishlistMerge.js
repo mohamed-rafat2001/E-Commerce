@@ -11,8 +11,6 @@ export default function useWishlistMerge() {
 	const previousAuthRef = useRef(false);
 
 	useEffect(() => {
-		let isCancelled = false;
-
 		const runMerge = async () => {
 			const justLoggedIn = !previousAuthRef.current && isAuthenticated;
 			if (!justLoggedIn) {
@@ -39,7 +37,7 @@ export default function useWishlistMerge() {
 					if (productId) {
 						try {
 							finalWishlist = await forceAddToWishlist(productId);
-						} catch (err) {
+						} catch {
 							// Ignore individual failures
 						}
 					}
@@ -59,9 +57,5 @@ export default function useWishlistMerge() {
 		};
 
 		runMerge();
-
-		return () => {
-			isCancelled = true;
-		};
 	}, [isAuthenticated, queryClient]);
 }

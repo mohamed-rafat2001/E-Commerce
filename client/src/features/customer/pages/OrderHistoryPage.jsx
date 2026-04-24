@@ -1,12 +1,14 @@
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import useOrderHistory from '../hooks/useOrderHistory';
+
 import { PageHeader, Card, Badge, DataTable, Button, EmptyState, Skeleton } from '../../../shared/ui';
 import { OrderIcon } from '../../../shared/constants/icons.jsx';
 
 const ITEMS_PER_PAGE = 10;
 
 const OrderHistoryPage = () => {
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('status') || 'All';
     const page = parseInt(searchParams.get('page')) || 1;
@@ -18,6 +20,7 @@ const OrderHistoryPage = () => {
     });
 
 	const tabs = ['All', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
 
 	const columns = [
 		{
@@ -52,10 +55,16 @@ const OrderHistoryPage = () => {
 		},
 		{
 			header: 'Actions',
-			render: () => (
+			render: (row) => (
 				<div className="flex gap-2">
-					<Button variant="outline" size="sm">Track</Button>
-					<Button variant="ghost" size="sm">Details</Button>
+					<Button variant="outline" size="sm" onClick={() => navigate(`/orders/${row._id}`)}>
+						Details
+					</Button>
+					{row.status === 'pending' && (
+						<Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600" onClick={() => navigate(`/orders/${row._id}`)}>
+							Cancel
+						</Button>
+					)}
 				</div>
 			)
 		}

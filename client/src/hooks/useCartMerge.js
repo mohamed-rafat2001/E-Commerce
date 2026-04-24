@@ -16,8 +16,6 @@ export default function useCartMerge() {
 	const previousAuthRef = useRef(false);
 
 	useEffect(() => {
-		let isCancelled = false;
-
 		const runMerge = async () => {
 			const justLoggedIn = !previousAuthRef.current && isAuthenticated;
 			if (!justLoggedIn) {
@@ -50,9 +48,5 @@ export default function useCartMerge() {
 		};
 
 		runMerge();
-
-		return () => {
-			isCancelled = true;
-		};
 	}, [isAuthenticated, queryClient]);
 }

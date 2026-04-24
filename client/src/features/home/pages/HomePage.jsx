@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
-import SEO, { schemas } from '../../../shared/components/SEO.jsx';
+import SEO from '../../../shared/components/SEO.jsx';
+import { schemas } from '../../../shared/components/SEOSchemas.js';
 import { HeroSection } from '../components';
 
 // ── Lazy-load below-fold sections ──────────────────────────────────
