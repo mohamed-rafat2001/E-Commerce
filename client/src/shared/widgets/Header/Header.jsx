@@ -10,9 +10,9 @@ import { LogoutIcon } from '../../constants/icons.jsx';
 
 // Refactored Modules
 import NavLinks from './NavLinks.jsx';
-import BrandLogo from './Header/BrandLogo.jsx';
-import QuickActions from './Header/QuickActions.jsx';
-import UserSection from './Header/UserSection.jsx';
+import BrandLogo from './header-modules/BrandLogo.jsx';
+import QuickActions from './header-modules/QuickActions.jsx';
+import UserSection from './header-modules/UserSection.jsx';
 
 // Shared Drawers
 import CartDrawer from '../../components/CartDrawer.jsx';

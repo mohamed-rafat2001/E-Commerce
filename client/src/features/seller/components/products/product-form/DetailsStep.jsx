@@ -52,6 +52,7 @@ const DetailsStep = ({
 							<Button 
 								variant="secondary" 
 								size="sm"
+								type="button"
 								onClick={() => {
 									onClose();
 									window.location.href = '/seller/brands';

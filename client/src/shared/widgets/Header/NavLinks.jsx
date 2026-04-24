@@ -9,8 +9,8 @@ import useWishlist from '../../../features/wishList/hooks/useWishlist.js';
 import useCart from '../../../features/cart/hooks/useCart.js';
 
 // Modular Sub-components
-import DesktopNav from './NavLinks/DesktopNav.jsx';
-import MobileDrawer from './NavLinks/MobileDrawer.jsx';
+import DesktopNav from './nav-modules/DesktopNav.jsx';
+import MobileDrawer from './nav-modules/MobileDrawer.jsx';
 
 /**
  * NavLinks - Refactored Navigation Entry Point

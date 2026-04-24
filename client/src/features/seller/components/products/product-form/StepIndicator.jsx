@@ -15,6 +15,7 @@ const StepIndicator = ({ steps, currentStep, onStepClick, validateCurrentStep })
 				return (
 					<div key={step.id} className="flex items-center flex-1">
 						<button
+							type="button"
 							onClick={() => {
 								if (index < currentStep || validateCurrentStep()) {
 									onStepClick(index);

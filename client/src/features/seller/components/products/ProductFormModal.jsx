@@ -46,6 +46,13 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	// Submit handler
 	const handleSubmitForm = async (e) => {
 		e.preventDefault();
+
+		// Only allow submission if we are on the last step
+		if (form.currentStep < STEPS.length - 1) {
+			form.handleNext();
+			return;
+		}
+
 		if (!form.validateForm(images.additionalImages)) {
 			form.setCurrentStep(form.findFirstErrorStep());
 			return;

@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDownIcon, SearchIcon } from '../../constants/icons.jsx';
 
 // Refactored Sub-components
-import BrandsGrid from './Dropdown/BrandsGrid.jsx';
-import CategoriesGrid from './Dropdown/CategoriesGrid.jsx';
-import SimpleList from './Dropdown/SimpleList.jsx';
+import BrandsGrid from './dropdown-modules/BrandsGrid.jsx';
+import CategoriesGrid from './dropdown-modules/CategoriesGrid.jsx';
+import SimpleList from './dropdown-modules/SimpleList.jsx';
 
 /**
  * DropdownMenu - Refactored Mega-menu orchestrator

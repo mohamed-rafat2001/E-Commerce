@@ -62,14 +62,15 @@ const SettingsStep = ({
 				<div className="grid grid-cols-2 gap-4">
 					<SummaryItem label="Name" value={formData.name || '—'} />
 					<SummaryItem label="Price" value={formData.price ? `$${parseFloat(formData.price).toFixed(2)}` : '—'} />
-					<SummaryItem label="Stock" value={String(formData.countInStock)} />
-					<SummaryItem label="Status" value={formData.status} />
+					<SummaryItem label="Stock" value={String(formData.countInStock || 0)} />
+					<SummaryItem label="Status" value={statusOptions.find(s => s.value === formData.status)?.label || formData.status} />
+					<SummaryItem label="Visibility" value={visibilityOptions.find(v => v.value === formData.visibility)?.label || formData.visibility} />
 					<SummaryItem label="Brand" value={brandOptions.find(b => b.value === formData.brandId)?.label || '—'} />
 					<SummaryItem label="Category" value={categoryOptions.find(c => c.value === formData.primaryCategory)?.label || '—'} />
-					<SummaryItem label="Sizes" value={formData.sizes.length > 0 ? formData.sizes.join(', ') : '—'} />
-					<SummaryItem label="Colors" value={formData.colors.length > 0 ? `${formData.colors.length} colors` : '—'} />
+					<SummaryItem label="Sizes" value={formData.sizes?.length > 0 ? formData.sizes.join(', ') : '—'} />
+					<SummaryItem label="Colors" value={formData.colors?.length > 0 ? `${formData.colors.length} colors` : '—'} />
 					<SummaryItem label="Cover" value={coverImagePreview ? '✅ Set' : '❌ None'} />
-					<SummaryItem label="Gallery" value={`${uploadedImagesCount} images`} />
+					<SummaryItem label="Gallery" value={`${uploadedImagesCount || 0} images`} />
 				</div>
 			</div>
 		</motion.div>

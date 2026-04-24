@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { HeartIcon, StoreIcon } from '../../constants/icons.jsx';
-import ThemeToggle from '../../components/ThemeToggle.jsx';
+import { HeartIcon, StoreIcon } from '../../../constants/icons.jsx';
+import ThemeToggle from '../../../components/ThemeToggle.jsx';
 
 /**
  * QuickActions - Cart, Wishlist, and Search controls

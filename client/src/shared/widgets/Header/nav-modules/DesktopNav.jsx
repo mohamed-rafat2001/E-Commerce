@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import DropdownMenu from '../Dropdown/index.jsx';
+import DropdownMenu from '../DropdownMenu.jsx';
 import NavLinkItem from './NavLinkItem.jsx';
 
 /**

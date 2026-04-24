@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, Button } from '../../ui/index.js';
-import { DashboardIcon, SettingsIcon, LogoutIcon } from '../../constants/icons.jsx';
+import { Avatar, Button } from '../../../ui/index.js';
+import { DashboardIcon, SettingsIcon, LogoutIcon } from '../../../constants/icons.jsx';
 
 /**
  * UserSection - Profile dropdown and authentication controls
