@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import CheckoutSteps from '../components/CheckoutSteps.jsx';
 import ShippingStep from '../components/ShippingStep.jsx';
 import PaymentStep from '../components/PaymentStep.jsx';
@@ -8,6 +9,7 @@ import OrderSummaryPanel from '../components/OrderSummaryPanel.jsx';
 import useCart from '../../cart/hooks/useCart.js';
 import useCheckout from '../hooks/useCheckout.js';
 import useCurrentUser from '../../user/hooks/useCurrentUser.js';
+import { selectPromoInfo } from '../../../app/store/slices/cartSlice';
 import { calculateOrderTotals } from '../utils/orderCalculations.js';
 import { Button, EmptyState } from '../../../shared/ui/index.js';
 import { FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
@@ -22,6 +24,7 @@ const CheckoutPage = () => {
 	const { cartItems, isLoading: cartLoading } = useCart();
 	const { checkout, isCheckingOut } = useCheckout();
 	const { isAuthenticated } = useCurrentUser();
+	const { code: couponCode, amount: couponDiscountAmount } = useSelector(selectPromoInfo);
 
 	const [step, setStep] = useState(1);
 	const [shippingAddress, setShippingAddress] = useState(null);
@@ -39,10 +42,10 @@ const CheckoutPage = () => {
 	}, [step]);
 
 	// Calculate order financials
-	const calculations = useMemo(() => calculateOrderTotals(cartItems), [cartItems]);
+	const calculations = useMemo(() => calculateOrderTotals(cartItems, couponDiscountAmount), [cartItems, couponDiscountAmount]);
 
 	const handlePlaceOrder = () => {
-		const payload = { shippingAddress, paymentMethod };
+		const payload = { shippingAddress, paymentMethod, couponCode };
 		
 		if (!isAuthenticated) {
 			payload.cartItems = cartItems.map(item => ({

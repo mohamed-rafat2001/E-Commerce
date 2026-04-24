@@ -25,6 +25,11 @@ const orderSchema = new mongoose.Schema(
 				ref: "SellerModel",
 			},
 		],
+		couponCode: {
+			type: String,
+			trim: true,
+			uppercase: true,
+		},
 		items: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

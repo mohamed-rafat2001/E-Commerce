@@ -128,6 +128,25 @@ const discountSchema = new mongoose.Schema(
 			default: 0,
 			min: 0,
 		},
+
+		// ── Coupons ───────────────────────────────────────────────────
+		isCoupon: {
+			type: Boolean,
+			default: false,
+		},
+		code: {
+			type: String,
+			trim: true,
+			uppercase: true,
+			validate: {
+				validator: function (v) {
+					// if it is a coupon, code is required
+					if (this.isCoupon && !v) return false;
+					return true;
+				},
+				message: "Coupon code is required if discount is a coupon",
+			},
+		},
 	},
 	{
 		timestamps: true,
@@ -157,8 +176,32 @@ discountSchema.virtual("hasUsageRemaining").get(function () {
 	return this.usageCount < this.usageLimit;
 });
 
+// ── Hooks ─────────────────────────────────────────────────────────────
+discountSchema.pre("validate", function (next) {
+	if (this.isCoupon && !this.code) {
+		// Clean the discount name: remove non-alphanumeric, take first 10 chars, uppercase
+		const prefix = this.name
+			? this.name
+					.replace(/[^a-zA-Z0-9]/g, "")
+					.substring(0, 10)
+					.toUpperCase()
+			: "PROMO";
+
+		// Generate 4-character random alphanumeric suffix
+		const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		let suffix = "";
+		for (let i = 0; i < 4; i++) {
+			suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+		}
+
+		this.code = `${prefix}-${suffix}`;
+	}
+	next();
+});
+
 // ── Indexes for fast queries ──────────────────────────────────────────
-discountSchema.index({ isActive: 1, startDate: 1, endDate: 1 });
+discountSchema.index({ isActive: 1, startDate: 1, endDate: 1, isCoupon: 1 });
+discountSchema.index({ code: 1 }, { unique: true, sparse: true, partialFilterExpression: { isCoupon: true } });
 discountSchema.index({ scope: 1, targetIds: 1 });
 discountSchema.index({ creatorId: 1, creatorRole: 1 });
 discountSchema.index({ endDate: 1 }); // For expiration cleanup queries

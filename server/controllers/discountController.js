@@ -24,6 +24,8 @@ const DISCOUNT_FIELDS = [
 	"endDate",
 	"isActive",
 	"usageLimit",
+	"isCoupon",
+	"code"
 ];
 
 // ===================================================================
@@ -336,4 +338,22 @@ export const getProductDiscount = catchAsync(async (req, res, next) => {
 	const result = await resolveBestDiscount(product);
 
 	sendResponse(res, 200, result || { message: "No active discounts for this product" });
+});
+
+/**
+ * Public: Validate a coupon code against a cart payload
+ * POST /api/v1/discounts/validate-coupon
+ */
+export const validateCoupon = catchAsync(async (req, res, next) => {
+	const { code, cartItems } = req.body;
+
+	if (!code) return next(new appError("Promo code is required", 400));
+	if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+		return next(new appError("Cart items are required to validate promo code", 400));
+	}
+
+	const { validateCouponForCart } = await import("../services/discountService.js");
+	const result = await validateCouponForCart(code, cartItems);
+
+	sendResponse(res, 200, result);
 });

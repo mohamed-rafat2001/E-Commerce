@@ -34,6 +34,9 @@ export const mergeGuestCart = (guestItems) =>
 // checkout — create orders from cart
 export const checkout = (orderData) => addFunc("orders/checkout", orderData);
 
+// validate promo code
+export const validatePromoCode = (data) => addFunc("discounts/validate-coupon", data);
+
 // cancel order
 export const cancelOrder = (orderId, reason) =>
     updateFunc(`orders/${orderId}/cancel`, { reason });

@@ -25,6 +25,7 @@ export const checkout = catchAsync(async (req, res, next) => {
 		shippingAddress,
 		paymentMethod,
 		notes,
+		couponCode: req.body.couponCode,
 	});
 
 	res.status(201).json({
@@ -37,7 +38,7 @@ export const checkout = catchAsync(async (req, res, next) => {
 // @desc    Guest Checkout — create orders from provided cart items (no auth)
 // @access  Public
 export const guestCheckout = catchAsync(async (req, res, next) => {
-	const { shippingAddress, paymentMethod, notes, cartItems, guestEmail, guestName, guestPhone } = req.body;
+	const { shippingAddress, paymentMethod, notes, cartItems, guestEmail, guestName, guestPhone, couponCode } = req.body;
 
 	if (!paymentMethod) {
 		return next(new appError("Payment method is required", 400));
@@ -60,6 +61,7 @@ export const guestCheckout = catchAsync(async (req, res, next) => {
 		guestEmail,
 		guestName,
 		guestPhone,
+		couponCode,
 	});
 
 	res.status(201).json({

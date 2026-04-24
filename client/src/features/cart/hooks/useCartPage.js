@@ -5,17 +5,21 @@
 */
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import useCart from './useCart';
+import { selectPromoInfo } from '../../../app/store/slices/cartSlice';
 import { calculateOrderTotals } from '../../order/utils/orderCalculations.js';
 
 const useCartPage = () => {
     const { cart, isLoading, updateQuantity, removeFromCart, clearCart: clearCartAction } = useCart();
     const navigate = useNavigate();
 
+    const { amount: couponDiscountAmount } = useSelector(selectPromoInfo);
+
     const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
     const isLoadingItems = isLoading;
 
-    const calculations = useMemo(() => calculateOrderTotals(cartItems), [cartItems]);
+    const calculations = useMemo(() => calculateOrderTotals(cartItems, couponDiscountAmount), [cartItems, couponDiscountAmount]);
 
     const handleQuantityChange = (productId, delta) => {
         const item = cartItems.find(i => {

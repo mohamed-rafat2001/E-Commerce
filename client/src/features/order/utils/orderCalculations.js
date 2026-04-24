@@ -1,4 +1,4 @@
-export const calculateOrderTotals = (cartItems) => {
+export const calculateOrderTotals = (cartItems, couponDiscount = 0) => {
 	let subtotal = 0;
 	let totalSavings = 0;
 	let hasFreeShipping = false;
@@ -28,7 +28,8 @@ export const calculateOrderTotals = (cartItems) => {
 		}
 	});
 
-	const discountAmount = totalSavings;
+	// Total discount is item-level discounts + global coupon discount
+	const discountAmount = totalSavings + couponDiscount;
 	const taxableAmount = Math.max(0, subtotal - discountAmount);
 	const tax = taxableAmount * 0.08;
 	

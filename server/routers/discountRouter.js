@@ -18,6 +18,7 @@ import {
 	// Public
 	getActiveDiscounts,
 	getProductDiscount,
+	validateCoupon,
 } from "../controllers/discountController.js";
 
 const router = express.Router();
@@ -70,6 +71,30 @@ router.get("/active", getActiveDiscounts);
  *         description: Product not found
  */
 router.get("/product/:productId", getProductDiscount);
+
+/**
+ * @swagger
+ * /api/v1/discounts/validate-coupon:
+ *   post:
+ *     summary: Validate a promo code and calculate savings for a cart
+ *     tags: [Discounts]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [code, cartItems]
+ *             properties:
+ *               code: { type: string }
+ *               cartItems: { type: array, items: { type: object } }
+ *     responses:
+ *       200:
+ *         description: Promo code validated successfully
+ *       400:
+ *         description: Promo code invalid or does not apply
+ */
+router.post("/validate-coupon", validateCoupon);
 
 // ── Authenticated Routes ──────────────────────────────────────────────
 router.use(Protect);

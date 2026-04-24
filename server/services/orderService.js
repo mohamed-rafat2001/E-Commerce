@@ -6,7 +6,7 @@ import OrderItemsModel from "../models/OrderItemsModel.js";
 import SellerModel from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
 import { validateCartForCheckout } from "./cartService.js";
-import { enrichProductsWithDiscounts, resolveShippingDiscount, incrementUsage } from "./discountService.js";
+import { enrichProductsWithDiscounts, resolveShippingDiscount, incrementUsage, validateCouponForCart } from "./discountService.js";
 
 // Shipping fee thresholds
 const SHIPPING_FREE_THRESHOLD = 500;
@@ -49,6 +49,7 @@ const processOrderCreation = async ({
     guestEmail,
     guestName,
     guestPhone,
+    couponCode,
 }) => {
     // Step 3 — Atomic inventory decrement
     const stockErrors = [];
@@ -88,6 +89,20 @@ const processOrderCreation = async ({
         productDataMap[p._id.toString()] = p;
     });
 
+    // Validate coupon if provided
+    let appliedCouponData = null;
+    if (couponCode) {
+        const itemsForValidation = validatedItems.map(cartItem => {
+            const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
+            return {
+                ...cartItem,
+                productObj: productDataMap[productId]
+            };
+        });
+        // This will throw if invalid
+        appliedCouponData = await validateCouponForCart(couponCode, itemsForValidation);
+    }
+
     // Step 4 — Group items by seller
     const itemsBySeller = {};
 
@@ -107,7 +122,12 @@ const processOrderCreation = async ({
         // Calculate unit price considering the active discount
         const originalUnitPrice = product.price?.amount || 0;
         const unitPrice = product.activeDiscount ? product.activeDiscount.discountedPrice : originalUnitPrice;
-        const discountSavings = (originalUnitPrice - unitPrice) * cartItem.quantity;
+        let discountSavings = (originalUnitPrice - unitPrice) * cartItem.quantity;
+        
+        // Add coupon savings if any allocated to this item
+        if (appliedCouponData && appliedCouponData.allocations && appliedCouponData.allocations[productId]) {
+            discountSavings += appliedCouponData.allocations[productId];
+        }
         
         itemsBySeller[sellerUserId].push({
             item: productId,
@@ -151,6 +171,10 @@ const processOrderCreation = async ({
                 appliedDiscounts.add(item.activeDiscount.discountId.toString());
             }
         });
+
+        if (appliedCouponData) {
+            appliedDiscounts.add(appliedCouponData.couponId.toString());
+        }
 
         const subtotal = totalOriginalPrice - itemSavings;
 
@@ -219,6 +243,7 @@ const processOrderCreation = async ({
         if (guestEmail) orderData.guestEmail = guestEmail;
         if (guestName) orderData.guestName = guestName;
         if (guestPhone) orderData.guestPhone = guestPhone;
+        if (couponCode) orderData.couponCode = couponCode;
 
         const [order] = await OrderModel.create([orderData], { session });
         createdOrders.push(order);

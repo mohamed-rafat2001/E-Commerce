@@ -9,6 +9,7 @@ const activeDiscountFilter = () => {
 	const now = new Date();
 	return {
 		isActive: true,
+		isCoupon: { $ne: true },
 		startDate: { $lte: now },
 		endDate: { $gt: now },
 		$or: [
@@ -372,4 +373,114 @@ export const enrichProductsWithDiscounts = async (products) => {
 
 		return prod;
 	});
+};
+
+/**
+ * Filter for active coupons
+ */
+const activeCouponFilter = () => {
+	const now = new Date();
+	return {
+		isActive: true,
+		isCoupon: true,
+		startDate: { $lte: now },
+		endDate: { $gt: now },
+		$or: [
+			{ usageLimit: null },
+			{ $expr: { $lt: ["$usageCount", "$usageLimit"] } },
+		],
+	};
+};
+
+/**
+ * Validates a coupon code against a list of cart items.
+ * Calculates overall coupon savings based on the matching products.
+ */
+export const validateCouponForCart = async (code, cartItems) => {
+	const uppercaseCode = code.trim().toUpperCase();
+
+	const coupon = await DiscountModel.findOne({
+		code: uppercaseCode,
+		...activeCouponFilter(),
+	}).lean();
+
+	if (!coupon) {
+		throw new appError("Invalid, expired, or fully redeemed promo code", 400);
+	}
+
+	// Now check which items in the cart are eligible for this coupon
+	let eligibleOriginalSubtotal = 0;
+	let validItemsFound = false;
+
+	// Build scope check variables
+	for (const cartItem of cartItems) {
+		const product = cartItem.productObj || cartItem.item;
+		const quantity = cartItem.quantity || 1;
+		const originalPrice = product.price?.amount || 0;
+
+		const productId = product._id?.toString();
+		const categoryId = product.primaryCategory?._id?.toString() || product.primaryCategory?.toString();
+		const sellerUserId = product.userId?.toString();
+
+		let isEligible = false;
+		if (coupon.scope === "all_products") {
+			isEligible = true;
+		} else if (coupon.scope === "single_product") {
+			isEligible = coupon.targetIds.some(t => t.toString() === productId);
+		} else if (coupon.scope === "category" && categoryId) {
+			isEligible = coupon.targetIds.some(t => t.toString() === categoryId);
+		} else if (coupon.scope === "seller_all" && sellerUserId) {
+			isEligible = coupon.targetIds.some(t => t.toString() === sellerUserId);
+		}
+
+		if (isEligible) {
+			cartItem.__isEligible = true;
+			validItemsFound = true;
+			eligibleOriginalSubtotal += originalPrice * quantity;
+		} else {
+			cartItem.__isEligible = false;
+		}
+	}
+
+	if (!validItemsFound) {
+		throw new appError("This promo code does not apply to any items in your cart", 400);
+	}
+
+	if (coupon.minOrderValue > 0) {
+		// Calculate full cart subtotal to check min limit
+		const fullCartSubtotal = cartItems.reduce((acc, item) => {
+			const product = item.productObj || item.item;
+			return acc + (product.price?.amount || 0) * (item.quantity || 1);
+		}, 0);
+
+		if (fullCartSubtotal < coupon.minOrderValue) {
+			throw new appError(`This promo code requires a minimum order value of $${coupon.minOrderValue}`, 400);
+		}
+	}
+
+	// Output savings using calculateDiscountedPrice on the eligible total
+	const { savings } = calculateDiscountedPrice(eligibleOriginalSubtotal, coupon);
+
+	const allocations = {};
+	if (savings > 0) {
+		cartItems.forEach(cartItem => {
+			if (cartItem.__isEligible) {
+				const product = cartItem.productObj || cartItem.item;
+				const itemTotal = (product.price?.amount || 0) * (cartItem.quantity || 1);
+				allocations[product._id.toString()] = (itemTotal / eligibleOriginalSubtotal) * savings;
+			}
+		});
+	}
+
+	return {
+		success: true,
+		couponId: coupon._id,
+		coupon,
+		allocations,
+		code: uppercaseCode,
+		type: coupon.type,
+		value: coupon.value,
+		discountAmount: savings,
+		message: `Promo code applied successfully!`
+	};
 };
