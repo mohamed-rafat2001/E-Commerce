@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useToast from '../../../shared/hooks/useToast.js';
 import useCurrentUser from '../../user/hooks/useCurrentUser.js';
 import { clearGuestCart } from '../../cart/services/guestCart.js';
+import { saveGuestOrder, saveGuestEmail } from '../services/guestOrders.js';
 
 /**
  * Hook for checkout — places order from cart, navigates to success page
@@ -29,11 +30,17 @@ export default function useCheckout() {
 				queryClient.invalidateQueries({ queryKey: ['orderHistory'] });
 			} else {
 				clearGuestCart();
+				const createdOrders = response?.data?.data || [];
+				if (createdOrders.length > 0) {
+					const email = createdOrders[0].guestEmail || state?.email;
+					if (email) saveGuestEmail(email);
+					createdOrders.forEach(o => saveGuestOrder(o._id, email, o.orderNumber));
+				}
 				// Also manually invalidate the cart query just in case
 				queryClient.invalidateQueries({ queryKey: ['cart'] });
 			}
 			showSuccess('Order placed successfully!');
-			navigate('/order-success', { state: { orders: response?.data?.data } });
+			navigate('/order-success', { state: { orders: response?.data?.data, email: response?.data?.data?.[0]?.guestEmail } });
 		},
 		onError: (err) => showError(err?.response?.data?.message || 'Checkout failed. Please try again.'),
 	});

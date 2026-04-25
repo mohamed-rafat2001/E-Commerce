@@ -30,8 +30,8 @@ const orderItemsSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-orderItemsSchema.pre("save", async function (next) {
-	if (!this.isModified("items")) return next();
+orderItemsSchema.pre("save", async function () {
+	if (!this.isModified("items")) return;
 
 	await this.populate("items.item");
 
@@ -56,8 +56,6 @@ orderItemsSchema.pre("save", async function (next) {
 	});
 
 	this.totalPrice = { amount: grandTotal, currency };
-
-	next();
 });
 
 export default mongoose.model("OrderItemsModel", orderItemsSchema);

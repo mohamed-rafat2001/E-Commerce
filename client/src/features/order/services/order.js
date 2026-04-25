@@ -7,6 +7,13 @@ export const checkoutOrder = (orderData) => addFunc("orders/checkout", orderData
 // Guest Checkout — create orders from provided cart items (no auth)
 export const guestCheckoutOrder = (orderData) => addFunc("orders/guest-checkout", orderData);
 
+// Public Guest Order History
+export const getGuestOrders = (email) => 
+	getFunc("orders/guest-history", { params: { email } });
+
+export const getGuestOrderDetail = (orderId, email) =>
+	getFunc("orders/guest-order-detail", { params: { orderId, email } });
+
 // Get orders for customer (owner)
 export const getOrdersForCustomer = (params) =>
 	getFunc("orders/myorders", { params });

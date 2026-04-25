@@ -15,6 +15,39 @@ const SHIPPING_STANDARD_FEE = 25;
 const SHIPPING_REDUCED_FEE = 10;
 
 /**
+ * Helper to determine if we can use transactions.
+ * Requires a Replica Set or Sharded cluster.
+ */
+const canUseTransactions = () => {
+    const conn = mongoose.connection;
+    return conn.client?.topology?.description?.type !== 'Single';
+};
+
+/**
+ * Higher-order helper to wrap logic in a transaction if supported.
+ * Fallbacks to non-transactional execution on standalone MongoDB instances.
+ */
+const withTransaction = async (workFn) => {
+    const session = await mongoose.startSession();
+    const useTransaction = canUseTransactions();
+    
+    if (useTransaction) session.startTransaction();
+    
+    try {
+        const result = await workFn(useTransaction ? session : null);
+        if (useTransaction) await session.commitTransaction();
+        return result;
+    } catch (error) {
+        if (useTransaction && session.inTransaction()) {
+            await session.abortTransaction();
+        }
+        throw error;
+    } finally {
+        session.endSession();
+    }
+};
+
+/**
  * Calculate shipping fee based on subtotal.
  */
 const calculateShippingFee = (subtotal) => {
@@ -246,7 +279,13 @@ const processOrderCreation = async ({
         if (couponCode) orderData.couponCode = couponCode;
 
         const [order] = await OrderModel.create([orderData], { session });
-        createdOrders.push(order);
+        
+        // Populate items to ensure UI has counts/details immediately
+        const populatedOrder = await OrderModel.findById(order._id)
+            .populate('items')
+            .session(session);
+            
+        createdOrders.push(populatedOrder || order);
     }
 
     return createdOrders;
@@ -258,28 +297,22 @@ const processOrderCreation = async ({
  */
 export const createOrdersFromCart = async (
     userId,
-    { shippingAddress, paymentMethod, notes }
+    { shippingAddress, paymentMethod, notes, couponCode }
 ) => {
     // Step 1 — Validate cart
     const { valid, errors, cart } = await validateCartForCheckout(userId);
-    if (!valid) {
-        throw new appError(errors.join("; "), 400);
-    }
-
-    // Step 2 — Open MongoDB transaction
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    // Step 2 — Use transaction helper
+    return await withTransaction(async (session) => {
         const createdOrders = await processOrderCreation({
             validatedItems: cart.items,
             shippingAddress,
             paymentMethod,
             session,
             userId,
+            couponCode,
         });
 
-        // Step 6 — Clear the cart inside the same transaction
+        // Step 6 — Clear the cart inside the same session
         await CartModel.updateOne(
             { _id: cart._id },
             {
@@ -291,19 +324,8 @@ export const createOrdersFromCart = async (
             { session }
         );
 
-        // Step 7 — Commit transaction
-        await session.commitTransaction();
-
         return createdOrders;
-    } catch (error) {
-        // Rollback on any error
-        if (session.inTransaction()) {
-            await session.abortTransaction();
-        }
-        throw error;
-    } finally {
-        session.endSession();
-    }
+    });
 };
 
 /**
@@ -327,6 +349,7 @@ export const createOrdersFromGuestCart = async ({
     guestEmail,
     guestName,
     guestPhone,
+    couponCode,
 }) => {
     // Step 1 — Validate all cart items exist and are in stock
     const errors = [];
@@ -367,12 +390,8 @@ export const createOrdersFromGuestCart = async ({
         throw new appError("No valid items to checkout", 400);
     }
 
-    // Step 2 — Open MongoDB transaction
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-        const createdOrders = await processOrderCreation({
+    return await withTransaction(async (session) => {
+        return await processOrderCreation({
             validatedItems,
             shippingAddress,
             paymentMethod,
@@ -380,20 +399,9 @@ export const createOrdersFromGuestCart = async ({
             guestEmail,
             guestName,
             guestPhone,
+            couponCode,
         });
-
-        // Step 6 — Commit transaction (no cart to clear for guests)
-        await session.commitTransaction();
-
-        return createdOrders;
-    } catch (error) {
-        if (session.inTransaction()) {
-            await session.abortTransaction();
-        }
-        throw error;
-    } finally {
-        session.endSession();
-    }
+    });
 };
 
 /**

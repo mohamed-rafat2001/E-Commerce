@@ -62,6 +62,8 @@ const CheckoutPage = lazy(() => import("../../features/order/pages/CheckoutPage.
 const OrdersPage = lazy(() => import("../../features/order/pages/OrdersPage.jsx"));
 const OrderDetailPage = lazy(() => import("../../features/order/pages/OrderDetailPage.jsx"));
 const OrderSuccessPage = lazy(() => import("../../features/order/pages/OrderSuccessPage.jsx"));
+const GuestOrdersPage = lazy(() => import("../../features/order/pages/GuestOrdersPage.jsx"));
+const GuestOrderDetailPage = lazy(() => import("../../features/order/pages/GuestOrderDetailPage.jsx"));
 
 // Discount pages
 const SellerDiscountsPage = lazy(() => import("../../features/discount/pages/SellerDiscountsPage.jsx"));
@@ -109,6 +111,8 @@ const router = createBrowserRouter([
 			// Checkout + success are accessible to both guests and logged-in users
 			{ path: "/checkout", element: S(CheckoutPage) },
 			{ path: "/order-success", element: S(OrderSuccessPage) },
+			{ path: "/guest-orders", element: S(GuestOrdersPage) },
+			{ path: "/guest-orders/:orderId", element: S(GuestOrderDetailPage) },
 			{
 				element: <ProtectedRoute />,
 				children: [

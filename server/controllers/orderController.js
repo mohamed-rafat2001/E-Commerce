@@ -71,6 +71,62 @@ export const guestCheckout = catchAsync(async (req, res, next) => {
 	});
 });
 
+// @desc    Get all orders for a Guest Email (Public History)
+// @access  Public
+export const getGuestOrdersByEmail = catchAsync(async (req, res, next) => {
+	const { email } = req.query;
+
+	if (!email) {
+		return next(new appError("Email is required to view your orders", 400));
+	}
+
+	const orders = await OrderModel.find({ 
+		guestEmail: { $regex: `^${email.trim()}$`, $options: 'i' } 
+	})
+		.populate({
+			path: "items",
+			populate: {
+				path: "items.item",
+				select: "name coverImage price title",
+			},
+		})
+		.sort("-createdAt");
+
+	if (!orders || orders.length === 0) {
+		return next(new appError("No orders found for this email", 404));
+	}
+
+	sendResponse(res, 200, orders);
+});
+
+// @desc    Get single order detail for Guest (Public)
+// @access  Public
+export const getGuestOrderDetail = catchAsync(async (req, res, next) => {
+	const { orderId, email } = req.query;
+
+	if (!orderId || !email) {
+		return next(new appError("Order ID and Email are required", 400));
+	}
+
+	const order = await OrderModel.findOne({ 
+		_id: orderId, 
+		guestEmail: { $regex: `^${email.trim()}$`, $options: 'i' } 
+	})
+		.populate({
+			path: "items",
+			populate: {
+				path: "items.item",
+				select: "name coverImage price title",
+			},
+		});
+
+	if (!order) {
+		return next(new appError("Order not found or access denied", 404));
+	}
+
+	sendResponse(res, 200, order);
+});
+
 // @desc    Get logged-in customer's orders (with status filter and pagination)
 // @access  Private/Customer
 export const getMyOrders = catchAsync(async (req, res, next) => {

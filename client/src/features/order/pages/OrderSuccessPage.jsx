@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiPackage, FiArrowRight, FiShoppingBag } from 'react-icons/fi';
 import { Button, Badge } from '../../../shared/ui/index.js';
+import useCurrentUser from '../../user/hooks/useCurrentUser.js';
 
 /**
  * Post-checkout success page — shows order confirmation with order IDs
@@ -10,6 +11,7 @@ import { Button, Badge } from '../../../shared/ui/index.js';
 const OrderSuccessPage = () => {
 	const { state } = useLocation();
 	const navigate = useNavigate();
+	const { isAuthenticated } = useCurrentUser();
 	const orders = state?.orders || [];
 
 	// Scroll to top
@@ -32,8 +34,8 @@ const OrderSuccessPage = () => {
 					<h1 className="text-2xl font-black text-gray-900 mb-3">Order Placed!</h1>
 					<p className="text-gray-500 mb-8">Your order has been placed successfully. Check your order history for details.</p>
 					<div className="flex flex-col sm:flex-row gap-3 justify-center">
-						<Button variant="primary" onClick={() => navigate('/orders')} className="gap-2">
-							<FiPackage className="w-4 h-4" /> Track My Orders
+						<Button variant="primary" onClick={() => navigate(isAuthenticated ? '/orders' : '/guest-orders')} className="gap-2">
+							<FiPackage className="w-4 h-4" /> View My Orders
 						</Button>
 						<Button variant="outline" onClick={() => navigate('/')} className="gap-2">
 							Continue Shopping <FiArrowRight className="w-4 h-4" />
@@ -111,21 +113,37 @@ const OrderSuccessPage = () => {
 									</div>
 									<div>
 										<p className="font-bold text-gray-900">
-											Order #{order._id ? `ORD-${order._id.substring(order._id.length - 8).toUpperCase()}` : `#${index + 1}`}
+											Order #{order.orderNumber || (order._id ? `ORD-${order._id.substring(order._id.length - 8).toUpperCase()}` : `#${index + 1}`)}
 										</p>
 										<p className="text-sm text-gray-500 mt-0.5">
-											{order.orderItems?.length || 0} item{(order.orderItems?.length || 0) !== 1 ? 's' : ''} 
+											{order.items?.reduce((sum, sub) => sum + (sub.items?.length || 0), 0) || 0} items 
 											{order.totalPrice && ` • $${order.totalPrice.amount || order.totalPrice}`}
 										</p>
 									</div>
 								</div>
 								<div className="flex items-center gap-3">
 									<Badge variant="warning" size="sm">{order.status || 'Pending'}</Badge>
-									<Link to={`/orders/${order._id}`}>
-										<Button variant="ghost" size="sm" className="gap-1">
-											View <FiArrowRight className="w-3 h-3" />
+									{isAuthenticated ? (
+										<Link to={`/orders/${order._id}`}>
+											<Button variant="ghost" size="sm" className="gap-1">
+												View <FiArrowRight className="w-3 h-3" />
+											</Button>
+										</Link>
+									) : (
+										<Button 
+											variant="ghost" 
+											size="sm" 
+											className="gap-1 focus:ring-0"
+											onClick={() => navigate('/guest-orders', { 
+												state: { 
+													orderId: order._id, 
+													email: order.guestEmail || order.userId?.email || state?.email 
+												} 
+											})}
+										>
+											Track <FiArrowRight className="w-3 h-3" />
 										</Button>
-									</Link>
+									)}
 								</div>
 							</div>
 						</motion.div>
@@ -142,10 +160,10 @@ const OrderSuccessPage = () => {
 					<Button
 						variant="primary"
 						size="lg"
-						onClick={() => navigate('/orders')}
+						onClick={() => navigate(isAuthenticated ? '/orders' : '/guest-orders')}
 						className="gap-2 px-8"
 					>
-						<FiPackage className="w-5 h-5" /> Track My Orders
+						<FiPackage className="w-5 h-5" /> View My Orders
 					</Button>
 					<Button
 						variant="outline"

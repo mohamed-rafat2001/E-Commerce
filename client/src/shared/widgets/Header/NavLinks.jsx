@@ -32,6 +32,7 @@ const NavLinks = () => {
             { name: 'Help', path: '/help', isHelp: true }
         ],
         help: [
+            { name: 'Guest Orders', path: '/guest-orders', description: 'View your purchase history' },
             { name: 'FAQs', path: '/faq', description: 'Frequently Asked Questions' },
             { name: 'Support', path: '/support', description: 'Contact our support team' },
             { name: 'Policies', path: '/policy', description: 'Shipping and Return policies' }

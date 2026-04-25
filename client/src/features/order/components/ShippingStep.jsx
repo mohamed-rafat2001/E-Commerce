@@ -25,11 +25,14 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 
 	const handleSelectAddress = (addr) => {
 		onSelect({
-			street: addr.line1 + (addr.line2 ? `, ${addr.line2}` : ''),
+			line1: addr.line1,
+			line2: addr.line2,
 			city: addr.city,
 			state: addr.state || '',
 			postalCode: addr.postalCode,
 			country: addr.country,
+			recipientName: addr.recipientName,
+			phone: addr.phone,
 			_fullAddr: addr,
 		});
 	};
@@ -42,13 +45,17 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 			}
 			setEmailError('');
 			onSelect({
-				street: data.line1 + (data.line2 ? `, ${data.line2}` : ''),
+				line1: data.line1,
+				line2: data.line2,
 				city: data.city,
 				state: data.state || '',
 				postalCode: data.postalCode,
 				country: data.country,
+				recipientName: data.recipientName,
+				phone: data.phone,
 				_fullAddr: data,
 			});
+			onNext(); // Auto-advance for guests after saving
 			return;
 		}
 
@@ -57,11 +64,14 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 				setShowNewForm(false);
 				// Select the freshly added address
 				onSelect({
-					street: data.line1 + (data.line2 ? `, ${data.line2}` : ''),
+					line1: data.line1,
+					line2: data.line2,
 					city: data.city,
 					state: data.state || '',
 					postalCode: data.postalCode,
 					country: data.country,
+					recipientName: data.recipientName,
+					phone: data.phone,
 					_fullAddr: data,
 				});
 			},
@@ -197,18 +207,27 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 				)}
 			</AnimatePresence>
 
-			{/* Continue Button */}
-			<div className="flex justify-end pt-2">
-				<Button
-					variant="primary"
-					size="lg"
-					onClick={handleNext}
-					disabled={!shippingAddress}
-					className="px-10"
-				>
-					Continue to Payment
-				</Button>
-			</div>
+			{/* Continue Button (Only shown when selecting saved addresses) */}
+			{!showNewForm && (
+				<div className="flex justify-end pt-2">
+					<Button
+						variant="primary"
+						size="lg"
+						onClick={handleNext}
+						disabled={!shippingAddress}
+						className="px-10 min-w-[200px]"
+					>
+						{shippingAddress ? (
+							<span className="flex items-center gap-2">
+								<FiCheck className="w-5 h-5" />
+								Address Saved — Next
+							</span>
+						) : (
+							'Continue to Payment'
+						)}
+					</Button>
+				</div>
+			)}
 		</motion.div>
 	);
 };

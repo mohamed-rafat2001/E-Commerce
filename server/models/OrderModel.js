@@ -3,6 +3,11 @@ import { addressSchema, moneySchema } from "./commonSchemas.js";
 
 const orderSchema = new mongoose.Schema(
 	{
+		orderNumber: {
+			type: String,
+			unique: true,
+			trim: true,
+		},
 		userId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "UserModel",
@@ -105,8 +110,20 @@ const orderSchema = new mongoose.Schema(
 	}
 );
 
-orderSchema.pre("save", async function (next) {
-	if (!this.isModified("items")) return next();
+orderSchema.pre("save", async function () {
+	if (!this.orderNumber) {
+		const now = new Date();
+		const datePart =
+			now.getFullYear().toString() +
+			String(now.getMonth() + 1).padStart(2, "0") +
+			String(now.getDate()).padStart(2, "0");
+		const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+		this.orderNumber = `ORD-${datePart}-${randomPart}`;
+	}
+});
+
+orderSchema.pre("save", async function () {
+	if (!this.isModified("items")) return;
 
 	await this.populate("items");
 
@@ -130,8 +147,6 @@ orderSchema.pre("save", async function (next) {
 		amount: itemsTotal + tax + shipping,
 		currency: currency,
 	};
-
-	next();
 });
 
 export default mongoose.model("OrderModel", orderSchema);

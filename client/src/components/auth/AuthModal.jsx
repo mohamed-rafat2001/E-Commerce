@@ -4,6 +4,7 @@
  - Login flow supports query params and can consume redirect target after successful auth.
 */
 import { useEffect, useMemo, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactDOM from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiX } from "react-icons/fi";
@@ -21,6 +22,7 @@ const FOCUSABLE = [
 export default function AuthModal() {
 	const { isOpen, message, redirectAfter } = useSelector((state) => state.authModalStore);
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const panelRef = useRef(null);
 
 	const portalRoot = useMemo(() => {
@@ -72,6 +74,11 @@ export default function AuthModal() {
 		dispatch(closeAuthModal());
 		window.location.assign(`/register?redirect=${encodeURIComponent(redirectValue)}`);
 	};
+    
+    const continueAsGuest = () => {
+        dispatch(closeAuthModal());
+        navigate(redirectValue);
+    };
 
 	return ReactDOM.createPortal(
 		<div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
@@ -118,6 +125,17 @@ export default function AuthModal() {
 						Create Account
 					</button>
 				</div>
+
+                {redirectValue === '/checkout' && (
+                    <div className="mt-4 pt-4 border-t border-gray-50">
+                        <button
+                            onClick={continueAsGuest}
+                            className="w-full py-3 text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest flex items-center justify-center gap-2"
+                        >
+                            Complete without login (Guest)
+                        </button>
+                    </div>
+                )}
 			</div>
 		</div>,
 		portalRoot

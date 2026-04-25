@@ -2,6 +2,8 @@ import express from "express";
 import {
 	checkout,
 	guestCheckout,
+	getGuestOrdersByEmail,
+	getGuestOrderDetail,
 	getMyOrders,
 	getMyOrder,
 	cancelOrder,
@@ -64,6 +66,8 @@ const router = express.Router();
  *         description: Guest orders created successfully
  */
 router.route("/guest-checkout").post(guestCheckout);
+router.route("/guest-history").get(getGuestOrdersByEmail);
+router.route("/guest-order-detail").get(getGuestOrderDetail);
 
 // ========== PROTECTED ROUTES (auth required) ==========
 router.use(Protect);

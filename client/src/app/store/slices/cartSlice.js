@@ -1,5 +1,5 @@
 import { createSlice, createSelector, createAsyncThunk } from "@reduxjs/toolkit";
-import { validatePromoCode } from "../features/cart/services/cart.js";
+import { validatePromoCode } from "../../../features/cart/services/cart.js";
 
 export const validatePromo = createAsyncThunk(
 	"cart/validatePromo",

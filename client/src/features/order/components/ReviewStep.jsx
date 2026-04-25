@@ -35,21 +35,18 @@ const ReviewStep = ({ shippingAddress, paymentMethod, cartItems, calculations, o
 					<FiMapPin className="w-5 h-5 text-indigo-600" />
 					<h3 className="font-bold text-gray-900 text-sm">Shipping Address</h3>
 				</div>
-				{shippingAddress?._fullAddr ? (
+				{shippingAddress ? (
 					<div className="text-sm text-gray-600 space-y-0.5 pl-7">
-						{shippingAddress._fullAddr.recipientName && (
-							<p className="font-semibold text-gray-800">{shippingAddress._fullAddr.recipientName}</p>
+						{(shippingAddress.recipientName || shippingAddress._fullAddr?.recipientName) && (
+							<p className="font-semibold text-gray-800">{shippingAddress.recipientName || shippingAddress._fullAddr.recipientName}</p>
 						)}
-						<p>{shippingAddress.street}</p>
+						<p>{shippingAddress.line1}</p>
+						{shippingAddress.line2 && <p>{shippingAddress.line2}</p>}
 						<p>{shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}</p>
 						<p>{shippingAddress.country}</p>
 					</div>
 				) : (
-					<div className="text-sm text-gray-600 space-y-0.5 pl-7">
-						<p>{shippingAddress?.street}</p>
-						<p>{shippingAddress?.city}, {shippingAddress?.state} {shippingAddress?.postalCode}</p>
-						<p>{shippingAddress?.country}</p>
-					</div>
+					<div className="text-sm text-gray-400 italic pl-7">No address selected</div>
 				)}
 			</div>
 
