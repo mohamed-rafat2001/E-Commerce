@@ -1,12 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config({ quiet: true });
 process.on("uncaughtException", (err) => {
-	console.log(err.name, err.message);
-	console.log("UNCAUGHT EXCEPTION ... SHUTTING DOWN..");
+	console.error(err.name, err.message);
+	console.error("UNCAUGHT EXCEPTION ... SHUTTING DOWN..");
 	process.exit(1);
 });
 
 const port = process.env.PORT;
+
 import { app } from "./app.js";
 import dbConnect from "./db/config.js";
 
@@ -14,12 +15,12 @@ import dbConnect from "./db/config.js";
 dbConnect();
 
 const server = app.listen(port, () => {
-	console.log(`server running at port ${port}`);
+	console.info(`server running at port ${port}`);
 });
 
 process.on("unhandledRejection", (err) => {
-	console.log(err.name, err.message);
-	console.log("UNHANDLED REJECTION ... SHUTTING DOWN..");
+	console.error(err.name, err.message);
+	console.error("UNHANDLED REJECTION ... SHUTTING DOWN..");
 	server.close(() => {
 		process.exit(1);
 	});

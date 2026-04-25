@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+
 import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 import {
 	addProduct,

@@ -2,7 +2,6 @@ import ReviewsModel from "../models/ReviewsModel.js";
 import {
 	createDoc,
 	updateByOwner,
-	getById,
 	getAll,
 	deleteOneByOwner,
 } from "./handlerFactory.js";
@@ -18,7 +17,7 @@ export const addReview = createDoc(ReviewsModel, ["rating", "comment"]);
 export const updateReview = updateByOwner(
 	ReviewsModel,
 
-	["rating", "comment"]
+	["rating", "comment"],
 );
 
 //  @desc   get reviews for a product or seller

@@ -5,7 +5,6 @@ import sendResponse from "../utils/sendResponse.js";
 import APIFeatures from "../utils/apiFeatures.js";
 import {
 	validateSellerScope,
-	enrichProductsWithDiscounts,
 	resolveBestDiscount,
 } from "../services/discountService.js";
 
@@ -25,7 +24,7 @@ const DISCOUNT_FIELDS = [
 	"isActive",
 	"usageLimit",
 	"isCoupon",
-	"code"
+	"code",
 ];
 
 // ===================================================================
@@ -36,8 +35,9 @@ const DISCOUNT_FIELDS = [
  * Admin: Create a discount (any scope).
  * POST /api/v1/discounts/admin
  */
-export const adminCreateDiscount = catchAsync(async (req, res, next) => {
+export const adminCreateDiscount = catchAsync(async (req, res, _next) => {
 	const data = {};
+
 	DISCOUNT_FIELDS.forEach((key) => {
 		if (req.body[key] !== undefined) data[key] = req.body[key];
 	});
@@ -49,6 +49,7 @@ export const adminCreateDiscount = catchAsync(async (req, res, next) => {
 	if (data.priority === undefined) data.priority = 100;
 
 	const discount = await DiscountModel.create(data);
+
 	sendResponse(res, 201, discount);
 });
 
@@ -58,6 +59,7 @@ export const adminCreateDiscount = catchAsync(async (req, res, next) => {
  */
 export const adminUpdateDiscount = catchAsync(async (req, res, next) => {
 	const updates = {};
+
 	DISCOUNT_FIELDS.forEach((key) => {
 		if (req.body[key] !== undefined) updates[key] = req.body[key];
 	});
@@ -65,7 +67,7 @@ export const adminUpdateDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findByIdAndUpdate(
 		req.params.id,
 		updates,
-		{ new: true, runValidators: true }
+		{ new: true, runValidators: true },
 	);
 
 	if (!discount) return next(new appError("Discount not found", 404));
@@ -78,6 +80,7 @@ export const adminUpdateDiscount = catchAsync(async (req, res, next) => {
  */
 export const adminDeleteDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findByIdAndDelete(req.params.id);
+
 	if (!discount) return next(new appError("Discount not found", 404));
 	sendResponse(res, 200, {});
 });
@@ -86,7 +89,7 @@ export const adminDeleteDiscount = catchAsync(async (req, res, next) => {
  * Admin: Get all discounts with filtering, sorting, pagination.
  * GET /api/v1/discounts/admin
  */
-export const adminGetAllDiscounts = catchAsync(async (req, res, next) => {
+export const adminGetAllDiscounts = catchAsync(async (req, res, _next) => {
 	const features = new APIFeatures(DiscountModel.find(), req.query)
 		.filter()
 		.sort()
@@ -112,6 +115,7 @@ export const adminGetAllDiscounts = catchAsync(async (req, res, next) => {
  */
 export const adminGetDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findById(req.params.id).lean();
+
 	if (!discount) return next(new appError("Discount not found", 404));
 	sendResponse(res, 200, discount);
 });
@@ -122,6 +126,7 @@ export const adminGetDiscount = catchAsync(async (req, res, next) => {
  */
 export const adminToggleDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findById(req.params.id);
+
 	if (!discount) return next(new appError("Discount not found", 404));
 
 	discount.isActive = !discount.isActive;
@@ -138,8 +143,9 @@ export const adminToggleDiscount = catchAsync(async (req, res, next) => {
  * Seller: Create a discount (seller_all or single_product only).
  * POST /api/v1/discounts/seller
  */
-export const sellerCreateDiscount = catchAsync(async (req, res, next) => {
+export const sellerCreateDiscount = catchAsync(async (req, res, _next) => {
 	const data = {};
+
 	DISCOUNT_FIELDS.forEach((key) => {
 		if (req.body[key] !== undefined) data[key] = req.body[key];
 	});
@@ -159,6 +165,7 @@ export const sellerCreateDiscount = catchAsync(async (req, res, next) => {
 	}
 
 	const discount = await DiscountModel.create(data);
+
 	sendResponse(res, 201, discount);
 });
 
@@ -168,6 +175,7 @@ export const sellerCreateDiscount = catchAsync(async (req, res, next) => {
  */
 export const sellerUpdateDiscount = catchAsync(async (req, res, next) => {
 	const updates = {};
+
 	DISCOUNT_FIELDS.forEach((key) => {
 		if (req.body[key] !== undefined) updates[key] = req.body[key];
 	});
@@ -177,19 +185,19 @@ export const sellerUpdateDiscount = catchAsync(async (req, res, next) => {
 		await validateSellerScope(
 			req.user._id,
 			updates.scope || undefined,
-			updates.targetIds
+			updates.targetIds,
 		);
 	}
 
 	const discount = await DiscountModel.findOneAndUpdate(
 		{ _id: req.params.id, creatorId: req.user._id },
 		updates,
-		{ new: true, runValidators: true }
+		{ new: true, runValidators: true },
 	);
 
 	if (!discount)
 		return next(
-			new appError("Discount not found or you don't have permission", 404)
+			new appError("Discount not found or you don't have permission", 404),
 		);
 
 	sendResponse(res, 200, discount);
@@ -207,7 +215,7 @@ export const sellerDeleteDiscount = catchAsync(async (req, res, next) => {
 
 	if (!discount)
 		return next(
-			new appError("Discount not found or you don't have permission", 404)
+			new appError("Discount not found or you don't have permission", 404),
 		);
 
 	sendResponse(res, 200, {});
@@ -217,7 +225,7 @@ export const sellerDeleteDiscount = catchAsync(async (req, res, next) => {
  * Seller: Get own discounts with filtering, sorting, pagination.
  * GET /api/v1/discounts/seller
  */
-export const sellerGetAllDiscounts = catchAsync(async (req, res, next) => {
+export const sellerGetAllDiscounts = catchAsync(async (req, res, _next) => {
 	const filter = { creatorId: req.user._id };
 
 	const features = new APIFeatures(DiscountModel.find(filter), req.query)
@@ -230,7 +238,7 @@ export const sellerGetAllDiscounts = catchAsync(async (req, res, next) => {
 
 	const countFeatures = new APIFeatures(
 		DiscountModel.find(filter),
-		req.query
+		req.query,
 	).filter();
 	const total = await countFeatures.query.countDocuments();
 
@@ -254,7 +262,7 @@ export const sellerGetDiscount = catchAsync(async (req, res, next) => {
 
 	if (!discount)
 		return next(
-			new appError("Discount not found or you don't have permission", 404)
+			new appError("Discount not found or you don't have permission", 404),
 		);
 
 	sendResponse(res, 200, discount);
@@ -272,7 +280,7 @@ export const sellerToggleDiscount = catchAsync(async (req, res, next) => {
 
 	if (!discount)
 		return next(
-			new appError("Discount not found or you don't have permission", 404)
+			new appError("Discount not found or you don't have permission", 404),
 		);
 
 	discount.isActive = !discount.isActive;
@@ -289,7 +297,7 @@ export const sellerToggleDiscount = catchAsync(async (req, res, next) => {
  * Public: Get all currently active discounts (for storefront display).
  * GET /api/v1/discounts/active
  */
-export const getActiveDiscounts = catchAsync(async (req, res, next) => {
+export const getActiveDiscounts = catchAsync(async (req, res, _next) => {
 	const now = new Date();
 
 	const filter = {
@@ -313,7 +321,7 @@ export const getActiveDiscounts = catchAsync(async (req, res, next) => {
 
 	const countFeatures = new APIFeatures(
 		DiscountModel.find(filter),
-		req.query
+		req.query,
 	);
 	const total = await countFeatures.query.countDocuments();
 
@@ -333,6 +341,7 @@ export const getProductDiscount = catchAsync(async (req, res, next) => {
 	const ProductModel = (await import("../models/ProductModel.js")).default;
 
 	const product = await ProductModel.findById(req.params.productId).lean();
+
 	if (!product) return next(new appError("Product not found", 404));
 
 	const result = await resolveBestDiscount(product);

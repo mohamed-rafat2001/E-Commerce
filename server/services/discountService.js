@@ -7,6 +7,7 @@ import appError from "../utils/appError.js";
  */
 const activeDiscountFilter = () => {
 	const now = new Date();
+
 	return {
 		isActive: true,
 		isCoupon: { $ne: true },
@@ -98,35 +99,36 @@ export const resolveBestDiscount = async (product) => {
  * Calculate the discounted price given an original price and a discount document.
  */
 export const calculateDiscountedPrice = (originalPrice, discount) => {
-	let savings = 0;
+	let savings;
 
 	switch (discount.type) {
-		case "percentage": {
-			savings = (originalPrice * discount.value) / 100;
-			// Apply max discount cap
-			if (
-				discount.maxDiscountAmount !== null &&
+	case "percentage": {
+		savings = (originalPrice * discount.value) / 100;
+		// Apply max discount cap
+		if (
+			discount.maxDiscountAmount !== null &&
 				discount.maxDiscountAmount !== undefined &&
 				savings > discount.maxDiscountAmount
-			) {
-				savings = discount.maxDiscountAmount;
-			}
-			break;
+		) {
+			savings = discount.maxDiscountAmount;
 		}
-		case "fixed_amount": {
-			savings = Math.min(discount.value, originalPrice);
-			break;
-		}
-		case "free_shipping":
-		case "shipping_discount":
-			// These don't affect product price directly
-			savings = 0;
-			break;
-		default:
-			savings = 0;
+		break;
+	}
+	case "fixed_amount": {
+		savings = Math.min(discount.value, originalPrice);
+		break;
+	}
+	case "free_shipping":
+	case "shipping_discount":
+		// These don't affect product price directly
+		savings = 0;
+		break;
+	default:
+		savings = 0;
 	}
 
 	const discountedPrice = Math.max(0, originalPrice - savings);
+
 	return {
 		discountedPrice: Math.round(discountedPrice * 100) / 100,
 		savings: Math.round(savings * 100) / 100,
@@ -142,8 +144,6 @@ export const calculateDiscountedPrice = (originalPrice, discount) => {
  * @returns {Object|null} — { discount, shippingSavings }
  */
 export const resolveShippingDiscount = async (products, orderSubtotal) => {
-	const now = new Date();
-
 	// Gather all unique category IDs and seller user IDs
 	const categoryIds = [
 		...new Set(
@@ -151,14 +151,14 @@ export const resolveShippingDiscount = async (products, orderSubtotal) => {
 				.map(
 					(p) =>
 						p.primaryCategory?._id?.toString() ||
-						p.primaryCategory?.toString()
+						p.primaryCategory?.toString(),
 				)
-				.filter(Boolean)
+				.filter(Boolean),
 		),
 	];
 	const sellerUserIds = [
 		...new Set(
-			products.map((p) => p.userId?.toString()).filter(Boolean)
+			products.map((p) => p.userId?.toString()).filter(Boolean),
 		),
 	];
 	const productIds = products.map((p) => p._id?.toString()).filter(Boolean);
@@ -182,7 +182,7 @@ export const resolveShippingDiscount = async (products, orderSubtotal) => {
 	const freeShipping = shippingDiscounts.find(
 		(d) =>
 			d.type === "free_shipping" &&
-			(d.minOrderValue === 0 || orderSubtotal >= d.minOrderValue)
+			(d.minOrderValue === 0 || orderSubtotal >= d.minOrderValue),
 	);
 
 	if (freeShipping) {
@@ -193,7 +193,7 @@ export const resolveShippingDiscount = async (products, orderSubtotal) => {
 	const shippingDisc = shippingDiscounts.find(
 		(d) =>
 			d.type === "shipping_discount" &&
-			(d.minOrderValue === 0 || orderSubtotal >= d.minOrderValue)
+			(d.minOrderValue === 0 || orderSubtotal >= d.minOrderValue),
 	);
 
 	if (shippingDisc) {
@@ -223,14 +223,14 @@ export const validateSellerScope = async (sellerId, scope, targetIds) => {
 	if (scope === "all_products") {
 		throw new appError(
 			"Sellers cannot create platform-wide discounts. Use 'seller_all' to apply to all your products.",
-			403
+			403,
 		);
 	}
 
 	if (scope === "category") {
 		throw new appError(
 			"Sellers cannot create category-wide discounts. Use 'seller_all' or 'single_product'.",
-			403
+			403,
 		);
 	}
 
@@ -243,7 +243,7 @@ export const validateSellerScope = async (sellerId, scope, targetIds) => {
 		if (products.length !== targetIds.length) {
 			throw new appError(
 				"You can only create discounts for your own products.",
-				403
+				403,
 			);
 		}
 	}
@@ -259,16 +259,16 @@ export const validateSellerScope = async (sellerId, scope, targetIds) => {
  */
 const formatBadge = (discount) => {
 	switch (discount.type) {
-		case "percentage":
-			return `-${discount.value}%`;
-		case "fixed_amount":
-			return `-$${discount.value}`;
-		case "free_shipping":
-			return "FREE SHIPPING";
-		case "shipping_discount":
-			return `-$${discount.value} SHIPPING`;
-		default:
-			return "";
+	case "percentage":
+		return `-${discount.value}%`;
+	case "fixed_amount":
+		return `-$${discount.value}`;
+	case "free_shipping":
+		return "FREE SHIPPING";
+	case "shipping_discount":
+		return `-$${discount.value} SHIPPING`;
+	default:
+		return "";
 	}
 };
 
@@ -311,8 +311,9 @@ export const enrichProductsWithDiscounts = async (products) => {
 				return d.targetIds?.some((t) => t.toString() === categoryId);
 			if (d.scope === "seller_all" && sellerUserId)
 				return d.targetIds?.some(
-					(t) => t.toString() === sellerUserId
+					(t) => t.toString() === sellerUserId,
 				);
+
 			return false;
 		});
 
@@ -320,6 +321,7 @@ export const enrichProductsWithDiscounts = async (products) => {
 
 		// Pick the best one (already sorted by priority desc, value desc)
 		let best = null;
+
 		for (const discount of matching) {
 			// Skip shipping-only discounts for price display
 			if (
@@ -329,6 +331,7 @@ export const enrichProductsWithDiscounts = async (products) => {
 				continue;
 
 			const result = calculateDiscountedPrice(originalPrice, discount);
+
 			if (
 				!best ||
 				discount.priority > best.discount.priority ||
@@ -360,8 +363,9 @@ export const enrichProductsWithDiscounts = async (products) => {
 		// Check for shipping discounts applicable to this product
 		const shippingDiscount = matching.find(
 			(d) =>
-				d.type === "free_shipping" || d.type === "shipping_discount"
+				d.type === "free_shipping" || d.type === "shipping_discount",
 		);
+
 		if (shippingDiscount) {
 			prod.shippingDiscount = {
 				discountId: shippingDiscount._id,
@@ -380,6 +384,7 @@ export const enrichProductsWithDiscounts = async (products) => {
  */
 const activeCouponFilter = () => {
 	const now = new Date();
+
 	return {
 		isActive: true,
 		isCoupon: true,
@@ -423,14 +428,15 @@ export const validateCouponForCart = async (code, cartItems) => {
 		const sellerUserId = product.userId?.toString();
 
 		let isEligible = false;
+
 		if (coupon.scope === "all_products") {
 			isEligible = true;
 		} else if (coupon.scope === "single_product") {
-			isEligible = coupon.targetIds.some(t => t.toString() === productId);
+			isEligible = coupon.targetIds.some((t) => t.toString() === productId);
 		} else if (coupon.scope === "category" && categoryId) {
-			isEligible = coupon.targetIds.some(t => t.toString() === categoryId);
+			isEligible = coupon.targetIds.some((t) => t.toString() === categoryId);
 		} else if (coupon.scope === "seller_all" && sellerUserId) {
-			isEligible = coupon.targetIds.some(t => t.toString() === sellerUserId);
+			isEligible = coupon.targetIds.some((t) => t.toString() === sellerUserId);
 		}
 
 		if (isEligible) {
@@ -450,6 +456,7 @@ export const validateCouponForCart = async (code, cartItems) => {
 		// Calculate full cart subtotal to check min limit
 		const fullCartSubtotal = cartItems.reduce((acc, item) => {
 			const product = item.productObj || item.item;
+
 			return acc + (product.price?.amount || 0) * (item.quantity || 1);
 		}, 0);
 
@@ -462,11 +469,13 @@ export const validateCouponForCart = async (code, cartItems) => {
 	const { savings } = calculateDiscountedPrice(eligibleOriginalSubtotal, coupon);
 
 	const allocations = {};
+
 	if (savings > 0) {
-		cartItems.forEach(cartItem => {
+		cartItems.forEach((cartItem) => {
 			if (cartItem.__isEligible) {
 				const product = cartItem.productObj || cartItem.item;
 				const itemTotal = (product.price?.amount || 0) * (cartItem.quantity || 1);
+
 				allocations[product._id.toString()] = (itemTotal / eligibleOriginalSubtotal) * savings;
 			}
 		});
@@ -481,6 +490,6 @@ export const validateCouponForCart = async (code, cartItems) => {
 		type: coupon.type,
 		value: coupon.value,
 		discountAmount: savings,
-		message: `Promo code applied successfully!`
+		message: "Promo code applied successfully!",
 	};
 };

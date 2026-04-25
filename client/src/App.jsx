@@ -11,7 +11,7 @@ import { HelmetProvider } from "react-helmet-async";
 import router from "./app/routes/router.jsx";
 import queryClient from "./shared/utils/queryClient.js";
 import { Toaster } from "react-hot-toast";
-import AuthModal from "./components/auth/AuthModal.jsx";
+
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import useCartMerge from "./hooks/useCartMerge.js";
 import useWishlistMerge from "./hooks/useWishlistMerge.js";
@@ -27,12 +27,7 @@ const ReactQueryDevtools = import.meta.env.DEV
 function AppBoot() {
 	useCartMerge();
 	useWishlistMerge();
-	return (
-		<>
-			<RouterProvider router={router} />
-			<AuthModal />
-		</>
-	);
+	return <RouterProvider router={router} />;
 }
 
 function App() {

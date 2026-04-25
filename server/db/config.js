@@ -8,10 +8,11 @@ export default function dbConnect() {
 
 	if (!dbURL) {
 		console.error("DB_URL is not defined in environment variables");
+
 		return;
 	}
 	mongoose
 		.connect(dbURL)
-		.then(() => console.log("db is connected"))
-		.catch((e) => console.log(e.message));
+		.then(() => console.info("db is connected"))
+		.catch((e) => console.error(e.message));
 }

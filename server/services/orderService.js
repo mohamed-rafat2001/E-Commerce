@@ -19,8 +19,9 @@ const SHIPPING_REDUCED_FEE = 10;
  * Requires a Replica Set or Sharded cluster.
  */
 const canUseTransactions = () => {
-    const conn = mongoose.connection;
-    return conn.client?.topology?.description?.type !== 'Single';
+	const conn = mongoose.connection;
+
+	return conn.client?.topology?.description?.type !== "Single";
 };
 
 /**
@@ -28,267 +29,260 @@ const canUseTransactions = () => {
  * Fallbacks to non-transactional execution on standalone MongoDB instances.
  */
 const withTransaction = async (workFn) => {
-    const session = await mongoose.startSession();
-    const useTransaction = canUseTransactions();
+	const session = await mongoose.startSession();
+	const useTransaction = canUseTransactions();
     
-    if (useTransaction) session.startTransaction();
+	if (useTransaction) session.startTransaction();
     
-    try {
-        const result = await workFn(useTransaction ? session : null);
-        if (useTransaction) await session.commitTransaction();
-        return result;
-    } catch (error) {
-        if (useTransaction && session.inTransaction()) {
-            await session.abortTransaction();
-        }
-        throw error;
-    } finally {
-        session.endSession();
-    }
+	try {
+		const result = await workFn(useTransaction ? session : null);
+
+		if (useTransaction) await session.commitTransaction();
+
+		return result;
+	} catch (error) {
+		if (useTransaction && session.inTransaction()) {
+			await session.abortTransaction();
+		}
+		throw error;
+	} finally {
+		session.endSession();
+	}
 };
 
 /**
  * Calculate shipping fee based on subtotal.
  */
 const calculateShippingFee = (subtotal) => {
-    if (subtotal >= SHIPPING_FREE_THRESHOLD) return 0;
-    if (subtotal >= SHIPPING_REDUCED_THRESHOLD) return SHIPPING_REDUCED_FEE;
-    return SHIPPING_STANDARD_FEE;
-};
+	if (subtotal >= SHIPPING_FREE_THRESHOLD) return 0;
+	if (subtotal >= SHIPPING_REDUCED_THRESHOLD) return SHIPPING_REDUCED_FEE;
 
-/**
- * Generate a human-readable, unique order number.
- * Format: ORD-YYYYMMDD-XXXXXX (timestamp + random)
- */
-const generateOrderNumber = () => {
-    const now = new Date();
-    const datePart =
-        now.getFullYear().toString() +
-        String(now.getMonth() + 1).padStart(2, "0") +
-        String(now.getDate()).padStart(2, "0");
-    const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `ORD-${datePart}-${randomPart}`;
+	return SHIPPING_STANDARD_FEE;
 };
 
 /**
  * Shared Helper: Process validated items, handle atomic inventory decrement, grouping by seller, and order creation.
  */
 const processOrderCreation = async ({
-    validatedItems,
-    shippingAddress,
-    paymentMethod,
-    session,
-    userId,
-    guestEmail,
-    guestName,
-    guestPhone,
-    couponCode,
+	validatedItems,
+	shippingAddress,
+	paymentMethod,
+	session,
+	userId,
+	guestEmail,
+	guestName,
+	guestPhone,
+	couponCode,
 }) => {
-    // Step 3 — Atomic inventory decrement
-    const stockErrors = [];
-    const productDataMap = {};
+	// Step 3 — Atomic inventory decrement
+	const stockErrors = [];
+	const productDataMap = {};
 
-    for (const { item, quantity } of validatedItems) {
-        const productId = item._id ? item._id.toString() : item.toString();
+	for (const { item, quantity } of validatedItems) {
+		const productId = item._id ? item._id.toString() : item.toString();
 
-        const updatedProduct = await ProductModel.findOneAndUpdate(
-            {
-                _id: productId,
-                countInStock: { $gte: quantity },
-            },
-            {
-                $inc: { countInStock: -quantity },
-            },
-            { new: true, session }
-        ).lean();
+		const updatedProduct = await ProductModel.findOneAndUpdate(
+			{
+				_id: productId,
+				countInStock: { $gte: quantity },
+			},
+			{
+				$inc: { countInStock: -quantity },
+			},
+			{ new: true, session },
+		).lean();
 
-        if (!updatedProduct) {
-            stockErrors.push(
-                `Insufficient stock for product "${productId}" (requested: ${quantity})`
-            );
-        } else {
-            productDataMap[productId] = updatedProduct;
-        }
-    }
+		if (!updatedProduct) {
+			stockErrors.push(
+				`Insufficient stock for product "${productId}" (requested: ${quantity})`,
+			);
+		} else {
+			productDataMap[productId] = updatedProduct;
+		}
+	}
 
-    if (stockErrors.length > 0) {
-        await session.abortTransaction();
-        throw new appError(stockErrors.join("; "), 400);
-    }
+	if (stockErrors.length > 0) {
+		await session.abortTransaction();
+		throw new appError(stockErrors.join("; "), 400);
+	}
 
-    // Enrich all locked products with live discount info
-    const enrichedProductArr = await enrichProductsWithDiscounts(Object.values(productDataMap));
-    enrichedProductArr.forEach(p => {
-        productDataMap[p._id.toString()] = p;
-    });
+	// Enrich all locked products with live discount info
+	const enrichedProductArr = await enrichProductsWithDiscounts(Object.values(productDataMap));
 
-    // Validate coupon if provided
-    let appliedCouponData = null;
-    if (couponCode) {
-        const itemsForValidation = validatedItems.map(cartItem => {
-            const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
-            return {
-                ...cartItem,
-                productObj: productDataMap[productId]
-            };
-        });
-        // This will throw if invalid
-        appliedCouponData = await validateCouponForCart(couponCode, itemsForValidation);
-    }
+	enrichedProductArr.forEach((p) => {
+		productDataMap[p._id.toString()] = p;
+	});
 
-    // Step 4 — Group items by seller
-    const itemsBySeller = {};
+	// Validate coupon if provided
+	let appliedCouponData = null;
 
-    for (const cartItem of validatedItems) {
-        const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
-        const product = productDataMap[productId];
+	if (couponCode) {
+		const itemsForValidation = validatedItems.map((cartItem) => {
+			const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
 
-        // Get the product's owner (seller) userId
-        const sellerUserId = product.userId?.toString();
+			return {
+				...cartItem,
+				productObj: productDataMap[productId],
+			};
+		});
 
-        if (!sellerUserId) continue;
+		// This will throw if invalid
+		appliedCouponData = await validateCouponForCart(couponCode, itemsForValidation);
+	}
 
-        if (!itemsBySeller[sellerUserId]) {
-            itemsBySeller[sellerUserId] = [];
-        }
+	// Step 4 — Group items by seller
+	const itemsBySeller = {};
 
-        // Calculate unit price considering the active discount
-        const originalUnitPrice = product.price?.amount || 0;
-        const unitPrice = product.activeDiscount ? product.activeDiscount.discountedPrice : originalUnitPrice;
-        let discountSavings = (originalUnitPrice - unitPrice) * cartItem.quantity;
+	for (const cartItem of validatedItems) {
+		const productId = cartItem.item._id ? cartItem.item._id.toString() : cartItem.item.toString();
+		const product = productDataMap[productId];
+
+		// Get the product's owner (seller) userId
+		const sellerUserId = product.userId?.toString();
+
+		if (!sellerUserId) continue;
+
+		if (!itemsBySeller[sellerUserId]) {
+			itemsBySeller[sellerUserId] = [];
+		}
+
+		// Calculate unit price considering the active discount
+		const originalUnitPrice = product.price?.amount || 0;
+		const unitPrice = product.activeDiscount ? product.activeDiscount.discountedPrice : originalUnitPrice;
+		let discountSavings = (originalUnitPrice - unitPrice) * cartItem.quantity;
         
-        // Add coupon savings if any allocated to this item
-        if (appliedCouponData && appliedCouponData.allocations && appliedCouponData.allocations[productId]) {
-            discountSavings += appliedCouponData.allocations[productId];
-        }
+		// Add coupon savings if any allocated to this item
+		if (appliedCouponData && appliedCouponData.allocations && appliedCouponData.allocations[productId]) {
+			discountSavings += appliedCouponData.allocations[productId];
+		}
         
-        itemsBySeller[sellerUserId].push({
-            item: productId,
-            quantity: cartItem.quantity,
-            price: { amount: originalUnitPrice * cartItem.quantity, currency: product.price?.currency || "USD" },
-            appliedUnitPrice: unitPrice,
-            productOriginalPrice: originalUnitPrice,
-            discountSavings,
-            activeDiscount: product.activeDiscount,
-            productObj: product,
-            productName: product.name,
-            productImage: product.coverImage,
-        });
-    }
+		itemsBySeller[sellerUserId].push({
+			item: productId,
+			quantity: cartItem.quantity,
+			price: { amount: originalUnitPrice * cartItem.quantity, currency: product.price?.currency || "USD" },
+			appliedUnitPrice: unitPrice,
+			productOriginalPrice: originalUnitPrice,
+			discountSavings,
+			activeDiscount: product.activeDiscount,
+			productObj: product,
+			productName: product.name,
+			productImage: product.coverImage,
+		});
+	}
 
-    // Step 5 — Build and save each order
-    const createdOrders = [];
+	// Step 5 — Build and save each order
+	const createdOrders = [];
 
-    for (const [sellerUserId, items] of Object.entries(itemsBySeller)) {
-        // Find the SellerModel document for this user (or fallback)
-        const seller = await SellerModel.findOne({ userId: sellerUserId })
-            .session(session)
-            .lean();
+	for (const [sellerUserId, items] of Object.entries(itemsBySeller)) {
+		// Find the SellerModel document for this user (or fallback)
+		const seller = await SellerModel.findOne({ userId: sellerUserId })
+			.session(session)
+			.lean();
 
-        const sellerId = seller ? seller._id : sellerUserId;
+		const sellerId = seller ? seller._id : sellerUserId;
 
-        // Calculate subtotal from original item prices
-        const currency = items[0]?.price?.currency || "USD";
-        const totalOriginalPrice = items.reduce(
-            (sum, item) => sum + (item.price?.amount || 0),
-            0
-        );
+		// Calculate subtotal from original item prices
+		const currency = items[0]?.price?.currency || "USD";
+		const totalOriginalPrice = items.reduce(
+			(sum, item) => sum + (item.price?.amount || 0),
+			0,
+		);
 
-        // Gather total item savings and applied discount IDs
-        let itemSavings = 0;
-        const appliedDiscounts = new Set();
+		// Gather total item savings and applied discount IDs
+		let itemSavings = 0;
+		const appliedDiscounts = new Set();
         
-        items.forEach(item => {
-            itemSavings += item.discountSavings || 0;
-            if (item.activeDiscount?.discountId) {
-                appliedDiscounts.add(item.activeDiscount.discountId.toString());
-            }
-        });
+		items.forEach((item) => {
+			itemSavings += item.discountSavings || 0;
+			if (item.activeDiscount?.discountId) {
+				appliedDiscounts.add(item.activeDiscount.discountId.toString());
+			}
+		});
 
-        if (appliedCouponData) {
-            appliedDiscounts.add(appliedCouponData.couponId.toString());
-        }
+		if (appliedCouponData) {
+			appliedDiscounts.add(appliedCouponData.couponId.toString());
+		}
 
-        const subtotal = totalOriginalPrice - itemSavings;
+		const subtotal = totalOriginalPrice - itemSavings;
 
-        // Resolve shipping discount for this seller's part of the order
-        const productsInOrder = items.map(i => i.productObj);
-        const resolvedShippingDiscount = await resolveShippingDiscount(productsInOrder, subtotal);
+		// Resolve shipping discount for this seller's part of the order
+		const productsInOrder = items.map((i) => i.productObj);
+		const resolvedShippingDiscount = await resolveShippingDiscount(productsInOrder, subtotal);
         
-        let shippingFee = calculateShippingFee(subtotal);
-        let shippingSavings = 0;
+		let shippingFee = calculateShippingFee(subtotal);
+		let shippingSavings = 0;
 
-        if (resolvedShippingDiscount) {
-            appliedDiscounts.add(resolvedShippingDiscount.discount._id.toString());
-            if (resolvedShippingDiscount.type === "free_shipping") {
-                shippingSavings = shippingFee;
-                shippingFee = 0;
-            } else if (resolvedShippingDiscount.type === "shipping_discount") {
-                shippingSavings = Math.min(shippingFee, resolvedShippingDiscount.shippingSavings);
-                shippingFee = Math.max(0, shippingFee - shippingSavings);
-            }
-        }
+		if (resolvedShippingDiscount) {
+			appliedDiscounts.add(resolvedShippingDiscount.discount._id.toString());
+			if (resolvedShippingDiscount.type === "free_shipping") {
+				shippingSavings = shippingFee;
+				shippingFee = 0;
+			} else if (resolvedShippingDiscount.type === "shipping_discount") {
+				shippingSavings = Math.min(shippingFee, resolvedShippingDiscount.shippingSavings);
+				shippingFee = Math.max(0, shippingFee - shippingSavings);
+			}
+		}
 
-        const orderId = new mongoose.Types.ObjectId();
+		const orderId = new mongoose.Types.ObjectId();
 
-        // Register Usage for Discounts
-        if (appliedDiscounts.size > 0) {
-            for (const dId of appliedDiscounts) {
-                // Background increment is fine here, or await it
-                incrementUsage(dId).catch(console.error);
-            }
-        }
+		// Register Usage for Discounts
+		if (appliedDiscounts.size > 0) {
+			for (const dId of appliedDiscounts) {
+				// Background increment is fine here, or await it
+				incrementUsage(dId).catch(console.error);
+			}
+		}
 
-        const orderItemsDoc = await OrderItemsModel.create(
-            [
-                {
-                    orderId,
-                    sellerId,
-                    items: items.map((item) => ({
-                        item: item.item,
-                        quantity: item.quantity,
-                        price: item.price,
-                    })),
-                },
-            ],
-            { session }
-        );
+		const orderItemsDoc = await OrderItemsModel.create(
+			[
+				{
+					orderId,
+					sellerId,
+					items: items.map((item) => ({
+						item: item.item,
+						quantity: item.quantity,
+						price: item.price,
+					})),
+				},
+			],
+			{ session },
+		);
 
-        const orderData = {
-            _id: orderId,
-            sellerIds: [sellerId],
-            items: [orderItemsDoc[0]._id],
-            shippingAddress,
-            paymentMethod,
-            shippingPrice: { amount: shippingFee, currency },
-            taxPrice: { amount: 0, currency },
-            itemsPrice: { amount: totalOriginalPrice, currency },
-            discountAmount: { amount: itemSavings, currency },
-            shippingDiscountAmount: { amount: shippingSavings, currency },
-            appliedDiscounts: Array.from(appliedDiscounts),
-            totalPrice: { amount: subtotal + shippingFee, currency },
-            status: "Pending",
-            isPaid: false,
-            isDelivered: false,
-        };
+		const orderData = {
+			_id: orderId,
+			sellerIds: [sellerId],
+			items: [orderItemsDoc[0]._id],
+			shippingAddress,
+			paymentMethod,
+			shippingPrice: { amount: shippingFee, currency },
+			taxPrice: { amount: 0, currency },
+			itemsPrice: { amount: totalOriginalPrice, currency },
+			discountAmount: { amount: itemSavings, currency },
+			shippingDiscountAmount: { amount: shippingSavings, currency },
+			appliedDiscounts: Array.from(appliedDiscounts),
+			totalPrice: { amount: subtotal + shippingFee, currency },
+			status: "Pending",
+			isPaid: false,
+			isDelivered: false,
+		};
 
-        if (userId) orderData.userId = userId;
-        if (guestEmail) orderData.guestEmail = guestEmail;
-        if (guestName) orderData.guestName = guestName;
-        if (guestPhone) orderData.guestPhone = guestPhone;
-        if (couponCode) orderData.couponCode = couponCode;
+		if (userId) orderData.userId = userId;
+		if (guestEmail) orderData.guestEmail = guestEmail;
+		if (guestName) orderData.guestName = guestName;
+		if (guestPhone) orderData.guestPhone = guestPhone;
+		if (couponCode) orderData.couponCode = couponCode;
 
-        const [order] = await OrderModel.create([orderData], { session });
+		const [order] = await OrderModel.create([orderData], { session });
         
-        // Populate items to ensure UI has counts/details immediately
-        const populatedOrder = await OrderModel.findById(order._id)
-            .populate('items')
-            .session(session);
+		// Populate items to ensure UI has counts/details immediately
+		const populatedOrder = await OrderModel.findById(order._id)
+			.populate("items")
+			.session(session);
             
-        createdOrders.push(populatedOrder || order);
-    }
+		createdOrders.push(populatedOrder || order);
+	}
 
-    return createdOrders;
+	return createdOrders;
 };
 
 /**
@@ -296,36 +290,37 @@ const processOrderCreation = async ({
  * All-or-nothing MongoDB transaction.
  */
 export const createOrdersFromCart = async (
-    userId,
-    { shippingAddress, paymentMethod, notes, couponCode }
+	userId,
+	{ shippingAddress, paymentMethod, _notes, couponCode },
 ) => {
-    // Step 1 — Validate cart
-    const { valid, errors, cart } = await validateCartForCheckout(userId);
-    // Step 2 — Use transaction helper
-    return await withTransaction(async (session) => {
-        const createdOrders = await processOrderCreation({
-            validatedItems: cart.items,
-            shippingAddress,
-            paymentMethod,
-            session,
-            userId,
-            couponCode,
-        });
+	// Step 1 — Validate cart
+	const { cart } = await validateCartForCheckout(userId);
 
-        // Step 6 — Clear the cart inside the same session
-        await CartModel.updateOne(
-            { _id: cart._id },
-            {
-                $set: {
-                    items: [],
-                    totalPrice: { amount: 0, currency: "USD" },
-                },
-            },
-            { session }
-        );
+	// Step 2 — Use transaction helper
+	return await withTransaction(async (session) => {
+		const createdOrders = await processOrderCreation({
+			validatedItems: cart.items,
+			shippingAddress,
+			paymentMethod,
+			session,
+			userId,
+			couponCode,
+		});
 
-        return createdOrders;
-    });
+		// Step 6 — Clear the cart inside the same session
+		await CartModel.updateOne(
+			{ _id: cart._id },
+			{
+				$set: {
+					items: [],
+					totalPrice: { amount: 0, currency: "USD" },
+				},
+			},
+			{ session },
+		);
+
+		return createdOrders;
+	});
 };
 
 /**
@@ -342,178 +337,183 @@ export const createOrdersFromCart = async (
  * @param {string} params.guestPhone
  */
 export const createOrdersFromGuestCart = async ({
-    cartItems,
-    shippingAddress,
-    paymentMethod,
-    notes,
-    guestEmail,
-    guestName,
-    guestPhone,
-    couponCode,
+	cartItems,
+	shippingAddress,
+	paymentMethod,
+	_notes,
+	guestEmail,
+	guestName,
+	guestPhone,
+	couponCode,
 }) => {
-    // Step 1 — Validate all cart items exist and are in stock
-    const errors = [];
-    const validatedItems = [];
+	// Step 1 — Validate all cart items exist and are in stock
+	const errors = [];
+	const validatedItems = [];
 
-    for (const cartItem of cartItems) {
-        const productId = cartItem.product_id || cartItem.productId || cartItem._id;
-        const quantity = Number(cartItem.quantity) || 1;
+	for (const cartItem of cartItems) {
+		const productId = cartItem.product_id || cartItem.productId || cartItem._id;
+		const quantity = Number(cartItem.quantity) || 1;
 
-        const product = await ProductModel.findById(productId).lean();
+		const product = await ProductModel.findById(productId).lean();
 
-        if (!product) {
-            errors.push(`Product "${productId}" not found`);
-            continue;
-        }
-        if (product.status !== "active") {
-            errors.push(`Product "${product.name}" is no longer available`);
-            continue;
-        }
-        if (product.countInStock <= 0) {
-            errors.push(`Product "${product.name}" is out of stock`);
-            continue;
-        }
-        if (quantity > product.countInStock) {
-            errors.push(
-                `Product "${product.name}" — requested ${quantity} but only ${product.countInStock} available`
-            );
-            continue;
-        }
+		if (!product) {
+			errors.push(`Product "${productId}" not found`);
+			continue;
+		}
+		if (product.status !== "active") {
+			errors.push(`Product "${product.name}" is no longer available`);
+			continue;
+		}
+		if (product.countInStock <= 0) {
+			errors.push(`Product "${product.name}" is out of stock`);
+			continue;
+		}
+		if (quantity > product.countInStock) {
+			errors.push(
+				`Product "${product.name}" — requested ${quantity} but only ${product.countInStock} available`,
+			);
+			continue;
+		}
 
-        validatedItems.push({ item: productId, quantity, product });
-    }
+		validatedItems.push({ item: productId, quantity, product });
+	}
 
-    if (errors.length > 0) {
-        throw new appError(errors.join("; "), 400);
-    }
-    if (validatedItems.length === 0) {
-        throw new appError("No valid items to checkout", 400);
-    }
+	if (errors.length > 0) {
+		throw new appError(errors.join("; "), 400);
+	}
+	if (validatedItems.length === 0) {
+		throw new appError("No valid items to checkout", 400);
+	}
 
-    return await withTransaction(async (session) => {
-        return await processOrderCreation({
-            validatedItems,
-            shippingAddress,
-            paymentMethod,
-            session,
-            guestEmail,
-            guestName,
-            guestPhone,
-            couponCode,
-        });
-    });
+	return await withTransaction(async (session) => {
+		return await processOrderCreation({
+			validatedItems,
+			shippingAddress,
+			paymentMethod,
+			session,
+			guestEmail,
+			guestName,
+			guestPhone,
+			couponCode,
+		});
+	});
 };
 
 /**
  * Cancel an order (customer only — pending orders only).
  * Restores inventory inside a transaction.
  */
-export const cancelOrder = async (orderId, userId, reason) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+export const cancelOrder = async (orderId, userId, _reason) => {
+	const session = await mongoose.startSession();
 
-    try {
-        const order = await OrderModel.findOne({
-            _id: orderId,
-            userId,
-        }).session(session);
+	session.startTransaction();
 
-        if (!order) {
-            throw new appError("Order not found", 404);
-        }
+	try {
+		const order = await OrderModel.findOne({
+			_id: orderId,
+			userId,
+		}).session(session);
 
-        if (order.status !== "Pending") {
-            throw new appError(
-                `Cannot cancel order with status "${order.status}". Only pending orders can be cancelled.`,
-                400
-            );
-        }
+		if (!order) {
+			throw new appError("Order not found", 404);
+		}
 
-        // Restore inventory — fetch order items to get per-item details
-        const orderItemsDocs = await OrderItemsModel.find({
-            orderId: order._id,
-        }).session(session);
+		if (order.status !== "Pending") {
+			throw new appError(
+				`Cannot cancel order with status "${order.status}". Only pending orders can be cancelled.`,
+				400,
+			);
+		}
 
-        for (const orderItemsDoc of orderItemsDocs) {
-            for (const item of orderItemsDoc.items) {
-                await ProductModel.findByIdAndUpdate(
-                    item.item,
-                    { $inc: { countInStock: item.quantity } },
-                    { session }
-                );
-            }
-        }
+		// Restore inventory — fetch order items to get per-item details
+		const orderItemsDocs = await OrderItemsModel.find({
+			orderId: order._id,
+		}).session(session);
 
-        // Update order status
-        order.status = "Cancelled";
-        await order.save({ session });
+		for (const orderItemsDoc of orderItemsDocs) {
+			for (const item of orderItemsDoc.items) {
+				await ProductModel.findByIdAndUpdate(
+					item.item,
+					{ $inc: { countInStock: item.quantity } },
+					{ session },
+				);
+			}
+		}
 
-        await session.commitTransaction();
-        return order;
-    } catch (error) {
-        if (session.inTransaction()) {
-            await session.abortTransaction();
-        }
-        throw error;
-    } finally {
-        session.endSession();
-    }
+		// Update order status
+		order.status = "Cancelled";
+		await order.save({ session });
+
+		await session.commitTransaction();
+
+		return order;
+	} catch (error) {
+		if (session.inTransaction()) {
+			await session.abortTransaction();
+		}
+		throw error;
+	} finally {
+		session.endSession();
+	}
 };
 
 /**
  * Seller updates order status (only allowed: Pending→Processing, Processing→Shipped).
  */
 export const updateOrderStatusBySeller = async (
-    orderId,
-    sellerUserId,
-    newStatus,
-    { tracking_number, note } = {}
+	orderId,
+	sellerUserId,
+	newStatus,
+	{ tracking_number: _tracking_number, note: _note } = {},
 ) => {
-    // Find seller model
-    const seller = await SellerModel.findOne({ userId: sellerUserId });
-    if (!seller) {
-        throw new appError("Seller profile not found", 404);
-    }
+	// Find seller model
+	const seller = await SellerModel.findOne({ userId: sellerUserId });
 
-    // Find the order items doc that belongs to this seller for this order
-    const orderItemsDoc = await OrderItemsModel.findOne({
-        orderId,
-        sellerId: seller._id,
-    });
+	if (!seller) {
+		throw new appError("Seller profile not found", 404);
+	}
 
-    if (!orderItemsDoc) {
-        throw new appError("Order not found or does not belong to you", 404);
-    }
+	// Find the order items doc that belongs to this seller for this order
+	const orderItemsDoc = await OrderItemsModel.findOne({
+		orderId,
+		sellerId: seller._id,
+	});
 
-    // Find the actual order
-    const order = await OrderModel.findById(orderId);
-    if (!order) {
-        throw new appError("Order not found", 404);
-    }
+	if (!orderItemsDoc) {
+		throw new appError("Order not found or does not belong to you", 404);
+	}
 
-    // Validate allowed transitions
-    const allowedTransitions = {
-        Pending: "Processing",
-        Processing: "Shipped",
-    };
+	// Find the actual order
+	const order = await OrderModel.findById(orderId);
 
-    if (allowedTransitions[order.status] !== newStatus) {
-        throw new appError(
-            `Cannot transition order from "${order.status}" to "${newStatus}". Sellers can only: Pending → Processing, Processing → Shipped.`,
-            400
-        );
-    }
+	if (!order) {
+		throw new appError("Order not found", 404);
+	}
 
-    // Update order
-    order.status = newStatus;
+	// Validate allowed transitions
+	const allowedTransitions = {
+		Pending: "Processing",
+		Processing: "Shipped",
+	};
 
-    if (newStatus === "Processing") {
-        order.isPaid = true;
-        order.paidAt = new Date();
-    }
+	if (allowedTransitions[order.status] !== newStatus) {
+		throw new appError(
+			`Cannot transition order from "${order.status}" to "${newStatus}". Sellers can only: Pending → Processing, Processing → Shipped.`,
+			400,
+		);
+	}
 
-    await order.save();
-    return order;
+	// Update order
+	order.status = newStatus;
+
+	if (newStatus === "Processing") {
+		order.isPaid = true;
+		order.paidAt = new Date();
+	}
+
+	await order.save();
+
+	return order;
 };
 
 /**
@@ -521,59 +521,61 @@ export const updateOrderStatusBySeller = async (
  * Handles inventory restoration for cancellation.
  */
 export const updateOrderStatusByAdmin = async (
-    orderId,
-    adminId,
-    newStatus,
-    { note, tracking_number } = {}
+	orderId,
+	adminId,
+	newStatus,
+	{ note: _note, tracking_number: _tracking_number } = {},
 ) => {
-    const order = await OrderModel.findById(orderId);
-    if (!order) {
-        throw new appError("Order not found", 404);
-    }
+	const order = await OrderModel.findById(orderId);
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
+	if (!order) {
+		throw new appError("Order not found", 404);
+	}
 
-    try {
-        if (newStatus === "Delivered") {
-            order.isDelivered = true;
-            order.deliveredAt = new Date();
-        }
+	const session = await mongoose.startSession();
 
-        // If cancelling and not already cancelled, restore inventory
-        if (newStatus === "Cancelled" && order.status !== "Cancelled") {
-            const orderItemsDocs = await OrderItemsModel.find({
-                orderId: order._id,
-            }).session(session);
+	session.startTransaction();
 
-            for (const orderItemsDoc of orderItemsDocs) {
-                for (const item of orderItemsDoc.items) {
-                    await ProductModel.findByIdAndUpdate(
-                        item.item,
-                        { $inc: { countInStock: item.quantity } },
-                        { session }
-                    );
-                }
-            }
-        }
+	try {
+		if (newStatus === "Delivered") {
+			order.isDelivered = true;
+			order.deliveredAt = new Date();
+		}
 
-        order.status = newStatus;
+		// If cancelling and not already cancelled, restore inventory
+		if (newStatus === "Cancelled" && order.status !== "Cancelled") {
+			const orderItemsDocs = await OrderItemsModel.find({
+				orderId: order._id,
+			}).session(session);
 
-        if (newStatus === "Processing") {
-            order.isPaid = true;
-            order.paidAt = new Date();
-        }
+			for (const orderItemsDoc of orderItemsDocs) {
+				for (const item of orderItemsDoc.items) {
+					await ProductModel.findByIdAndUpdate(
+						item.item,
+						{ $inc: { countInStock: item.quantity } },
+						{ session },
+					);
+				}
+			}
+		}
 
-        await order.save({ session });
-        await session.commitTransaction();
+		order.status = newStatus;
 
-        return order;
-    } catch (error) {
-        if (session.inTransaction()) {
-            await session.abortTransaction();
-        }
-        throw error;
-    } finally {
-        session.endSession();
-    }
+		if (newStatus === "Processing") {
+			order.isPaid = true;
+			order.paidAt = new Date();
+		}
+
+		await order.save({ session });
+		await session.commitTransaction();
+
+		return order;
+	} catch (error) {
+		if (session.inTransaction()) {
+			await session.abortTransaction();
+		}
+		throw error;
+	} finally {
+		session.endSession();
+	}
 };

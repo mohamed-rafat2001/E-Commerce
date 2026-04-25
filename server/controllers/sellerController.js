@@ -1,5 +1,4 @@
 import SellerModel from "../models/SellerModel.js";
-import ProductModel from "../models/ProductModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
 import OrderModel from "../models/OrderModel.js";
 import { updateByOwner } from "./handlerFactory.js";
@@ -17,9 +16,11 @@ import { fetchSellerDashboardStats, fetchSellerAnalyticsData } from "../services
 export const getSellerProfile = catchAsync(async (req, res, next) => {
 	const cacheKey = `sellers:id:${req.user._id}`;
 	const cached = await getCache(cacheKey);
+
 	if (cached) return sendResponse(res, 200, cached);
 
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller profile not found", 404));
 
 	await setCache(cacheKey, seller, 900); // 15 minutes TTL
@@ -44,6 +45,7 @@ export const completeSellerDoc = updateByOwner(SellerModel, [
 // @access Private/Seller
 export const addAddressestoSeller = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller not found", 404));
 
 	if (!req.body.addresses) {
@@ -62,6 +64,7 @@ export const addAddressestoSeller = catchAsync(async (req, res, next) => {
 // @access Private/Seller
 export const addPayoutMethodtoSeller = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller not found", 404));
 
 	if (!req.body.payoutMethods) {
@@ -84,6 +87,7 @@ export const addPayoutMethodtoSeller = catchAsync(async (req, res, next) => {
 export const getSellerDashboardStats = catchAsync(async (req, res, next) => {
 	try {
 		const data = await fetchSellerDashboardStats(req.user);
+
 		sendResponse(res, 200, data);
 	} catch (error) {
 		return next(new appError(error.message, 404));
@@ -99,6 +103,7 @@ export const getSellerDashboardStats = catchAsync(async (req, res, next) => {
 export const getSellerAnalytics = catchAsync(async (req, res, next) => {
 	try {
 		const data = await fetchSellerAnalyticsData(req.user);
+
 		sendResponse(res, 200, data);
 	} catch (error) {
 		return next(new appError(error.message, 404));
@@ -113,12 +118,13 @@ export const updateSellerOrderStatus = catchAsync(async (req, res, next) => {
 	const { orderId } = req.params;
 
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller profile not found", 404));
 
 	// Verify the seller owns items in this order
 	const orderItem = await OrderItemsModel.findOne({
 		orderId,
-		sellerId: seller._id
+		sellerId: seller._id,
 	});
 
 	if (!orderItem) {
@@ -126,29 +132,32 @@ export const updateSellerOrderStatus = catchAsync(async (req, res, next) => {
 	}
 
 	const order = await OrderModel.findById(orderId);
+
 	if (!order) return next(new appError("Order not found", 404));
 
 	// Sellers can only transition: Pending→Processing, Processing→Shipped
 	const allowedTransitions = {
-		Pending: ['Processing'],
-		Processing: ['Shipped'],
+		Pending: ["Processing"],
+		Processing: ["Shipped"],
 	};
 
 	const allowed = allowedTransitions[order.status];
+
 	if (!allowed || !allowed.includes(status)) {
 		return next(new appError(
-			`Cannot transition from ${order.status} to ${status}. Allowed: ${allowed?.join(', ') || 'none'}`,
-			400
+			`Cannot transition from ${order.status} to ${status}. Allowed: ${allowed?.join(", ") || "none"}`,
+			400,
 		));
 	}
 
 	order.status = status;
-	if (status === 'Processing') {
+	if (status === "Processing") {
 		order.isPaid = true;
 		order.paidAt = Date.now();
 	}
 
 	const updatedOrder = await order.save();
+
 	sendResponse(res, 200, updatedOrder);
 });
 
@@ -157,6 +166,7 @@ export const updateSellerOrderStatus = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller profile not found", 404));
 
 	// Handle file upload
@@ -171,7 +181,7 @@ export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
 				try {
 					await cloudinary.uploader.destroy(seller.brandImg.public_id);
 				} catch (error) {
-					console.log("Error deleting old image:", error);
+					console.error("Error deleting old image:", error);
 				}
 			}
 
@@ -182,7 +192,7 @@ export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
 			await deleteCache(`sellers:id:${req.user._id}`);
 			sendResponse(res, 200, {
 				message: "Brand image updated successfully",
-				brandImg: seller.brandImg
+				brandImg: seller.brandImg,
 			});
 		});
 	});
@@ -193,13 +203,14 @@ export const updateSellerBrandImage = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const deleteSellerBrandImage = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) return next(new appError("Seller profile not found", 404));
 
 	if (seller.brandImg?.public_id) {
 		try {
 			await cloudinary.uploader.destroy(seller.brandImg.public_id);
 		} catch (error) {
-			console.log("Error deleting image:", error);
+			console.error("Error deleting image:", error);
 		}
 	}
 
@@ -208,7 +219,7 @@ export const deleteSellerBrandImage = catchAsync(async (req, res, next) => {
 
 	await deleteCache(`sellers:id:${req.user._id}`);
 	sendResponse(res, 200, {
-		message: "Brand image deleted successfully"
+		message: "Brand image deleted successfully",
 	});
 });
 
@@ -229,6 +240,7 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 
 		// Remove duplicates from subCategories
 		const uniqueSubCategories = [...new Set(subCategories)];
+
 		seller.subCategories = uniqueSubCategories;
 	} else if (subCategories === null || subCategories === undefined) {
 		// Clear subCategories if explicitly set to null/undefined
@@ -242,7 +254,7 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 	// Populate the categories for response
 	await seller.populate([
 		{ path: "primaryCategory", select: "name description" },
-		{ path: "subCategories", select: "name description" }
+		{ path: "subCategories", select: "name description" },
 	]);
 
 	await deleteCache(`sellers:id:${req.user._id}`);
@@ -250,8 +262,8 @@ export const updateSellerCategories = catchAsync(async (req, res, next) => {
 		message: "Categories updated successfully",
 		seller: {
 			primaryCategory: seller.primaryCategory,
-			subCategories: seller.subCategories
-		}
+			subCategories: seller.subCategories,
+		},
 	});
 });
 

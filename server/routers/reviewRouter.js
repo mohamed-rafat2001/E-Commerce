@@ -1,10 +1,10 @@
 import express from "express";
 import { Protect } from "../middlewares/authMiddleware.js";
 import {
-  addReview,
-  deleteReview,
-  getSingleReview,
-  updateReview,
+	addReview,
+	deleteReview,
+	getSingleReview,
+	updateReview,
 } from "../controllers/reviewController.js";
 
 const router = express.Router();
@@ -105,9 +105,9 @@ router.use(Protect);
  *         description: Review deleted
  */
 router
-  .route("/:id")
-  .post(addReview)
-  .patch(updateReview)
-  .delete(deleteReview);
+	.route("/:id")
+	.post(addReview)
+	.patch(updateReview)
+	.delete(deleteReview);
 
 export default router;

@@ -22,15 +22,15 @@ const categorySchema = new mongoose.Schema(
 			trim: true,
 		},
 		coverImage: {
-				public_id: String,
-				secure_url: String,
-			},
+			public_id: String,
+			secure_url: String,
+		},
 		isActive: {
 			type: Boolean,
 			default: true,
 		},
 	},
-	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
 
 // Virtual populate for subcategories
@@ -52,7 +52,7 @@ categorySchema.virtual("productCount", {
 	ref: "ProductModel",
 	localField: "_id",
 	foreignField: "primaryCategory",
-	count: true
+	count: true,
 });
 
 categorySchema.pre("save", async function () {

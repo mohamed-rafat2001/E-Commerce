@@ -10,8 +10,9 @@ import * as cartService from "../services/cartService.js";
 
 // @desc    Get authenticated user's cart (enriched with live product data)
 // @access  Private/Customer
-export const getCart = catchAsync(async (req, res, next) => {
+export const getCart = catchAsync(async (req, res, _next) => {
 	const cart = await cartService.getCart(req.user._id);
+
 	sendResponse(res, 200, cart);
 });
 
@@ -49,7 +50,7 @@ export const updateItemQuantity = catchAsync(async (req, res, next) => {
 	const cart = await cartService.updateItemQuantity(
 		req.user._id,
 		productId,
-		quantity
+		quantity,
 	);
 
 	sendResponse(res, 200, cart);
@@ -65,13 +66,15 @@ export const removeFromCart = catchAsync(async (req, res, next) => {
 	}
 
 	const cart = await cartService.removeItem(req.user._id, productId);
+
 	sendResponse(res, 200, cart);
 });
 
 // @desc    Clear entire cart
 // @access  Private/Customer
-export const clearCart = catchAsync(async (req, res, next) => {
+export const clearCart = catchAsync(async (req, res, _next) => {
 	const cart = await cartService.clearCart(req.user._id);
+
 	sendResponse(res, 200, cart);
 });
 
@@ -86,12 +89,14 @@ export const mergeGuestCart = catchAsync(async (req, res, next) => {
 	}
 
 	const cart = await cartService.mergeGuestCart(req.user._id, guestItems);
+
 	sendResponse(res, 200, cart);
 });
 
 // @desc    Validate cart for checkout
 // @access  Private/Customer
-export const validateCart = catchAsync(async (req, res, next) => {
+export const validateCart = catchAsync(async (req, res, _next) => {
 	const result = await cartService.validateCartForCheckout(req.user._id);
+
 	sendResponse(res, 200, result);
 });

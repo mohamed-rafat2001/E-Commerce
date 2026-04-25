@@ -62,7 +62,7 @@ const orderSchema = new mongoose.Schema(
 					amount: { type: Number, default: 0, min: 0 },
 					currency: { type: String, default: "USD", trim: true, uppercase: true },
 				},
-				{ _id: false }
+				{ _id: false },
 			),
 			default: () => ({ amount: 0, currency: "USD" }),
 		},
@@ -72,7 +72,7 @@ const orderSchema = new mongoose.Schema(
 					amount: { type: Number, default: 0, min: 0 },
 					currency: { type: String, default: "USD", trim: true, uppercase: true },
 				},
-				{ _id: false }
+				{ _id: false },
 			),
 			default: () => ({ amount: 0, currency: "USD" }),
 		},
@@ -107,7 +107,7 @@ const orderSchema = new mongoose.Schema(
 	},
 	{
 		timestamps: true,
-	}
+	},
 );
 
 orderSchema.pre("save", async function () {
@@ -118,6 +118,7 @@ orderSchema.pre("save", async function () {
 			String(now.getMonth() + 1).padStart(2, "0") +
 			String(now.getDate()).padStart(2, "0");
 		const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+
 		this.orderNumber = `ORD-${datePart}-${randomPart}`;
 	}
 });

@@ -25,7 +25,7 @@ const cartSchema = new mongoose.Schema(
 			default: true,
 		},
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 cartSchema.pre(/^find/, function () {
@@ -49,6 +49,7 @@ cartSchema.pre("save", async function () {
 		// Use lean() to bypass ProductModel's heavy pre-find hooks
 		// (which cascade populate reviews, brand, category, etc.)
 		const productId = item.item?._id || item.item;
+
 		if (!productId) continue;
 
 		const product = await ProductModel.findById(productId)

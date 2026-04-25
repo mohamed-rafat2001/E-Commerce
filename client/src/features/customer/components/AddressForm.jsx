@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { Input, Button } from '../../../shared/ui/index.js';
 
-const AddressForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
+const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }) => {
 	const {
 		register,
 		handleSubmit,
@@ -91,7 +91,7 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
 					Cancel
 				</Button>
 				<Button type="submit" variant="primary" isLoading={isLoading}>
-					{initialData ? 'Update Address' : 'Save Address'}
+					{submitLabel || (initialData ? 'Update Address' : 'Save Address')}
 				</Button>
 			</div>
 		</form>

@@ -9,9 +9,10 @@ function sendCookies(res, accessToken, refreshToken) {
 		const accessOptions = {
 			...commonOptions,
 			expires: accessToken ? new Date(
-				Date.now() + process.env.JWT_ACCESS_COOKIE_EXPIRES * 60 * 1000
+				Date.now() + process.env.JWT_ACCESS_COOKIE_EXPIRES * 60 * 1000,
 			) : new Date(0),
 		};
+
 		res.cookie("accessToken", accessToken || "", accessOptions);
 	}
 
@@ -19,9 +20,10 @@ function sendCookies(res, accessToken, refreshToken) {
 		const refreshOptions = {
 			...commonOptions,
 			expires: refreshToken ? new Date(
-				Date.now() + process.env.JWT_REFRESH_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+				Date.now() + process.env.JWT_REFRESH_COOKIE_EXPIRES * 24 * 60 * 60 * 1000,
 			) : new Date(0),
 		};
+
 		res.cookie("refreshToken", refreshToken || "", refreshOptions);
 	}
 }

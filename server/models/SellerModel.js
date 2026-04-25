@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import validator from "validator";
 import { addressSchema, moneySchema } from "./commonSchemas.js";
 
 const payoutMethodSchema = new mongoose.Schema(
@@ -38,9 +37,8 @@ const payoutMethodSchema = new mongoose.Schema(
 			default: false,
 		},
 	},
-	{ _id: false, timestamps: true }
+	{ _id: false, timestamps: true },
 );
-
 
 const SellerSchema = new mongoose.Schema(
 	{
@@ -54,7 +52,7 @@ const SellerSchema = new mongoose.Schema(
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "CategoryModel",
-			}
+			},
 		],
 		status: {
 			type: String,
@@ -74,8 +72,9 @@ const SellerSchema = new mongoose.Schema(
 		toObject: { virtuals: true },
 		timestamps: true,
 		id: false,
-	}
+	},
 );
+
 // virtual populate
 SellerSchema.virtual("reviews", {
 	ref: "ReviewsModel",
@@ -93,10 +92,12 @@ SellerSchema.virtual("brands", {
 SellerSchema.virtual("averageBrandRating").get(function() {
 	if (!this.brands || this.brands.length === 0) return 0;
 	
-	const activeBrands = this.brands.filter(brand => brand.isActive);
+	const activeBrands = this.brands.filter((brand) => brand.isActive);
+
 	if (activeBrands.length === 0) return 0;
 	
 	const totalRating = activeBrands.reduce((sum, brand) => sum + (brand.ratingAverage || 0), 0);
+
 	return Math.round((totalRating / activeBrands.length) * 10) / 10; // Round to 1 decimal
 });
 
@@ -104,7 +105,8 @@ SellerSchema.virtual("averageBrandRating").get(function() {
 SellerSchema.virtual("totalReviews").get(function() {
 	if (!this.brands || this.brands.length === 0) return 0;
 	
-	const activeBrands = this.brands.filter(brand => brand.isActive);
+	const activeBrands = this.brands.filter((brand) => brand.isActive);
+
 	return activeBrands.reduce((sum, brand) => sum + (brand.ratingCount || 0), 0);
 });
 
@@ -113,7 +115,7 @@ SellerSchema.pre(/^find/, function () {
 	this.populate("reviews");
 	this.populate({
 		path: "brands",
-		match: { isActive: true }
+		match: { isActive: true },
 	});
 	this.populate("preferredCategories", "name description");
 });

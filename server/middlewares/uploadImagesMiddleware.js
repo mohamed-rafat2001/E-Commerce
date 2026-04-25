@@ -1,13 +1,13 @@
-import { upload } from '../utils/cloudinary.js';
+import { upload } from "../utils/cloudinary.js";
 
 export const uploadProductImages = upload.fields([
-	{ name: 'coverImage', maxCount: 1 },
-	{ name: 'images', maxCount: 8 },
+	{ name: "coverImage", maxCount: 1 },
+	{ name: "images", maxCount: 8 },
 ]);
 
 export const uploadBrandImages = upload.fields([
-	{ name: 'logo', maxCount: 1 },
-	{ name: 'coverImage', maxCount: 1 },
+	{ name: "logo", maxCount: 1 },
+	{ name: "coverImage", maxCount: 1 },
 ]);
 
 // For single image upload like profileImg or category coverImage
@@ -35,7 +35,7 @@ export const setCloudinaryBody = (req, res, next) => {
 		}
 		// Generic handling for other fields if needed
 		Object.keys(req.files).forEach((key) => {
-			if (key !== 'coverImage' && key !== 'images' && key !== 'logo') {
+			if (key !== "coverImage" && key !== "images" && key !== "logo") {
 				req.body[key] = req.files[key].map((file) => ({
 					public_id: file.filename,
 					secure_url: file.path,
@@ -46,6 +46,7 @@ export const setCloudinaryBody = (req, res, next) => {
 
 	if (req.file) {
 		const fieldName = req.file.fieldname;
+
 		req.body[fieldName] = {
 			public_id: req.file.filename,
 			secure_url: req.file.path,

@@ -210,7 +210,7 @@ router
 router.patch(
 	"/admin/:id/toggle",
 	restrictTo("SuperAdmin", "Admin"),
-	adminToggleDiscount
+	adminToggleDiscount,
 );
 
 // ── Seller Routes ─────────────────────────────────────────────────────
@@ -282,7 +282,7 @@ router
 router.patch(
 	"/seller/:id/toggle",
 	restrictTo("Seller"),
-	sellerToggleDiscount
+	sellerToggleDiscount,
 );
 
 export default router;

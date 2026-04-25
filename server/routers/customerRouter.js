@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+
 import { Protect, restrictTo } from "../middlewares/authMiddleware.js";
 import {
 	addAddressestoCustomer,
@@ -233,4 +234,3 @@ router.patch("/payment-methods/:paymentMethodId", updatePaymentMethod);
 router.patch("/payment-methods/:paymentMethodId/default", setDefaultPaymentMethod);
 
 export default router;
-

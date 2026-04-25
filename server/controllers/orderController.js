@@ -81,7 +81,7 @@ export const getGuestOrdersByEmail = catchAsync(async (req, res, next) => {
 	}
 
 	const orders = await OrderModel.find({ 
-		guestEmail: { $regex: `^${email.trim()}$`, $options: 'i' } 
+		guestEmail: { $regex: `^${email.trim()}$`, $options: "i" }, 
 	})
 		.populate({
 			path: "items",
@@ -110,7 +110,7 @@ export const getGuestOrderDetail = catchAsync(async (req, res, next) => {
 
 	const order = await OrderModel.findOne({ 
 		_id: orderId, 
-		guestEmail: { $regex: `^${email.trim()}$`, $options: 'i' } 
+		guestEmail: { $regex: `^${email.trim()}$`, $options: "i" }, 
 	})
 		.populate({
 			path: "items",
@@ -129,7 +129,7 @@ export const getGuestOrderDetail = catchAsync(async (req, res, next) => {
 
 // @desc    Get logged-in customer's orders (with status filter and pagination)
 // @access  Private/Customer
-export const getMyOrders = catchAsync(async (req, res, next) => {
+export const getMyOrders = catchAsync(async (req, res, _next) => {
 	const userId = req.user._id;
 	let filter = { userId };
 
@@ -152,7 +152,7 @@ export const getMyOrders = catchAsync(async (req, res, next) => {
 	// Count total for pagination
 	const countFeatures = new APIFeatures(
 		OrderModel.find(filter),
-		req.query
+		req.query,
 	).filter();
 	const total = await countFeatures.query.countDocuments();
 
@@ -187,13 +187,14 @@ export const getMyOrder = catchAsync(async (req, res, next) => {
 
 // @desc    Cancel an order (customer, pending only)
 // @access  Private/Customer
-export const cancelOrder = catchAsync(async (req, res, next) => {
+export const cancelOrder = catchAsync(async (req, res, _next) => {
 	const { reason } = req.body;
 	const order = await orderService.cancelOrder(
 		req.params.id,
 		req.user._id,
-		reason
+		reason,
 	);
+
 	sendResponse(res, 200, order);
 });
 
@@ -203,6 +204,7 @@ export const cancelOrder = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const getSellerOrders = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
@@ -216,6 +218,7 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 			status: queryObj.status,
 		}).select("_id");
 		const matchingOrderIds = matchingOrders.map((o) => o._id);
+
 		filter.orderId = { $in: matchingOrderIds };
 		delete queryObj.status;
 	}
@@ -239,7 +242,7 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 	// Get total count for pagination
 	const countFeatures = new APIFeatures(
 		OrderItemsModel.find(filter),
-		queryObj
+		queryObj,
 	).filter();
 	const total = await countFeatures.query.countDocuments();
 
@@ -285,7 +288,7 @@ export const updateOrderStatusBySeller = catchAsync(async (req, res, next) => {
 		req.params.id,
 		req.user._id,
 		status,
-		{ tracking_number, note }
+		{ tracking_number, note },
 	);
 
 	sendResponse(res, 200, order);
@@ -295,7 +298,7 @@ export const updateOrderStatusBySeller = catchAsync(async (req, res, next) => {
 
 // @desc    Get all orders (admin, with filters)
 // @access  Private/Admin
-export const getAllOrders = catchAsync(async (req, res, next) => {
+export const getAllOrders = catchAsync(async (req, res, _next) => {
 	const features = new APIFeatures(OrderModel.find(), req.query)
 		.filter()
 		.sort()
@@ -337,7 +340,7 @@ export const updateOrderStatusByAdmin = catchAsync(async (req, res, next) => {
 		req.params.id,
 		req.user._id,
 		status,
-		{ note, tracking_number }
+		{ note, tracking_number },
 	);
 
 	sendResponse(res, 200, order);

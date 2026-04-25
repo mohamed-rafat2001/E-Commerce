@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 			default: "active",
 		},
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 // hash password before saving
@@ -105,6 +105,7 @@ userSchema.methods.createPasswordResetCode = function () {
 	}
 	this.passwordResetCode = code;
 	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
 	return code;
 };
 // check if password is correct

@@ -1,10 +1,8 @@
 import BrandModel from "../models/BrandModel.js";
 import BrandFollowerModel from "../models/BrandFollowerModel.js";
 import SellerModel from "../models/SellerModel.js";
-import ProductModel from "../models/ProductModel.js";
-import { uploadSingleImage, uploadBrandImages, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";
-import cloudinary from "../utils/cloudinary.js";
 import catchAsync from "../middlewares/catchAsync.js";
+import cloudinary from "../utils/cloudinary.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 import APIFeatures from "../utils/apiFeatures.js";
@@ -13,13 +11,17 @@ import { getCache, setCache, deleteCache, deleteCacheByPattern } from "../utils/
 // Helper to build cache key for brands
 const buildBrandCacheKey = (identifier, req) => {
 	let key = `brands:${identifier}`;
+
 	if (Object.keys(req.query).length > 0) {
 		const sorted = Object.keys(req.query).sort().reduce((acc, k) => {
 			acc[k] = req.query[k];
+
 			return acc;
 		}, {});
+
 		key += `:${JSON.stringify(sorted)}`;
 	}
+
 	return key;
 };
 
@@ -31,7 +33,7 @@ const invalidateBrandCache = async (brandId) => {
 // @desc    Get all active brands (public endpoint for landing page)
 // @route   GET /api/v1/brands/public
 // @access  Public
-export const getAllActiveBrands = catchAsync(async (req, res, next) => {
+export const getAllActiveBrands = catchAsync(async (req, res, _next) => {
 	// Get total count for pagination
 	const countQuery = BrandModel.find({ isActive: true });
 	const countFeatures = new APIFeatures(countQuery, req.query)
@@ -57,10 +59,12 @@ export const getAllActiveBrands = catchAsync(async (req, res, next) => {
 	const brandsWithFollowers = await Promise.all(
 		brands.map(async (brand) => {
 			const brandObj = brand.toObject();
+
 			brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
 			brandObj.productsCount = brandObj.products?.length || 0;
+
 			return brandObj;
-		})
+		}),
 	);
 
 	const page = req.query.page * 1 || 1;
@@ -86,12 +90,14 @@ export const getAllActiveBrands = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const getMyBrands = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 
 	const cacheKey = buildBrandCacheKey(`owner:${seller._id}`, req);
 	const cached = await getCache(cacheKey);
+
 	if (cached) return res.status(200).json(cached);
 
 	// Initialize query with seller filter
@@ -107,7 +113,7 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 
 	const brands = await features.query.populate({
 		path: "products",
-		select: "_id"
+		select: "_id",
 	});
 
 	// Get total count for pagination
@@ -120,16 +126,18 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 	const brandsWithFollowers = await Promise.all(
 		brands.map(async (brand) => {
 			const brandObj = brand.toObject();
+
 			brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+
 			return brandObj;
-		})
+		}),
 	);
 
 	const responseData = {
 		status: "success",
 		results: brandsWithFollowers.length,
 		total,
-		data: brandsWithFollowers
+		data: brandsWithFollowers,
 	};
 
 	await setCache(cacheKey, responseData, 7200); // 2 hours TTL
@@ -141,20 +149,22 @@ export const getMyBrands = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const getBrand = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 
 	const cacheKey = `brands:id:${req.params.id}`;
 	const cached = await getCache(cacheKey);
+
 	if (cached) return sendResponse(res, 200, cached);
 
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: seller._id
+		sellerId: seller._id,
 	}).populate({
 		path: "products",
-		select: "_id"
+		select: "_id",
 	});
 
 	if (!brand) {
@@ -162,6 +172,7 @@ export const getBrand = catchAsync(async (req, res, next) => {
 	}
 
 	const brandObj = brand.toObject();
+
 	brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
 
 	await setCache(cacheKey, brandObj, 7200); // 2 hours TTL
@@ -174,6 +185,7 @@ export const getBrand = catchAsync(async (req, res, next) => {
 export const createBrand = catchAsync(async (req, res, next) => {
 	// Verify seller exists
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
@@ -182,9 +194,10 @@ export const createBrand = catchAsync(async (req, res, next) => {
 	req.body.sellerId = seller._id;
 
 	const brand = await BrandModel.create(req.body);
+
 	await brand.populate([
 		{ path: "primaryCategory", select: "name description" },
-		{ path: "subCategories", select: "name description" }
+		{ path: "subCategories", select: "name description" },
 	]);
 
 	await invalidateBrandCache(brand._id);
@@ -197,12 +210,13 @@ export const createBrand = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const updateBrand = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: seller._id
+		sellerId: seller._id,
 	});
 
 	if (!brand) {
@@ -214,7 +228,7 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		try {
 			await cloudinary.uploader.destroy(brand.logo.public_id);
 		} catch (error) {
-			console.log("Error deleting old logo:", error);
+			console.error("Error deleting old logo:", error);
 		}
 	}
 
@@ -223,7 +237,7 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 		try {
 			await cloudinary.uploader.destroy(brand.coverImage.public_id);
 		} catch (error) {
-			console.log("Error deleting old cover image:", error);
+			console.error("Error deleting old cover image:", error);
 		}
 	}
 
@@ -233,7 +247,7 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 	await brand.populate([
 		{ path: "primaryCategory", select: "name description" },
 		{ path: "subCategories", select: "name description" },
-		{ path: "products", select: "_id" }
+		{ path: "products", select: "_id" },
 	]);
 
 	await invalidateBrandCache(brand._id);
@@ -246,12 +260,13 @@ export const updateBrand = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const deleteBrand = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: seller._id
+		sellerId: seller._id,
 	});
 
 	if (!brand) {
@@ -263,7 +278,7 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 		try {
 			await cloudinary.uploader.destroy(brand.logo.public_id);
 		} catch (error) {
-			console.log("Error deleting logo:", error);
+			console.error("Error deleting logo:", error);
 		}
 	}
 
@@ -279,12 +294,13 @@ export const deleteBrand = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const updateBrandLogo = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: seller._id
+		sellerId: seller._id,
 	});
 
 	if (!brand) {
@@ -296,7 +312,7 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 		try {
 			await cloudinary.uploader.destroy(brand.logo.public_id);
 		} catch (error) {
-			console.log("Error deleting old logo:", error);
+			console.error("Error deleting old logo:", error);
 		}
 	}
 
@@ -307,7 +323,7 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 
 	sendResponse(res, 200, {
 		message: "Logo updated successfully",
-		logo: brand.logo
+		logo: brand.logo,
 	});
 });
 
@@ -316,12 +332,13 @@ export const updateBrandLogo = catchAsync(async (req, res, next) => {
 // @access  Private/Seller
 export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 	const seller = await SellerModel.findOne({ userId: req.user._id });
+
 	if (!seller) {
 		return next(new appError("Seller profile not found", 404));
 	}
 	const brand = await BrandModel.findOne({
 		_id: req.params.id,
-		sellerId: seller._id
+		sellerId: seller._id,
 	});
 
 	if (!brand) {
@@ -332,7 +349,7 @@ export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 		try {
 			await cloudinary.uploader.destroy(brand.logo.public_id);
 		} catch (error) {
-			console.log("Error deleting logo:", error);
+			console.error("Error deleting logo:", error);
 		}
 	}
 
@@ -342,6 +359,6 @@ export const deleteBrandLogo = catchAsync(async (req, res, next) => {
 	await invalidateBrandCache(brand._id);
 
 	sendResponse(res, 200, {
-		message: "Logo deleted successfully"
+		message: "Logo deleted successfully",
 	});
 });

@@ -6,15 +6,18 @@ class APIFeatures {
 
 	filter() {
 		const queryObj = { ...this.queryString };
-		const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'populate'];
-		excludedFields.forEach(el => delete queryObj[el]);
+		const excludedFields = ["page", "sort", "limit", "fields", "search", "populate"];
+
+		excludedFields.forEach((el) => delete queryObj[el]);
 
 		// Support for both nested and flattened bracket syntax (e.g., price[gt])
-		Object.keys(queryObj).forEach(key => {
+		Object.keys(queryObj).forEach((key) => {
 			const match = key.match(/^(.+)\[(gt|gte|lt|lte)\]$/);
+
 			if (match) {
-				const [_, field, op] = match;
-				if (typeof queryObj[field] !== 'object' || queryObj[field] === null) {
+				const [, field, op] = match;
+
+				if (typeof queryObj[field] !== "object" || queryObj[field] === null) {
 					queryObj[field] = {};
 				}
 				queryObj[field][op] = queryObj[key];
@@ -24,29 +27,35 @@ class APIFeatures {
 
 		// Advanced filtering (gte, lte, etc.)
 		let queryStr = JSON.stringify(queryObj);
-		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
 		this.query = this.query.find(JSON.parse(queryStr));
+
 		return this;
 	}
 
 	sort() {
 		if (this.queryString.sort) {
-			const sortBy = this.queryString.sort.split(',').join(' ');
+			const sortBy = this.queryString.sort.split(",").join(" ");
+
 			this.query = this.query.sort(sortBy);
 		} else {
-			this.query = this.query.sort('-createdAt');
+			this.query = this.query.sort("-createdAt");
 		}
+
 		return this;
 	}
 
 	limitFields() {
 		if (this.queryString.fields) {
-			const fields = this.queryString.fields.split(',').join(' ');
+			const fields = this.queryString.fields.split(",").join(" ");
+
 			this.query = this.query.select(fields);
 		} else {
-			this.query = this.query.select('-__v');
+			this.query = this.query.select("-__v");
 		}
+
 		return this;
 	}
 
@@ -56,12 +65,13 @@ class APIFeatures {
 		const skip = (page - 1) * limit;
 
 		this.query = this.query.skip(skip).limit(limit);
+
 		return this;
 	}
 
 	search(modelSchema) {
 		if (this.queryString.search) {
-			const searchRegex = new RegExp(this.queryString.search, 'i');
+			const searchRegex = new RegExp(this.queryString.search, "i");
 			const searchConditions = [{ name: searchRegex }];
 
 			// If schema is provided, check for description
@@ -71,6 +81,7 @@ class APIFeatures {
 
 			this.query = this.query.find({ $or: searchConditions });
 		}
+
 		return this;
 	}
 }

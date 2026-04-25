@@ -13,17 +13,19 @@ export const app = express();
 // Compresses all API responses. Brotli is preferred if client supports it.
 // This reduces JSON payload sizes by 60-80%.
 let compression;
+
 try {
 	compression = (await import("compression")).default;
 	app.use(compression({
 		level: 6, // Balance between speed and compression ratio
 		threshold: 1024, // Only compress responses > 1KB
 		filter: (req, res) => {
-			if (req.headers['x-no-compression']) return false;
+			if (req.headers["x-no-compression"]) return false;
+
 			return compression.filter(req, res);
 		},
 	}));
-} catch (e) {
+} catch (_e) {
 	console.warn("[Compression] compression package not installed. Responses will not be compressed.");
 }
 
@@ -31,10 +33,10 @@ app.use(
 	cors({
 		origin: ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
 		credentials: true,
-		methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-		allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Access-Control-Allow-Headers', 'If-None-Match'],
-		exposedHeaders: ['ETag'],
-	})
+		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Allow-Headers", "If-None-Match"],
+		exposedHeaders: ["ETag"],
+	}),
 );
 
 // set security HTTP headers.
@@ -44,13 +46,13 @@ app.use(helmet());
 // Express enables weak ETags by default. This ensures the client can
 // send If-None-Match headers and receive 304 Not Modified responses,
 // avoiding re-downloading unchanged data.
-app.set('etag', 'weak');
+app.set("etag", "weak");
 
 // ─── Keep-Alive ───────────────────────────────────────────────────
 // Ensure HTTP keep-alive connections so TCP handshakes aren't repeated.
 app.use((req, res, next) => {
-	res.set('Connection', 'keep-alive');
-	res.set('Keep-Alive', 'timeout=65, max=1000');
+	res.set("Connection", "keep-alive");
+	res.set("Keep-Alive", "timeout=65, max=1000");
 	next();
 });
 
@@ -60,6 +62,7 @@ const limiter = rateLimit({
 	windowMs: 60 * 60 * 1000, // 1 hour
 	message: "too many requests for this IP, Please try again in an hour",
 });
+
 app.use("/api", limiter);
 
 // body parser, reading data from body into req.body
@@ -90,17 +93,17 @@ import BrandModel from "./models/BrandModel.js";
 import CategoryModel from "./models/CategoryModel.js";
 
 app.get("/sitemap.xml", async (req, res) => {
-    try {
-        const baseUrl = process.env.CLIENT_URL || 'https://shopynow.com';
+	try {
+		const baseUrl = process.env.CLIENT_URL || "https://shopynow.com";
         
-        // Fetch static and dynamic routes
-        const [products, brands, categories] = await Promise.all([
-            ProductModel.find({ countInStock: { $gt: 0 } }, '_id updatedAt').limit(1000).lean(),
-            BrandModel.find({ isActive: true }, '_id updatedAt').lean(),
-            CategoryModel.find({}, '_id updatedAt').lean()
-        ]);
+		// Fetch static and dynamic routes
+		const [products, brands, categories] = await Promise.all([
+			ProductModel.find({ countInStock: { $gt: 0 } }, "_id updatedAt").limit(1000).lean(),
+			BrandModel.find({ isActive: true }, "_id updatedAt").lean(),
+			CategoryModel.find({}, "_id updatedAt").lean(),
+		]);
 
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>
+		let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>${baseUrl}/</loc>
@@ -123,47 +126,47 @@ app.get("/sitemap.xml", async (req, res) => {
         <priority>0.8</priority>
     </url>`;
 
-        // Add Products
-        products.forEach(p => {
-            xml += `
+		// Add Products
+		products.forEach((p) => {
+			xml += `
     <url>
         <loc>${baseUrl}/products/${p._id}</loc>
         <lastmod>${(p.updatedAt || new Date()).toISOString()}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>`;
-        });
+		});
 
-        // Add Brands
-        brands.forEach(b => {
-            xml += `
+		// Add Brands
+		brands.forEach((b) => {
+			xml += `
     <url>
         <loc>${baseUrl}/brands/${b._id}</loc>
         <lastmod>${(b.updatedAt || new Date()).toISOString()}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>`;
-        });
+		});
 
-        // Add Categories
-        categories.forEach(c => {
-            xml += `
+		// Add Categories
+		categories.forEach((c) => {
+			xml += `
     <url>
         <loc>${baseUrl}/products?category=${c._id}</loc>
         <lastmod>${(c.updatedAt || new Date()).toISOString()}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>`;
-        });
+		});
 
-        xml += `\n</urlset>`;
+		xml += "\n</urlset>";
 
-        res.header("Content-Type", "application/xml");
-        res.status(200).send(xml);
-    } catch (error) {
-        console.error("Sitemap generation error:", error);
-        res.status(500).end();
-    }
+		res.header("Content-Type", "application/xml");
+		res.status(200).send(xml);
+	} catch (error) {
+		console.error("Sitemap generation error:", error);
+		res.status(500).end();
+	}
 });
 
 // ─── Redis Health Check Endpoint ──────────────────────────────────
@@ -188,18 +191,18 @@ app.get("/api/v1/health/cache", async (req, res) => {
 		// Parse hit/miss stats
 		const hitsMatch = statsRaw.match(/keyspace_hits:(\d+)/);
 		const missesMatch = statsRaw.match(/keyspace_misses:(\d+)/);
-		const hits = parseInt(hitsMatch?.[1] || '0');
-		const misses = parseInt(missesMatch?.[1] || '0');
+		const hits = parseInt(hitsMatch?.[1] || "0");
+		const misses = parseInt(missesMatch?.[1] || "0");
 		const hitRate = hits + misses > 0
-			? ((hits / (hits + misses)) * 100).toFixed(2) + '%'
-			: 'N/A';
+			? ((hits / (hits + misses)) * 100).toFixed(2) + "%"
+			: "N/A";
 
 		const dbSize = await redisClient.dbsize();
 
 		res.json({
 			status: "healthy",
-			memoryUsed: memMatch?.[1] || 'unknown',
-			maxMemory: maxMemMatch?.[1] || 'unlimited',
+			memoryUsed: memMatch?.[1] || "unknown",
+			maxMemory: maxMemMatch?.[1] || "unlimited",
 			totalKeys: dbSize,
 			cacheHitRate: hitRate,
 			cacheHits: hits,

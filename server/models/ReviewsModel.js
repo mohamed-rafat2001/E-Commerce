@@ -32,8 +32,9 @@ const ReviewsSchema = new mongoose.Schema(
 		toObject: { virtuals: true },
 		timestamps: true,
 		id: false,
-	}
+	},
 );
+
 ReviewsSchema.pre(/^find/, function () {
 	this.populate("userId", "firstName lastName profileImg");
 });
@@ -44,7 +45,7 @@ ReviewsSchema.statics.calculateRatings = async function (itemId) {
 		{
 			$match: { 
 				itemId: new mongoose.Types.ObjectId(itemId),
-				brandId: { $exists: false } // Only product reviews
+				brandId: { $exists: false }, // Only product reviews
 			},
 		},
 		{
@@ -61,7 +62,7 @@ ReviewsSchema.statics.calculateRatings = async function (itemId) {
 		{
 			$match: { 
 				brandId: new mongoose.Types.ObjectId(itemId),
-				itemId: { $exists: false } // Only brand reviews
+				itemId: { $exists: false }, // Only brand reviews
 			},
 		},
 		{
@@ -76,6 +77,7 @@ ReviewsSchema.statics.calculateRatings = async function (itemId) {
 	// Update product ratings
 	if (productStats.length > 0) {
 		const item = await ProductModel.findById(itemId);
+
 		if (item) {
 			await ProductModel.findByIdAndUpdate(itemId, {
 				ratingAverage: productStats[0].avgRating,
@@ -92,6 +94,7 @@ ReviewsSchema.statics.calculateRatings = async function (itemId) {
 	// Update brand ratings
 	if (brandStats.length > 0) {
 		const brand = await BrandModel.findById(itemId);
+
 		if (brand) {
 			await BrandModel.findByIdAndUpdate(itemId, {
 				ratingAverage: Math.round(brandStats[0].avgRating * 10) / 10,

@@ -1,8 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import PageSkeleton from "../../shared/ui/PageSkeleton/PageSkeleton.jsx";
+import AuthModal from "../../components/auth/AuthModal.jsx";
 
 // Layouts — loaded eagerly (needed for every page)
 import DashboardLayout from "../../layouts/DashboardLayout.jsx";
@@ -88,120 +89,135 @@ const S = (Component, props = {}) => (
 	</SuspenseWrapper>
 );
 
+// Global root layout to provide shared context to all routes
+const RootLayout = () => {
+	return (
+		<>
+			<Outlet />
+			<AuthModal />
+		</>
+	);
+};
+
 // Create app routing
 const router = createBrowserRouter([
-	// Public Routes
 	{
-		element: <PublicLayout />,
+		element: <RootLayout />,
 		children: [
-			{ path: "/", element: S(HomePage) },
-			{ path: "/login", element: S(LoginPage) },
-			{ path: "/register", element: S(RegisterPage) },
-			{ path: "/cart", element: S(CartPage) },
-			{ path: "/public-cart", element: S(CartPage) },
-			{ path: "/public-wishlist", element: S(PublicWishlistPage) },
-			{ path: "/products", element: S(ProductsPage) },
-			{ path: "/products/:id", element: S(ProductDetailPage) },
-			{ path: "/brands", element: S(PublicBrandsPage) },
-			{ path: "/brands/all", element: S(PublicBrandsPage) },
-			{ path: "/brands/:brandId", element: S(BrandDetailPage) },
-			{ path: "/categories", element: S(PublicCategoriesPage) },
-			{ path: "/categories/all", element: S(PublicCategoriesPage) },
-			{ path: "/categories/:categoryId", element: S(CategoryProductsRedirectPage) },
-			// Checkout + success are accessible to both guests and logged-in users
-			{ path: "/checkout", element: S(CheckoutPage) },
-			{ path: "/order-success", element: S(OrderSuccessPage) },
-			{ path: "/guest-orders", element: S(GuestOrdersPage) },
-			{ path: "/guest-orders/:orderId", element: S(GuestOrderDetailPage) },
+			// Public Routes
 			{
-				element: <ProtectedRoute />,
+				element: <PublicLayout />,
 				children: [
-					{ path: "/orders", element: S(OrdersPage) },
-					{ path: "/orders/:orderId", element: S(OrderDetailPage) },
-					{ path: "/profile", element: S(PlaceholderPage, { title: "Profile" }) },
-					{ path: "/profile/edit", element: S(PlaceholderPage, { title: "Edit Profile" }) },
+					{ path: "/", element: S(HomePage) },
+					{ path: "/login", element: S(LoginPage) },
+					{ path: "/register", element: S(RegisterPage) },
+					{ path: "/cart", element: S(CartPage) },
+					{ path: "/public-cart", element: S(CartPage) },
+					{ path: "/public-wishlist", element: S(PublicWishlistPage) },
+					{ path: "/products", element: S(ProductsPage) },
+					{ path: "/products/:id", element: S(ProductDetailPage) },
+					{ path: "/brands", element: S(PublicBrandsPage) },
+					{ path: "/brands/all", element: S(PublicBrandsPage) },
+					{ path: "/brands/:brandId", element: S(BrandDetailPage) },
+					{ path: "/categories", element: S(PublicCategoriesPage) },
+					{ path: "/categories/all", element: S(PublicCategoriesPage) },
+					{ path: "/categories/:categoryId", element: S(CategoryProductsRedirectPage) },
+					// Checkout + success are accessible to both guests and logged-in users
+					{ path: "/checkout", element: S(CheckoutPage) },
+					{ path: "/order-success", element: S(OrderSuccessPage) },
+					{ path: "/guest-orders", element: S(GuestOrdersPage) },
+					{ path: "/guest-orders/:orderId", element: S(GuestOrderDetailPage) },
+					{
+						element: <ProtectedRoute />,
+						children: [
+							{ path: "/orders", element: S(OrdersPage) },
+							{ path: "/orders/:orderId", element: S(OrderDetailPage) },
+							{ path: "/profile", element: S(PlaceholderPage, { title: "Profile" }) },
+							{ path: "/profile/edit", element: S(PlaceholderPage, { title: "Edit Profile" }) },
+						],
+					},
+				]
+			},
+			// Admin Routes
+			{
+				element: <ProtectedRoute allowedRoles={["Admin"]} />,
+				children: [
+					{
+						path: "/admin",
+						element: <DashboardLayout />,
+						children: [
+							{ index: true, element: S(AdminDashboardPage) },
+							{ path: "dashboard", element: S(AdminDashboardPage) },
+							{ path: "personalDetails", element: S(PersonalDetailsPage) },
+							{ path: "settings", element: S(SettingsPage) },
+							{ path: "users", element: S(AdminUsersPage) },
+							{ path: "users/:userId", element: S(UserDetailsPage) },
+							{ path: "products", element: S(AdminProductsPage) },
+							{ path: "products/:id", element: S(ManagementProductDetailPage, { viewerRole: "admin" }) },
+							{ path: "orders", element: S(AdminOrdersPage) },
+							{ path: "analytics", element: S(AdminAnalyticsPage) },
+							{ path: "categories", element: S(CategoriesAndSubCategoriesPage) },
+							{ path: "brands", element: S(AdminBrandsPage) },
+							{ path: "discounts", element: S(AdminDiscountsPage) },
+						],
+					},
 				],
+			},
+
+			// Seller Routes
+			{
+				element: <ProtectedRoute allowedRoles={["Seller"]} />,
+				children: [
+					{
+						path: "/seller",
+						element: <DashboardLayout />,
+						children: [
+							{ index: true, element: S(SellerDashboardPage) },
+							{ path: "dashboard", element: S(SellerDashboardPage) },
+							{ path: "personalDetails", element: S(PersonalDetailsPage) },
+							{ path: "settings", element: S(SettingsPage) },
+							{ path: "inventory", element: S(SellerProductsPage) },
+							{ path: "inventory/:id", element: S(ManagementProductDetailPage, { viewerRole: "seller" }) },
+							{ path: "orders", element: S(SellerOrdersPage) },
+							{ path: "brands", element: S(BrandsManagementPage) },
+							{ path: "brands/:id", element: S(SellerBrandDetailsPage) },
+							{ path: "analytics", element: S(SellerAnalyticsPage) },
+							{ path: "discounts", element: S(SellerDiscountsPage) },
+						],
+					},
+				],
+			},
+
+			// Customer Routes
+			{
+				element: <ProtectedRoute allowedRoles={["Customer"]} />,
+				children: [
+					{
+						path: "/customer",
+						element: <DashboardLayout />,
+						children: [
+							{ index: true, element: S(CustomerDashboardPage) },
+							{ path: "dashboard", element: S(CustomerDashboardPage) },
+							{ path: "personalDetails", element: S(PersonalDetailsPage) },
+							{ path: "shippingAddresses", element: S(ShippingAddressesPage) },
+							{ path: "paymentMethods", element: S(PaymentMethodsPage) },
+							{ path: "orderHistory", element: S(OrderHistoryPage) },
+							{ path: "products/:id", element: S(ProductDetailPage) },
+							{ path: "cart", element: S(CartPage, { isPanel: true }) },
+							{ path: "wishlist", element: S(CustomerWishlistPage) },
+							{ path: "settings", element: S(SettingsPage) },
+						],
+					},
+				],
+			},
+
+			// Page Not Found Route (Catch-all)
+			{
+				path: "*",
+				element: <PageNotFound />,
 			},
 		]
-	},
-	// Admin Routes
-	{
-		element: <ProtectedRoute allowedRoles={["Admin"]} />,
-		children: [
-			{
-				path: "/admin",
-				element: <DashboardLayout />,
-				children: [
-					{ index: true, element: S(AdminDashboardPage) },
-					{ path: "dashboard", element: S(AdminDashboardPage) },
-					{ path: "personalDetails", element: S(PersonalDetailsPage) },
-					{ path: "settings", element: S(SettingsPage) },
-					{ path: "users", element: S(AdminUsersPage) },
-					{ path: "users/:userId", element: S(UserDetailsPage) },
-					{ path: "products", element: S(AdminProductsPage) },
-					{ path: "products/:id", element: S(ManagementProductDetailPage, { viewerRole: "admin" }) },
-					{ path: "orders", element: S(AdminOrdersPage) },
-					{ path: "analytics", element: S(AdminAnalyticsPage) },
-					{ path: "categories", element: S(CategoriesAndSubCategoriesPage) },
-					{ path: "brands", element: S(AdminBrandsPage) },
-					{ path: "discounts", element: S(AdminDiscountsPage) },
-				],
-			},
-		],
-	},
-
-	// Seller Routes
-	{
-		element: <ProtectedRoute allowedRoles={["Seller"]} />,
-		children: [
-			{
-				path: "/seller",
-				element: <DashboardLayout />,
-				children: [
-					{ index: true, element: S(SellerDashboardPage) },
-					{ path: "dashboard", element: S(SellerDashboardPage) },
-					{ path: "personalDetails", element: S(PersonalDetailsPage) },
-					{ path: "settings", element: S(SettingsPage) },
-					{ path: "inventory", element: S(SellerProductsPage) },
-					{ path: "inventory/:id", element: S(ManagementProductDetailPage, { viewerRole: "seller" }) },
-					{ path: "orders", element: S(SellerOrdersPage) },
-					{ path: "brands", element: S(BrandsManagementPage) },
-					{ path: "brands/:id", element: S(SellerBrandDetailsPage) },
-					{ path: "analytics", element: S(SellerAnalyticsPage) },
-					{ path: "discounts", element: S(SellerDiscountsPage) },
-				],
-			},
-		],
-	},
-
-	// Customer Routes
-	{
-		element: <ProtectedRoute allowedRoles={["Customer"]} />,
-		children: [
-			{
-				path: "/customer",
-				element: <DashboardLayout />,
-				children: [
-					{ index: true, element: S(CustomerDashboardPage) },
-					{ path: "dashboard", element: S(CustomerDashboardPage) },
-					{ path: "personalDetails", element: S(PersonalDetailsPage) },
-					{ path: "shippingAddresses", element: S(ShippingAddressesPage) },
-					{ path: "paymentMethods", element: S(PaymentMethodsPage) },
-					{ path: "orderHistory", element: S(OrderHistoryPage) },
-					{ path: "products/:id", element: S(ProductDetailPage) },
-					{ path: "cart", element: S(CartPage, { isPanel: true }) },
-					{ path: "wishlist", element: S(CustomerWishlistPage) },
-					{ path: "settings", element: S(SettingsPage) },
-				],
-			},
-		],
-	},
-
-	// Page Not Found Route (Catch-all)
-	{
-		path: "*",
-		element: <PageNotFound />,
-	},
+	}
 ]);
 
 export default router;

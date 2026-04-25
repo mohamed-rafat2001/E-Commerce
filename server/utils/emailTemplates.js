@@ -1,7 +1,7 @@
 export const passwordResetCodeTemplate = (
 	resetCode,
 	userName,
-	expiryMinutes = 10
+	expiryMinutes = 10,
 ) => {
 	return `
     <!DOCTYPE html>

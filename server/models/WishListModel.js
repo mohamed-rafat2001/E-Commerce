@@ -12,8 +12,9 @@ const wishListSchema = new mongoose.Schema(
 			},
 		],
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
+
 wishListSchema.pre(/^find/, function () {
 	this.populate("items");
 });

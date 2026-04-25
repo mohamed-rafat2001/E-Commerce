@@ -9,7 +9,6 @@ import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendResponse.js";
 
-
 export const signUp = catchAsync(async (req, res, next) => {
 	const {
 		firstName,
@@ -66,7 +65,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 			state,
 			postalCode,
 			country,
-			isDefault: true
+			isDefault: true,
 		}] : [];
 
 		userModel = await CustomerModel.create({
@@ -91,6 +90,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 	if (!userModel) {
 		// Rollback user creation if profile creation fails
 		await UserModel.findByIdAndDelete(user._id);
+
 		return next(new appError(`${userRole} profile not created`, 400));
 	}
 
@@ -113,6 +113,7 @@ export const login = catchAsync(async (req, res, next) => {
 
 	// find the user using email
 	const user = await UserModel.findOne({ email }).select("+password");
+
 	if (!user) return next(new appError("email or password is incorrect", 400));
 	const isPasswordCorrect = await user.correctPassword(password, user.password);
 
@@ -129,6 +130,7 @@ export const login = catchAsync(async (req, res, next) => {
 	
 	// Get populated profile model to maintain consistent response structure
 	let userProfile;
+
 	if (user.role === "Customer") {
 		userProfile = await CustomerModel.findOne({ userId: user._id })
 			.populate("userId", "firstName lastName email phoneNumber role profileImg");
@@ -157,6 +159,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
 
 	// Check if user still exists
 	const user = await UserModel.findById(decoded._id);
+
 	if (!user) {
 		return next(new appError("The user belonging to this token no longer exists.", 401));
 	}
@@ -172,7 +175,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
 });
 
 // logOut function
-export const logOut = catchAsync(async (req, res, next) => {
+export const logOut = catchAsync(async (req, res, _next) => {
 	sendCookies(res, null, null);
 	sendResponse(res, 200, {});
 });
@@ -181,6 +184,7 @@ export const logOut = catchAsync(async (req, res, next) => {
 export const getMe = catchAsync(async (req, res, next) => {
 	let user;
 	const role = req.user.role;
+
 	// find the user depend on user role
 	if (role === "Customer") {
 		user = await CustomerModel.findOne({ userId: req.user._id })
@@ -204,13 +208,14 @@ export const updatePersonalDetails = catchAsync(async (req, res, next) => {
 	const user = await UserModel.findByIdAndUpdate(
 		req.user._id,
 		{ firstName, lastName, phoneNumber, email, profileImg },
-		{ new: true, runValidators: true }
+		{ new: true, runValidators: true },
 	);
 
 	if (!user) return next(new appError("User not found", 404));
 
 	// Return consistent populated profile structure
 	let userProfile;
+
 	if (user.role === "Customer") {
 		userProfile = await CustomerModel.findOne({ userId: user._id })
 			.populate("userId", "firstName lastName email phoneNumber role profileImg");
@@ -230,20 +235,22 @@ export const deleteMe = catchAsync(async (req, res, next) => {
 	const user = await UserModel.findByIdAndUpdate(
 		req.user._id,
 		{ status: "deleted" },
-		{ runValidators: true, new: true }
+		{ runValidators: true, new: true },
 	);
 	let model;
 	const role = req.user.role;
+
 	if (role === "Customer") model = CustomerModel;
 	if (role === "Seller") model = SellerModel;
 
 	// change the status
 	let profileDeleted;
+
 	if (model) {
 		profileDeleted = await model.findOneAndUpdate(
 			{ userId: req.user._id },
 			{ status: "deleted" },
-			{ runValidators: true, new: true }
+			{ runValidators: true, new: true },
 		);
 	}
 	
@@ -260,10 +267,12 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 
 	// find the user using email
 	const user = await UserModel.findOne({ email });
+
 	if (!user) return next(new appError("user not found", 400));
 
 	// create passwordResetToken
 	const resetCode = user.createPasswordResetCode();
+
 	await user.save({ validateBeforeSave: false });
 	// sendEmail to user contain the uniqeCode
 	if (!resetCode) return next(new appError("something went wrong", 400));
@@ -273,9 +282,10 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 		html: passwordResetCodeTemplate(
 			resetCode,
 			`${user.firstName} ${user.lastName}`,
-			user.passwordResetExpires
+			user.passwordResetExpires,
 		),
 	});
+
 	// check if email is sent
 	if (!Email) return next(new appError("something went wrong", 400));
 	// send response to client
@@ -285,6 +295,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 export const resetPassword = catchAsync(async (req, res, next) => {
 	// get resetCode and password from req.body
 	const { resetCode, password, confirmPassword } = req.body;
+
 	// check if resetCode and password are provided
 	if (!resetCode || !password || !confirmPassword)
 		return next(new appError("please provide all fields", 400));
@@ -294,6 +305,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 		passwordResetCode: resetCode,
 		passwordResetExpires: { $gt: Date.now() },
 	});
+
 	if (!user) return next(new appError("invalid reset code", 400));
 
 	// update the user password
@@ -313,6 +325,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 // update password
 export const updatePassword = catchAsync(async (req, res, next) => {
 	const { newPassword, currentPassword, confirmPassword } = req.body;
+
 	// check if newPassword, currentPassword, confirmPassword are provided
 	if (!newPassword || !currentPassword || !confirmPassword)
 		return next(new appError("please provide all fields", 400));
@@ -320,8 +333,9 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 	const user = await UserModel.findById(req.user._id).select("+password");
 	const isPasswordCorrect = await user.correctPassword(
 		currentPassword,
-		user.password
+		user.password,
 	);
+
 	// check if password is correct
 	if (!user || !isPasswordCorrect)
 		return next(new appError("invalid credentials", 400));

@@ -73,7 +73,7 @@ const BrandSchema = new mongoose.Schema(
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
 		timestamps: true,
-	}
+	},
 );
 
 // Virtual populate for products
@@ -94,7 +94,7 @@ BrandSchema.pre(/^find/, function () {
 	this.populate({
 		path: "subCategories",
 		select: "name description categoryId",
-		populate: { path: "categoryId", select: "name" }
+		populate: { path: "categoryId", select: "name" },
 	});
 });
 

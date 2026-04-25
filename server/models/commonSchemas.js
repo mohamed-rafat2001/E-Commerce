@@ -51,7 +51,7 @@ export const addressSchema = new mongoose.Schema(
 			default: false,
 		},
 	},
-	{ _id: true }
+	{ _id: true },
 );
 
 export const moneySchema = new mongoose.Schema(
@@ -69,7 +69,7 @@ export const moneySchema = new mongoose.Schema(
 			default: "USD",
 		},
 	},
-	{ _id: false }
+	{ _id: false },
 );
 
 export const paymentMethodSchema = new mongoose.Schema(
@@ -88,5 +88,5 @@ export const paymentMethodSchema = new mongoose.Schema(
 		},
 		providerId: String, // Stripe/PayPal payment method ID
 	},
-	{ _id: true }
+	{ _id: true },
 );

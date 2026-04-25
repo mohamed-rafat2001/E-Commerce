@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { moneySchema } from "./commonSchemas.js";
 
 /**
  * DiscountModel — Promotion / Discount schema.
@@ -45,6 +44,7 @@ const discountSchema = new mongoose.Schema(
 			validate: {
 				validator: function (v) {
 					if (this.type === "percentage" && v > 100) return false;
+
 					return true;
 				},
 				message: "Percentage discount cannot exceed 100%",
@@ -142,6 +142,7 @@ const discountSchema = new mongoose.Schema(
 				validator: function (v) {
 					// if it is a coupon, code is required
 					if (this.isCoupon && !v) return false;
+
 					return true;
 				},
 				message: "Coupon code is required if discount is a coupon",
@@ -153,7 +154,7 @@ const discountSchema = new mongoose.Schema(
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
 		id: false,
-	}
+	},
 );
 
 // ── Virtuals ──────────────────────────────────────────────────────────
@@ -163,6 +164,7 @@ discountSchema.virtual("isExpired").get(function () {
 
 discountSchema.virtual("isCurrentlyActive").get(function () {
 	const now = new Date();
+
 	return (
 		this.isActive &&
 		this.startDate <= now &&
@@ -173,6 +175,7 @@ discountSchema.virtual("isCurrentlyActive").get(function () {
 
 discountSchema.virtual("hasUsageRemaining").get(function () {
 	if (this.usageLimit === null) return true;
+
 	return this.usageCount < this.usageLimit;
 });
 
@@ -182,14 +185,15 @@ discountSchema.pre("validate", function (next) {
 		// Clean the discount name: remove non-alphanumeric, take first 10 chars, uppercase
 		const prefix = this.name
 			? this.name
-					.replace(/[^a-zA-Z0-9]/g, "")
-					.substring(0, 10)
-					.toUpperCase()
+				.replace(/[^a-zA-Z0-9]/g, "")
+				.substring(0, 10)
+				.toUpperCase()
 			: "PROMO";
 
 		// Generate 4-character random alphanumeric suffix
 		const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		let suffix = "";
+
 		for (let i = 0; i < 4; i++) {
 			suffix += chars.charAt(Math.floor(Math.random() * chars.length));
 		}

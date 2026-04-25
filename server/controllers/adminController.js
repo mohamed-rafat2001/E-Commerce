@@ -8,7 +8,6 @@ import CartModel from "../models/CartModel.js";
 import WishListModel from "../models/WishListModel.js";
 import ReviewsModel from "../models/ReviewsModel.js";
 import OrderModel from "../models/OrderModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
 import DiscountModel from "../models/DiscountModel.js";
 import appError from "../utils/appError.js";
 import catchAsync from "../middlewares/catchAsync.js";
@@ -172,13 +171,14 @@ export const getAll = catchAsync(async (req, res, next) => {
 
 		if (req.query.populate) {
 			let populateFields;
+
 			try {
 				if (req.query.populate.startsWith("{") || req.query.populate.startsWith("[")) {
 					populateFields = JSON.parse(req.query.populate);
 				} else {
 					populateFields = req.query.populate.split(",").join(" ");
 				}
-			} catch (e) {
+			} catch (_e) {
 				populateFields = req.query.populate.split(",").join(" ");
 			}
 			features.query = features.query.populate(populateFields);
@@ -195,9 +195,11 @@ export const getAll = catchAsync(async (req, res, next) => {
 		const brandsWithFollowers = await Promise.all(
 			docs.map(async (brand) => {
 				const brandObj = brand.toObject();
+
 				brandObj.followersCount = await BrandFollowerModel.countDocuments({ brandId: brand._id });
+
 				return brandObj;
-			})
+			}),
 		);
 
 		return res.status(200).json({
@@ -210,53 +212,60 @@ export const getAll = catchAsync(async (req, res, next) => {
 
 	// Default: use generic handler
 	const fn = fetchAll(req.Model);
+
 	return fn(req, res, next);
 });
 
 export const getOne = (req, res, next) => {
 	const fn = fetchById(req.Model);
+
 	return fn(req, res, next);
 };
 
 export const createOne = (req, res, next) => {
 	const fn = createOneDoc(req.Model, req.createFields);
+
 	return fn(req, res, next);
 };
 
 export const updateOne = (req, res, next) => {
 	const fn = modifyById(req.Model, req.updateFields);
+
 	return fn(req, res, next);
 };
 
 export const deleteOne = (req, res, next) => {
 	const fn = removeById(req.Model);
+
 	return fn(req, res, next);
 };
 
 export const deleteAll = (req, res, next) => {
 	const fn = removeAll(req.Model);
+
 	return fn(req, res, next);
 };
 
 // get dashboard stats
-export const getDashboardStats = catchAsync(async (req, res, next) => {
+export const getDashboardStats = catchAsync(async (req, res, _next) => {
 	const data = await fetchDashboardStats();
 
 	res.status(200).json({
-		status: 'success',
-		data
+		status: "success",
+		data,
 	});
 });
 
 // @desc    Get detailed admin analytics
 // @route   GET /api/v1/admin/analytics
 // @access  Private/Admin
-export const getAnalytics = catchAsync(async (req, res, next) => {
-	const { timeRange } = req.query; // 'week', 'month', 'year'
+export const getAnalytics = catchAsync(async (req, res, _next) => {
+	const { _timeRange } = req.query; // 'week', 'month', 'year'
 
 	// Default to last 30 days if not specified
 	const endDate = new Date();
 	const startDate = new Date();
+
 	startDate.setDate(startDate.getDate() - 30);
 
 	const data = await fetchAnalyticsData(startDate, endDate);
@@ -269,17 +278,20 @@ export const getAnalytics = catchAsync(async (req, res, next) => {
 // @access  Private/Admin
 export const getUserFullDetails = catchAsync(async (req, res, next) => {
 	const user = await UserModel.findById(req.params.id);
+
 	if (!user) return next(new appError("User not found", 404));
 
 	let userDetails = user.toObject();
 
 	if (user.role === "Seller") {
 		const seller = await SellerModel.findOne({ userId: user._id });
+
 		if (seller) {
 			userDetails.seller = seller.toObject();
 		}
 	} else if (user.role === "Customer") {
 		const customer = await CustomerModel.findOne({ userId: user._id });
+
 		if (customer) {
 			userDetails.customer = customer.toObject();
 		}

@@ -28,9 +28,9 @@ const productSchema = new mongoose.Schema(
 			trim: true,
 		},
 		coverImage: {
-				public_id: String,
-				secure_url: String,
-			},
+			public_id: String,
+			secure_url: String,
+		},
 		images: [
 			{
 				public_id: String,
@@ -92,8 +92,9 @@ const productSchema = new mongoose.Schema(
 		toObject: { virtuals: true },
 		timestamps: true,
 		id: false,
-	}
+	},
 );
+
 // virtual populate
 productSchema.virtual("reviews", {
 	ref: "ReviewsModel",

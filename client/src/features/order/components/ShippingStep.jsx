@@ -18,10 +18,11 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 	const [emailError, setEmailError] = useState('');
 
 	useEffect(() => {
-		if (!isAuthenticated || (addresses && addresses.length === 0)) {
+		// Only force show new form if user is guest or has no addresses, AND no address is currently selected
+		if ((!isAuthenticated || (addresses && addresses.length === 0)) && !shippingAddress) {
 			setShowNewForm(true);
 		}
-	}, [isAuthenticated, addresses]);
+	}, [isAuthenticated, addresses, shippingAddress]);
 
 	const handleSelectAddress = (addr) => {
 		onSelect({
@@ -35,6 +36,7 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 			phone: addr.phone,
 			_fullAddr: addr,
 		});
+		setShowNewForm(false); // Hide form when an address is selected
 	};
 
 	const handleNewAddressSubmit = (data) => {
@@ -55,6 +57,7 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 				phone: data.phone,
 				_fullAddr: data,
 			});
+			setShowNewForm(false); // Hide form after saving guest address
 			onNext(); // Auto-advance for guests after saving
 			return;
 		}
@@ -74,6 +77,7 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 					phone: data.phone,
 					_fullAddr: data,
 				});
+				onNext(); // Also auto-advance for authenticated users after successful save
 			},
 		});
 	};
@@ -190,6 +194,7 @@ const ShippingStep = ({ shippingAddress, onSelect, onNext, guestEmail, onGuestEm
 							onSubmit={handleNewAddressSubmit}
 							isLoading={isAuthenticated ? isAdding : false}
 							onCancel={() => isAuthenticated ? setShowNewForm(false) : null}
+							submitLabel="Save & Continue"
 						/>
 					</motion.div>
 				) : (

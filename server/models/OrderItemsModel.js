@@ -27,7 +27,7 @@ const orderItemsSchema = new mongoose.Schema(
 		],
 		totalPrice: moneySchema,
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 orderItemsSchema.pre("save", async function () {

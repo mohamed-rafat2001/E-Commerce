@@ -23,20 +23,20 @@ export const addToWishList = catchAsync(async (req, res, next) => {
 		});
 	} else {
 		const itemIndex = doc.items.findIndex(
-			(item) => (item._id || item).toString() === req.params.id
+			(item) => (item._id || item).toString() === req.params.id,
 		);
 
 		if (itemIndex === -1) {
 			doc.items.push(req.params.id);
 		} else {
 			// Only toggle off if we are not forcing an add (e.g. merging from guest wishlist where we only want to ensure it's saved)
-			if (req.query.forceAdd !== 'true') {
+			if (req.query.forceAdd !== "true") {
 				doc.items.splice(itemIndex, 1);
 			}
 		}
 
 		// If items are populated, we need to extract the IDs before saving
-		doc.items = doc.items.map(item => item._id || item);
+		doc.items = doc.items.map((item) => item._id || item);
 		await doc.save();
 	}
 	// check if doc created

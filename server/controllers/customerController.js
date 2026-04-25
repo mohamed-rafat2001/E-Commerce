@@ -1,5 +1,4 @@
 import CustomerModel from "../models/CustomerModel.js";
-import { updateByOwner } from "./handlerFactory.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
@@ -9,6 +8,7 @@ import appError from "../utils/appError.js";
 // @access Private/Customer
 export const getCustomerProfile = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 	sendResponse(res, 200, customer);
 });
@@ -18,6 +18,7 @@ export const getCustomerProfile = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const addAddressestoCustomer = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	if (!req.body.addresses) {
@@ -25,6 +26,7 @@ export const addAddressestoCustomer = catchAsync(async (req, res, next) => {
 	}
 
 	const newAddress = { ...req.body.addresses };
+
 	delete newAddress._id;
 
 	if (customer.addresses.length === 0 || newAddress.isDefault) {
@@ -42,10 +44,11 @@ export const addAddressestoCustomer = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const deleteAddressFromCustomer = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	customer.addresses = customer.addresses.filter(
-		(addr) => addr._id.toString() !== req.params.addressId
+		(addr) => addr._id.toString() !== req.params.addressId,
 	);
 
 	await customer.save();
@@ -57,6 +60,7 @@ export const deleteAddressFromCustomer = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const addPaymentMethod = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	if (!req.body.paymentMethod) {
@@ -64,6 +68,7 @@ export const addPaymentMethod = catchAsync(async (req, res, next) => {
 	}
 
 	const newPM = { ...req.body.paymentMethod };
+
 	delete newPM._id;
 
 	if (customer.paymentMethods.length === 0 || newPM.isDefault) {
@@ -81,10 +86,11 @@ export const addPaymentMethod = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const deletePaymentMethod = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	customer.paymentMethods = customer.paymentMethods.filter(
-		(pm) => pm._id.toString() !== req.params.paymentMethodId
+		(pm) => pm._id.toString() !== req.params.paymentMethodId,
 	);
 
 	await customer.save();
@@ -96,6 +102,7 @@ export const deletePaymentMethod = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const setDefaultPaymentMethod = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	customer.paymentMethods.forEach((pm) => {
@@ -111,9 +118,11 @@ export const setDefaultPaymentMethod = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const updatePaymentMethod = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	const pm = customer.paymentMethods.id(req.params.paymentMethodId);
+
 	if (!pm) return next(new appError("Payment method not found", 404));
 
 	// If setting as default, unset others
@@ -122,6 +131,7 @@ export const updatePaymentMethod = catchAsync(async (req, res, next) => {
 	}
 
 	const updateData = { ...req.body };
+
 	delete updateData._id;
 	pm.set(updateData);
 
@@ -134,9 +144,11 @@ export const updatePaymentMethod = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const updateAddress = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	const address = customer.addresses.id(req.params.addressId);
+
 	if (!address) return next(new appError("Address not found", 404));
 
 	// If setting as default, unset others
@@ -145,6 +157,7 @@ export const updateAddress = catchAsync(async (req, res, next) => {
 	}
 
 	const updateData = { ...req.body };
+
 	delete updateData._id;
 	address.set(updateData);
 
@@ -157,6 +170,7 @@ export const updateAddress = catchAsync(async (req, res, next) => {
 // @access Private/Customer
 export const setDefaultAddress = catchAsync(async (req, res, next) => {
 	const customer = await CustomerModel.findOne({ userId: req.user._id });
+
 	if (!customer) return next(new appError("Customer not found", 404));
 
 	customer.addresses.forEach((addr) => {
@@ -166,4 +180,3 @@ export const setDefaultAddress = catchAsync(async (req, res, next) => {
 	await customer.save();
 	sendResponse(res, 200, customer);
 });
-

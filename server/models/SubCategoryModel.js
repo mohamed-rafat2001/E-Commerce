@@ -39,7 +39,7 @@ const SubCategorySchema = new mongoose.Schema(
 		timestamps: true,
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
-	}
+	},
 );
 
 // Indexes
@@ -59,7 +59,7 @@ SubCategorySchema.virtual("productCount", {
 	ref: "ProductModel",
 	localField: "_id",
 	foreignField: "subCategory",
-	count: true
+	count: true,
 });
 
 // Populate middleware
