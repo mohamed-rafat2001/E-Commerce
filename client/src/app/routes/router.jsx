@@ -127,6 +127,10 @@ const router = createBrowserRouter([
 					{ path: "/order-success", element: S(OrderSuccessPage) },
 					{ path: "/guest-orders", element: S(GuestOrdersPage) },
 					{ path: "/guest-orders/:orderId", element: S(GuestOrderDetailPage) },
+					{ path: "/help", element: S(PlaceholderPage, { title: "Help Center" }) },
+					{ path: "/faq", element: S(PlaceholderPage, { title: "Frequently Asked Questions" }) },
+					{ path: "/support", element: S(PlaceholderPage, { title: "Customer Support" }) },
+					{ path: "/policy", element: S(PlaceholderPage, { title: "Our Policies" }) },
 					{
 						element: <ProtectedRoute />,
 						children: [

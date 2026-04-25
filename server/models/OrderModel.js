@@ -123,31 +123,4 @@ orderSchema.pre("save", async function () {
 	}
 });
 
-orderSchema.pre("save", async function () {
-	if (!this.isModified("items")) return;
-
-	await this.populate("items");
-
-	// Calculate total amount from all valid OrderItems
-	const itemsTotal = this.items.reduce((sum, item) => {
-		return sum + (item.totalPrice?.amount || 0);
-	}, 0);
-	
-	const currency = this.items?.[0]?.totalPrice?.currency || "USD";
-
-	this.itemsPrice = { amount: itemsTotal, currency };
-
-	// Update tax and shipping currency to match items
-	if (this.taxPrice) this.taxPrice.currency = currency;
-	if (this.shippingPrice) this.shippingPrice.currency = currency;
-
-	const tax = this.taxPrice?.amount || 0;
-	const shipping = this.shippingPrice?.amount || 0;
-
-	this.totalPrice = {
-		amount: itemsTotal + tax + shipping,
-		currency: currency,
-	};
-});
-
 export default mongoose.model("OrderModel", orderSchema);

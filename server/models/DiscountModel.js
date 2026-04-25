@@ -180,8 +180,8 @@ discountSchema.virtual("hasUsageRemaining").get(function () {
 });
 
 // ── Hooks ─────────────────────────────────────────────────────────────
-discountSchema.pre("validate", function (next) {
-	if (this.isCoupon && !this.code) {
+discountSchema.pre("validate", async function () {
+	if (this.isCoupon && (this.isNew || !this.code)) {
 		// Clean the discount name: remove non-alphanumeric, take first 10 chars, uppercase
 		const prefix = this.name
 			? this.name
@@ -190,17 +190,30 @@ discountSchema.pre("validate", function (next) {
 				.toUpperCase()
 			: "PROMO";
 
-		// Generate 4-character random alphanumeric suffix
-		const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		let suffix = "";
+		let isUnique = false;
+		let attempts = 0;
 
-		for (let i = 0; i < 4; i++) {
-			suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+		while (!isUnique && attempts < 10) {
+			// Generate 4-character random alphanumeric suffix
+			const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			let suffix = "";
+
+			for (let i = 0; i < 4; i++) {
+				suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+			}
+
+			const generatedCode = `${prefix}-${suffix}`;
+
+			// Check for existence in DB
+			// eslint-disable-next-line no-await-in-loop
+			const existing = await this.constructor.findOne({ code: generatedCode });
+			if (!existing) {
+				this.code = generatedCode;
+				isUnique = true;
+			}
+			attempts++;
 		}
-
-		this.code = `${prefix}-${suffix}`;
 	}
-	next();
 });
 
 // ── Indexes for fast queries ──────────────────────────────────────────

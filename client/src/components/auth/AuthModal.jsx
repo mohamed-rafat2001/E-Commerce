@@ -93,21 +93,21 @@ export default function AuthModal() {
 				role="dialog"
 				aria-modal="true"
 				aria-label="Authentication Required"
-				className="relative z-10 w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 shadow-2xl"
+				className="relative z-10 w-full max-w-md rounded-3xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 shadow-2xl"
 			>
 				<button
 					onClick={close}
-					className="absolute right-4 top-4 h-9 w-9 rounded-full border border-gray-100 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+					className="absolute right-4 top-4 h-9 w-9 rounded-full border border-gray-100 dark:border-gray-800 text-gray-500 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
 					aria-label="Close"
 				>
 					<FiX className="mx-auto h-4 w-4" />
 				</button>
 
 				<div className="mb-6 flex items-center justify-center">
-					<span className="text-2xl font-black tracking-tight text-gray-900">ShopyNow</span>
+					<span className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">ShopyNow</span>
 				</div>
 
-				<p className="mb-8 text-center text-sm font-medium leading-relaxed text-gray-600">
+				<p className="mb-8 text-center text-sm font-medium leading-relaxed text-gray-600 dark:text-gray-400">
 					{message || "Sign in to continue"}
 				</p>
 
@@ -120,7 +120,7 @@ export default function AuthModal() {
 					</button>
 					<button
 						onClick={goToRegister}
-						className="rounded-2xl border-2 border-gray-100 px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 transition-colors hover:bg-gray-50"
+						className="rounded-2xl border-2 border-gray-100 dark:border-gray-800 px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
 					>
 						Create Account
 					</button>
@@ -130,7 +130,7 @@ export default function AuthModal() {
                     <div className="mt-4 pt-4 border-t border-gray-50">
                         <button
                             onClick={continueAsGuest}
-                            className="w-full py-3 text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="w-full py-3 text-xs font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors uppercase tracking-widest flex items-center justify-center gap-2"
                         >
                             Complete without login (Guest)
                         </button>

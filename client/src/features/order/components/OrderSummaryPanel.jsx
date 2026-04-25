@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FiShoppingBag, FiCheckCircle } from 'react-icons/fi';
+import PromoCodeInput from '../../cart/components/PromoCodeInput.jsx';
 
 /**
  * Checkout sidebar — shows cart items and price summary
@@ -7,12 +8,17 @@ import { FiShoppingBag, FiCheckCircle } from 'react-icons/fi';
 const OrderSummaryPanel = ({ cartItems, calculations }) => {
 	return (
 		<motion.div
-			className="sticky top-28 bg-white rounded-3xl border border-gray-100 shadow-xl p-6 space-y-5 h-fit"
+			className="sticky top-28 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl p-6 space-y-5 h-fit transition-colors duration-300"
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: 0.2 }}
 		>
-			<h2 className="text-lg font-bold text-gray-900 tracking-tight">Order Summary</h2>
+			<h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Order Summary</h2>
+
+			{/* Promo Code Input */}
+			<div className="pb-2">
+				<PromoCodeInput />
+			</div>
 
 			{/* Cart Items */}
 			<div className="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
@@ -23,39 +29,39 @@ const OrderSummaryPanel = ({ cartItems, calculations }) => {
 					return (
 						<motion.div
 							key={product._id || index}
-							className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors"
+							className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
 							initial={{ opacity: 0, x: 10 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.1 + index * 0.05 }}
 						>
-							<div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+							<div className="w-14 h-14 rounded-xl bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0">
 								{image ? (
 									<img src={image} alt={product.title || product.name || ''} className="w-full h-full object-cover" />
 								) : (
-									<div className="w-full h-full flex items-center justify-center text-gray-300">
+									<div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-500">
 										<FiShoppingBag className="w-5 h-5" />
 									</div>
 								)}
 							</div>
 							<div className="flex-1 min-w-0">
-								<p className="text-sm font-semibold text-gray-900 truncate">{product.title || product.name}</p>
-								<p className="text-xs text-gray-400 font-medium">Qty: {item.quantity || 1}</p>
+								<p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{product.title || product.name}</p>
+								<p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Qty: {item.quantity || 1}</p>
 							</div>
-							<span className="text-sm font-bold text-gray-900 whitespace-nowrap">${(price * (item.quantity || 1)).toFixed(2)}</span>
+							<span className="text-sm font-bold text-gray-900 dark:text-white whitespace-nowrap">${(price * (item.quantity || 1)).toFixed(2)}</span>
 						</motion.div>
 					);
 				})}
 			</div>
 
 			{/* Divider */}
-			<div className="h-px bg-gray-100" />
+			<div className="h-px bg-gray-100 dark:bg-gray-700" />
 
 			{/* Price Breakdown */}
 			{calculations && (
 				<div className="space-y-3">
-					<div className="flex justify-between text-sm text-gray-500">
+					<div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
 						<span>Subtotal</span>
-						<span className="text-gray-900 font-medium">${calculations.subtotal.toFixed(2)}</span>
+						<span className="text-gray-900 dark:text-white font-medium">${calculations.subtotal.toFixed(2)}</span>
 					</div>
 					{calculations.discountAmount > 0 && (
 						<div className="flex justify-between text-sm text-emerald-600">
@@ -63,24 +69,24 @@ const OrderSummaryPanel = ({ cartItems, calculations }) => {
 							<span className="font-medium">-${calculations.discountAmount.toFixed(2)}</span>
 						</div>
 					)}
-					<div className="flex justify-between text-sm text-gray-500">
+					<div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
 						<span>Shipping</span>
 						{calculations.shipping === 0 ? (
-							<span className="text-emerald-500 font-bold text-xs uppercase tracking-wider">Free</span>
+							<span className="text-emerald-500 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">Free</span>
 						) : (
-							<span className="text-gray-900 font-medium">${calculations.shipping.toFixed(2)}</span>
+							<span className="text-gray-900 dark:text-white font-medium">${calculations.shipping.toFixed(2)}</span>
 						)}
 					</div>
-					<div className="flex justify-between text-sm text-gray-500">
+					<div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
 						<span>Tax (8%)</span>
-						<span className="text-gray-900 font-medium">${calculations.tax.toFixed(2)}</span>
+						<span className="text-gray-900 dark:text-white font-medium">${calculations.tax.toFixed(2)}</span>
 					</div>
 
-					<div className="h-px bg-gray-100" />
+					<div className="h-px bg-gray-100 dark:bg-gray-700" />
 
 					<div className="flex justify-between items-center">
-						<span className="font-bold text-gray-900 text-base">Total</span>
-						<span className="font-black text-indigo-600 text-xl">${calculations.total.toFixed(2)}</span>
+						<span className="font-bold text-gray-900 dark:text-white text-base">Total</span>
+						<span className="font-black text-indigo-600 dark:text-indigo-400 text-xl">${calculations.total.toFixed(2)}</span>
 					</div>
 				</div>
 			)}

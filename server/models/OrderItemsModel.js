@@ -30,32 +30,4 @@ const orderItemsSchema = new mongoose.Schema(
 	{ timestamps: true },
 );
 
-orderItemsSchema.pre("save", async function () {
-	if (!this.isModified("items")) return;
-
-	await this.populate("items.item");
-
-	let currency = "USD";
-	let grandTotal = 0;
-
-	this.items.forEach((item) => {
-		if (item.item && item.item.price) {
-			const unitPrice = item.item.price.amount;
-			const itemSubtotal = unitPrice * item.quantity;
-
-			// Set the item price to the subtotal for that quantity
-			item.price = {
-				amount: itemSubtotal,
-				currency: item.item.price.currency,
-			};
-
-			currency = item.item.price.currency;
-			// Add this item's subtotal to the grand total
-			grandTotal += itemSubtotal;
-		}
-	});
-
-	this.totalPrice = { amount: grandTotal, currency };
-});
-
 export default mongoose.model("OrderItemsModel", orderItemsSchema);

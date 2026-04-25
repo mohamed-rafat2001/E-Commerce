@@ -25,20 +25,20 @@ const ReviewStep = ({ shippingAddress, paymentMethod, cartItems, calculations, o
 			transition={{ duration: 0.3 }}
 		>
 			<div>
-				<h2 className="text-xl font-bold text-gray-900 mb-1">Review Your Order</h2>
-				<p className="text-sm text-gray-500">Double-check everything before placing your order.</p>
+				<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Review Your Order</h2>
+				<p className="text-sm text-gray-500 dark:text-gray-400">Double-check everything before placing your order.</p>
 			</div>
 
 			{/* Shipping Address Review */}
-			<div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
+			<div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 space-y-2">
 				<div className="flex items-center gap-2 mb-3">
-					<FiMapPin className="w-5 h-5 text-indigo-600" />
-					<h3 className="font-bold text-gray-900 text-sm">Shipping Address</h3>
+					<FiMapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+					<h3 className="font-bold text-gray-900 dark:text-white text-sm">Shipping Address</h3>
 				</div>
 				{shippingAddress ? (
-					<div className="text-sm text-gray-600 space-y-0.5 pl-7">
+					<div className="text-sm text-gray-600 dark:text-gray-400 space-y-0.5 pl-7">
 						{(shippingAddress.recipientName || shippingAddress._fullAddr?.recipientName) && (
-							<p className="font-semibold text-gray-800">{shippingAddress.recipientName || shippingAddress._fullAddr.recipientName}</p>
+							<p className="font-semibold text-gray-800 dark:text-gray-200">{shippingAddress.recipientName || shippingAddress._fullAddr.recipientName}</p>
 						)}
 						<p>{shippingAddress.line1}</p>
 						{shippingAddress.line2 && <p>{shippingAddress.line2}</p>}
@@ -51,22 +51,22 @@ const ReviewStep = ({ shippingAddress, paymentMethod, cartItems, calculations, o
 			</div>
 
 			{/* Payment Method Review */}
-			<div className="p-5 rounded-2xl bg-gray-50 border border-gray-200">
+			<div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
 				<div className="flex items-center gap-2 mb-3">
-					<FiCreditCard className="w-5 h-5 text-indigo-600" />
-					<h3 className="font-bold text-gray-900 text-sm">Payment Method</h3>
+					<FiCreditCard className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+					<h3 className="font-bold text-gray-900 dark:text-white text-sm">Payment Method</h3>
 				</div>
 				<div className="flex items-center gap-3 pl-7">
 					<span className="text-2xl">{payment.icon}</span>
-					<span className="font-semibold text-gray-800 text-sm">{payment.label}</span>
+					<span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{payment.label}</span>
 				</div>
 			</div>
 
 			{/* Cart Items Review */}
-			<div className="p-5 rounded-2xl bg-gray-50 border border-gray-200">
+			<div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
 				<div className="flex items-center gap-2 mb-4">
-					<FiShoppingBag className="w-5 h-5 text-indigo-600" />
-					<h3 className="font-bold text-gray-900 text-sm">Order Items ({cartItems.length})</h3>
+					<FiShoppingBag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+					<h3 className="font-bold text-gray-900 dark:text-white text-sm">Order Items ({cartItems.length})</h3>
 				</div>
 				<div className="space-y-3 pl-7 max-h-64 overflow-y-auto">
 					{cartItems.map((item, index) => {
@@ -85,10 +85,10 @@ const ReviewStep = ({ shippingAddress, paymentMethod, cartItems, calculations, o
 									)}
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-sm font-semibold text-gray-900 truncate">{product.title || product.name}</p>
-									<p className="text-xs text-gray-500">Qty: {item.quantity || 1}</p>
+									<p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{product.title || product.name}</p>
+									<p className="text-xs text-gray-500 dark:text-gray-400">Qty: {item.quantity || 1}</p>
 								</div>
-								<span className="text-sm font-bold text-gray-900">${(price * (item.quantity || 1)).toFixed(2)}</span>
+								<span className="text-sm font-bold text-gray-900 dark:text-white">${(price * (item.quantity || 1)).toFixed(2)}</span>
 							</div>
 						);
 					})}
@@ -97,23 +97,23 @@ const ReviewStep = ({ shippingAddress, paymentMethod, cartItems, calculations, o
 
 			{/* Price Summary */}
 			{calculations && (
-				<div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 space-y-2">
-					<div className="flex justify-between text-sm text-gray-600">
+				<div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800/50 space-y-2">
+					<div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
 						<span>Subtotal</span>
-						<span className="font-semibold">${calculations.subtotal.toFixed(2)}</span>
+						<span className="font-semibold dark:text-gray-200">${calculations.subtotal.toFixed(2)}</span>
 					</div>
-					<div className="flex justify-between text-sm text-gray-600">
+					<div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
 						<span>Shipping</span>
-						<span className="font-semibold">{calculations.shipping === 0 ? 'Free' : `$${calculations.shipping.toFixed(2)}`}</span>
+						<span className="font-semibold dark:text-gray-200">{calculations.shipping === 0 ? 'Free' : `$${calculations.shipping.toFixed(2)}`}</span>
 					</div>
-					<div className="flex justify-between text-sm text-gray-600">
+					<div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
 						<span>Tax</span>
-						<span className="font-semibold">${calculations.tax.toFixed(2)}</span>
+						<span className="font-semibold dark:text-gray-200">${calculations.tax.toFixed(2)}</span>
 					</div>
-					<div className="h-px bg-indigo-200/50 my-1" />
+					<div className="h-px bg-indigo-200/50 dark:bg-indigo-800/50 my-1" />
 					<div className="flex justify-between items-center">
-						<span className="font-bold text-gray-900">Total</span>
-						<span className="text-xl font-black text-indigo-600">${calculations.total.toFixed(2)}</span>
+						<span className="font-bold text-gray-900 dark:text-white">Total</span>
+						<span className="text-xl font-black text-indigo-600 dark:text-indigo-400">${calculations.total.toFixed(2)}</span>
 					</div>
 				</div>
 			)}

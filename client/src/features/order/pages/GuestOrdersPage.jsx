@@ -131,7 +131,6 @@ const GuestOrdersPage = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="border-none bg-transparent focus:ring-0 text-sm font-medium"
-                                hideLabel
                             />
                         </div>
                         <Button

@@ -36,6 +36,8 @@ const defaultForm = {
 	endDate: '',
 	isActive: true,
 	usageLimit: '',
+	isCoupon: false,
+	code: '',
 };
 
 /**
@@ -62,6 +64,8 @@ const DiscountFormModal = ({ isOpen, onClose, onSubmit, discount, role = 'Seller
 				endDate: discount.endDate ? new Date(discount.endDate).toISOString().slice(0, 16) : '',
 				isActive: discount.isActive ?? true,
 				usageLimit: discount.usageLimit ?? '',
+				isCoupon: discount.isCoupon ?? false,
+				code: discount.code || '',
 			});
 		} else {
 			setForm({
@@ -97,6 +101,7 @@ const DiscountFormModal = ({ isOpen, onClose, onSubmit, discount, role = 'Seller
 			endDate: form.endDate ? new Date(form.endDate).toISOString() : undefined,
 			isActive: form.isActive,
 			usageLimit: form.usageLimit ? Number(form.usageLimit) : null,
+			isCoupon: form.isCoupon,
 		};
 
 		// Clean undefined values
@@ -172,6 +177,53 @@ const DiscountFormModal = ({ isOpen, onClose, onSubmit, discount, role = 'Seller
 								className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
 							/>
 						</div>
+
+						{/* Discount Method: Automatic vs Coupon */}
+						<div>
+							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+								Discount Method
+							</label>
+							<div className="flex gap-4">
+								<label className="flex items-center gap-2 cursor-pointer">
+									<input
+										type="radio"
+										name="isCoupon"
+										checked={!form.isCoupon}
+										onChange={() => setForm(prev => ({ ...prev, isCoupon: false }))}
+										className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+									/>
+									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Automatic</span>
+								</label>
+								<label className="flex items-center gap-2 cursor-pointer">
+									<input
+										type="radio"
+										name="isCoupon"
+										checked={form.isCoupon}
+										onChange={() => setForm(prev => ({ ...prev, isCoupon: true }))}
+										className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+									/>
+									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Coupon Code</span>
+								</label>
+							</div>
+						</div>
+
+						{/* Coupon Code Indicator */}
+						{form.isCoupon && (
+							<motion.div
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: 'auto' }}
+								exit={{ opacity: 0, height: 0 }}
+								className="bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-500/20"
+							>
+								<div className="flex items-center gap-3">
+									<FiTag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+									<div>
+										<p className="text-sm font-bold text-gray-900 dark:text-white">Auto-generate Coupon Code</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">The system will generate a unique code based on the discount name after saving.</p>
+									</div>
+								</div>
+							</motion.div>
+						)}
 
 						{/* Type Selection */}
 						<div>

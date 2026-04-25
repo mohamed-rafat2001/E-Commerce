@@ -73,9 +73,16 @@ const DiscountTable = ({ discounts, onEdit, onDelete, onToggle }) => {
 								<td className="px-5 py-4">
 									<div>
 										<p className="font-semibold text-gray-900 dark:text-white truncate max-w-[160px]">{d.name}</p>
-										{d.description && (
-											<p className="text-xs text-gray-400 truncate max-w-[160px] mt-0.5">{d.description}</p>
-										)}
+										<div className="flex flex-col gap-0.5 mt-0.5">
+											{d.isCoupon && d.code && (
+												<span className="text-[10px] font-black italic text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded w-fit uppercase tracking-tighter">
+													Code: {d.code}
+												</span>
+											)}
+											{d.description && (
+												<p className="text-xs text-gray-400 truncate max-w-[160px]">{d.description}</p>
+											)}
+										</div>
 									</div>
 								</td>
 

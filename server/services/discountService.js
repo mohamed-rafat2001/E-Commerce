@@ -414,14 +414,22 @@ export const validateCouponForCart = async (code, cartItems) => {
 	}
 
 	// Now check which items in the cart are eligible for this coupon
+	const productIds = cartItems.map(i => (typeof i.item === 'string' ? i.item : (i.item?._id || i.productId))).filter(Boolean);
+	const productsFromDb = await ProductModel.find({ _id: { $in: productIds } }).lean();
+	const productMap = productsFromDb.reduce((acc, p) => ({ ...acc, [p._id.toString()]: p }), {});
+
 	let eligibleOriginalSubtotal = 0;
 	let validItemsFound = false;
 
 	// Build scope check variables
 	for (const cartItem of cartItems) {
-		const product = cartItem.productObj || cartItem.item;
+		const pId = typeof cartItem.item === 'string' ? cartItem.item : (cartItem.item?._id || cartItem.productId);
+		const product = cartItem.productObj || productMap[pId?.toString()] || cartItem.item;
+		
+		if (!product || typeof product === 'string') continue;
+
 		const quantity = cartItem.quantity || 1;
-		const originalPrice = product.price?.amount || 0;
+		const originalPrice = product.price?.amount || product.price || 0;
 
 		const productId = product._id?.toString();
 		const categoryId = product.primaryCategory?._id?.toString() || product.primaryCategory?.toString();
@@ -455,9 +463,11 @@ export const validateCouponForCart = async (code, cartItems) => {
 	if (coupon.minOrderValue > 0) {
 		// Calculate full cart subtotal to check min limit
 		const fullCartSubtotal = cartItems.reduce((acc, item) => {
-			const product = item.productObj || item.item;
+			const ptId = typeof item.item === 'string' ? item.item : (item.item?._id || item.productId);
+			const product = item.productObj || productMap[ptId?.toString()] || item.item;
+			const price = (product?.price?.amount || product?.price || 0);
 
-			return acc + (product.price?.amount || 0) * (item.quantity || 1);
+			return acc + price * (item.quantity || 1);
 		}, 0);
 
 		if (fullCartSubtotal < coupon.minOrderValue) {
@@ -473,8 +483,10 @@ export const validateCouponForCart = async (code, cartItems) => {
 	if (savings > 0) {
 		cartItems.forEach((cartItem) => {
 			if (cartItem.__isEligible) {
-				const product = cartItem.productObj || cartItem.item;
-				const itemTotal = (product.price?.amount || 0) * (cartItem.quantity || 1);
+				const paId = typeof cartItem.item === 'string' ? cartItem.item : (cartItem.item?._id || cartItem.productId);
+				const product = cartItem.productObj || productMap[paId?.toString()] || cartItem.item;
+				const price = (product?.price?.amount || product?.price || 0);
+				const itemTotal = price * (cartItem.quantity || 1);
 
 				allocations[product._id.toString()] = (itemTotal / eligibleOriginalSubtotal) * savings;
 			}
