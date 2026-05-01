@@ -406,11 +406,29 @@ export const validateCouponForCart = async (code, cartItems) => {
 
 	const coupon = await DiscountModel.findOne({
 		code: uppercaseCode,
-		...activeCouponFilter(),
+		isCoupon: true,
 	}).lean();
 
 	if (!coupon) {
-		throw new appError("Invalid, expired, or fully redeemed promo code", 400);
+		throw new appError("Invalid promo code", 400);
+	}
+
+	if (!coupon.isActive) {
+		throw new appError("This promo code is currently disabled", 400);
+	}
+
+	const now = new Date();
+	if (coupon.startDate > now) {
+		const options = { dateStyle: 'medium', timeStyle: 'short' };
+		throw new appError(`This promo code will be active starting ${coupon.startDate.toLocaleString(undefined, options)}`, 400);
+	}
+
+	if (coupon.endDate <= now) {
+		throw new appError("This promo code has expired", 400);
+	}
+
+	if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
+		throw new appError("This promo code has reached its usage limit", 400);
 	}
 
 	// Now check which items in the cart are eligible for this coupon

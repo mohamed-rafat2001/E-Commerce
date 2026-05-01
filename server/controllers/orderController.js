@@ -247,16 +247,11 @@ export const getSellerOrders = catchAsync(async (req, res, next) => {
 	const total = await countFeatures.query.countDocuments();
 
 	const transformedOrders = orderItems.map((oi) => ({
-		id: oi.orderId?._id || oi._id,
+		_id: oi.orderId?._id || oi._id,
 		status: oi.orderId?.status || "Pending",
-		date: oi.createdAt,
-		customer: {
-			name: oi.orderId?.userId
-				? `${oi.orderId.userId.firstName || ""} ${oi.orderId.userId.lastName || ""}`.trim()
-				: "Unknown",
-			email: oi.orderId?.userId?.email || "N/A",
-		},
-		total: oi.totalPrice?.amount || 0,
+		createdAt: oi.createdAt,
+		userId: oi.orderId?.userId,
+		totalPrice: oi.totalPrice,
 		items: oi.items.map((item) => ({
 			name: item.item?.name || "Product",
 			quantity: item.quantity,

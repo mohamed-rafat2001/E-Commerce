@@ -43,7 +43,8 @@ const discountSchema = new mongoose.Schema(
 			min: [0, "Discount value cannot be negative"],
 			validate: {
 				validator: function (v) {
-					if (this.type === "percentage" && v > 100) return false;
+					const type = this.get ? this.get("type") : this.type;
+					if (type === "percentage" && v > 100) return false;
 
 					return true;
 				},
@@ -107,7 +108,10 @@ const discountSchema = new mongoose.Schema(
 			required: [true, "End date is required"],
 			validate: {
 				validator: function (v) {
-					return v > this.startDate;
+					const startDate = this.get ? this.get("startDate") : this.startDate;
+					if (!startDate) return true;
+
+					return v > startDate;
 				},
 				message: "End date must be after start date",
 			},
@@ -141,7 +145,8 @@ const discountSchema = new mongoose.Schema(
 			validate: {
 				validator: function (v) {
 					// if it is a coupon, code is required
-					if (this.isCoupon && !v) return false;
+					const isCoupon = this.get ? this.get("isCoupon") : this.isCoupon;
+					if (isCoupon && !v) return false;
 
 					return true;
 				},

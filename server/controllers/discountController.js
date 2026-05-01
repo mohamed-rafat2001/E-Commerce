@@ -67,7 +67,7 @@ export const adminUpdateDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findByIdAndUpdate(
 		req.params.id,
 		updates,
-		{ new: true, runValidators: true },
+		{ new: true, runValidators: true, context: "query" },
 	);
 
 	if (!discount) return next(new appError("Discount not found", 404));
@@ -192,7 +192,7 @@ export const sellerUpdateDiscount = catchAsync(async (req, res, next) => {
 	const discount = await DiscountModel.findOneAndUpdate(
 		{ _id: req.params.id, creatorId: req.user._id },
 		updates,
-		{ new: true, runValidators: true },
+		
 	);
 
 	if (!discount)

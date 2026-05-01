@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { removePromo } from '../../../app/store/slices/cartSlice';
 import { checkoutOrder, guestCheckoutOrder } from '../services/order.js';
 import { useNavigate } from 'react-router-dom';
 import useToast from '../../../shared/hooks/useToast.js';
@@ -12,6 +14,7 @@ import { saveGuestOrder, saveGuestEmail } from '../services/guestOrders.js';
 export default function useCheckout() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 	const { showSuccess, showError } = useToast();
 	const { isAuthenticated } = useCurrentUser();
 
@@ -24,6 +27,9 @@ export default function useCheckout() {
 			}
 		},
 		onSuccess: (response) => {
+			// Clear promo code from Redux
+			dispatch(removePromo());
+
 			if (isAuthenticated) {
 				queryClient.invalidateQueries({ queryKey: ['cart'] });
 				queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -32,7 +38,7 @@ export default function useCheckout() {
 				clearGuestCart();
 				const createdOrders = response?.data?.data || [];
 				if (createdOrders.length > 0) {
-					const email = createdOrders[0].guestEmail || state?.email;
+					const email = createdOrders[0].guestEmail || response?.data?.data?.[0]?.guestEmail;
 					if (email) saveGuestEmail(email);
 					createdOrders.forEach(o => saveGuestOrder(o._id, email, o.orderNumber));
 				}

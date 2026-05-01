@@ -13,6 +13,7 @@ const SHIPPING_FREE_THRESHOLD = 500;
 const SHIPPING_REDUCED_THRESHOLD = 200;
 const SHIPPING_STANDARD_FEE = 25;
 const SHIPPING_REDUCED_FEE = 10;
+const TAX_RATE = 0.08;
 
 /**
  * Helper to determine if we can use transactions.
@@ -209,7 +210,7 @@ const processOrderCreation = async ({
 		const productsInOrder = items.map((i) => i.productObj);
 		const resolvedShippingDiscount = await resolveShippingDiscount(productsInOrder, subtotal);
         
-		let shippingFee = calculateShippingFee(subtotal);
+		let shippingFee = calculateShippingFee(totalOriginalPrice);
 		let shippingSavings = 0;
 
 		if (resolvedShippingDiscount) {
@@ -222,6 +223,9 @@ const processOrderCreation = async ({
 				shippingFee = Math.max(0, shippingFee - shippingSavings);
 			}
 		}
+
+		const taxFee = Math.round(subtotal * TAX_RATE * 100) / 100;
+		const finalTotal = subtotal + shippingFee + taxFee;
 
 		const orderId = new mongoose.Types.ObjectId();
 
@@ -243,6 +247,7 @@ const processOrderCreation = async ({
 						quantity: item.quantity,
 						price: item.price,
 					})),
+					totalPrice: { amount: finalTotal, currency },
 				},
 			],
 			{ session },
@@ -255,12 +260,12 @@ const processOrderCreation = async ({
 			shippingAddress,
 			paymentMethod,
 			shippingPrice: { amount: shippingFee, currency },
-			taxPrice: { amount: 0, currency },
+			taxPrice: { amount: taxFee, currency },
 			itemsPrice: { amount: totalOriginalPrice, currency },
 			discountAmount: { amount: itemSavings, currency },
 			shippingDiscountAmount: { amount: shippingSavings, currency },
 			appliedDiscounts: Array.from(appliedDiscounts),
-			totalPrice: { amount: subtotal + shippingFee, currency },
+			totalPrice: { amount: finalTotal, currency },
 			status: "Pending",
 			isPaid: false,
 			isDelivered: false,

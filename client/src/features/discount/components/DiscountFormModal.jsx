@@ -60,17 +60,36 @@ const DiscountFormModal = ({ isOpen, onClose, onSubmit, discount, role = 'Seller
 				scope: discount.scope || (role === 'Admin' ? 'all_products' : 'seller_all'),
 				targetIds: (discount.targetIds || []).join(', '),
 				priority: discount.priority ?? '',
-				startDate: discount.startDate ? new Date(discount.startDate).toISOString().slice(0, 16) : '',
-				endDate: discount.endDate ? new Date(discount.endDate).toISOString().slice(0, 16) : '',
+				startDate: discount.startDate ? (() => {
+					const d = new Date(discount.startDate);
+					d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+					return d.toISOString().slice(0, 16);
+				})() : '',
+				endDate: discount.endDate ? (() => {
+					const d = new Date(discount.endDate);
+					d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+					return d.toISOString().slice(0, 16);
+				})() : '',
 				isActive: discount.isActive ?? true,
 				usageLimit: discount.usageLimit ?? '',
 				isCoupon: discount.isCoupon ?? false,
 				code: discount.code || '',
 			});
 		} else {
+			const now = new Date();
+			now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+			const defaultStart = now.toISOString().slice(0, 16);
+			
+			const nextWeek = new Date();
+			nextWeek.setDate(nextWeek.getDate() + 7);
+			nextWeek.setMinutes(nextWeek.getMinutes() - nextWeek.getTimezoneOffset());
+			const defaultEnd = nextWeek.toISOString().slice(0, 16);
+
 			setForm({
 				...defaultForm,
 				scope: role === 'Admin' ? 'all_products' : 'seller_all',
+				startDate: defaultStart,
+				endDate: defaultEnd,
 			});
 		}
 	}, [discount, role]);
