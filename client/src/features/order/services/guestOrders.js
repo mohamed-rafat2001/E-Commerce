@@ -10,7 +10,7 @@ const STORAGE_KEY = 'guest_orders';
 export const getSavedGuestOrders = () => {
     try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    } catch (e) {
+    } catch {
         return [];
     }
 };

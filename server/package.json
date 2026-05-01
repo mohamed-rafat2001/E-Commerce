@@ -10,7 +10,8 @@
 		"start": "node server.js",
 		"server": "cross-env NODE_MODE=DEV nodemon server.js",
 		"client": "npm run dev --prefix ../client",
-		"dev": "concurrently \"npm run server\" \"npm run client\""
+		"dev": "concurrently \"npm run server\" \"npm run client\"",
+		"test:api-security": "node --test tests/api-security.test.mjs"
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.3",

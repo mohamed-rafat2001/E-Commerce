@@ -44,6 +44,7 @@ const discountSchema = new mongoose.Schema(
 			validate: {
 				validator: function (v) {
 					const type = this.get ? this.get("type") : this.type;
+
 					if (type === "percentage" && v > 100) return false;
 
 					return true;
@@ -109,6 +110,7 @@ const discountSchema = new mongoose.Schema(
 			validate: {
 				validator: function (v) {
 					const startDate = this.get ? this.get("startDate") : this.startDate;
+
 					if (!startDate) return true;
 
 					return v > startDate;
@@ -146,6 +148,7 @@ const discountSchema = new mongoose.Schema(
 				validator: function (v) {
 					// if it is a coupon, code is required
 					const isCoupon = this.get ? this.get("isCoupon") : this.isCoupon;
+
 					if (isCoupon && !v) return false;
 
 					return true;
@@ -210,8 +213,9 @@ discountSchema.pre("validate", async function () {
 			const generatedCode = `${prefix}-${suffix}`;
 
 			// Check for existence in DB
-			// eslint-disable-next-line no-await-in-loop
+			 
 			const existing = await this.constructor.findOne({ code: generatedCode });
+
 			if (!existing) {
 				this.code = generatedCode;
 				isUnique = true;

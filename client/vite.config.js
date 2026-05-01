@@ -8,10 +8,16 @@ export default defineConfig(({ mode }) => ({
 	build: {
 		// Use terser for better minification + drop console.log in production
 		minify: 'terser',
+		modulePreload: { polyfill: false },
 		terserOptions: {
 			compress: {
 				drop_console: true,
 				drop_debugger: true,
+				passes: 2,
+				unsafe_arrows: true,
+			},
+			format: {
+				comments: false,
 			},
 		},
 		// Enable CSS code splitting — each async chunk gets its own CSS

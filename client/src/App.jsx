@@ -16,6 +16,28 @@ import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import useCartMerge from "./hooks/useCartMerge.js";
 import useWishlistMerge from "./hooks/useWishlistMerge.js";
 
+const toasterOptions = {
+	duration: 4000,
+	className: "react-hot-toast",
+	style: {
+		background: "#ffffff",
+		color: "#1e293b",
+		padding: "12px 14px",
+		borderRadius: "14px",
+		boxShadow: "0 10px 30px -16px rgba(2, 6, 23, 0.45)",
+		border: "1px solid #e2e8f0",
+		maxWidth: "360px",
+	},
+	success: {
+		duration: 3000,
+		icon: null,
+	},
+	error: {
+		duration: 5000,
+		icon: null,
+	},
+};
+
 const ReactQueryDevtools = import.meta.env.DEV
 	? lazy(() =>
 		import("@tanstack/react-query-devtools").then((module) => ({
@@ -44,28 +66,7 @@ function App() {
 						<AppBoot />
 						<Toaster
 							position="top-right"
-							toastOptions={{
-								duration: 4000,
-								className: "react-hot-toast",
-								style: {
-									background: 'rgba(255, 255, 255, 0.95)',
-									backdropFilter: 'blur(12px)',
-									color: '#1e293b',
-									padding: '12px 16px',
-									borderRadius: '20px',
-									boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.1), 0 10px 20px -10px rgba(0, 0, 0, 0.05)',
-									border: '1px solid rgba(255, 255, 255, 0.5)',
-									maxWidth: '400px',
-								},
-								success: {
-									duration: 3000,
-									icon: null,
-								},
-								error: {
-									duration: 5000,
-									icon: null,
-								},
-							}}
+							toastOptions={toasterOptions}
 							containerStyle={{
 								top: 40,
 								right: 24,

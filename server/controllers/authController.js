@@ -110,12 +110,20 @@ export const login = catchAsync(async (req, res, next) => {
 
 	if (!email || !password)
 		return next(new appError("please provide email and password", 400));
+	if (typeof email !== "string" || typeof password !== "string")
+		return next(new appError("invalid credentials format", 400));
+
+	const normalizedEmail = email.trim().toLowerCase();
+	const normalizedPassword = password.trim();
+
+	if (!normalizedEmail || !normalizedPassword)
+		return next(new appError("please provide email and password", 400));
 
 	// find the user using email
-	const user = await UserModel.findOne({ email }).select("+password");
+	const user = await UserModel.findOne({ email: normalizedEmail }).select("+password");
 
 	if (!user) return next(new appError("email or password is incorrect", 400));
-	const isPasswordCorrect = await user.correctPassword(password, user.password);
+	const isPasswordCorrect = await user.correctPassword(normalizedPassword, user.password);
 
 	// check if password and email  is correct
 	if (!isPasswordCorrect)

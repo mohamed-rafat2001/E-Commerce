@@ -3,10 +3,11 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import PageSkeleton from "../../shared/ui/PageSkeleton/PageSkeleton.jsx";
-import AuthModal from "../../components/auth/AuthModal.jsx";
+
+const AuthModal = lazy(() => import("../../components/auth/AuthModal.jsx"));
+const DashboardLayout = lazy(() => import("../../layouts/DashboardLayout.jsx"));
 
 // Layouts — loaded eagerly (needed for every page)
-import DashboardLayout from "../../layouts/DashboardLayout.jsx";
 import PublicLayout from "../../shared/layout/PublicLayout.jsx";
 
 // ─── Lazy-loaded Pages ────────────────────────────────────────────
@@ -94,7 +95,9 @@ const RootLayout = () => {
 	return (
 		<>
 			<Outlet />
-			<AuthModal />
+			<Suspense fallback={null}>
+				<AuthModal />
+			</Suspense>
 		</>
 	);
 };

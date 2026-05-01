@@ -380,24 +380,6 @@ export const enrichProductsWithDiscounts = async (products) => {
 };
 
 /**
- * Filter for active coupons
- */
-const activeCouponFilter = () => {
-	const now = new Date();
-
-	return {
-		isActive: true,
-		isCoupon: true,
-		startDate: { $lte: now },
-		endDate: { $gt: now },
-		$or: [
-			{ usageLimit: null },
-			{ $expr: { $lt: ["$usageCount", "$usageLimit"] } },
-		],
-	};
-};
-
-/**
  * Validates a coupon code against a list of cart items.
  * Calculates overall coupon savings based on the matching products.
  */
@@ -418,8 +400,10 @@ export const validateCouponForCart = async (code, cartItems) => {
 	}
 
 	const now = new Date();
+
 	if (coupon.startDate > now) {
-		const options = { dateStyle: 'medium', timeStyle: 'short' };
+		const options = { dateStyle: "medium", timeStyle: "short" };
+
 		throw new appError(`This promo code will be active starting ${coupon.startDate.toLocaleString(undefined, options)}`, 400);
 	}
 
@@ -432,7 +416,7 @@ export const validateCouponForCart = async (code, cartItems) => {
 	}
 
 	// Now check which items in the cart are eligible for this coupon
-	const productIds = cartItems.map(i => (typeof i.item === 'string' ? i.item : (i.item?._id || i.productId))).filter(Boolean);
+	const productIds = cartItems.map((i) => (typeof i.item === "string" ? i.item : (i.item?._id || i.productId))).filter(Boolean);
 	const productsFromDb = await ProductModel.find({ _id: { $in: productIds } }).lean();
 	const productMap = productsFromDb.reduce((acc, p) => ({ ...acc, [p._id.toString()]: p }), {});
 
@@ -441,10 +425,10 @@ export const validateCouponForCart = async (code, cartItems) => {
 
 	// Build scope check variables
 	for (const cartItem of cartItems) {
-		const pId = typeof cartItem.item === 'string' ? cartItem.item : (cartItem.item?._id || cartItem.productId);
+		const pId = typeof cartItem.item === "string" ? cartItem.item : (cartItem.item?._id || cartItem.productId);
 		const product = cartItem.productObj || productMap[pId?.toString()] || cartItem.item;
 		
-		if (!product || typeof product === 'string') continue;
+		if (!product || typeof product === "string") continue;
 
 		const quantity = cartItem.quantity || 1;
 		const originalPrice = product.price?.amount || product.price || 0;
@@ -481,7 +465,7 @@ export const validateCouponForCart = async (code, cartItems) => {
 	if (coupon.minOrderValue > 0) {
 		// Calculate full cart subtotal to check min limit
 		const fullCartSubtotal = cartItems.reduce((acc, item) => {
-			const ptId = typeof item.item === 'string' ? item.item : (item.item?._id || item.productId);
+			const ptId = typeof item.item === "string" ? item.item : (item.item?._id || item.productId);
 			const product = item.productObj || productMap[ptId?.toString()] || item.item;
 			const price = (product?.price?.amount || product?.price || 0);
 
@@ -501,7 +485,7 @@ export const validateCouponForCart = async (code, cartItems) => {
 	if (savings > 0) {
 		cartItems.forEach((cartItem) => {
 			if (cartItem.__isEligible) {
-				const paId = typeof cartItem.item === 'string' ? cartItem.item : (cartItem.item?._id || cartItem.productId);
+				const paId = typeof cartItem.item === "string" ? cartItem.item : (cartItem.item?._id || cartItem.productId);
 				const product = cartItem.productObj || productMap[paId?.toString()] || cartItem.item;
 				const price = (product?.price?.amount || product?.price || 0);
 				const itemTotal = price * (cartItem.quantity || 1);

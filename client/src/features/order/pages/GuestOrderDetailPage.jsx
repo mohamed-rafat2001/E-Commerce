@@ -40,7 +40,7 @@ const GuestOrderDetailPage = () => {
             try {
                 const res = await getGuestOrderDetail(orderId, email);
                 setOrder(res.data.data || res.data);
-            } catch (err) {
+            } catch {
                 toast.error('Could not load order details');
                 navigate('/guest-orders');
             } finally {

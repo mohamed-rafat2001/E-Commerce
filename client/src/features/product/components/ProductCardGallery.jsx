@@ -50,6 +50,9 @@ const ProductCardGallery = memo(function ProductCardGallery({
         src={imageUrl}
         alt={productName}
         className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
         crossOrigin="anonymous"
       />
     );
@@ -92,6 +95,9 @@ const ProductCardGallery = memo(function ProductCardGallery({
                 src={imageUrl}
                 alt={`${productName} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
                 crossOrigin="anonymous"
               />
             </button>
@@ -105,6 +111,9 @@ const ProductCardGallery = memo(function ProductCardGallery({
           src={images[activeIndex]?.secure_url || images[activeIndex]}
           alt={productName}
           className="w-full h-full object-cover transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
           crossOrigin="anonymous"
         />
       </div>

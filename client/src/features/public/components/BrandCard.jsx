@@ -32,6 +32,9 @@ export default function BrandCard({ brand }) {
 							src={coverUrl}
 							alt={brand.name || "Brand cover"}
 							className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+							loading="lazy"
+							decoding="async"
+							fetchPriority="low"
 							crossOrigin="anonymous"
 						/>
 					) : (
@@ -46,6 +49,9 @@ export default function BrandCard({ brand }) {
 									src={logoUrl}
 									alt={brand.name || "Brand logo"}
 									className="w-full h-full object-cover"
+									loading="lazy"
+									decoding="async"
+									fetchPriority="low"
 									crossOrigin="anonymous"
 								/>
 							) : (
