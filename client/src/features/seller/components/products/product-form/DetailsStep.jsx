@@ -1,30 +1,24 @@
 import { motion } from 'framer-motion';
-import { Select, Button } from '../../../../../shared/ui/index.js';
-import { FiTag, FiGrid, FiLayers, FiAlertCircle, FiX } from 'react-icons/fi';
+import { Controller } from 'react-hook-form';
+import { Select, Skeleton } from '../../../../../shared/ui/index.js';
+import { FiFolder, FiTag, FiShoppingBag, FiInfo } from 'react-icons/fi';
 import TagInput from './TagInput.jsx';
 
 const DetailsStep = ({
-	formData,
-	formErrors,
-	onSelectChange,
-	// Brand/Category data
-	brands,
+	register,
+	errors,
+	control,
 	brandOptions,
 	brandsLoading,
 	categoryOptions,
 	subCategoryOptions,
 	categoriesLoading,
-	onClose,
-	// Sizes
-	sizeInput,
-	onSizeInputChange,
+	sizes,
+	colors,
 	onAddSize,
 	onRemoveSize,
-	// Colors
-	colorInput,
-	onColorInputChange,
 	onAddColor,
-	onRemoveColor,
+	onRemoveColor
 }) => {
 	return (
 		<motion.div
@@ -33,144 +27,114 @@ const DetailsStep = ({
 			animate={{ opacity: 1, x: 0 }}
 			exit={{ opacity: 0, x: -20 }}
 			transition={{ duration: 0.25 }}
-			className="space-y-5"
+			className="space-y-6"
 		>
-			{/* Brand Selection */}
-			<div>
-				{brands && brands.length === 0 ? (
-					<div className="border-2 border-dashed border-amber-200 rounded-xl p-5 text-center bg-amber-50/50">
-						<div className="flex flex-col items-center gap-3">
-							<div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
-								<FiAlertCircle className="w-5 h-5 text-amber-600" />
-							</div>
-							<div>
-								<h3 className="font-bold text-amber-800 text-sm">No Brands Available</h3>
-								<p className="text-xs text-amber-600 mt-1">
-									You need to create a brand before adding products.
-								</p>
-							</div>
-							<Button 
-								variant="secondary" 
-								size="sm"
-								type="button"
-								onClick={() => {
-									onClose();
-									window.location.href = '/seller/brands';
-								}}
-								className="!rounded-xl"
-							>
-								Create Your First Brand
-							</Button>
-						</div>
-					</div>
-				) : (
-					<div>
-						<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-							<FiTag className="w-4 h-4 text-indigo-500" />
-							Brand <span className="text-rose-400">*</span>
-						</label>
-						<Select
-							value={formData.brandId}
-							onChange={(val) => onSelectChange('brandId', val)}
-							options={[
-								{ value: '', label: 'Select brand...' },
-								...brandOptions
-							]}
-							loading={brandsLoading}
-						/>
-						{formErrors.brandId && (
-							<p className="text-xs text-rose-500 mt-1.5 flex items-center gap-1">
-								<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.brandId}
-							</p>
-						)}
-					</div>
-				)}
-			</div>
-
-			{/* Categories */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+				{/* Brand Selection */}
 				<div>
 					<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-						<FiGrid className="w-4 h-4 text-emerald-500" />
+						<FiShoppingBag className="w-4 h-4 text-indigo-500" />
+						Brand <span className="text-rose-400">*</span>
+					</label>
+					<Controller
+						name="brandId"
+						control={control}
+						render={({ field }) => (
+							<Select
+								options={[{ value: '', label: 'Select Brand' }, ...brandOptions]}
+								{...field}
+								isLoading={brandsLoading}
+								error={errors.brandId?.message}
+							/>
+						)}
+					/>
+				</div>
+
+				{/* Primary Category */}
+				<div>
+					<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+						<FiFolder className="w-4 h-4 text-indigo-500" />
 						Primary Category <span className="text-rose-400">*</span>
 					</label>
-					<Select
-						value={formData.primaryCategory}
-						onChange={(val) => onSelectChange('primaryCategory', val)}
-						options={[
-							{ value: '', label: 'Select category...' },
-							...categoryOptions
-						]}
-						loading={categoriesLoading}
-					/>
-					{formErrors.primaryCategory && (
-						<p className="text-xs text-rose-500 mt-1.5 flex items-center gap-1">
-							<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.primaryCategory}
-						</p>
-					)}
-				</div>
-				<div>
-					<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-						<FiLayers className="w-4 h-4 text-purple-500" />
-						Sub Category
-					</label>
-					<Select
-						value={formData.subCategory}
-						onChange={(val) => onSelectChange('subCategory', val)}
-						options={[
-							{ value: '', label: 'Optional...' },
-							...subCategoryOptions
-						]}
-						disabled={!formData.primaryCategory}
-						loading={categoriesLoading}
+					<Controller
+						name="primaryCategory"
+						control={control}
+						render={({ field }) => (
+							<Select
+								options={[{ value: '', label: 'Select Category' }, ...categoryOptions]}
+								{...field}
+								isLoading={categoriesLoading}
+								error={errors.primaryCategory?.message}
+							/>
+						)}
 					/>
 				</div>
 			</div>
 
-			{/* Sizes */}
-			<TagInput
-				label="Sizes"
-				emoji="📏"
-				items={formData.sizes}
-				inputValue={sizeInput}
-				onInputChange={onSizeInputChange}
-				onAdd={onAddSize}
-				onRemove={onRemoveSize}
-				placeholder="e.g., S, M, L, XL, 42"
-			/>
-
-			{/* Colors */}
-			<TagInput
-				label="Colors"
-				emoji="🎨"
-				items={formData.colors}
-				inputValue={colorInput}
-				onInputChange={onColorInputChange}
-				onAdd={onAddColor}
-				onRemove={onRemoveColor}
-				placeholder="#FF5733 or red"
-				error={formErrors.colors}
-				renderTag={(color, onRemove) => (
-					<span 
-						key={color} 
-						className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-gray-700 border border-gray-200 shadow-sm"
-					>
-						<span 
-							className="w-4 h-4 rounded-md border border-gray-200 shadow-inner" 
-							style={{ backgroundColor: color.startsWith('#') ? color : color }}
+			{/* Sub Category */}
+			<div>
+				<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+					<FiTag className="w-4 h-4 text-indigo-500" />
+					Sub Category (Optional)
+				</label>
+				<Controller
+					name="subCategory"
+					control={control}
+					render={({ field }) => (
+						<Select
+							options={[{ value: '', label: 'Select Sub Category' }, ...subCategoryOptions]}
+							{...field}
+							disabled={!control._formValues.primaryCategory}
+							isLoading={categoriesLoading}
+							error={errors.subCategory?.message}
 						/>
-						{color}
-						<button
-							type="button"
-							onClick={() => onRemove(color)}
-							className="text-gray-400 hover:text-rose-500 transition-colors"
-							aria-label={`Remove ${color}`}
-						>
-							<FiX className="w-3 h-3" />
-						</button>
-					</span>
-				)}
-			/>
+					)}
+				/>
+			</div>
+
+			<div className="h-px bg-gray-100 my-1" />
+
+			{/* Product Variants (Tags) */}
+			<div className="space-y-5">
+				<div>
+					<div className="flex items-center justify-between mb-2">
+						<label className="flex items-center gap-2 text-sm font-bold text-gray-700">
+							Available Sizes
+						</label>
+						<span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Press Enter to Add</span>
+					</div>
+					<TagInput
+						tags={sizes || []}
+						onAdd={onAddSize}
+						onRemove={onRemoveSize}
+						placeholder="e.g., S, M, L, XL, 42, 44..."
+						type="text"
+					/>
+				</div>
+
+				<div>
+					<div className="flex items-center justify-between mb-2">
+						<label className="flex items-center gap-2 text-sm font-bold text-gray-700">
+							Available Colors
+						</label>
+						<span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hex or Name</span>
+					</div>
+					<TagInput
+						tags={colors || []}
+						onAdd={onAddColor}
+						onRemove={onRemoveColor}
+						placeholder="e.g., Black, #FF0000, Silver..."
+						type="color"
+					/>
+				</div>
+			</div>
+
+			<div className="bg-amber-50 rounded-xl p-4 border border-amber-100 flex gap-3">
+				<FiInfo className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+				<p className="text-xs text-amber-700 leading-relaxed">
+					Adding variants like <strong>sizes</strong> and <strong>colors</strong> helps customers find exactly what they're looking for and increases conversion rates.
+				</p>
+			</div>
 		</motion.div>
 	);
 };

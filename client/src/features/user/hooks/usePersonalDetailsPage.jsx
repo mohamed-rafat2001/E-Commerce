@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileUpdateSchema, changePasswordSchema } from '../../../shared/validation/schemas.js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { ToastSuccess, ToastError } from '../../../shared/ui/index.js';
@@ -40,6 +42,8 @@ const usePersonalDetailsPage = () => {
 
     // Profile form
     const profileForm = useForm({
+        resolver: zodResolver(profileUpdateSchema),
+        mode: 'onChange',
         defaultValues: {
             firstName: userData?.firstName || '',
             lastName: userData?.lastName || '',
@@ -51,6 +55,8 @@ const usePersonalDetailsPage = () => {
 
     // Password form
     const passwordForm = useForm({
+        resolver: zodResolver(changePasswordSchema),
+        mode: 'onChange',
         defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
     });
 

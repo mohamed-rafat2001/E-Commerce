@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { addressSchema } from '../../../shared/validation/schemas.js';
 import { Input, Button } from '../../../shared/ui/index.js';
 
 const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }) => {
@@ -7,6 +9,8 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }
 		handleSubmit,
 		formState: { errors },
 	} = useForm({
+		resolver: zodResolver(addressSchema),
+		mode: 'onChange',
 		defaultValues: initialData || {
 			label: 'Home',
 			recipientName: '',
@@ -26,13 +30,13 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }
 				<Input
 					label="Address Label (e.g. Home, Work)"
 					placeholder="Home"
-					{...register('label', { required: 'Label is required' })}
+					{...register('label')}
 					error={errors.label?.message}
 				/>
 				<Input
 					label="Recipient Name"
 					placeholder="John Doe"
-					{...register('recipientName', { required: 'Name is required' })}
+					{...register('recipientName')}
 					error={errors.recipientName?.message}
 				/>
 			</div>
@@ -40,14 +44,14 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }
 			<Input
 				label="Phone Number"
 				placeholder="+20 123 456 7890"
-				{...register('phone', { required: 'Phone is required' })}
+				{...register('phone')}
 				error={errors.phone?.message}
 			/>
 
 			<Input
 				label="Address Line 1"
 				placeholder="Street name, Building number"
-				{...register('line1', { required: 'Address is required' })}
+				{...register('line1')}
 				error={errors.line1?.message}
 			/>
 
@@ -61,7 +65,7 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }
 				<Input
 					label="City"
 					placeholder="Cairo"
-					{...register('city', { required: 'City is required' })}
+					{...register('city')}
 					error={errors.city?.message}
 				/>
 				<Input
@@ -75,13 +79,13 @@ const AddressForm = ({ initialData, onSubmit, isLoading, onCancel, submitLabel }
 				<Input
 					label="Postal Code"
 					placeholder="12345"
-					{...register('postalCode', { required: 'Postal code is required' })}
+					{...register('postalCode')}
 					error={errors.postalCode?.message}
 				/>
 				<Input
 					label="Country"
 					placeholder="Egypt"
-					{...register('country', { required: 'Country is required' })}
+					{...register('country')}
 					error={errors.country?.message}
 				/>
 			</div>

@@ -1,184 +1,134 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Button, Modal, Input, LoadingSpinner } from '../../../../shared/ui/index.js';
-import { FiUploadCloud, FiX } from 'react-icons/fi';
-import { uploadSingleImage } from '../../../../shared/services/uploadService.js';
-import { toast } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { categorySchema } from '../../../../shared/validation/schemas.js';
+import { Modal, Button, Input } from '../../../../shared/ui/index.js';
+import { FiFolder, FiCheck, FiX, FiInfo } from 'react-icons/fi';
 
 const CategoryFormModal = ({ isOpen, onClose, category, onSubmit, isLoading }) => {
-	const [formData, setFormData] = useState({
-		name: '',
-		description: '',
-		isActive: true,
-		coverImage: { public_id: '', secure_url: '' }
-	});
+	const isEdit = !!category;
 
-	const [uploading, setUploading] = useState(false);
-	const [uploadProgress, setUploadProgress] = useState(0);
-	const fileInputRef = useRef(null);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+		watch,
+		setValue,
+	} = useForm({
+		resolver: zodResolver(categorySchema),
+		mode: 'onChange',
+		defaultValues: {
+			name: '',
+			description: '',
+			isActive: true,
+		},
+	});
 
 	useEffect(() => {
 		if (isOpen) {
-			setFormData({
-				name: category?.name || '',
-				description: category?.description || '',
-				isActive: category?.isActive !== undefined ? category.isActive : true,
-				coverImage: category?.coverImage || { public_id: '', secure_url: '' }
-			});
-		}
-	}, [isOpen, category]);
-
-	const handleFileChange = async (e) => {
-		const file = e.target.files[0];
-		if (!file) return;
-
-		if (!file.type.startsWith('image/')) {
-			return toast.error("Please select a valid image file");
-		}
-
-		try {
-			setUploading(true);
-			setUploadProgress(0);
-			
-			const response = await uploadSingleImage(file, (progress) => {
-				setUploadProgress(progress);
-			});
-
-			if (response.status === 'success') {
-				setFormData(prev => ({
-					...prev,
-					coverImage: {
-						public_id: response.data.public_id,
-						secure_url: response.data.secure_url
-					}
-				}));
-				toast.success("Image uploaded successfully!");
+			if (category) {
+				reset({
+					name: category.name || '',
+					description: category.description || '',
+					isActive: category.isActive ?? true,
+				});
+			} else {
+				reset({
+					name: '',
+					description: '',
+					isActive: true,
+				});
 			}
-		} catch (error) {
-			toast.error("Failed to upload image. Please try again.");
-			console.error("Upload error:", error);
-		} finally {
-			setUploading(false);
-			setUploadProgress(0);
 		}
-	};
+	}, [isOpen, category, reset]);
 
-	const removeImage = () => {
-		setFormData(prev => ({
-			...prev,
-			coverImage: { public_id: '', secure_url: '' }
-		}));
-		if (fileInputRef.current) fileInputRef.current.value = '';
-	};
-
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		if (uploading) return toast.error("Please wait for the image to finish uploading");
-		onSubmit(formData);
+	const onInternalSubmit = (data) => {
+		onSubmit(data);
 	};
 
 	return (
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
-			title={category ? "Edit Category" : "Add Category"}
-			size="sm"
-			footer={
-				<>
-					<Button variant="secondary" onClick={onClose} disabled={isLoading}>
-						Cancel
-					</Button>
-					<Button type="submit" form="category-form" disabled={isLoading || uploading}>
-						{isLoading ? <LoadingSpinner size="sm" /> : (category ? "Update" : "Create")}
-					</Button>
-				</>
-			}
+			title={isEdit ? 'Edit Category' : 'Create New Category'}
+			size="md"
 		>
-			<form id="category-form" onSubmit={handleSubmit} className="space-y-4">
-				<div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 group hover:border-indigo-300 transition-colors relative min-h-[160px]">
-					{formData.coverImage?.secure_url ? (
-						<div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md">
-							<img 
-								src={formData.coverImage.secure_url} 
-								alt="Preview" 
-								className="w-full h-full object-cover"
-								crossOrigin="anonymous"
-							/>
-							<button
-								type="button"
-								onClick={removeImage}
-								className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-full shadow-lg hover:bg-red-50 transition-colors z-10"
-							>
-								<FiX className="w-4 h-4" />
-							</button>
-						</div>
-					) : (
-						<div 
-							onClick={() => fileInputRef.current?.click()}
-							className="flex flex-col items-center cursor-pointer text-gray-500 group-hover:text-indigo-600 transition-colors"
-						>
-							<div className="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:shadow-indigo-100 transition-all">
-								<FiUploadCloud className="w-6 h-6" />
-							</div>
-							<p className="text-sm font-semibold">Click to upload image</p>
-							<p className="text-xs text-gray-400 mt-1">PNG, JPG or WebP up to 5MB</p>
-						</div>
-					)}
-
-					<input 
-						ref={fileInputRef}
-						type="file" 
-						className="hidden" 
-						accept="image/*"
-						onChange={handleFileChange}
-						disabled={uploading}
-					/>
-
-					{uploading && (
-						<div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20">
-							<div className="w-2/3 h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
-								<motion.div 
-									className="h-full bg-indigo-500"
-									initial={{ width: 0 }}
-									animate={{ width: `${uploadProgress}%` }}
-								/>
-							</div>
-							<p className="text-sm font-bold text-indigo-600">Uploading {uploadProgress}%</p>
-						</div>
-					)}
-				</div>
-
+			<form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-6">
+				{/* Category Name */}
 				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+					<div className="flex items-center gap-2 mb-2">
+						<FiFolder className="text-gray-400" />
+						<label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Category Name
+						</label>
+					</div>
 					<Input
-						value={formData.name}
-						onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-						placeholder="e.g. Electronics"
-						required
+						placeholder="e.g. Electronics, Fashion..."
+						{...register('name')}
+						error={errors.name?.message}
+						disabled={isLoading}
 					/>
 				</div>
 
+				{/* Description */}
 				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+					<div className="flex items-center gap-2 mb-2">
+						<FiInfo className="text-gray-400" />
+						<label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Description
+						</label>
+					</div>
 					<textarea
-						value={formData.description}
-						onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-						placeholder="Briefly describe this category..."
-						className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white min-h-[100px]"
+						className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none min-h-[100px] resize-none
+							${errors.description ? 'border-red-500 bg-red-50/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-indigo-500'}
+						`}
+						placeholder="Describe what this category includes..."
+						{...register('description')}
+						disabled={isLoading}
 					/>
+					{errors.description && (
+						<p className="mt-1 text-xs text-red-500 font-medium">{errors.description.message}</p>
+					)}
 				</div>
 
-				<div className="flex items-center gap-2 pt-2">
-					<input
-						type="checkbox"
-						id="isActive"
-						checked={formData.isActive}
-						onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-						className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-					/>
-					<label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-						Mark as active category
+				{/* Status Toggle */}
+				<div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+					<div>
+						<p className="font-semibold text-gray-900 dark:text-gray-100">Visible for customers</p>
+						<p className="text-xs text-gray-500">If disabled, this category and its products will be hidden.</p>
+					</div>
+					<label className="relative inline-flex items-center cursor-pointer">
+						<input
+							type="checkbox"
+							className="sr-only peer"
+							checked={watch('isActive')}
+							onChange={(e) => setValue('isActive', e.target.checked)}
+						/>
+						<div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
 					</label>
+				</div>
+
+				{/* Actions */}
+				<div className="flex gap-3 pt-4">
+					<Button
+						type="button"
+						variant="ghost"
+						fullWidth
+						onClick={onClose}
+						disabled={isLoading}
+					>
+						<FiX className="mr-2" /> Cancel
+					</Button>
+					<Button
+						type="submit"
+						variant="primary"
+						fullWidth
+						isLoading={isLoading}
+					>
+						<FiCheck className="mr-2" />
+						{isEdit ? 'Save Changes' : 'Create Category'}
+					</Button>
 				</div>
 			</form>
 		</Modal>

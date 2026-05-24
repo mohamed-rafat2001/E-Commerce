@@ -5,6 +5,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '../../../shared/validation/schemas.js';
 import useLogin from './useLogin.jsx';
 import useCurrentUser from '../../user/hooks/useCurrentUser.js';
 
@@ -27,7 +29,10 @@ const useLoginPage = () => {
         }
     }, [isAuthenticated, userRole, navigate, searchParams]);
 
-    const form = useForm();
+    const form = useForm({
+        resolver: zodResolver(loginSchema),
+        mode: 'onChange',
+    });
 
     const onSubmit = (data) => {
         login(data);

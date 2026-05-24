@@ -1,46 +1,54 @@
+import { useState } from 'react';
 import { FiX } from 'react-icons/fi';
 import { Input, Button } from '../../../../../shared/ui/index.js';
 
 const TagInput = ({ 
 	label, 
 	emoji,
-	items, 
-	inputValue, 
-	onInputChange, 
+	tags = [], 
 	onAdd, 
 	onRemove, 
 	placeholder,
 	error,
 	renderTag,
 }) => {
+	const [inputValue, setInputValue] = useState('');
+
+	const handleAdd = () => {
+		if (inputValue.trim()) {
+			onAdd(inputValue);
+			setInputValue('');
+		}
+	};
+
 	return (
 		<div className="p-4 bg-gray-50/80 rounded-xl border border-gray-100">
 			<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
 				{emoji} {label}
 				<span className="text-[10px] font-medium text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">
-					{items.length} added
+					{tags.length} added
 				</span>
 			</label>
 			<div className="flex gap-2">
 				<Input
 					placeholder={placeholder}
 					value={inputValue}
-					onChange={(e) => onInputChange(e.target.value)}
+					onChange={(e) => setInputValue(e.target.value)}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter') {
 							e.preventDefault();
-							onAdd();
+							handleAdd();
 						}
 					}}
 				/>
-				<Button type="button" variant="primary" onClick={onAdd} className="shrink-0 !rounded-xl">
+				<Button type="button" variant="primary" onClick={handleAdd} className="shrink-0 !rounded-xl">
 					Add
 				</Button>
 			</div>
 			{error && <p className="text-xs text-rose-500 mt-1.5">{error}</p>}
-			{items.length > 0 && (
+			{tags.length > 0 && (
 				<div className="flex flex-wrap gap-1.5 mt-3">
-					{items.map((item) => (
+					{tags.map((item) => (
 						renderTag ? renderTag(item, onRemove) : (
 							<span 
 								key={item} 

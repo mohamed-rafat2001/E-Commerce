@@ -2,7 +2,9 @@ import { motion } from 'framer-motion';
 import { Input } from '../../../../../shared/ui/index.js';
 import { FiBox, FiLayers, FiDollarSign, FiHash, FiAlertCircle } from 'react-icons/fi';
 
-const BasicInfoStep = ({ formData, formErrors, onChange }) => {
+const BasicInfoStep = ({ register, errors, watch }) => {
+	const description = watch('description') || '';
+
 	return (
 		<motion.div
 			key="step-basic"
@@ -19,17 +21,10 @@ const BasicInfoStep = ({ formData, formErrors, onChange }) => {
 					Product Name <span className="text-rose-400">*</span>
 				</label>
 				<Input
-					name="name"
-					value={formData.name}
-					onChange={onChange}
 					placeholder="e.g., Premium Wireless Headphones"
-					required
+					{...register('name')}
+					error={errors.name?.message}
 				/>
-				{formErrors.name && (
-					<p className="text-xs text-rose-500 mt-1.5 flex items-center gap-1">
-						<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.name}
-					</p>
-				)}
 			</div>
 
 			{/* Description */}
@@ -39,22 +34,21 @@ const BasicInfoStep = ({ formData, formErrors, onChange }) => {
 					Description <span className="text-rose-400">*</span>
 				</label>
 				<textarea
-					name="description"
-					value={formData.description}
-					onChange={onChange}
+					{...register('description')}
 					placeholder="Describe your product features, materials, and what makes it special..."
 					rows={4}
-					className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all outline-none resize-none text-sm bg-gray-50/50 focus:bg-white"
-					required
+					className={`w-full px-4 py-3 rounded-xl border transition-all outline-none resize-none text-sm bg-gray-50/50 focus:bg-white
+						${errors.description ? 'border-rose-300 focus:ring-rose-500/20 focus:border-rose-400' : 'border-gray-200 focus:ring-indigo-500/20 focus:border-indigo-400'}
+					`}
 				/>
 				<div className="flex items-center justify-between mt-1.5">
-					{formErrors.description && (
+					{errors.description && (
 						<p className="text-xs text-rose-500 flex items-center gap-1">
-							<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.description}
+							<FiAlertCircle className="w-3.5 h-3.5" /> {errors.description.message}
 						</p>
 					)}
 					<p className="text-[10px] text-gray-400 ml-auto">
-						{formData.description.length}/500 characters
+						{description.length}/500 characters
 					</p>
 				</div>
 			</div>
@@ -70,21 +64,13 @@ const BasicInfoStep = ({ formData, formErrors, onChange }) => {
 						<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">$</span>
 						<Input
 							type="number"
-							name="price"
-							value={formData.price}
-							onChange={onChange}
 							placeholder="0.00"
-							min="0"
 							step="0.01"
-							required
 							className="!pl-7"
+							{...register('price')}
+							error={errors.price?.message}
 						/>
 					</div>
-					{formErrors.price && (
-						<p className="text-xs text-rose-500 mt-1.5 flex items-center gap-1">
-							<FiAlertCircle className="w-3.5 h-3.5" /> {formErrors.price}
-						</p>
-					)}
 				</div>
 				<div>
 					<label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
@@ -93,12 +79,9 @@ const BasicInfoStep = ({ formData, formErrors, onChange }) => {
 					</label>
 					<Input
 						type="number"
-						name="countInStock"
-						value={formData.countInStock}
-						onChange={onChange}
 						placeholder="0"
-						min="0"
-						required
+						{...register('countInStock')}
+						error={errors.countInStock?.message}
 					/>
 				</div>
 			</div>

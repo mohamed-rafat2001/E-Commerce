@@ -49,10 +49,10 @@ const SecuritySection = ({ passwordForm, isChangingPassword, setIsChangingPasswo
                     <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="sm:col-span-2">
-                                <Input type="password" label="Current Password" placeholder="Enter your current password" error={errors.currentPassword?.message} {...register('currentPassword', { required: 'Current password is required' })} />
+                                <Input type="password" label="Current Password" placeholder="Enter your current password" error={errors.currentPassword?.message} {...register('currentPassword')} />
                             </div>
-                            <Input type="password" label="New Password" placeholder="Minimum 8 characters" error={errors.newPassword?.message} {...register('newPassword', { required: 'New password is required', minLength: { value: 8, message: 'Minimum 8 characters' }, validate: (value) => { const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; return strongRegex.test(value) || 'Must contain uppercase, lowercase, number and special character'; } })} />
-                            <Input type="password" label="Confirm New Password" placeholder="Repeat your new password" error={errors.confirmPassword?.message} {...register('confirmPassword', { required: 'Please confirm your new password', validate: (value) => value === watch('newPassword') || 'Passwords do not match' })} />
+                            <Input type="password" label="New Password" placeholder="Minimum 8 characters" error={errors.newPassword?.message} {...register('newPassword')} />
+                            <Input type="password" label="Confirm New Password" placeholder="Repeat your new password" error={errors.confirmPassword?.message} {...register('confirmPassword')} />
                         </div>
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-50 dark:border-gray-700">
                             <Button variant="ghost" type="button" onClick={() => { setIsChangingPassword(false); reset(); }} disabled={isUpdatingPassword}>Cancel</Button>

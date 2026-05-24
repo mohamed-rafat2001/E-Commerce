@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registerFullSchema } from '../../../shared/validation/schemas.js';
 import useRegister from './useRegister.jsx';
 
 const STEP_ANIMATION_VARIANTS = {
@@ -17,6 +19,7 @@ const useRegisterPage = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const form = useForm({
+        resolver: zodResolver(registerFullSchema),
         mode: 'onChange',
         defaultValues: { role: 'Customer', gender: 'male' },
     });

@@ -1,470 +1,363 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiPercent, FiDollarSign, FiTruck, FiCalendar, FiTarget, FiTag } from 'react-icons/fi';
-import { Button } from '../../../shared/ui/index.js';
+import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { discountSchema } from '../../../../shared/validation/schemas.js';
+import { Modal, Button, Input, Select, Checkbox } from '../../../../shared/ui/index.js';
+import { FiTag, FiPercent, FiCalendar, FiTarget, FiHash, FiClock, FiCheck, FiX, FiInfo } from 'react-icons/fi';
+import useCategories from '../../../admin/hooks/categories/useCategories.js';
+import useListingProducts from '../../../listing/hooks/useListingProducts.js';
 
-const DISCOUNT_TYPES = [
-	{ value: 'percentage', label: 'Percentage Off', icon: <FiPercent />, color: 'text-emerald-500' },
-	{ value: 'fixed_amount', label: 'Fixed Amount Off', icon: <FiDollarSign />, color: 'text-blue-500' },
-	{ value: 'free_shipping', label: 'Free Shipping', icon: <FiTruck />, color: 'text-purple-500' },
-	{ value: 'shipping_discount', label: 'Shipping Discount', icon: <FiDollarSign />, color: 'text-orange-500' },
+const typeOptions = [
+	{ value: 'percentage', label: 'Percentage (%)' },
+	{ value: 'fixed_amount', label: 'Fixed Amount ($)' },
+	{ value: 'free_shipping', label: 'Free Shipping' },
+	{ value: 'shipping_discount', label: 'Shipping Discount' },
 ];
 
-const SCOPE_OPTIONS_SELLER = [
+const scopeOptions = [
+	{ value: 'all_products', label: 'All Products' },
+	{ value: 'category', label: 'Specific Category' },
 	{ value: 'seller_all', label: 'All My Products' },
-	{ value: 'single_product', label: 'Specific Products' },
+	{ value: 'single_product', label: 'Single Product' },
 ];
 
-const SCOPE_OPTIONS_ADMIN = [
-	{ value: 'all_products', label: 'All Products (Platform-wide)' },
-	{ value: 'category', label: 'Specific Categories' },
-	{ value: 'seller_all', label: 'Specific Seller' },
-	{ value: 'single_product', label: 'Specific Products' },
-];
+const DiscountFormModal = ({ isOpen, onClose, discount, onSubmit, isLoading }) => {
+	const isEdit = !!discount;
+	const { categories } = useCategories();
+	const { products } = useListingProducts({}, { enabled: isOpen });
 
-const defaultForm = {
-	name: '',
-	description: '',
-	type: 'percentage',
-	value: '',
-	maxDiscountAmount: '',
-	minOrderValue: '',
-	scope: 'seller_all',
-	targetIds: '',
-	priority: '',
-	startDate: '',
-	endDate: '',
-	isActive: true,
-	usageLimit: '',
-	isCoupon: false,
-	code: '',
-};
-
-/**
- * Reusable modal for creating/editing discounts.
- * @param {string} role - 'Seller' or 'Admin' — controls which scopes are available.
- */
-const DiscountFormModal = ({ isOpen, onClose, onSubmit, discount, role = 'Seller', isSubmitting }) => {
-	const [form, setForm] = useState(defaultForm);
-	const scopeOptions = role === 'Admin' ? SCOPE_OPTIONS_ADMIN : SCOPE_OPTIONS_SELLER;
+	const {
+		register,
+		handleSubmit,
+		control,
+		watch,
+		setValue,
+		reset,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(discountSchema),
+		mode: 'onChange',
+		defaultValues: {
+			name: '',
+			description: '',
+			type: 'percentage',
+			value: '',
+			maxDiscountAmount: '',
+			minOrderValue: '',
+			scope: 'all_products',
+			targetIds: '',
+			priority: 1,
+			startDate: '',
+			endDate: '',
+			isActive: true,
+			usageLimit: '',
+			isCoupon: false,
+			code: '',
+		},
+	});
 
 	useEffect(() => {
-		if (discount) {
-			setForm({
-				name: discount.name || '',
-				description: discount.description || '',
-				type: discount.type || 'percentage',
-				value: discount.value ?? '',
-				maxDiscountAmount: discount.maxDiscountAmount ?? '',
-				minOrderValue: discount.minOrderValue ?? '',
-				scope: discount.scope || (role === 'Admin' ? 'all_products' : 'seller_all'),
-				targetIds: (discount.targetIds || []).join(', '),
-				priority: discount.priority ?? '',
-				startDate: discount.startDate ? (() => {
-					const d = new Date(discount.startDate);
-					d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-					return d.toISOString().slice(0, 16);
-				})() : '',
-				endDate: discount.endDate ? (() => {
-					const d = new Date(discount.endDate);
-					d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-					return d.toISOString().slice(0, 16);
-				})() : '',
-				isActive: discount.isActive ?? true,
-				usageLimit: discount.usageLimit ?? '',
-				isCoupon: discount.isCoupon ?? false,
-				code: discount.code || '',
-			});
-		} else {
-			const now = new Date();
-			now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-			const defaultStart = now.toISOString().slice(0, 16);
-			
-			const nextWeek = new Date();
-			nextWeek.setDate(nextWeek.getDate() + 7);
-			nextWeek.setMinutes(nextWeek.getMinutes() - nextWeek.getTimezoneOffset());
-			const defaultEnd = nextWeek.toISOString().slice(0, 16);
-
-			setForm({
-				...defaultForm,
-				scope: role === 'Admin' ? 'all_products' : 'seller_all',
-				startDate: defaultStart,
-				endDate: defaultEnd,
-			});
+		if (isOpen) {
+			if (discount) {
+				reset({
+					name: discount.name || '',
+					description: discount.description || '',
+					type: discount.type || 'percentage',
+					value: discount.value || '',
+					maxDiscountAmount: discount.maxDiscountAmount || '',
+					minOrderValue: discount.minOrderValue || '',
+					scope: discount.scope || 'all_products',
+					targetIds: Array.isArray(discount.targetIds) ? discount.targetIds.join(',') : (discount.targetIds || ''),
+					priority: discount.priority || 1,
+					startDate: discount.startDate ? new Date(discount.startDate).toISOString().split('T')[0] : '',
+					endDate: discount.endDate ? new Date(discount.endDate).toISOString().split('T')[0] : '',
+					isActive: discount.isActive ?? true,
+					usageLimit: discount.usageLimit || '',
+					isCoupon: discount.isCoupon || false,
+					code: discount.code || '',
+				});
+			} else {
+				reset({
+					name: '',
+					description: '',
+					type: 'percentage',
+					value: '',
+					maxDiscountAmount: '',
+					minOrderValue: '',
+					scope: 'all_products',
+					targetIds: '',
+					priority: 1,
+					startDate: '',
+					endDate: '',
+					isActive: true,
+					usageLimit: '',
+					isCoupon: false,
+					code: '',
+				});
+			}
 		}
-	}, [discount, role]);
+	}, [isOpen, discount, reset]);
 
-	const handleChange = (e) => {
-		const { name, value, type: inputType, checked } = e.target;
-		setForm((prev) => ({
-			...prev,
-			[name]: inputType === 'checkbox' ? checked : value,
-		}));
-	};
+	const selectedType = watch('type');
+	const selectedScope = watch('scope');
+	const isCoupon = watch('isCoupon');
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		const data = {
-			name: form.name,
-			description: form.description || undefined,
-			type: form.type,
-			value: form.value ? Number(form.value) : 0,
-			maxDiscountAmount: form.maxDiscountAmount ? Number(form.maxDiscountAmount) : null,
-			minOrderValue: form.minOrderValue ? Number(form.minOrderValue) : 0,
-			scope: form.scope,
-			targetIds: form.targetIds
-				? form.targetIds.split(',').map((id) => id.trim()).filter(Boolean)
-				: [],
-			priority: form.priority ? Number(form.priority) : undefined,
-			startDate: form.startDate ? new Date(form.startDate).toISOString() : undefined,
-			endDate: form.endDate ? new Date(form.endDate).toISOString() : undefined,
-			isActive: form.isActive,
-			usageLimit: form.usageLimit ? Number(form.usageLimit) : null,
-			isCoupon: form.isCoupon,
+	const onInternalSubmit = (data) => {
+		// Convert targetIds back to array if needed for some scopes
+		const processedData = {
+			...data,
+			targetIds: data.targetIds ? data.targetIds.split(',').map(id => id.trim()) : []
 		};
-
-		// Clean undefined values
-		Object.keys(data).forEach((key) => data[key] === undefined && delete data[key]);
-
-		onSubmit(data, discount?._id);
+		onSubmit(processedData);
 	};
-
-	const isValueRequired = form.type !== 'free_shipping';
-	const needsTargetIds = ['category', 'single_product'].includes(form.scope);
-
-	if (!isOpen) return null;
 
 	return (
-		<AnimatePresence>
-			<motion.div
-				className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				exit={{ opacity: 0 }}
-				onClick={onClose}
-			>
-				<motion.div
-					className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-					onClick={(e) => e.stopPropagation()}
-					initial={{ scale: 0.95, opacity: 0 }}
-					animate={{ scale: 1, opacity: 1 }}
-					exit={{ scale: 0.95, opacity: 0 }}
-				>
-					{/* Header */}
-					<div className="sticky top-0 z-10 bg-white dark:bg-gray-900 px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between rounded-t-2xl">
-						<div className="flex items-center gap-3">
-							<div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10">
-								<FiTag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-							</div>
-							<h2 className="text-lg font-bold text-gray-900 dark:text-white">
-								{discount ? 'Edit Discount' : 'Create Discount'}
-							</h2>
-						</div>
-						<button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-							<FiX className="w-5 h-5 text-gray-500" />
-						</button>
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title={isEdit ? 'Edit Discount Strategy' : 'Create New Discount'}
+			size="xl"
+		>
+			<form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-8">
+				{/* Basic Info Section */}
+				<section className="bg-gray-50 dark:bg-gray-900/40 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+					<div className="flex items-center gap-2 mb-4 text-indigo-600 dark:text-indigo-400">
+						<FiTag className="w-5 h-5" />
+						<h3 className="font-bold uppercase tracking-wider text-sm">Basic Information</h3>
 					</div>
-
-					{/* Form */}
-					<form onSubmit={handleSubmit} className="p-6 space-y-6">
-						{/* Name */}
+					<div className="space-y-5">
+						<Input
+							label="Discount Name"
+							placeholder="e.g. Summer Super Sale"
+							{...register('name')}
+							error={errors.name?.message}
+							disabled={isLoading}
+						/>
 						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-								Discount Name *
-							</label>
-							<input
-								name="name"
-								value={form.name}
-								onChange={handleChange}
-								required
-								placeholder="e.g., Summer Sale, Flash Friday"
-								className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-							/>
-						</div>
-
-						{/* Description */}
-						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-								Description
-							</label>
+							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Description</label>
 							<textarea
-								name="description"
-								value={form.description}
-								onChange={handleChange}
-								rows={2}
-								placeholder="Customer-facing description..."
-								className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
+								className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none min-h-[80px] resize-none
+									${errors.description ? 'border-red-500 bg-red-50/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-indigo-500'}
+								`}
+								placeholder="What is this discount about?"
+								{...register('description')}
+								disabled={isLoading}
 							/>
+							{errors.description && <p className="mt-1 text-xs text-red-500 font-medium">{errors.description.message}</p>}
 						</div>
+					</div>
+				</section>
 
-						{/* Discount Method: Automatic vs Coupon */}
-						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-								Discount Method
-							</label>
-							<div className="flex gap-4">
-								<label className="flex items-center gap-2 cursor-pointer">
-									<input
-										type="radio"
-										name="isCoupon"
-										checked={!form.isCoupon}
-										onChange={() => setForm(prev => ({ ...prev, isCoupon: false }))}
-										className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
-									/>
-									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Automatic</span>
-								</label>
-								<label className="flex items-center gap-2 cursor-pointer">
-									<input
-										type="radio"
-										name="isCoupon"
-										checked={form.isCoupon}
-										onChange={() => setForm(prev => ({ ...prev, isCoupon: true }))}
-										className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
-									/>
-									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Coupon Code</span>
-								</label>
-							</div>
+				{/* Configuration SECTION */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					{/* Type & Value */}
+					<section className="space-y-4">
+						<div className="flex items-center gap-2 mb-2 text-indigo-600 dark:text-indigo-400">
+							<FiPercent className="w-5 h-5" />
+							<h3 className="font-bold uppercase tracking-wider text-sm">Rules & Value</h3>
 						</div>
-
-						{/* Coupon Code Indicator */}
-						{form.isCoupon && (
-							<motion.div
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: 'auto' }}
-								exit={{ opacity: 0, height: 0 }}
-								className="bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-500/20"
-							>
-								<div className="flex items-center gap-3">
-									<FiTag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-									<div>
-										<p className="text-sm font-bold text-gray-900 dark:text-white">Auto-generate Coupon Code</p>
-										<p className="text-xs text-gray-500 dark:text-gray-400">The system will generate a unique code based on the discount name after saving.</p>
-									</div>
-								</div>
-							</motion.div>
-						)}
-
-						{/* Type Selection */}
-						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-								Discount Type *
-							</label>
-							<div className="grid grid-cols-2 gap-3">
-								{DISCOUNT_TYPES.map((t) => (
-									<label
-										key={t.value}
-										className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-											form.type === t.value
-												? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
-												: 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-										}`}
-									>
-										<input
-											type="radio"
-											name="type"
-											value={t.value}
-											checked={form.type === t.value}
-											onChange={handleChange}
-											className="sr-only"
-										/>
-										<span className={`text-lg ${t.color}`}>{t.icon}</span>
-										<span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.label}</span>
-									</label>
-								))}
-							</div>
-						</div>
-
-						{/* Value + Max Cap Row */}
-						{isValueRequired && (
-							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-										Value * {form.type === 'percentage' ? '(%)' : '($)'}
-									</label>
-									<input
-										name="value"
-										type="number"
-										min="0"
-										max={form.type === 'percentage' ? '100' : undefined}
-										step="any"
-										value={form.value}
-										onChange={handleChange}
-										required
-										placeholder={form.type === 'percentage' ? '15' : '25.00'}
-										className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-									/>
-								</div>
-								{form.type === 'percentage' && (
-									<div>
-										<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-											Max Discount Cap ($)
-										</label>
-										<input
-											name="maxDiscountAmount"
-											type="number"
-											min="0"
-											step="any"
-											value={form.maxDiscountAmount}
-											onChange={handleChange}
-											placeholder="50 (optional)"
-											className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-										/>
-									</div>
-								)}
-							</div>
-						)}
-
-						{/* Min Order Value */}
-						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-								Minimum Order Value ($)
-							</label>
-							<input
-								name="minOrderValue"
-								type="number"
-								min="0"
-								step="any"
-								value={form.minOrderValue}
-								onChange={handleChange}
-								placeholder="0 (no minimum)"
-								className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-							/>
-						</div>
-
-						{/* Scope */}
-						<div>
-							<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-								<FiTarget className="inline mr-1" /> Apply To *
-							</label>
-							<select
-								name="scope"
-								value={form.scope}
-								onChange={handleChange}
-								className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-							>
-								{scopeOptions.map((s) => (
-									<option key={s.value} value={s.value}>
-										{s.label}
-									</option>
-								))}
-							</select>
-						</div>
-
-						{/* Target IDs (only for category or single_product) */}
-						{needsTargetIds && (
-							<div>
-								<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-									Target IDs (comma-separated)
-								</label>
-								<input
-									name="targetIds"
-									value={form.targetIds}
-									onChange={handleChange}
-									placeholder="product_id_1, product_id_2"
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-								/>
-								<p className="text-xs text-gray-400 mt-1">
-									{form.scope === 'category' ? 'Enter Category IDs' : 'Enter Product IDs'}
-								</p>
-							</div>
-						)}
-
-						{/* Date Range */}
-						<div className="grid grid-cols-2 gap-4">
-							<div>
-								<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-									<FiCalendar className="inline mr-1" /> Start Date *
-								</label>
-								<input
-									name="startDate"
-									type="datetime-local"
-									value={form.startDate}
-									onChange={handleChange}
-									required
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-									<FiCalendar className="inline mr-1" /> End Date *
-								</label>
-								<input
-									name="endDate"
-									type="datetime-local"
-									value={form.endDate}
-									onChange={handleChange}
-									required
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-								/>
-							</div>
-						</div>
-
-						{/* Priority + Usage Limit */}
-						<div className="grid grid-cols-2 gap-4">
-							{role === 'Admin' && (
-								<div>
-									<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-										Priority
-									</label>
-									<input
-										name="priority"
-										type="number"
-										min="0"
-										max="1000"
-										value={form.priority}
-										onChange={handleChange}
-										placeholder="100 (default for Admin)"
-										className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-									/>
-								</div>
+						<Controller
+							name="type"
+							control={control}
+							render={({ field }) => (
+								<Select label="Discount Type" options={typeOptions} {...field} disabled={isLoading} />
 							)}
-							<div>
-								<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-									Usage Limit
-								</label>
-								<input
-									name="usageLimit"
-									type="number"
-									min="0"
-									value={form.usageLimit}
-									onChange={handleChange}
-									placeholder="Unlimited"
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-								/>
-							</div>
-						</div>
-
-						{/* Active Toggle */}
-						<label className="flex items-center gap-3 cursor-pointer">
-							<input
-								name="isActive"
-								type="checkbox"
-								checked={form.isActive}
-								onChange={handleChange}
-								className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+						/>
+						{selectedType !== 'free_shipping' && (
+							<Input
+								label={selectedType === 'percentage' ? 'Percentage Value (%)' : 'Fixed Amount ($)'}
+								type="number"
+								placeholder="0.00"
+								{...register('value')}
+								error={errors.value?.message}
+								disabled={isLoading}
 							/>
-							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-								Active immediately
-							</span>
-						</label>
+						)}
+						{selectedType === 'percentage' && (
+							<Input
+								label="Max Discount Amount (Optional)"
+								type="number"
+								placeholder="Limit the discount"
+								{...register('maxDiscountAmount')}
+								error={errors.maxDiscountAmount?.message}
+								disabled={isLoading}
+							/>
+						)}
+						<Input
+							label="Min Order Value ($)"
+							type="number"
+							placeholder="0.00"
+							{...register('minOrderValue')}
+							error={errors.minOrderValue?.message}
+							disabled={isLoading}
+						/>
+					</section>
 
-						{/* Footer */}
-						<div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-							<Button variant="ghost" onClick={onClose} type="button">
-								Cancel
-							</Button>
-							<Button type="submit" disabled={isSubmitting}>
-								{isSubmitting
-									? 'Saving...'
-									: discount
-									? 'Update Discount'
-									: 'Create Discount'}
-							</Button>
+					{/* Target & Scope */}
+					<section className="space-y-4">
+						<div className="flex items-center gap-2 mb-2 text-indigo-600 dark:text-indigo-400">
+							<FiTarget className="w-5 h-5" />
+							<h3 className="font-bold uppercase tracking-wider text-sm">Target Scope</h3>
 						</div>
-					</form>
-				</motion.div>
-			</motion.div>
-		</AnimatePresence>
+						<Controller
+							name="scope"
+							control={control}
+							render={({ field }) => (
+								<Select label="Applies To" options={scopeOptions} {...field} disabled={isLoading} />
+							)}
+						/>
+						
+						{selectedScope === 'category' && (
+							<Controller
+								name="targetIds"
+								control={control}
+								render={({ field }) => (
+									<Select
+										label="Select Category"
+										options={categories.map(c => ({ value: c._id, label: c.name }))}
+										{...field}
+										disabled={isLoading}
+									/>
+								)}
+							/>
+						)}
+
+						{selectedScope === 'single_product' && (
+							<Controller
+								name="targetIds"
+								control={control}
+								render={({ field }) => (
+									<Select
+										label="Select Product"
+										options={products.map(p => ({ value: p._id, label: p.name }))}
+										{...field}
+										disabled={isLoading}
+									/>
+								)}
+							/>
+						)}
+
+						<Input
+							label="Priority (0-1000)"
+							type="number"
+							placeholder="e.g. 10"
+							{...register('priority')}
+							error={errors.priority?.message}
+							disabled={isLoading}
+						/>
+					</section>
+				</div>
+
+				{/* Coupon Section */}
+				<section className="p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50">
+					<div className="flex items-center justify-between mb-4">
+						<div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
+							<FiHash className="w-5 h-5" />
+							<h3 className="font-bold uppercase tracking-wider text-sm">Coupon Configuration</h3>
+						</div>
+						<Controller
+							name="isCoupon"
+							control={control}
+							render={({ field }) => (
+								<Checkbox
+									label="Is Coupon?"
+									checked={field.value}
+									onChange={field.onChange}
+									disabled={isLoading}
+								/>
+							)}
+						/>
+					</div>
+					
+					{isCoupon && (
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-top-2">
+							<Input
+								label="Promo Code"
+								placeholder="e.g. SAVE20"
+								{...register('code')}
+								error={errors.code?.message}
+								disabled={isLoading}
+							/>
+							<Input
+								label="Usage Limit (Optional)"
+								type="number"
+								placeholder="e.g. 500 redemptions"
+								{...register('usageLimit')}
+								error={errors.usageLimit?.message}
+								disabled={isLoading}
+							/>
+						</div>
+					)}
+				</section>
+
+				{/* Validity Section */}
+				<section className="bg-gray-50 dark:bg-gray-900/40 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+					<div className="flex items-center gap-2 mb-4 text-indigo-600 dark:text-indigo-400">
+						<FiCalendar className="w-5 h-5" />
+						<h3 className="font-bold uppercase tracking-wider text-sm">Execution Period</h3>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+						<Input
+							label="Start Date"
+							type="date"
+							{...register('startDate')}
+							error={errors.startDate?.message}
+							disabled={isLoading}
+						/>
+						<Input
+							label="End Date"
+							type="date"
+							{...register('endDate')}
+							error={errors.endDate?.message}
+							disabled={isLoading}
+						/>
+					</div>
+				</section>
+
+				{/* Final Controls */}
+				<div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-700">
+					<div className="flex items-center gap-3">
+						<FiClock className="text-gray-400 w-5 h-5" />
+						<div>
+							<p className="font-bold text-gray-900 dark:text-gray-100">Instantly Activate</p>
+							<p className="text-xs text-gray-500">Enable this discount now.</p>
+						</div>
+					</div>
+					<Controller
+						name="isActive"
+						control={control}
+						render={({ field }) => (
+							<Checkbox
+								checked={field.value}
+								onChange={field.onChange}
+								disabled={isLoading}
+							/>
+						)}
+					/>
+				</div>
+
+				<div className="flex gap-4 pt-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4 border-t border-gray-100 dark:border-gray-700 z-10">
+					<Button
+						type="button"
+						variant="ghost"
+						fullWidth
+						onClick={onClose}
+						disabled={isLoading}
+					>
+						<FiX className="mr-2" /> Cancel
+					</Button>
+					<Button
+						type="submit"
+						variant="primary"
+						fullWidth
+						isLoading={isLoading}
+					>
+						<FiCheck className="mr-2" />
+						{isEdit ? 'Update Strategy' : 'Create Discount'}
+					</Button>
+				</div>
+			</form>
+		</Modal>
 	);
 };
 

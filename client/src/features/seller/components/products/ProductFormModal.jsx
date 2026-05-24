@@ -29,12 +29,15 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	const { brands, isLoading: brandsLoading } = useSellerBrands();
 
 	const form = useProductForm({ product, isOpen });
+	const { register, watch, handleSubmit, formState: { errors }, control, setValue } = form.form;
+	
 	const images = useImageUpload({ product, isOpen });
 
 	// Fetch related subcategories whenever a valid primaryCategory is selected
+	const primaryCategory = watch('primaryCategory');
 	const { subCategories: subCategoriesList, isLoading: subCategoriesLoading } = useAdminSubCategories(
-		{ categoryId: form.formData.primaryCategory },
-		{ enabled: !!form.formData.primaryCategory }
+		{ categoryId: primaryCategory },
+		{ enabled: !!primaryCategory }
 	);
 
 	// Derived options
@@ -44,32 +47,24 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 		.map(c => ({ value: c._id, label: c.name }));
 
 	// Submit handler
-	const handleSubmitForm = async (e) => {
-		e.preventDefault();
-
+	const onFormSubmit = async (data) => {
 		// Only allow submission if we are on the last step
 		if (form.currentStep < STEPS.length - 1) {
 			form.handleNext();
 			return;
 		}
 
-		if (!form.validateForm(images.additionalImages)) {
-			form.setCurrentStep(form.findFirstErrorStep());
-			return;
-		}
-
 		const { coverImage, error: coverError } = await images.uploadCoverImage();
 		if (coverError) {
-			form.setFormErrors(prev => ({ ...prev, image: coverError }));
-			form.setCurrentStep(1);
+			// Real-time error handling for images
 			return;
 		}
 
 		const additionalImageUrls = images.getUploadedAdditionalImages();
 
 		const submitData = {
-			...form.formData,
-			price: { amount: parseFloat(form.formData.price), currency: 'USD' },
+			...data,
+			price: { amount: parseFloat(data.price), currency: 'USD' },
 		};
 
 		if (coverImage) submitData.coverImage = coverImage;
@@ -128,20 +123,19 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 									steps={STEPS}
 									currentStep={form.currentStep}
 									onStepClick={form.setCurrentStep}
-									validateCurrentStep={form.validateCurrentStep}
 								/>
 							</div>
 						</div>
 
 						{/* Body */}
 						<div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
-							<form id="product-form" onSubmit={handleSubmitForm} className="p-6">
+							<form id="product-form" onSubmit={handleSubmit(onFormSubmit)} className="p-6">
 								<AnimatePresence mode="wait">
 									{form.currentStep === 0 && (
 										<BasicInfoStep
-											formData={form.formData}
-											formErrors={form.formErrors}
-											onChange={form.handleChange}
+											register={register}
+											errors={errors}
+											watch={watch}
 										/>
 									)}
 
@@ -156,29 +150,25 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 											additionalImages={images.additionalImages}
 											onAdditionalImagesSelect={images.handleAdditionalImagesSelect}
 											onRemoveAdditionalImage={images.removeAdditionalImage}
-											formErrors={form.formErrors}
-											setFormErrors={form.setFormErrors}
+											errors={errors}
 										/>
 									)}
 
 									{form.currentStep === 2 && (
 										<DetailsStep
-											formData={form.formData}
-											formErrors={form.formErrors}
-											onSelectChange={form.handleSelectChange}
+											register={register}
+											errors={errors}
+											control={control}
 											brands={brands}
 											brandOptions={brandOptions}
 											brandsLoading={brandsLoading}
 											categoryOptions={categoryOptions}
 											subCategoryOptions={subCategoryOptions}
 											categoriesLoading={categoriesLoading || subCategoriesLoading}
-											onClose={onClose}
-											sizeInput={form.sizeInput}
-											onSizeInputChange={form.setSizeInput}
+											sizes={watch('sizes')}
+											colors={watch('colors')}
 											onAddSize={form.addSize}
 											onRemoveSize={form.removeSize}
-											colorInput={form.colorInput}
-											onColorInputChange={form.setColorInput}
 											onAddColor={form.addColor}
 											onRemoveColor={form.removeColor}
 										/>
@@ -186,10 +176,9 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 
 									{form.currentStep === 3 && (
 										<SettingsStep
-											formData={form.formData}
-											onSelectChange={form.handleSelectChange}
-											brandOptions={brandOptions}
-											categoryOptions={categoryOptions}
+											register={register}
+											control={control}
+											watch={watch}
 											coverImagePreview={images.coverImagePreview}
 											uploadedImagesCount={images.additionalImages.filter(i => i.uploaded).length}
 										/>

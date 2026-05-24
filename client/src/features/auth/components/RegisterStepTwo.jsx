@@ -39,10 +39,7 @@ const RegisterStepTwo = ({
 							className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
 								errors.firstName ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
-							{...register("firstName", {
-								required: "Required",
-								minLength: { value: 3, message: "Min 3 chars" },
-							})}
+							{...register("firstName")}
 						/>
 					</div>
 					{errors.firstName && (
@@ -60,10 +57,7 @@ const RegisterStepTwo = ({
 							className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
 								errors.lastName ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 							}`}
-							{...register("lastName", {
-								required: "Required",
-								minLength: { value: 3, message: "Min 3 chars" },
-							})}
+							{...register("lastName")}
 						/>
 					</div>
 					{errors.lastName && (
@@ -83,10 +77,7 @@ const RegisterStepTwo = ({
 						className={`appearance-none block w-full pl-11 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm ${
 							errors.phoneNumber ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"
 						}`}
-						{...register("phoneNumber", {
-							required: "Required",
-							minLength: { value: 3, message: "Min 3 chars" },
-						})}
+						{...register("phoneNumber")}
 					/>
 				</div>
 				{errors.phoneNumber && (
@@ -112,7 +103,7 @@ const RegisterStepTwo = ({
 								type="radio"
 								value={g}
 								className="sr-only"
-								{...register("gender", { required: "Gender is required" })}
+								{...register("gender")}
 							/>
 							<span className="capitalize font-medium text-sm">{g}</span>
 						</label>

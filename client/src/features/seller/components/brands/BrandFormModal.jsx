@@ -1,335 +1,238 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Input, Select, Modal } from '../../../../shared/ui/index.js';
-import { FiSave, FiImage, FiX } from 'react-icons/fi';
-import { useAdminSubCategories } from '../../../admin/hooks/subCategories/useAdminSubCategories.js';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { brandSchema } from '../../../../shared/validation/schemas.js';
+import { Modal, Button, Input, Select, Skeleton } from '../../../../shared/ui/index.js';
+import { FiCheck, FiX, FiMail, FiPhone, FiGlobe, FiBriefcase, FiTag } from 'react-icons/fi';
+import useCategories from '../../../admin/hooks/categories/useCategories.js';
+import useSubCategories from '../../../admin/hooks/categories/useSubCategories.js';
 
-const BrandFormModal = ({ isOpen, onClose, onSubmit, brand, categories, isSubmitting }) => {
-	const fileInputRef = useRef(null);
-	const coverInputRef = useRef(null);
-	const [imagePreview, setImagePreview] = useState(null);
-	const [coverPreview, setCoverPreview] = useState(null);
-	const [logoFile, setLogoFile] = useState(null);
-	const [coverFile, setCoverFile] = useState(null);
-	const [formData, setFormData] = useState({
-		name: '',
-		description: '',
-		website: '',
-		businessEmail: '',
-		businessPhone: '',
-		primaryCategory: '',
-		subCategories: []
+const BrandFormModal = ({ isOpen, onClose, brand, onSubmit, isLoading }) => {
+	const isEdit = !!brand;
+	const { categories, isLoading: catsLoading } = useCategories();
+
+	const {
+		register,
+		handleSubmit,
+		control,
+		watch,
+		setValue,
+		reset,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(brandSchema),
+		mode: 'onChange',
+		defaultValues: {
+			name: '',
+			description: '',
+			businessEmail: '',
+			businessPhone: '',
+			website: '',
+			primaryCategory: '',
+			subCategories: [],
+		},
 	});
 
-	// Fetch related subcategories whenever a valid primaryCategory is selected
-	const { subCategories: subCategoriesList } = useAdminSubCategories(
-		{ categoryId: formData.primaryCategory },
-		{ enabled: !!formData.primaryCategory }
-	);
+	const selectedPrimaryId = watch('primaryCategory');
+	const { subCategories, isLoading: subsLoading } = useSubCategories(selectedPrimaryId);
 
 	useEffect(() => {
-		if (brand) {
-			setFormData({
-				name: brand.name || '',
-				description: brand.description || '',
-				website: brand.website || '',
-				businessEmail: brand.businessEmail || '',
-				businessPhone: brand.businessPhone || '',
-				primaryCategory: brand.primaryCategory?._id || '',
-				subCategories: brand.subCategories?.map(cat => cat._id) || []
-			});
-			setImagePreview(brand.logo?.secure_url || null);
-			setCoverPreview(brand.coverImage?.secure_url || null);
-			setLogoFile(null);
-			setCoverFile(null);
+		if (isOpen) {
+			if (brand) {
+				reset({
+					name: brand.name || '',
+					description: brand.description || '',
+					businessEmail: brand.businessEmail || '',
+					businessPhone: brand.businessPhone || '',
+					website: brand.website || '',
+					primaryCategory: brand.primaryCategory?._id || brand.primaryCategory || '',
+					subCategories: (brand.subCategories || []).map((s) => s._id || s),
+				});
+			} else {
+				reset({
+					name: '',
+					description: '',
+					businessEmail: '',
+					businessPhone: '',
+					website: '',
+					primaryCategory: '',
+					subCategories: [],
+				});
+			}
+		}
+	}, [isOpen, brand, reset]);
+
+	const onInternalSubmit = (data) => {
+		onSubmit(data);
+	};
+
+	const handleCategoryChange = (val) => {
+		setValue('primaryCategory', val);
+		setValue('subCategories', []);
+	};
+
+	const toggleSubCategory = (subId) => {
+		const current = watch('subCategories') || [];
+		if (current.includes(subId)) {
+			setValue('subCategories', current.filter((id) => id !== subId));
 		} else {
-			setFormData({
-				name: '',
-				description: '',
-				website: '',
-				businessEmail: '',
-				businessPhone: '',
-				primaryCategory: '',
-				subCategories: []
-			});
-			setImagePreview(null);
-			setCoverPreview(null);
-			setLogoFile(null);
-			setCoverFile(null);
+			setValue('subCategories', [...current, subId]);
 		}
-	}, [brand, isOpen]);
-
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setFormData(prev => ({ ...prev, [name]: value }));
-	};
-
-	const handleImageChange = (e) => {
-		const file = e.target.files[0];
-		if (file) {
-			setLogoFile(file);
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setImagePreview(reader.result);
-			};
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const handleRemoveImage = () => {
-		setLogoFile(null);
-		setImagePreview(null);
-		if (fileInputRef.current) {
-			fileInputRef.current.value = '';
-		}
-	};
-
-	const handleCoverImageChange = (e) => {
-		const file = e.target.files[0];
-		if (file) {
-			setCoverFile(file);
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setCoverPreview(reader.result);
-			};
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const handleRemoveCoverImage = () => {
-		setCoverFile(null);
-		setCoverPreview(null);
-		if (coverInputRef.current) {
-			coverInputRef.current.value = '';
-		}
-	};
-
-	const handleSubCategoryToggle = (categoryId) => {
-		setFormData(prev => ({
-			...prev,
-			subCategories: prev.subCategories.includes(categoryId)
-				? prev.subCategories.filter(id => id !== categoryId)
-				: [...prev.subCategories, categoryId]
-		}));
-	};
-
-	const handleSubmit = (e) => {
-		e.preventDefault();
-
-		// Create FormData for file upload
-		const data = new FormData();
-		data.append('name', formData.name);
-		data.append('description', formData.description);
-		data.append('website', formData.website);
-		data.append('businessEmail', formData.businessEmail);
-		data.append('businessPhone', formData.businessPhone);
-		data.append('primaryCategory', formData.primaryCategory);
-
-		formData.subCategories.forEach(cat => {
-			data.append('subCategories', cat);
-		});
-
-		if (logoFile) {
-			data.append('logo', logoFile);
-		}
-
-		if (coverFile) {
-			data.append('coverImage', coverFile);
-		}
-
-		onSubmit(data, brand?._id);
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title={brand ? "Edit Brand" : "Create New Brand"} size="md">
-			<form onSubmit={handleSubmit} className="space-y-4">
-				{/* Image Upload Section */}
-				<div className="flex gap-4 mb-6">
-					{/* Logo Upload */}
-					<div className="flex flex-col items-center flex-1">
-						<label className="text-sm font-medium text-gray-700 mb-2">Brand Logo</label>
-						<div className="relative w-32 h-32 mb-2">
-							{imagePreview ? (
-								<div className="relative w-full h-full">
-									<img
-										src={imagePreview}
-										alt="Preview"
-										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
-									/>
-									<button
-										type="button"
-										onClick={handleRemoveImage}
-										className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
-									>
-										<FiX className="w-4 h-4" />
-									</button>
-								</div>
-							) : (
-								<div
-									onClick={() => fileInputRef.current?.click()}
-									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
-								>
-									<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
-									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Logo</span>
-								</div>
-							)}
-							<input
-								type="file"
-								ref={fileInputRef}
-								onChange={handleImageChange}
-								accept="image/*"
-								className="hidden"
-							/>
-						</div>
-						<p className="text-xs text-gray-400">500x500px, Max 5MB</p>
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title={isEdit ? 'Edit Brand Profile' : 'Register New Brand'}
+			size="lg"
+		>
+			<form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-6">
+				{/* Basic Info */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+					<div className="md:col-span-2">
+						<Input
+							label="Brand Name"
+							placeholder="Your brand name"
+							icon={<FiBriefcase />}
+							{...register('name')}
+							error={errors.name?.message}
+							disabled={isLoading}
+						/>
 					</div>
-
-					{/* Cover Image Upload */}
-					<div className="flex flex-col items-center flex-1">
-						<label className="text-sm font-medium text-gray-700 mb-2">Cover Image (Optional)</label>
-						<div className="relative w-full h-32 mb-2">
-							{coverPreview ? (
-								<div className="relative w-full h-full">
-									<img
-										src={coverPreview}
-										alt="Cover Preview"
-										className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
-									/>
-									<button
-										type="button"
-										onClick={handleRemoveCoverImage}
-										className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-sm"
-									>
-										<FiX className="w-4 h-4" />
-									</button>
-								</div>
-							) : (
-								<div
-									onClick={() => coverInputRef.current?.click()}
-									className="w-full h-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
-								>
-									<FiImage className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition-colors" />
-									<span className="text-xs text-gray-500 group-hover:text-indigo-600 font-medium">Upload Cover</span>
-								</div>
-							)}
-							<input
-								type="file"
-								ref={coverInputRef}
-								onChange={handleCoverImageChange}
-								accept="image/*"
-								className="hidden"
-							/>
-						</div>
-						<p className="text-xs text-gray-400">1200x400px, Max 5MB</p>
-					</div>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Brand Name *</label>
-					<Input
-						name="name"
-						value={formData.name}
-						onChange={handleChange}
-						placeholder="Enter brand name"
-						required
-					/>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-					<textarea
-						name="description"
-						value={formData.description}
-						onChange={handleChange}
-						placeholder="Describe your brand..."
-						rows={3}
-						className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-						required
-					/>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Business Email *</label>
-					<Input
-						name="businessEmail"
-						value={formData.businessEmail}
-						onChange={handleChange}
-						placeholder="contact@brand.com"
-						type="email"
-						required
-					/>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Business Phone *</label>
-					<Input
-						name="businessPhone"
-						value={formData.businessPhone}
-						onChange={handleChange}
-						placeholder="+1 (555) 000-0000"
-						type="tel"
-						required
-					/>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-					<Input
-						name="website"
-						value={formData.website}
-						onChange={handleChange}
-						placeholder="https://yourbrand.com"
-						type="url"
-					/>
-				</div>
-
-				{categories && (
-					<Select
-						label="Primary Category"
-						value={formData.primaryCategory}
-						onChange={(val) => setFormData(prev => ({
-							...prev,
-							primaryCategory: val,
-							subCategories: [] // Clear subcategories when category changes
-						}))}
-						options={categories.map(c => ({ value: c._id, label: c.name }))}
-					/>
-				)}
-
-				{formData.primaryCategory && subCategoriesList && subCategoriesList.length > 0 && (
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
-							Sub Categories <span className="text-gray-400 font-normal">(Select multiple)</span>
+					<div className="md:col-span-2">
+						<label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+							Brand Description
 						</label>
-						<div className="border border-gray-300 rounded-xl p-3 bg-white">
-							<div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-								{subCategoriesList.map(category => (
-									<label
-										key={category._id}
-										className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-									>
-										<input
-											type="checkbox"
-											checked={formData.subCategories.includes(category._id)}
-											onChange={() => handleSubCategoryToggle(category._id)}
-											className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-										/>
-										<span className="text-sm text-gray-700">{category.name}</span>
-									</label>
-								))}
-							</div>
-							{formData.subCategories.length === 0 && (
-								<p className="text-sm text-gray-400 text-center py-2">
-									No subcategories selected
-								</p>
+						<textarea
+							className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none min-h-[100px] resize-none
+								${errors.description ? 'border-red-500 bg-red-50/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-indigo-500 shadow-sm'}
+							`}
+							placeholder="Tell us about your brand..."
+							{...register('description')}
+							disabled={isLoading}
+						/>
+						{errors.description && <p className="mt-1 text-xs text-red-500 font-medium">{errors.description.message}</p>}
+					</div>
+				</div>
+
+				<div className="h-px bg-gray-100 dark:bg-gray-800 my-2" />
+
+				{/* Contact Info */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+					<Input
+						label="Business Email"
+						type="email"
+						placeholder="contact@brand.com"
+						icon={<FiMail />}
+						{...register('businessEmail')}
+						error={errors.businessEmail?.message}
+						disabled={isLoading}
+					/>
+					<Input
+						label="Business Phone"
+						placeholder="+20 123 456 7890"
+						icon={<FiPhone />}
+						{...register('businessPhone')}
+						error={errors.businessPhone?.message}
+						disabled={isLoading}
+					/>
+					<div className="md:col-span-2">
+						<Input
+							label="Website (Optional)"
+							placeholder="https://www.brand.com"
+							icon={<FiGlobe />}
+							{...register('website')}
+							error={errors.website?.message}
+							disabled={isLoading}
+						/>
+					</div>
+				</div>
+
+				<div className="h-px bg-gray-100 dark:bg-gray-800 my-2" />
+
+				{/* Categories */}
+				<div className="space-y-4">
+					<div className="flex items-center gap-2 mb-2 text-indigo-600 dark:text-indigo-400">
+						<FiTag className="w-4 h-4" />
+						<h4 className="text-sm font-bold uppercase tracking-wider">Brand Categorization</h4>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+						<Controller
+							name="primaryCategory"
+							control={control}
+							render={({ field }) => (
+								<Select
+									label="Primary Category"
+									options={[{ value: '', label: 'Select Category' }, ...categories.map(c => ({ value: c._id, label: c.name }))]}
+									{...field}
+									onChange={(e) => {
+										field.onChange(e);
+										handleCategoryChange(e.target.value);
+									}}
+									isLoading={catsLoading}
+									disabled={isLoading}
+								/>
+							)}
+						/>
+					</div>
+
+					{selectedPrimaryId && (
+						<div className="bg-gray-50 dark:bg-gray-900/40 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+							<p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Sub-Categories Selection</p>
+							{subsLoading ? (
+								<div className="flex gap-2 flex-wrap">
+									<Skeleton className="w-24 h-8 rounded-full" count={4} />
+								</div>
+							) : (
+								<div className="flex flex-wrap gap-2">
+									{subCategories.length > 0 ? (
+										subCategories.map(sub => {
+											const isSelected = (watch('subCategories') || []).includes(sub._id);
+											return (
+												<button
+													key={sub._id}
+													type="button"
+													onClick={() => toggleSubCategory(sub._id)}
+													disabled={isLoading}
+													className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border
+														${isSelected
+															? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'
+															: 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 hover:border-indigo-400 hover:text-indigo-600'
+														}`}
+												>
+													{sub.name}
+												</button>
+											);
+										})
+									) : (
+										<p className="text-xs text-gray-500 italic">No sub-categories available for this selection.</p>
+									)}
+								</div>
 							)}
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 
-				<div className="flex gap-3 pt-4">
-					<Button variant="secondary" type="button" onClick={onClose} fullWidth>Cancel</Button>
-					<Button type="submit" loading={isSubmitting} fullWidth icon={<FiSave className="w-4 h-4" />}>
-						{brand ? "Update Brand" : "Create Brand"}
+				<div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+					<Button
+						type="button"
+						variant="ghost"
+						fullWidth
+						onClick={onClose}
+						disabled={isLoading}
+					>
+						<FiX className="mr-2" /> Cancel
+					</Button>
+					<Button
+						type="submit"
+						variant="primary"
+						fullWidth
+						isLoading={isLoading}
+					>
+						<FiCheck className="mr-2" />
+						{isEdit ? 'Update Brand' : 'Register Brand'}
 					</Button>
 				</div>
 			</form>

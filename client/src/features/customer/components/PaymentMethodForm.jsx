@@ -1,11 +1,15 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { paymentMethodSchema } from '../../../shared/validation/schemas.js';
 import { Modal, Input, Button } from '../../../shared/ui/index.js';
 import useMutationFactory from '../../../shared/hooks/useMutationFactory.jsx';
 import { addPaymentMethodFunc, updatePaymentMethodFunc } from '../services/customerService.js';
 
 const PaymentMethodForm = ({ isOpen, onClose, initialData }) => {
 	const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
+		resolver: zodResolver(paymentMethodSchema(!!initialData)),
+		mode: 'onChange',
 		defaultValues: {
 			type: 'Visa',
 			holder: '',
@@ -123,20 +127,14 @@ const PaymentMethodForm = ({ isOpen, onClose, initialData }) => {
 					<Input
 						label="Card Holder Name"
 						placeholder="e.g. JOHN DOE"
-						{...register('holder', { required: 'Card holder name is required' })}
+						{...register('holder')}
 						error={errors.holder?.message}
 					/>
 
 					<Input
 						label="Card Number"
 						placeholder="•••• •••• •••• ••••"
-						{...register('cardNumber', { 
-							required: !initialData && 'Card number is required',
-							pattern: {
-								value: /^[\d\s•]{13,19}$/,
-								message: 'Invalid card number'
-							}
-						})}
+						{...register('cardNumber')}
 						error={errors.cardNumber?.message}
 						disabled={!!initialData}
 					/>
@@ -145,13 +143,7 @@ const PaymentMethodForm = ({ isOpen, onClose, initialData }) => {
 						<Input
 							label="Expiry Date"
 							placeholder="MM/YY"
-							{...register('expiry', { 
-								required: 'Expiry date is required',
-								pattern: {
-									value: /^(0[1-9]|1[0-2])\/\d{2}$/,
-									message: 'Use MM/YY format'
-								}
-							})}
+							{...register('expiry')}
 						error={errors.expiry?.message}
 					/>
 					

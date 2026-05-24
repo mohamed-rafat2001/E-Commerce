@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { adminUserSchema } from '../../../../shared/validation/schemas.js';
 import { Modal, Button, Input, Select } from '../../../../shared/ui/index.js';
 import { FiEdit2, FiUserCheck } from 'react-icons/fi';
 import toast from 'react-hot-toast';
@@ -18,6 +20,8 @@ const statusOptions = [
 const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 	const isEdit = !!user;
 	const { register, handleSubmit, formState: { errors }, reset, control } = useForm({
+		resolver: zodResolver(adminUserSchema(isEdit)),
+		mode: 'onChange',
 		defaultValues: {
 			firstName: '',
 			lastName: '',
@@ -50,9 +54,6 @@ const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 			delete data.password;
 			delete data.confirmPassword;
 		}
-		if (!isEdit && data.password !== data.confirmPassword) {
-			return toast.error("Passwords do not match");
-		}
 		onSubmit(data);
 	};
 
@@ -78,12 +79,12 @@ const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 				</div>
 
 				<div className="grid grid-cols-2 gap-4">
-					<Input label="First Name" placeholder="Jane" {...register('firstName', { required: 'First name is required' })} error={errors.firstName?.message} />
-					<Input label="Last Name" placeholder="Smith" {...register('lastName', { required: 'Last name is required' })} error={errors.lastName?.message} />
+					<Input label="First Name" placeholder="Jane" {...register('firstName')} error={errors.firstName?.message} />
+					<Input label="Last Name" placeholder="Smith" {...register('lastName')} error={errors.lastName?.message} />
 				</div>
 
-				<Input label="Email" type="email" placeholder="jane@example.com" {...register('email', { required: 'Email is required' })} error={errors.email?.message} />
-				<Input label="Phone Number" placeholder="+1234567890" {...register('phoneNumber', { required: 'Phone number is required' })} error={errors.phoneNumber?.message} />
+				<Input label="Email" type="email" placeholder="jane@example.com" {...register('email')} error={errors.email?.message} />
+				<Input label="Phone Number" placeholder="+1234567890" {...register('phoneNumber')} error={errors.phoneNumber?.message} />
 
 				<div className="grid grid-cols-2 gap-4">
 					<Controller name="role" control={control} render={({ field }) => <Select label="Role" options={roleOptions} {...field} />} />
@@ -92,8 +93,8 @@ const UserFormModal = ({ isOpen, onClose, user, onSubmit, isLoading }) => {
 
 				{!isEdit && (
 					<div className="grid grid-cols-2 gap-4">
-						<Input label="Password" type="password" placeholder="••••••••" {...register('password', { required: !isEdit ? 'Password is required' : false })} error={errors.password?.message} />
-						<Input label="Confirm Password" type="password" placeholder="••••••••" {...register('confirmPassword', { required: !isEdit ? 'Confirmation is required' : false })} error={errors.confirmPassword?.message} />
+						<Input label="Password" type="password" placeholder="••••••••" {...register('password')} error={errors.password?.message} />
+						<Input label="Confirm Password" type="password" placeholder="••••••••" {...register('confirmPassword')} error={errors.confirmPassword?.message} />
 					</div>
 				)}
 			</form>

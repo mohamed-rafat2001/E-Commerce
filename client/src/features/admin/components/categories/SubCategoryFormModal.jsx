@@ -1,230 +1,147 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button, Input, Textarea, Select, LoadingSpinner, Modal } from '../../../../shared/ui/index.js';
-import { PlusIcon, ImageIcon, XIcon } from '../../../../shared/constants/icons.jsx';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { subCategorySchema } from '../../../../shared/validation/schemas.js';
+import { Modal, Button, Input, Select } from '../../../../shared/ui/index.js';
+import { FiFolder, FiCheck, FiX, FiInfo, FiTag } from 'react-icons/fi';
 
-const SubCategoryFormModal = ({ isOpen, onClose, subCategory, onSubmit, isLoading, categories, uploadProgress }) => {
-	const [formData, setFormData] = useState({
-		name: '',
-		description: '',
-		categoryId: ''
+const SubCategoryFormModal = ({ isOpen, onClose, subCategory, categories, onSubmit, isLoading }) => {
+	const isEdit = !!subCategory;
+
+	// Prepare options for the category selector
+	const categoryOptions = categories.map((cat) => ({
+		value: cat._id,
+		label: cat.name,
+	}));
+
+	const {
+		register,
+		handleSubmit,
+		control,
+		formState: { errors },
+		reset,
+	} = useForm({
+		resolver: zodResolver(subCategorySchema),
+		mode: 'onChange',
+		defaultValues: {
+			name: '',
+			categoryId: '',
+			description: '',
+		},
 	});
-	const [selectedImage, setSelectedImage] = useState(null);
-	const [imagePreview, setImagePreview] = useState(null);
-	const fileInputRef = useRef(null);
 
 	useEffect(() => {
-		if (subCategory) {
-			setFormData({
-				name: subCategory.name || '',
-				description: subCategory.description || '',
-				categoryId: subCategory.categoryId?._id || subCategory.categoryId || '',
-			});
-			setImagePreview(subCategory.image?.secure_url || null);
-		} else {
-			setFormData({
-				name: '',
-				description: '',
-				categoryId: '',
-			});
-			setImagePreview(null);
-			setSelectedImage(null);
+		if (isOpen) {
+			if (subCategory) {
+				reset({
+					name: subCategory.name || '',
+					categoryId: subCategory.categoryId?._id || subCategory.categoryId || '',
+					description: subCategory.description || '',
+				});
+			} else {
+				reset({
+					name: '',
+					categoryId: '',
+					description: '',
+				});
+			}
 		}
-	}, [subCategory, isOpen]);
+	}, [isOpen, subCategory, reset]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setFormData(prev => ({ ...prev, [name]: value }));
+	const onInternalSubmit = (data) => {
+		onSubmit(data);
 	};
-
-	const handleImageChange = (e) => {
-		const file = e.target.files[0];
-		if (!file) return;
-
-		// Validate file type
-		if (!file.type.startsWith('image/')) {
-			alert('Please select an image file');
-			return;
-		}
-
-		// Validate file size (5MB max)
-		if (file.size > 5 * 1024 * 1024) {
-			alert('Image size must be less than 5MB');
-			return;
-		}
-
-		setSelectedImage(file);
-		
-		// Create preview
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			setImagePreview(reader.result);
-		};
-		reader.readAsDataURL(file);
-	};
-
-	const handleRemoveImage = () => {
-		setImagePreview(null);
-		setSelectedImage(null);
-		if (fileInputRef.current) {
-			fileInputRef.current.value = '';
-		}
-	};
-
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		
-		const submitData = new FormData();
-		submitData.append('name', formData.name);
-		submitData.append('description', formData.description);
-		submitData.append('categoryId', formData.categoryId);
-		
-		if (selectedImage) {
-			submitData.append('image', selectedImage);
-		}
-
-		onSubmit(submitData, subCategory?._id);
-	};
-
-	const isValid = formData.name.trim() && formData.categoryId;
 
 	return (
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
-			title={subCategory ? 'Edit Subcategory' : 'Create New Subcategory'}
-			size="sm"
-			footer={
-				<div className="flex w-full items-center justify-between">
-					{uploadProgress > 0 && uploadProgress < 100 && (
-						<div className="flex-1 mr-4">
-							<div className="flex justify-between text-xs text-gray-500 mb-1">
-								<span>Uploading image...</span>
-								<span>{uploadProgress}%</span>
-							</div>
-							<div className="w-full bg-gray-200 rounded-full h-1.5">
-								<div 
-									className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
-									style={{ width: `${uploadProgress}%` }}
-								/>
-							</div>
-						</div>
-					)}
-					<div className="flex items-center gap-3 ml-auto">
-						<Button variant="secondary" onClick={onClose} disabled={isLoading}>
-							Cancel
-						</Button>
-						<Button type="submit" form="subcategory-form" disabled={!isValid || isLoading}>
-							{isLoading ? (
-								<div className="flex items-center gap-2">
-									<LoadingSpinner size="sm" />
-									<span>{subCategory ? 'Updating...' : 'Creating...'}</span>
-								</div>
-							) : (
-								subCategory ? 'Update' : 'Create'
-							)}
-						</Button>
-					</div>
-				</div>
-			}
+			title={isEdit ? 'Edit Sub-Category' : 'Create Sub-Category'}
+			size="md"
 		>
-			<form id="subcategory-form" onSubmit={handleSubmit} className="space-y-6">
-				{/* Image Upload */}
+			<form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-6">
+				{/* Parent Category Select */}
 				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-3">
-						Subcategory Image
-					</label>
-					<div className="flex items-start gap-6">
-						{/* Image Preview */}
-						<div className="shrink-0">
-							{imagePreview ? (
-								<div className="relative">
-									<img 
-										src={imagePreview} 
-										alt="Preview" 
-										className="w-24 h-24 rounded-xl object-cover border-2 border-gray-200"
-									/>
-									<button
-										type="button"
-										onClick={handleRemoveImage}
-										className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-600 transition-colors"
-									>
-										<XIcon className="w-3 h-3" />
-									</button>
-								</div>
-							) : (
-								<div className="w-24 h-24 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-									<ImageIcon className="w-8 h-8 text-gray-400" />
-								</div>
-							)}
-						</div>
-						
-						{/* Upload Button */}
-						<div className="flex-1">
-							<input
-								type="file"
-								ref={fileInputRef}
-								onChange={handleImageChange}
-								accept="image/*"
-								className="hidden"
-							/>
-							<Button
-								type="button"
-								variant="secondary"
-								onClick={() => fileInputRef.current?.click()}
-								icon={<PlusIcon className="w-4 h-4" />}
-							>
-								{imagePreview ? 'Change Image' : 'Upload Image'}
-							</Button>
-							<p className="text-xs text-gray-500 mt-2">
-								Recommended: 400x400px, Max 5MB. JPG, PNG, or WebP
-							</p>
-						</div>
+					<div className="flex items-center gap-2 mb-2">
+						<FiFolder className="text-gray-400" />
+						<label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Parent Category
+						</label>
 					</div>
-				</div>
-
-				{/* Name */}
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-2">
-						Subcategory Name *
-					</label>
-					<Input
-						name="name"
-						value={formData.name}
-						onChange={handleChange}
-						placeholder="Enter subcategory name"
-						required
+					<Controller
+						name="categoryId"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								options={[
+									{ value: '', label: 'Select a category' },
+									...categoryOptions,
+								]}
+								error={errors.categoryId?.message}
+								disabled={isLoading}
+							/>
+						)}
 					/>
 				</div>
 
-				{/* Category */}
+				{/* Sub-Category Name */}
 				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-2">
-						Parent Category *
-					</label>
-					<Select
-						value={formData.categoryId}
-						onChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}
-						options={categories.map(cat => ({ 
-							value: cat._id, 
-							label: cat.name 
-						}))}
-						placeholder="Select parent category"
-						required
+					<div className="flex items-center gap-2 mb-2">
+						<FiTag className="text-gray-400" />
+						<label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Sub-Category Name
+						</label>
+					</div>
+					<Input
+						placeholder="e.g. Smartphones, T-Shirts..."
+						{...register('name')}
+						error={errors.name?.message}
+						disabled={isLoading}
 					/>
 				</div>
 
 				{/* Description */}
 				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-2">
-						Description
-					</label>
-					<Textarea
-						name="description"
-						value={formData.description}
-						onChange={handleChange}
-						placeholder="Describe this subcategory..."
-						rows={3}
+					<div className="flex items-center gap-2 mb-2">
+						<FiInfo className="text-gray-400" />
+						<label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Description
+						</label>
+					</div>
+					<textarea
+						className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none min-h-[100px] resize-none
+							${errors.description ? 'border-red-500 bg-red-50/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-indigo-500'}
+						`}
+						placeholder="Briefly describe this sub-category..."
+						{...register('description')}
+						disabled={isLoading}
 					/>
+					{errors.description && (
+						<p className="mt-1 text-xs text-red-500 font-medium">{errors.description.message}</p>
+					)}
+				</div>
+
+				{/* Actions */}
+				<div className="flex gap-3 pt-4">
+					<Button
+						type="button"
+						variant="ghost"
+						fullWidth
+						onClick={onClose}
+						disabled={isLoading}
+					>
+						<FiX className="mr-2" /> Cancel
+					</Button>
+					<Button
+						type="submit"
+						variant="primary"
+						fullWidth
+						isLoading={isLoading}
+					>
+						<FiCheck className="mr-2" />
+						{isEdit ? 'Save Changes' : 'Create Sub-Category'}
+					</Button>
 				</div>
 			</form>
 		</Modal>
