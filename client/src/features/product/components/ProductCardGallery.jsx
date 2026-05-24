@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { FiImage } from 'react-icons/fi';
 import useProductCardGallery from '../hooks/useProductCardGallery';
+import { getOptimizedImageUrl, getCloudinarySrcSet } from '../../../shared/utils/imageUtils';
 
 /**
  * ProductCardGallery - Vertical thumbnail gallery component for product cards
@@ -47,7 +48,9 @@ const ProductCardGallery = memo(function ProductCardGallery({
 
     return (
       <img
-        src={imageUrl}
+        src={getOptimizedImageUrl(imageUrl, { width: 600 })}
+        srcSet={getCloudinarySrcSet(imageUrl)}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         alt={productName}
         className="w-full h-full object-cover"
         loading="lazy"
@@ -92,7 +95,7 @@ const ProductCardGallery = memo(function ProductCardGallery({
                 }`}
             >
               <img
-                src={imageUrl}
+                src={getOptimizedImageUrl(imageUrl, { width: 100, height: 100 })}
                 alt={`${productName} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -108,7 +111,9 @@ const ProductCardGallery = memo(function ProductCardGallery({
       {/* RIGHT — Main image */}
       <div className="flex-1 rounded-r-lg overflow-hidden relative">
         <img
-          src={images[activeIndex]?.secure_url || images[activeIndex]}
+          src={getOptimizedImageUrl(images[activeIndex]?.secure_url || images[activeIndex], { width: 600 })}
+          srcSet={getCloudinarySrcSet(images[activeIndex]?.secure_url || images[activeIndex])}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           alt={productName}
           className="w-full h-full object-cover transition-transform duration-500"
           loading="lazy"

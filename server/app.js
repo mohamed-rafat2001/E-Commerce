@@ -199,6 +199,7 @@ app.get("/api/v1/health/cache", async (req, res) => {
 
 		const dbSize = await redisClient.dbsize();
 
+		res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
 		res.json({
 			status: "healthy",
 			memoryUsed: memMatch?.[1] || "unknown",

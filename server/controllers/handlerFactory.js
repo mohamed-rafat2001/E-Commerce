@@ -166,9 +166,9 @@ export const getOneByOwner = (Model) =>
 		let doc;
 
 		if (!req.params.id || req.params.id === "user") {
-			doc = await Model.findOne({ userId });
+			doc = await Model.findOne({ userId }).lean();
 		} else {
-			doc = await Model.findOne({ _id: req.params.id, userId });
+			doc = await Model.findOne({ _id: req.params.id, userId }).lean();
 		}
 
 		if (!doc) {
@@ -213,7 +213,7 @@ export const getAllByOwner = (Model) =>
 			.limitFields()
 			.paginate();
 
-		const docs = await features.query;
+		const docs = await features.query.lean();
 
 		const countFeatures = new APIFeatures(Model.find(filter), req.query)
 			.filter()
@@ -247,7 +247,7 @@ export const getById = (Model) =>
 			if (cached) return sendResponse(res, 200, cached);
 		}
 
-		let doc = await Model.findById(req.params.id);
+		let doc = await Model.findById(req.params.id).lean();
 
 		if (!doc) return next(new appError("Document not found", 404));
 
@@ -311,7 +311,7 @@ export const getAll = (Model) =>
 			features.query = features.query.populate(populateFields);
 		}
 
-		const docs = await features.query;
+		const docs = await features.query.lean();
 
 		const countFeatures = new APIFeatures(Model.find(filter), req.query)
 			.filter()

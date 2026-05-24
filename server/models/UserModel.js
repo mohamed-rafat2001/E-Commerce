@@ -70,17 +70,24 @@ const userSchema = new mongoose.Schema(
 			enum: ["active", "suspended", "deleted"],
 			default: "active",
 		},
+		passwordChangedAt: Date,
 	},
 	{ timestamps: true },
 );
 
 // hash password before saving
-userSchema.pre("save", async function () {
-	if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {
+	if (!this.isModified("password")) return next();
 
 	this.password = await bcryptjs.hash(this.password, 12);
 	this.confirmPassword = undefined;
+
+	if (!this.isNew) {
+		this.passwordChangedAt = Date.now() - 1000;
+	}
+	next();
 });
+
 // create access token using jsonwebtoken
 userSchema.methods.CreateAccessToken = function () {
 	return jwt.sign({ _id: this._id }, process.env.JWT_ACCESS_SECRET, {
@@ -108,8 +115,23 @@ userSchema.methods.createPasswordResetCode = function () {
 
 	return code;
 };
+
 // check if password is correct
 userSchema.methods.correctPassword = async function (password, userPassword) {
 	return await bcryptjs.compare(password, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+	if (this.passwordChangedAt) {
+		const changedTimestamp = parseInt(
+			this.passwordChangedAt.getTime() / 1000,
+			10,
+		);
+
+		return JWTTimestamp < changedTimestamp;
+	}
+
+	// False means NOT changed
+	return false;
 };
 export default mongoose.model("UserModel", userSchema);

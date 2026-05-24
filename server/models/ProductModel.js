@@ -114,8 +114,14 @@ productSchema.pre("save", async function () {
 	this.slug = slugify(this.name, { lower: true, strict: true });
 });
 
-//  mongoose indexs price
+// Indexes for performance
 productSchema.index({ price: 1 });
+productSchema.index({ status: 1, createdAt: -1 });
+productSchema.index({ brandId: 1, status: 1 });
+productSchema.index({ primaryCategory: 1, status: 1 });
 productSchema.index({ userId: 1, status: 1 });
+
+// Text index for search
+productSchema.index({ name: "text", description: "text" }, { weights: { name: 10, description: 5 } });
 
 export default mongoose.model("ProductModel", productSchema);

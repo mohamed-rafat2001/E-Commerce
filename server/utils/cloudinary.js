@@ -22,6 +22,10 @@ export const storage = new CloudinaryStorage({
 			folder: folder,
 			allowed_formats: ["jpg", "png", "jpeg", "webp"],
 			public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
+			transformation: [
+				{ quality: "auto", fetch_format: "auto" },
+				{ format: "webp" }
+			],
 		};
 	},
 });

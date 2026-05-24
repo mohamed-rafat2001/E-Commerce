@@ -37,6 +37,13 @@ export const Protect = catchAsync(async (req, res, next) => {
 			return next(new appError("Your account has been deactivated.", 403));
 		}
 
+		// check if password was changed after token was issued
+		if (user.changedPasswordAfter(decode.iat)) {
+			return next(
+				new appError("User recently changed password! Please log in again.", 401),
+			);
+		}
+
 		req.user = user;
 		next();
 	} catch (error) {
@@ -53,7 +60,7 @@ export const restrictTo = (...roles) => {
 	return (req, res, next) => {
 		if (!roles.includes(req.user.role))
 			return next(
-				new appError("you don't have permission to perform this action", 400),
+				new appError("you don't have permission to perform this action", 403),
 			);
 		next();
 	};

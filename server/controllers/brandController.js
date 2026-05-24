@@ -34,6 +34,11 @@ const invalidateBrandCache = async (brandId) => {
 // @route   GET /api/v1/brands/public
 // @access  Public
 export const getAllActiveBrands = catchAsync(async (req, res, _next) => {
+	const cacheKey = buildBrandCacheKey("all:active", req);
+	const cached = await getCache(cacheKey);
+
+	if (cached) return res.status(200).json(cached);
+
 	// Get total count for pagination
 	const countQuery = BrandModel.find({ isActive: true });
 	const countFeatures = new APIFeatures(countQuery, req.query)
@@ -71,7 +76,7 @@ export const getAllActiveBrands = catchAsync(async (req, res, _next) => {
 	const limit = req.query.limit * 1 || 100;
 	const numberOfPages = Math.ceil(total / limit);
 
-	return res.status(200).json({
+	const responseData = {
 		status: "success",
 		results: brandsWithFollowers.length,
 		total,
@@ -82,7 +87,10 @@ export const getAllActiveBrands = catchAsync(async (req, res, _next) => {
 			limit,
 		},
 		data: brandsWithFollowers,
-	});
+	};
+
+	await setCache(cacheKey, responseData, 3600); // 1 hour TTL
+	return res.status(200).json(responseData);
 });
 
 // @desc    Get all brands for current seller
