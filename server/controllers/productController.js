@@ -9,7 +9,7 @@ import {
 	updateByOwner,
 } from "./handlerFactory.js";
 import { getCache, setCache } from "../utils/cache.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import { enrichProductsWithDiscounts } from "../services/discountService.js";
 

@@ -1,7 +1,7 @@
 import BrandModel from "../models/BrandModel.js";
 import BrandFollowerModel from "../models/BrandFollowerModel.js";
 import SellerModel from "../models/SellerModel.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import cloudinary from "../utils/cloudinary.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";

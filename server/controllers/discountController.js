@@ -1,5 +1,5 @@
 import DiscountModel from "../models/DiscountModel.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import APIFeatures from "../utils/apiFeatures.js";

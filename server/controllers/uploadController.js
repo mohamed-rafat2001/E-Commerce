@@ -1,4 +1,4 @@
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 

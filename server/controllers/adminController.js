@@ -10,7 +10,7 @@ import ReviewsModel from "../models/ReviewsModel.js";
 import OrderModel from "../models/OrderModel.js";
 import DiscountModel from "../models/DiscountModel.js";
 import appError from "../utils/appError.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import { fetchDashboardStats, fetchAnalyticsData } from "../services/adminAnalyticsService.js";
 

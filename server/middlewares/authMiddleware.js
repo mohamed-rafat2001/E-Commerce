@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import UserModel from "../models/UserModel.js";
-import catchAsync from "./catchAsync.js";
+import { catchAsync } from "./catchAsync.js";
 import appError from "../utils/appError.js";
 
 //authentication

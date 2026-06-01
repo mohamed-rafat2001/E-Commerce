@@ -1,7 +1,7 @@
 import OrderModel from "../models/OrderModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
 import SellerModel from "../models/SellerModel.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import APIFeatures from "../utils/apiFeatures.js";

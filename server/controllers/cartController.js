@@ -3,7 +3,7 @@
  - Merge endpoint historically expects guest_items from frontend localStorage schema.
  - Supporting guestItems alias improves compatibility for unified auth-aware clients.
 */
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import * as cartService from "../services/cartService.js";

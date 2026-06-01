@@ -2,7 +2,7 @@ import SellerModel from "../models/SellerModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
 import OrderModel from "../models/OrderModel.js";
 import { updateByOwner } from "./handlerFactory.js";
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImagesMiddleware.js";

@@ -1,4 +1,4 @@
-import catchAsync from "../middlewares/catchAsync.js";
+import { catchAsync } from "../middlewares/catchAsync.js";
 import jwt from "jsonwebtoken";
 import UserModel from "../models/UserModel.js";
 import CustomerModel from "../models/CustomerModel.js";
