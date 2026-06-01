@@ -17,8 +17,8 @@ const CartItemCard = ({ item, onRemove, onUpdateQuantity }) => {
     const name = product?.name || item.name;
     const image = product?.coverImage?.secure_url || product?.image?.secure_url || product?.image || item.image || "/placeholder-product.png";
 
-    // Format variant details (mocking if not available)
-    const variantInfo = `${item.color || 'Universal'} / ${item.size || 'One Size'} / ${item.material || 'Premium'}`;
+    // Format variant details
+    const variantInfo = [item.color, item.size, item.material].filter(Boolean).join(' / ');
 
     const handleRemove = () => {
         onRemove(productId);

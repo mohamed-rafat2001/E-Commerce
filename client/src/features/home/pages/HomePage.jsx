@@ -15,8 +15,6 @@ const FlashSaleSection = lazy(() => import('../components/FlashSale/FlashSaleSec
 const ProductsSection = lazy(() => import('../components/Products/ProductsSection'));
 const BestSellersSection = lazy(() => import('../components/BestSellers/BestSellersSection'));
 const FeaturedSection = lazy(() => import('../components/Featured/FeaturedSection'));
-const TestimonialsSection = lazy(() => import('../components/Testimonials/TestimonialsSection'));
-const StatsSection = lazy(() => import('../components/Stats/StatsSection'));
 const SellerCtaBanner = lazy(() => import('../components/SellerCTA/SellerCtaBanner'));
 const NewsletterSection = lazy(() => import('../components/Newsletter/NewsletterSection'));
 
@@ -91,16 +89,6 @@ const HomePage = () => {
 					<section aria-label="Featured picks">
 						<FeaturedSection />
 					</section>
-				</Suspense>
-
-				<Suspense fallback={<SectionFallback />}>
-					<section aria-label="Customer testimonials">
-						<TestimonialsSection />
-					</section>
-				</Suspense>
-
-				<Suspense fallback={<SectionFallback />}>
-					<StatsSection />
 				</Suspense>
 
 				<Suspense fallback={<SectionFallback />}>
