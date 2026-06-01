@@ -36,7 +36,8 @@ export async function dbConnect() {
 		connectTimeoutMS: MONGODB_CONNECT_TIMEOUT_MS,
 		socketTimeoutMS: 20000,
 		maxPoolSize: 5,
-		family: 4,
+		autoSelectFamily: false,
+		tls: dbURL.startsWith("mongodb+srv://"),
 	})
 		.then((connection) => {
 			console.info("db is connected");
@@ -45,6 +46,14 @@ export async function dbConnect() {
 		})
 		.catch((error) => {
 			connectionPromise = null;
+			const tlsHandshakeFailed = /tlsv1 alert internal error|SSL alert number 80/i.test(error.message);
+
+			if (tlsHandshakeFailed) {
+				throw new Error(
+					"MongoDB TLS handshake failed. Check that DB_URL is a valid Atlas connection string, verify Atlas Network Access allows the deployment, and confirm the cluster is reachable from Netlify.",
+				);
+			}
+
 			console.error(error.message);
 			throw error;
 		});
