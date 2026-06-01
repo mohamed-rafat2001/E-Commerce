@@ -1,147 +1,137 @@
-# Server Documentation
+# Server (API)
 
-This directory contains the backend API for the E-Commerce platform. It is built using **Node.js** and **Express**, following a modular **MVC (Model-View-Controller)** architecture.
+Backend API for the E-Commerce platform. This server is built with **Node.js + Express (ESM)** and uses **MongoDB (Mongoose)** for persistence. Authentication is cookie-based using **JWT access + refresh tokens**.
 
-## 🚀 Tech Stack
+This server can run in two modes:
+- **Local Express server** via `server.js`
+- **Netlify Functions** via `functions/api.js` (serverless-http wrapper)
 
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB (Mongoose)
-- **Authentication:** JWT (JSON Web Tokens) & Bcrypt
-- **Security:** Helmet, Rate Limiting, Mongo Sanitize, XSS Protection (HPP)
-- **File Uploads:** Multer & Cloudinary
-- **Documentation:** Swagger UI
-- **Email:** Nodemailer
+## Tech Stack
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT (access + refresh) in HttpOnly cookies
+- Security: Helmet, rate limiting, mongo sanitize, HPP
+- Compression: gzip/brotli via `compression`
+- Optional infra:
+  - Redis (`ioredis`) for caching + health endpoint
+  - Cloudinary for image uploads
+  - Nodemailer for sending emails (password reset, etc.)
 
-## �️ Project Structure
-
-The server is organized into logical layers to ensure separation of concerns:
+## Project Structure (High Level)
 
 ```
 server/
-├── controllers/        # Request handlers (Business Logic)
-│   ├── authController.js
-│   ├── productController.js
-│   └── ...
-│
-├── models/             # Mongoose Schemas (Data Layer)
-│   ├── UserModel.js
-│   ├── ProductModel.js
-│   └── ...
-│
-├── routers/            # API Route Definitions
-│   ├── authRouter.js
-│   ├── productRouter.js
-│   └── ...
-│
-├── middlewares/        # Custom Middleware
-│   ├── authMiddleware.js       # JWT verification & Role checks
-│   ├── globalErrorController.js # Centralized error handling
-│   └── uploadImagesMiddleware.js # File upload processing
-│
-├── utils/              # Helper Functions
-│   ├── apiFeatures.js  # Pagination, Sorting, Filtering logic
-│   ├── emailTemplates.js
-│   └── appError.js     # Custom Error class
-│
-├── db/                 # Database Configuration
-├── app.js              # Express App Setup (Middleware & Routes)
-└── server.js           # Server Entry Point
+├── app.js                 # Express app: middleware, routes, health, sitemap
+├── server.js              # Local entry (loads .env, connects DB, starts HTTP server)
+├── db/
+│   └── config.js           # Mongo connection (DB_URL + DB_PASSWORD)
+├── functions/
+│   └── api.js              # Netlify Function handler (serverless-http)
+├── routers/                # Route modules (mounted under /api/v1/*)
+├── controllers/            # Request handlers
+├── models/                 # Mongoose models
+├── middlewares/            # Auth, uploads, error handling helpers
+└── utils/                  # Cookies, Redis client, email, helpers, etc.
 ```
 
-## 🏗️ Architecture
+## Environment Variables (`server/.env`)
 
-### 1. MVC Pattern
-- **Models**: Define the data structure and validation rules (e.g., `UserModel`, `ProductModel`).
-- **Controllers**: Handle incoming requests, interact with models, and send responses.
-- **Routers**: Map HTTP endpoints to specific controller functions.
-
-### 2. Security & Middleware
-The application implements a robust security layer:
-- **Helmet**: Sets secure HTTP headers.
-- **Rate Limiting**: Prevents brute-force attacks (100 requests/hour per IP).
-- **Data Sanitization**: Protects against NoSQL injection (`express-mongo-sanitize`) and Parameter Pollution (`hpp`).
-- **CORS**: Configured to allow requests from the client application.
-
-### 3. Global Error Handling
-A centralized error handling middleware (`globalErrorController.js`) catches operational and programming errors, returning consistent JSON error responses to the client.
-
-### 4. Authentication & Authorization
-- **JWT**: Access and Refresh tokens are used for session management.
-- **Role-Based Access Control (RBAC)**: Middleware (`restrictTo`) ensures endpoints are protected based on user roles (`Customer`, `Seller`, `Admin`, `SuperAdmin`).
-
-## � Key Features
-
-### API Endpoints (Prefix: `/api/v1`)
-
-- **Authentication**: Signup, Login, Password Reset, Token Refresh.
-- **Products**: CRUD operations, Advanced Filtering, Searching, Pagination.
-- **Orders**: Cart management, Checkout, Order History, Status Updates.
-- **Admin Dashboard**: Dynamic CRUD for all system models (Users, Products, Categories).
-- **File Uploads**: Image uploading to Cloudinary via Multer.
-
-### 📜 API Documentation
-Interactive API documentation is available via Swagger UI:
-- **URL**: `http://localhost:8000/api-docs`
-
-## 📦 Getting Started
-
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Environment Setup
-Create a `.env` file in the root of the `server/` directory with the following variables:
+The codebase expects the following variables:
 
 ```env
-PORT=8000
-DATABASE_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/ecommerce
-JWT_ACCESS_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
+# Required
+PORT=4000
+DB_URL=mongodb+srv://<username>:<db_password>@cluster0.example.mongodb.net/ecommerce?retryWrites=true&w=majority
+DB_PASSWORD=your_db_password
+
+# Recommended (production)
+CLIENT_URL=https://your-client-domain.netlify.app
+NODE_MODE=PROD
+NODE_ENV=production
+
+# JWT
+JWT_ACCESS_SECRET=change_me
+JWT_REFRESH_SECRET=change_me_too
 JWT_ACCESS_EXPIRES=15m
 JWT_REFRESH_EXPIRES=7d
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-EMAIL_USERNAME=your_email
-EMAIL_PASSWORD=your_password
+
+# Cookie expiry values used by utils/sendCookies.js
+# access: minutes, refresh: days
+JWT_ACCESS_COOKIE_EXPIRES=15
+JWT_REFRESH_COOKIE_EXPIRES=7
+
+# Optional: Redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+# REDIS_PASSWORD=
+
+# Optional: Email
+EMAIL_SERVICE=
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+EMAIL_FROM_NAME=
+EMAIL_FROM=
+
+# Optional: Cloudinary (note: variables are lowercase in server/utils/cloudinary.js)
+cloud_name=
+api_key=
+api_secret=
 ```
 
-### 3. Run Server
+## Scripts
+From `server/`:
+
 ```bash
-# Development Mode (with Nodemon)
-npm run server
-
-# Production Mode
-npm start
+npm run server   # Dev: nodemon + NODE_MODE=DEV
+npm start        # Prod: node server.js
+npm run dev      # Runs server + client concurrently
+npm test         # Jest tests (uses experimental-vm-modules)
 ```
 
-## � User Flow: From Signup to Order
+## API
 
-```mermaid
-sequenceDiagram
-    participant User as 👤 Client
-    participant Auth as 🔐 Auth Service
-    participant Product as 🛍️ Product Service
-    participant Cart as 🛒 Cart Service
-    participant Order as 📦 Order Service
-    participant DB as 🗄️ Database
+### Base URL
+- Local: `http://localhost:<PORT>`
+- API prefix: `/api/v1`
 
-    %% Signup / Login Flow
-    User->>Auth: POST /signup
-    Auth->>DB: Create User
-    Auth-->>User: JWT Cookie
+### Health & Infra
+- `GET /api/v1/health` — server health check
+- `GET /api/v1/health/cache` — Redis connection + stats (returns 503 if Redis not ready)
+- `GET /sitemap.xml` — dynamic sitemap (uses `CLIENT_URL` for `<loc>` base)
 
-    %% Browsing Flow
-    User->>Product: GET /products
-    Product->>DB: Query
-    Product-->>User: Product List
+### Route Map (Mounted in `app.js`)
+- `/api/v1/authentications` — sign up, login, refresh token, logout, forgot/reset password, `/me`
+- `/api/v1/products` — product listing + CRUD (role-restricted for seller/admin actions)
+- `/api/v1/brands` — public brands + seller brand management + follow features
+- `/api/v1/categories`, `/api/v1/subcategories`
+- `/api/v1/cart`, `/api/v1/wishlist`
+- `/api/v1/orders` — guest checkout + authenticated order lifecycle
+- `/api/v1/reviews`
+- `/api/v1/admin` — admin CRUD + analytics endpoints (restricted)
+- `/api/v1/upload` — authenticated image upload
+- `/api/v1/discounts` — discount rules + coupon validation
 
-    %% Order Flow
-    User->>Cart: POST /cart (Add Item)
-    User->>Order: POST /orders (Checkout)
-    Order->>DB: Create Order
-    Order->>Cart: Clear Cart
-    Order-->>User: Order Confirmation
-```
+## Cookies, CORS, and Auth Notes
+- The server uses `cors({ credentials: true })` and expects the frontend to send requests with `withCredentials: true`.
+- In production (`NODE_MODE=PROD`), cookies are configured to be `secure` and `sameSite=None`.
+- Make sure `CLIENT_URL` matches your deployed client origin, otherwise the browser will block cookies.
+
+## Deploying the Server to Netlify (Functions)
+This repository includes [netlify.toml](./netlify.toml) and a function entrypoint at [functions/api.js](./functions/api.js).
+
+Netlify site settings (recommended):
+- Base directory: `server`
+- Functions directory: `functions`
+- The redirect in `netlify.toml` routes `/*` to `/.netlify/functions/api/:splat` so you can call endpoints as:
+  - `https://YOUR-SERVER.netlify.app/api/v1/health`
+  - `https://YOUR-SERVER.netlify.app/api/v1/products`
+
+Set these environment variables in Netlify:
+- `DB_URL`, `DB_PASSWORD`
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `JWT_ACCESS_EXPIRES`, `JWT_REFRESH_EXPIRES`
+- `JWT_ACCESS_COOKIE_EXPIRES`, `JWT_REFRESH_COOKIE_EXPIRES`
+- `CLIENT_URL` (your Netlify client site URL)
+- `NODE_MODE=PROD`, `NODE_ENV=production`
+- Optional: Redis / Cloudinary / Email variables if you use those features

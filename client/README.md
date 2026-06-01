@@ -9,9 +9,9 @@ This directory contains the frontend application for the E-Commerce platform, bu
 - **Styling:** Tailwind CSS & Framer Motion
 - **Routing:** React Router DOM
 - **HTTP Client:** Axios
-- **Icons:** Lucide React
+- **Icons:** React Icons + FontAwesome
 
-## � Complete Project Structure
+## Complete Project Structure
 
 The following tree represents the complete file organization of the client application.
 
@@ -177,6 +177,18 @@ The application dynamically adjusts its UI based on the logged-in user's role:
 - JWT-based authentication with `httpOnly` cookies.
 - Secure login, registration, and password reset flows.
 
+## Scripts
+From `client/`:
+
+```bash
+npm run dev       # Start Vite dev server
+npm run build     # Production build
+npm run preview   # Preview production build locally
+npm run lint      # ESLint
+npm run test:flows
+npm run test:forms-security
+```
+
 ## 📦 Getting Started
 
 ### 1. Install Dependencies
@@ -187,10 +199,23 @@ npm install
 ### 2. Environment Setup
 Create a `.env` file in the root of the `client/` directory:
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://localhost:4000/api/v1/
 ```
 
 ### 3. Run Development Server
 ```bash
 npm run dev
 ```
+
+## Deployment (Netlify)
+This repository includes [netlify.toml](./netlify.toml) for SPA routing.
+
+Recommended Netlify settings:
+- Base directory: `client`
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Environment variables:
+  - `VITE_API_URL` = `https://YOUR-SERVER.netlify.app/api/v1/`
+
+Build note:
+- `vite.config.js` uses `minify: "terser"`, so `terser` must be installed (this repo includes it as a dev dependency).
