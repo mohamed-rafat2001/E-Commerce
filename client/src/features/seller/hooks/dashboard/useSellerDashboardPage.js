@@ -62,14 +62,12 @@ const useSellerDashboardPage = () => {
     (error.response?.data?.message || error.message || "Failed to load dashboard data") : 
     null;
 
-  // Create stats array for mapping in the component
+  // Create stats array for mapping in the component (using real metrics)
   const statsArray = [
     {
       id: "totalProducts",
       title: "Total Products",
       value: stats.totalProducts,
-      change: "+12%",
-      changeType: "positive",
       icon: ProductIcon,
       gradient: "from-blue-500 to-cyan-600"
     },
@@ -77,17 +75,13 @@ const useSellerDashboardPage = () => {
       id: "totalOrders",
       title: "Total Orders",
       value: stats.totalOrders,
-      change: "+8%",
-      changeType: "positive",
       icon: OrderIcon,
       gradient: "from-emerald-500 to-teal-600"
     },
     {
       id: "totalRevenue",
       title: "Total Revenue",
-      value: `$${stats.totalRevenue.toLocaleString()}`,
-      change: "+15%",
-      changeType: "positive",
+      value: `$${(stats.totalRevenue || 0).toLocaleString()}`,
       icon: AnalyticsIcon,
       gradient: "from-purple-500 to-indigo-600"
     },
@@ -95,8 +89,6 @@ const useSellerDashboardPage = () => {
       id: "lowStockItems",
       title: "Low Stock Items",
       value: stats.lowStockItems,
-      change: "-2",
-      changeType: "negative",
       icon: InventoryIcon,
       gradient: "from-amber-500 to-orange-600"
     }
