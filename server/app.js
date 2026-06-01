@@ -10,6 +10,8 @@ import compression from "compression";
 // db connection moved to server.js
 export const app = express();
 
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+
 // ─── GZIP/Brotli Compression ─────────────────────────────────────
 // Compresses all API responses. Brotli is preferred if client supports it.
 // This reduces JSON payload sizes by 60-80%.
@@ -79,7 +81,9 @@ app.use(hpp());
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const swaggerUiMiddleware = resolveModuleDefault(swaggerUi);
+
+app.use("/api-docs", swaggerUiMiddleware.serve, swaggerUiMiddleware.setup(swaggerSpec));
 
 // ─── Dynamic Sitemap Generation ──────────────────────────────────
 import ProductModel from "./models/ProductModel.js";
@@ -228,20 +232,36 @@ import uploadRouter from "./routers/uploadRouter.js";
 import brandRouter from "./routers/brandRouter.js";
 import discountRouter from "./routers/discountRouter.js";
 
-app.use("/api/v1/authentications", authRouter);
-app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/sellers", sellerRouter);
-app.use("/api/v1/customers", customerRouter);
-app.use("/api/v1/products", productRouter);
-app.use("/api/v1/cart", cartRouter);
-app.use("/api/v1/wishlist", wishListRouter);
-app.use("/api/v1/reviews", reviewRouter);
-app.use("/api/v1/categories", categoryRouter);
-app.use("/api/v1/subcategories", subCategoryRouter);
-app.use("/api/v1/orders", orderRouter);
-app.use("/api/v1/upload", uploadRouter);
-app.use("/api/v1/brands", brandRouter);
-app.use("/api/v1/discounts", discountRouter);
+const authRoutes = resolveModuleDefault(authRouter);
+const adminRoutes = resolveModuleDefault(adminRouter);
+const sellerRoutes = resolveModuleDefault(sellerRouter);
+const customerRoutes = resolveModuleDefault(customerRouter);
+const productRoutes = resolveModuleDefault(productRouter);
+const cartRoutes = resolveModuleDefault(cartRouter);
+const wishListRoutes = resolveModuleDefault(wishListRouter);
+const reviewRoutes = resolveModuleDefault(reviewRouter);
+const categoryRoutes = resolveModuleDefault(categoryRouter);
+const subCategoryRoutes = resolveModuleDefault(subCategoryRouter);
+const orderRoutes = resolveModuleDefault(orderRouter);
+const uploadRoutes = resolveModuleDefault(uploadRouter);
+const brandRoutes = resolveModuleDefault(brandRouter);
+const discountRoutes = resolveModuleDefault(discountRouter);
+const globalErrorHandler = resolveModuleDefault(globalError);
+
+app.use("/api/v1/authentications", authRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/sellers", sellerRoutes);
+app.use("/api/v1/customers", customerRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/wishlist", wishListRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/subcategories", subCategoryRoutes);
+app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/upload", uploadRoutes);
+app.use("/api/v1/brands", brandRoutes);
+app.use("/api/v1/discounts", discountRoutes);
 
 // global error handler
-app.use(globalError);
+app.use(globalErrorHandler);
