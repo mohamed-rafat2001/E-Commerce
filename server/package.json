@@ -35,8 +35,6 @@
 		"nodemailer": "^8.0.10",
 		"serverless-http": "^4.0.0",
 		"slugify": "^1.6.9",
-		"swagger-jsdoc": "^6.3.0",
-		"swagger-ui-express": "^5.0.1",
 		"validator": "^13.15.35"
 	},
 	"devDependencies": {

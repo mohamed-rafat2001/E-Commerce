@@ -9,7 +9,7 @@ process.on("uncaughtException", (err) => {
 const port = process.env.PORT;
 
 import { app } from "./app.js";
-import dbConnect from "./db/config.js";
+import { dbConnect } from "./db/config.js";
 
 // Connect to DB
 dbConnect();

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export default function dbConnect() {
+export function dbConnect() {
 	const dbPassword = process.env.DB_PASSWORD;
 	const dbURL = process.env.DB_URL
 		? process.env.DB_URL.replace("<db_password>", dbPassword)
@@ -16,3 +16,5 @@ export default function dbConnect() {
 		.then(() => console.info("db is connected"))
 		.catch((e) => console.error(e.message));
 }
+
+export default dbConnect;

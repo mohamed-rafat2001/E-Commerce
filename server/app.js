@@ -78,13 +78,6 @@ app.use((req, _res, next) => {
 // Prevent parameter pollution
 app.use(hpp());
 
-import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./swagger.js";
-
-const swaggerUiMiddleware = resolveModuleDefault(swaggerUi);
-
-app.use("/api-docs", swaggerUiMiddleware.serve, swaggerUiMiddleware.setup(swaggerSpec));
-
 // ─── Dynamic Sitemap Generation ──────────────────────────────────
 import ProductModel from "./models/ProductModel.js";
 import BrandModel from "./models/BrandModel.js";
