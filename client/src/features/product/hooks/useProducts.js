@@ -7,7 +7,7 @@ import { getAllProducts } from "../services/product.js";
  * @param {Function} options.queryFn - Function to fetch products
  * @param {string[]} options.queryKey - Query key
  */
-export default function useProducts({ queryFn = getAllProducts, queryKey = ["products"] } = {}) {
+export default function useProducts({ queryFn = getAllProducts, queryKey = ["products"], ...options } = {}) {
 	const {
 		data: response,
 		isLoading,
@@ -16,6 +16,7 @@ export default function useProducts({ queryFn = getAllProducts, queryKey = ["pro
 	} = useQuery({
 		queryKey: queryKey,
 		queryFn: queryFn,
+		...options,
 	});
 
 	const products = response?.data?.data || [];

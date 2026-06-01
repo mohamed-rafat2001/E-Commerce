@@ -14,7 +14,7 @@ const visibilityOptions = [
 	{ value: 'private', label: 'Private - Only via link' },
 ];
 
-const SettingsStep = ({ register, control, watch, coverImagePreview, uploadedImagesCount }) => {
+const SettingsStep = ({ control, watch, coverImagePreview, uploadedImagesCount }) => {
 	return (
 		<motion.div
 			key="step-settings"

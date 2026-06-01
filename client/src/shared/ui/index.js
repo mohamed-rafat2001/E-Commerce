@@ -27,3 +27,4 @@ export { default as StatCard } from './StatCard/StatCard.jsx';
 export { default as Skeleton } from './Skeleton/Skeleton.jsx';
 export { default as EmptyState } from './EmptyState/EmptyState.jsx';
 export { default as ScrollReveal } from './ScrollReveal/ScrollReveal.jsx';
+export { default as Checkbox } from './Checkbox/Checkbox.jsx';

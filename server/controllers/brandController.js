@@ -90,6 +90,7 @@ export const getAllActiveBrands = catchAsync(async (req, res, _next) => {
 	};
 
 	await setCache(cacheKey, responseData, 3600); // 1 hour TTL
+
 	return res.status(200).json(responseData);
 });
 

@@ -53,26 +53,23 @@ const sendErrorProd = (error, res) => {
 };
 
 export default function globalError(error, req, res, _next) {
-	error.status = error.status || "error";
 	error.statusCode = error.statusCode || 500;
+	error.status = error.status || "error";
+
+	let errorCopy = { ...error };
+
+	errorCopy.message = error.message;
+	errorCopy.name = error.name; // Ensure name is preserved for checks
+
+	if (errorCopy.name === "CastError") errorCopy = handleCastErrorDB(errorCopy);
+	if (errorCopy.code === 11000) errorCopy = handleDuplicateFieldsDB(errorCopy);
+	if (errorCopy.name === "ValidationError") errorCopy = handleValidationErrorDB(errorCopy);
+	if (errorCopy.name === "JsonWebTokenError") errorCopy = handleJWTError();
+	if (errorCopy.name === "TokenExpiredError") errorCopy = handleJWTExpiredError();
 
 	if (process.env.NODE_MODE === "DEV") {
-		sendErrorDev(error, res);
+		sendErrorDev(errorCopy, res);
 	} else {
-		let errorCopy = { ...error };
-
-		errorCopy.message = error.message;
-
-		if (errorCopy.name === "CastError")
-			errorCopy = handleCastErrorDB(errorCopy);
-		if (errorCopy.code === 11000)
-			errorCopy = handleDuplicateFieldsDB(errorCopy);
-		if (errorCopy.name === "ValidationError")
-			errorCopy = handleValidationErrorDB(errorCopy);
-		if (errorCopy.name === "JsonWebTokenError") errorCopy = handleJWTError();
-		if (errorCopy.name === "TokenExpiredError")
-			errorCopy = handleJWTExpiredError();
-
 		sendErrorProd(errorCopy, res);
 	}
 }

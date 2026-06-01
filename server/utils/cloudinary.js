@@ -24,7 +24,7 @@ export const storage = new CloudinaryStorage({
 			public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
 			transformation: [
 				{ quality: "auto", fetch_format: "auto" },
-				{ format: "webp" }
+				{ format: "webp" },
 			],
 		};
 	},

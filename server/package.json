@@ -8,10 +8,11 @@
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js",
+		"build": "echo 'Building serverless functions'",
 		"server": "cross-env NODE_MODE=DEV nodemon server.js",
 		"client": "npm run dev --prefix ../client",
 		"dev": "concurrently \"npm run server\" \"npm run client\"",
-		"test:api-security": "node --test tests/api-security.test.mjs"
+		"test": "cross-env NODE_OPTIONS=--experimental-vm-modules NODE_MODE=DEV jest --runInBand"
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.3",
@@ -33,6 +34,7 @@
 		"multer": "^2.0.2",
 		"multer-storage-cloudinary": "^4.0.0",
 		"nodemailer": "^7.0.13",
+		"serverless-http": "^4.0.0",
 		"slugify": "^1.6.6",
 		"swagger-jsdoc": "^6.2.8",
 		"swagger-ui-express": "^5.0.1",
@@ -47,6 +49,7 @@
 		"eslint-plugin-import": "^2.32.0",
 		"globals": "^17.5.0",
 		"jest": "^30.2.0",
+		"mongodb-memory-server": "^11.1.0",
 		"nodemon": "^3.1.14",
 		"supertest": "^7.2.2"
 	}

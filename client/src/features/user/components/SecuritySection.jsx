@@ -3,7 +3,7 @@ import { Card, Button, Input } from '../../../shared/ui/index.js';
 import { LockIcon, ShieldIcon } from '../../../shared/constants/icons.jsx';
 
 const SecuritySection = ({ passwordForm, isChangingPassword, setIsChangingPassword, isUpdatingPassword, onPasswordSubmit }) => {
-    const { register, handleSubmit, formState: { errors }, reset, watch } = passwordForm;
+    const { register, handleSubmit, formState: { errors }, reset } = passwordForm;
 
     return (
         <Card className="lg:col-span-2">

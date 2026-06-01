@@ -25,7 +25,20 @@ if (process.env.REDIS_PASSWORD) {
 	redisConfig.password = process.env.REDIS_PASSWORD;
 }
 
-const redisClient = new Redis(redisConfig);
+let redisClient;
+
+if (process.env.NODE_ENV === "test") {
+	redisClient = {
+		on: () => { },
+		get: async () => null,
+		set: async () => null,
+		del: async () => null,
+		config: async () => null,
+		status: "ready",
+	};
+} else {
+	redisClient = new Redis(redisConfig);
+}
 
 redisClient.on("connect", () => {
 	console.info("[Redis] Connected to Redis successfully.");

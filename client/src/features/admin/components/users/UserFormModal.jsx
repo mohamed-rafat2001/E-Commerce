@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { adminUserSchema } from '../../../../shared/validation/schemas.js';
 import { Modal, Button, Input, Select } from '../../../../shared/ui/index.js';
 import { FiEdit2, FiUserCheck } from 'react-icons/fi';
-import toast from 'react-hot-toast';
 
 const roleOptions = [
 	{ value: 'Customer', label: 'Customer' },

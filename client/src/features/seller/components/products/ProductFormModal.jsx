@@ -29,7 +29,7 @@ const ProductFormModal = ({ isOpen, onClose, product = null, onSubmit, isLoading
 	const { brands, isLoading: brandsLoading } = useSellerBrands();
 
 	const form = useProductForm({ product, isOpen });
-	const { register, watch, handleSubmit, formState: { errors }, control, setValue } = form.form;
+	const { register, watch, handleSubmit, formState: { errors }, control } = form.form;
 	
 	const images = useImageUpload({ product, isOpen });
 

@@ -5,7 +5,7 @@ import { brandSchema } from '../../../../shared/validation/schemas.js';
 import { Modal, Button, Input, Select, Skeleton } from '../../../../shared/ui/index.js';
 import { FiCheck, FiX, FiMail, FiPhone, FiGlobe, FiBriefcase, FiTag } from 'react-icons/fi';
 import useCategories from '../../../admin/hooks/categories/useCategories.js';
-import useSubCategories from '../../../admin/hooks/categories/useSubCategories.js';
+import { useAdminSubCategories as useSubCategories } from '../../../admin/hooks/subCategories/useAdminSubCategories.js';
 
 const BrandFormModal = ({ isOpen, onClose, brand, onSubmit, isLoading }) => {
 	const isEdit = !!brand;
@@ -34,7 +34,10 @@ const BrandFormModal = ({ isOpen, onClose, brand, onSubmit, isLoading }) => {
 	});
 
 	const selectedPrimaryId = watch('primaryCategory');
-	const { subCategories, isLoading: subsLoading } = useSubCategories(selectedPrimaryId);
+	const { subCategories, isLoading: subsLoading } = useSubCategories(
+		{ categoryId: selectedPrimaryId },
+		{ enabled: !!selectedPrimaryId }
+	);
 
 	useEffect(() => {
 		if (isOpen) {

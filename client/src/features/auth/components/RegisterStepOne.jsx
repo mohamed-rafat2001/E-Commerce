@@ -16,7 +16,6 @@ const RegisterStepOne = ({
 	showConfirmPassword, 
 	setShowConfirmPassword,
 	onNextStep, 
-	getValues,
 	variants 
 }) => {
 	return (

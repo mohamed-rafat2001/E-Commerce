@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { discountSchema } from '../../../../shared/validation/schemas.js';
-import { Modal, Button, Input, Select, Checkbox } from '../../../../shared/ui/index.js';
+import { discountSchema } from '../../../shared/validation/schemas.js';
+import { Modal, Button, Input, Select, Checkbox } from '../../../shared/ui/index.js';
 import { FiTag, FiPercent, FiCalendar, FiTarget, FiHash, FiClock, FiCheck, FiX, FiInfo } from 'react-icons/fi';
-import useCategories from '../../../admin/hooks/categories/useCategories.js';
-import useListingProducts from '../../../listing/hooks/useListingProducts.js';
+import useCategories from '../../admin/hooks/categories/useCategories.js';
+import useProducts from '../../product/hooks/useProducts.js';
 
 const typeOptions = [
 	{ value: 'percentage', label: 'Percentage (%)' },
@@ -24,14 +24,13 @@ const scopeOptions = [
 const DiscountFormModal = ({ isOpen, onClose, discount, onSubmit, isLoading }) => {
 	const isEdit = !!discount;
 	const { categories } = useCategories();
-	const { products } = useListingProducts({}, { enabled: isOpen });
+	const { products } = useProducts({ enabled: isOpen });
 
 	const {
 		register,
 		handleSubmit,
 		control,
 		watch,
-		setValue,
 		reset,
 		formState: { errors },
 	} = useForm({

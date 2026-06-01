@@ -5,7 +5,6 @@ import { FiFolder, FiTag, FiShoppingBag, FiInfo } from 'react-icons/fi';
 import TagInput from './TagInput.jsx';
 
 const DetailsStep = ({
-	register,
 	errors,
 	control,
 	brandOptions,
