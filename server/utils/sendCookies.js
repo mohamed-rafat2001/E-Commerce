@@ -1,8 +1,24 @@
+const LOCAL_ORIGIN_REGEX = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+
+const shouldUseCrossSiteCookies = () => {
+	const nodeMode = (process.env.NODE_MODE || process.env.NODE_ENV || "").toLowerCase();
+	const deploymentContext = (process.env.CONTEXT || "").toLowerCase();
+	const clientUrl = (process.env.CLIENT_URL || "").trim();
+	const hasRemoteClient = clientUrl && !LOCAL_ORIGIN_REGEX.test(clientUrl);
+
+	return nodeMode === "prod"
+		|| nodeMode === "production"
+		|| deploymentContext === "production"
+		|| deploymentContext === "deploy-preview"
+		|| Boolean(hasRemoteClient);
+};
+
 function sendCookies(res, accessToken, refreshToken) {
+	const useCrossSiteCookies = shouldUseCrossSiteCookies();
 	const commonOptions = {
 		httpOnly: true,
-		secure: process.env.NODE_MODE === "PROD",
-		sameSite: process.env.NODE_MODE === "PROD" ? "None" : "Lax",
+		secure: useCrossSiteCookies,
+		sameSite: useCrossSiteCookies ? "None" : "Lax",
 	};
 
 	if (accessToken !== undefined) {
