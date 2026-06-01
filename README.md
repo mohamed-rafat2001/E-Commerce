@@ -1,98 +1,151 @@
-# E-Commerce Platform
+# E-Commerce Platform (MERN)
 
-A robust and scalable E-Commerce application built with the MERN stack (MongoDB, Express, React, Node.js). This project features a comprehensive backend API and a modern frontend user interface, supporting multiple user roles including Customers, Sellers, and Admins.
+Full-stack E-Commerce application built with **React (Vite)** on the client and **Node.js/Express + MongoDB** on the server. The platform supports multiple roles (**Customer**, **Seller**, **Admin/SuperAdmin**) with role-based dashboards, product & brand management, cart/checkout, and orders.
 
-## 🚀 Tech Stack
+## Tech Stack
 
-### Client
-- **Framework:** React (Vite)
-- **State Management:** Redux Toolkit
-- **Styling:** Tailwind CSS
-- **Routing:** React Router DOM
-- **HTTP Client:** Axios (or similar)
+### Client (`/client`)
+- React 19 + Vite
+- React Router
+- Redux Toolkit + TanStack Query
+- Tailwind CSS + Framer Motion
+- Axios (cookie-based auth with `withCredentials`)
 
-### Server
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB (Mongoose ODM)
-- **Authentication:** JWT (JSON Web Tokens) & Cookies
-- **Security:** Helmet, Rate Limiting, Mongo Sanitize, HPP
+### Server (`/server`)
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT (access + refresh) stored in HttpOnly cookies
+- Security: Helmet, rate limiting, mongo sanitize, HPP, compression
+- Optional infra: Redis cache + Cloudinary uploads
 
-## 🛠️ Project Structure
+## Repository Structure
+- [client/](./client) — frontend app
+- [server/](./server) — backend API (can run as an Express server locally, or as Netlify Functions in deployment)
 
-The project is organized as a monorepo-style structure:
+## Features
+- Authentication: sign up, login, logout, refresh token, forgot/reset password
+- Role-based access control (Customer / Seller / Admin / SuperAdmin)
+- Products: listing, details, filtering, seller product management
+- Brands: public brand discovery, seller brand management, follow/followers
+- Categories/Subcategories
+- Cart + Wishlist
+- Orders: guest checkout and authenticated checkout, order history, cancellations, seller/admin status updates
+- Uploads: image uploads via Cloudinary (server-side)
+- Health + Infra checks: `/api/v1/health`, `/api/v1/health/cache`
+- SEO: dynamic `/sitemap.xml`
 
-- **`/client`**: The React frontend application.
-- **`/server`**: The Node.js/Express backend API.
+## Local Development
 
-## 📦 Installation & Setup
+### Requirements
+- Node.js 18+ (recommended)
+- MongoDB Atlas (recommended) or MongoDB locally
+- (Optional) Redis for cache endpoints
+- (Optional) Cloudinary account for image uploads
 
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (Local or Atlas connection string)
+### Install Dependencies
+From the repository root:
 
-### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd E-Commerce
-```
+cd server
+npm install
 
-### 2. Install Dependencies
-Install dependencies for both the root (if any), server, and client.
-
-**Root & Server:**
-```bash
+cd ../client
 npm install
 ```
 
-**Client:**
-```bash
-cd client
-npm install
-cd ..
-```
+### Environment Variables
 
-### 3. Environment Variables
-Create a `.env` file in the **`server/`** directory with the following variables:
+#### Server (`server/.env`)
+The server reads configuration from environment variables (see usage in `server/server.js`, `server/db/config.js`, and auth/cookie utilities).
 
 ```env
 PORT=4000
-DATABASE_URL=mongodb://localhost:27017/ecommerce  # Or your Atlas URL
-JWT_SECRET=your_super_secret_key_change_this
-JWT_EXPIRES_IN=30d
-COOKIE_EXPIRES_IN=30
+
+# MongoDB (Atlas URL template)
+DB_URL=mongodb+srv://<username>:<db_password>@cluster0.example.mongodb.net/ecommerce?retryWrites=true&w=majority
+DB_PASSWORD=your_db_password
+
+# CORS / sitemap base
+CLIENT_URL=http://localhost:5173
+
+# JWT (access + refresh)
+JWT_ACCESS_SECRET=change_me
+JWT_REFRESH_SECRET=change_me_too
+JWT_ACCESS_EXPIRES=15m
+JWT_REFRESH_EXPIRES=7d
+
+# Cookie expiration (numbers)
+JWT_ACCESS_COOKIE_EXPIRES=15
+JWT_REFRESH_COOKIE_EXPIRES=7
+
+# Runtime mode flags used by the codebase
+NODE_MODE=DEV
 NODE_ENV=development
+
+# Optional: Redis cache
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+# REDIS_PASSWORD=
+
+# Optional: Email
+EMAIL_SERVICE=
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+EMAIL_FROM_NAME=
+EMAIL_FROM=
+
+# Optional: Cloudinary (note: keys are lowercase in this codebase)
+cloud_name=
+api_key=
+api_secret=
 ```
 
-### 4. Running the Application
+#### Client (`client/.env`)
 
-You can run both the client and server concurrently from the root directory:
+```env
+VITE_API_URL=http://localhost:4000/api/v1/
+```
+
+### Run (Dev)
+Run both client + server using the server workspace script:
 
 ```bash
-# Runs both Client and Server
+cd server
 npm run dev
 ```
 
-Or run them individually:
+Or run them separately:
 
 ```bash
-# Server only
+cd server
 npm run server
 
-# Client only
-npm run client
+cd ../client
+npm run dev
 ```
 
-## 🔑 Key Features
-- **User Authentication:** Secure login/register flow with JWT and HttpOnly cookies.
-- **Role-Based Access Control:** Separate portals/permissions for Customers, Sellers, and Admins.
-- **Product Management:** Create, read, update, delete products with image support.
-- **Order System:** Unified order lifecycle management (Processing, Shipped, Delivered, Cancelled) with Snapshot tracking via `OrderItems`.
-- **Dynamic Admin Dashboard:** Centralized SuperAdmin control panel for managing all system models with field-level security.
-- **Shopping Cart & Wishlist:** Persistent cart and wishlist management with real-time price aggregation.
-- **Reviews:** Product review and rating system with automatic average calculation.
+## Deployment
 
-## 📄 Documentation
+### Client on Netlify
+This repository includes [client/netlify.toml](./client/netlify.toml).
 
-- **[Server Documentation](./server/README.md):** Detailed API endpoints, user flow diagrams, and backend architecture.
-- **[Client Documentation](./client/README.md):** Frontend project structure, role-based UI components, and state management details.
+- Base directory: `client`
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Environment variables:
+  - `VITE_API_URL` = your deployed server base (example: `https://YOUR-SERVER.netlify.app/api/v1/`)
+
+### Server on Netlify (Functions)
+This repository includes [server/netlify.toml](./server/netlify.toml) and a Netlify Function handler at [server/functions/api.js](./server/functions/api.js).
+
+- Base directory: `server`
+- Functions directory: `functions`
+- Requests to `/api/v1/*` are redirected to the Netlify function and handled by Express.
+- Environment variables: use the same variables as `server/.env` (set them in Netlify site settings).
+  - Important: set `CLIENT_URL` to your deployed client URL and `NODE_MODE=PROD` so cookies use secure settings.
+
+## Documentation
+- [server/README.md](./server/README.md) — API, env vars, deployment (Netlify Functions)
+- [client/README.md](./client/README.md) — UI architecture, env vars, deployment (Netlify)
