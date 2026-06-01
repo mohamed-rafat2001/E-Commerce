@@ -1,13 +1,7 @@
-/* Codebase Pattern Summary:
-Modeled after features/product/hooks/useProductsPage.js and features/product/hooks/useProductFilters.js.
-This hook follows URL-based state for filters/pagination and wraps public fetching with React Query,
-while applying client-side filtering/sorting to keep interactions instant.
-*/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getCategories } from "../services/index.js";
-
 import usePaginationLimit from "../../../shared/hooks/usePaginationLimit.js";
 
 const sortMapper = {
@@ -19,8 +13,6 @@ const sortMapper = {
 
 export default function usePublicCategoriesPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const makeId = (seed) => seed.toString(16).padStart(24, "0").slice(0, 24);
-
 	const paginationLimit = usePaginationLimit('PUBLIC_CATEGORIES');
 
 	const filters = useMemo(
@@ -39,40 +31,13 @@ export default function usePublicCategoriesPage() {
 		keepPreviousData: true,
 	});
 
-	const mockCategories = useMemo(() => {
-		return Array.from({ length: 30 }, (_, index) => {
-			const id = makeId(22000 + index);
-			return {
-				_id: id,
-				id,
-				name: `Category Showcase ${index + 1}`,
-				slug: `category-showcase-${index + 1}`,
-				productsCount: 25 + (index * 4),
-				subCategories: Array.from({ length: 5 }, (_, subIndex) => ({
-					_id: makeId(26000 + index * 8 + subIndex),
-					id: makeId(26000 + index * 8 + subIndex),
-					name: `Sub Category ${subIndex + 1}`
-				}))
-			};
-		});
-	}, []);
-
 	const apiCategories = useMemo(() => data?.data?.data || [], [data]);
-	const allCategories = useMemo(() => {
-		if (!Array.isArray(apiCategories) || apiCategories.length === 0) {
-			return mockCategories;
-		}
-		if (apiCategories.length >= 18) {
-			return apiCategories;
-		}
-		return [...apiCategories, ...mockCategories.slice(0, 18 - apiCategories.length)];
-	}, [apiCategories, mockCategories]);
 
 	const filteredCategories = useMemo(() => {
 		const query = filters.search.trim().toLowerCase();
-		if (!query) return allCategories;
-		return allCategories.filter((category) => (category.name || "").toLowerCase().includes(query));
-	}, [allCategories, filters.search]);
+		if (!query) return apiCategories;
+		return apiCategories.filter((category) => (category.name || "").toLowerCase().includes(query));
+	}, [apiCategories, filters.search]);
 
 	const totalCount = filteredCategories.length;
 	const totalPages = Math.max(1, Math.ceil(totalCount / filters.limit));
