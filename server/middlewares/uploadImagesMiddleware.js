@@ -1,19 +1,52 @@
-import { upload } from "../utils/cloudinary.js";
+import { upload, uploadParsedFilesToCloudinary } from "../utils/cloudinary.js";
 
-export const uploadProductImages = upload.fields([
+const composeMiddlewares = (...middlewares) => (req, res, next) => {
+	let currentIndex = 0;
+
+	const run = (error) => {
+		if (error) {
+			next(error);
+
+			return;
+		}
+
+		const middleware = middlewares[currentIndex];
+		currentIndex += 1;
+
+		if (!middleware) {
+			next();
+
+			return;
+		}
+
+		try {
+			const maybePromise = middleware(req, res, run);
+
+			if (maybePromise?.catch) {
+				maybePromise.catch(run);
+			}
+		} catch (err) {
+			run(err);
+		}
+	};
+
+	run();
+};
+
+export const uploadProductImages = composeMiddlewares(upload.fields([
 	{ name: "coverImage", maxCount: 1 },
 	{ name: "images", maxCount: 8 },
-]);
+]), uploadParsedFilesToCloudinary);
 
-export const uploadBrandImages = upload.fields([
+export const uploadBrandImages = composeMiddlewares(upload.fields([
 	{ name: "logo", maxCount: 1 },
 	{ name: "coverImage", maxCount: 1 },
-]);
+]), uploadParsedFilesToCloudinary);
 
 // For single image upload like profileImg or category coverImage
-export const uploadSingleImage = (fieldName) => upload.single(fieldName);
+export const uploadSingleImage = (fieldName) => composeMiddlewares(upload.single(fieldName), uploadParsedFilesToCloudinary);
 
-export const setCloudinaryBody = (req, res, next) => {
+export const setCloudinaryBody = (req, _res, next) => {
 	if (req.files) {
 		if (req.files.coverImage) {
 			req.body.coverImage = {

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import compression from "compression";
 
 // db connection moved to server.js
 export const app = express();
@@ -12,22 +13,15 @@ export const app = express();
 // ─── GZIP/Brotli Compression ─────────────────────────────────────
 // Compresses all API responses. Brotli is preferred if client supports it.
 // This reduces JSON payload sizes by 60-80%.
-let compression;
+app.use(compression({
+	level: 6, // Balance between speed and compression ratio
+	threshold: 1024, // Only compress responses > 1KB
+	filter: (req, res) => {
+		if (req.headers["x-no-compression"]) return false;
 
-try {
-	compression = (await import("compression")).default;
-	app.use(compression({
-		level: 6, // Balance between speed and compression ratio
-		threshold: 1024, // Only compress responses > 1KB
-		filter: (req, res) => {
-			if (req.headers["x-no-compression"]) return false;
-
-			return compression.filter(req, res);
-		},
-	}));
-} catch (_e) {
-	console.warn("[Compression] compression package not installed. Responses will not be compressed.");
-}
+		return compression.filter(req, res);
+	},
+}));
 
 app.use(
 	cors({
@@ -50,7 +44,7 @@ app.set("etag", "weak");
 
 // ─── Keep-Alive ───────────────────────────────────────────────────
 // Ensure HTTP keep-alive connections so TCP handshakes aren't repeated.
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
 	res.set("Connection", "keep-alive");
 	res.set("Keep-Alive", "timeout=65, max=1000");
 	next();
@@ -72,7 +66,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
 // Data sanitization against noSQL query injection
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
 	if (req.body) mongoSanitize.sanitize(req.body);
 	if (req.query) mongoSanitize.sanitize(req.query);
 	if (req.params) mongoSanitize.sanitize(req.params);
@@ -92,7 +86,7 @@ import ProductModel from "./models/ProductModel.js";
 import BrandModel from "./models/BrandModel.js";
 import CategoryModel from "./models/CategoryModel.js";
 
-app.get("/sitemap.xml", async (req, res) => {
+app.get("/sitemap.xml", async (_req, res) => {
 	try {
 		const baseUrl = process.env.CLIENT_URL || "https://shopynow.com";
         
@@ -172,7 +166,7 @@ app.get("/sitemap.xml", async (req, res) => {
 // ─── Redis Health Check Endpoint ──────────────────────────────────
 import redisClient from "./utils/redisClient.js";
 
-app.get("/api/v1/health/cache", async (req, res) => {
+app.get("/api/v1/health/cache", async (_req, res) => {
 	try {
 		if (redisClient.status !== "ready") {
 			return res.status(503).json({
