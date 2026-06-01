@@ -4,12 +4,20 @@ let connectionPromise = null;
 
 export async function dbConnect() {
 	const dbPassword = process.env.DB_PASSWORD;
-	const dbURL = process.env.DB_URL
-		? process.env.DB_URL.replace("<db_password>", dbPassword)
-		: undefined;
+	const rawDbURL = process.env.DB_URL;
 
-	if (!dbURL) {
+	if (!rawDbURL) {
 		throw new Error("DB_URL is not defined in environment variables");
+	}
+
+	if (rawDbURL.includes("<db_password>") && !dbPassword) {
+		throw new Error("DB_PASSWORD is required because DB_URL contains <db_password>");
+	}
+
+	const dbURL = rawDbURL.replace("<db_password>", dbPassword ?? "");
+
+	if (!/^mongodb(\+srv)?:\/\//.test(dbURL)) {
+		throw new Error("DB_URL must start with mongodb:// or mongodb+srv://");
 	}
 
 	if (mongoose.connection.readyState === 1) {

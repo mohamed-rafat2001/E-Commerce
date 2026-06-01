@@ -8,6 +8,10 @@ const UserModel = resolveModuleDefault(UserModelModule);
 
 //authentication
 export const Protect = catchAsync(async (req, res, next) => {
+	if (!process.env.JWT_ACCESS_SECRET) {
+		return next(new appError("Missing auth environment variable: JWT_ACCESS_SECRET", 500));
+	}
+
 	let token;
 
 	if (

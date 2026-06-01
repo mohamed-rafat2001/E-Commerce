@@ -14,7 +14,46 @@ const UserModel = resolveModuleDefault(UserModelModule);
 const CustomerModel = resolveModuleDefault(CustomerModelModule);
 const SellerModel = resolveModuleDefault(SellerModelModule);
 
+const REQUIRED_AUTH_ENV = [
+	"JWT_ACCESS_SECRET",
+	"JWT_REFRESH_SECRET",
+	"JWT_ACCESS_EXPIRES",
+	"JWT_REFRESH_EXPIRES",
+	"JWT_ACCESS_COOKIE_EXPIRES",
+	"JWT_REFRESH_COOKIE_EXPIRES",
+];
+
+const ensureAuthEnvConfigured = (next) => {
+	const missing = REQUIRED_AUTH_ENV.filter((key) => !process.env[key]);
+	const invalidNumeric = [
+		"JWT_ACCESS_COOKIE_EXPIRES",
+		"JWT_REFRESH_COOKIE_EXPIRES",
+	].filter((key) => Number.isNaN(Number(process.env[key])) || Number(process.env[key]) <= 0);
+
+	if (missing.length > 0) {
+		next(new appError(
+			`Missing auth environment variables: ${missing.join(", ")}`,
+			500,
+		));
+
+		return false;
+	}
+
+	if (invalidNumeric.length > 0) {
+		next(new appError(
+			`Invalid numeric auth environment variables: ${invalidNumeric.join(", ")}`,
+			500,
+		));
+
+		return false;
+	}
+
+	return true;
+};
+
 export const signUp = catchAsync(async (req, res, next) => {
+	if (!ensureAuthEnvConfigured(next)) return;
+
 	const {
 		firstName,
 		lastName,
@@ -111,6 +150,8 @@ export const signUp = catchAsync(async (req, res, next) => {
 });
 
 export const login = catchAsync(async (req, res, next) => {
+	if (!ensureAuthEnvConfigured(next)) return;
+
 	const { email, password } = req.body;
 
 	if (!email || !password)
@@ -161,6 +202,8 @@ export const login = catchAsync(async (req, res, next) => {
 });
 
 export const refreshToken = catchAsync(async (req, res, next) => {
+	if (!ensureAuthEnvConfigured(next)) return;
+
 	const refreshToken = req.cookies.refreshToken;
 
 	if (!refreshToken) {
@@ -306,6 +349,8 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 export const resetPassword = catchAsync(async (req, res, next) => {
+	if (!ensureAuthEnvConfigured(next)) return;
+
 	// get resetCode and password from req.body
 	const { resetCode, password, confirmPassword } = req.body;
 
@@ -337,6 +382,8 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
 // update password
 export const updatePassword = catchAsync(async (req, res, next) => {
+	if (!ensureAuthEnvConfigured(next)) return;
+
 	const { newPassword, currentPassword, confirmPassword } = req.body;
 
 	// check if newPassword, currentPassword, confirmPassword are provided
