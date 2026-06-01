@@ -19,6 +19,7 @@ function sendCookies(res, accessToken, refreshToken) {
 		httpOnly: true,
 		secure: useCrossSiteCookies,
 		sameSite: useCrossSiteCookies ? "None" : "Lax",
+		partitioned: useCrossSiteCookies,
 	};
 
 	if (accessToken !== undefined) {
