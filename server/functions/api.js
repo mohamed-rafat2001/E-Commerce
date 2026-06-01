@@ -37,11 +37,20 @@ const buildCorsHeaders = (event) => {
 	return headers;
 };
 
+const getRequestMethod = (event) => event?.httpMethod
+	|| event?.requestContext?.http?.method
+	|| event?.headers?.[":method"]
+	|| "";
+
 export const handler = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false;
 
-	if (event?.httpMethod === "OPTIONS") {
-		return serverlessHandler(event, context);
+	if (getRequestMethod(event).toUpperCase() === "OPTIONS") {
+		return {
+			statusCode: 204,
+			headers: buildCorsHeaders(event),
+			body: "",
+		};
 	}
 
 	try {
