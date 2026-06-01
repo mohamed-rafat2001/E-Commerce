@@ -2,7 +2,11 @@ import serverless from "serverless-http";
 import { app } from "../app.js";
 import { dbConnect } from "../db/config.js";
 
-// Ensure DB is connected
-dbConnect();
+const serverlessHandler = serverless(app);
 
-export const handler = serverless(app);
+export const handler = async (event, context) => {
+	context.callbackWaitsForEmptyEventLoop = false;
+	await dbConnect();
+
+	return serverlessHandler(event, context);
+};
