@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 let connectionPromise = null;
+const MONGODB_CONNECT_TIMEOUT_MS = 8000;
+
+mongoose.set("bufferCommands", false);
 
 export async function dbConnect() {
 	const dbPassword = process.env.DB_PASSWORD;
@@ -28,7 +31,13 @@ export async function dbConnect() {
 		return connectionPromise;
 	}
 
-	connectionPromise = mongoose.connect(dbURL)
+	connectionPromise = mongoose.connect(dbURL, {
+		serverSelectionTimeoutMS: MONGODB_CONNECT_TIMEOUT_MS,
+		connectTimeoutMS: MONGODB_CONNECT_TIMEOUT_MS,
+		socketTimeoutMS: 20000,
+		maxPoolSize: 5,
+		family: 4,
+	})
 		.then((connection) => {
 			console.info("db is connected");
 
