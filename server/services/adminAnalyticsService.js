@@ -1,12 +1,17 @@
 import * as UserModelModule from "../models/UserModel.js";
-import ProductModel from "../models/ProductModel.js";
-import BrandModel from "../models/BrandModel.js";
-import CategoryModel from "../models/CategoryModel.js";
-import OrderModel from "../models/OrderModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
+import * as BrandModelModule from "../models/BrandModel.js";
+import * as CategoryModelModule from "../models/CategoryModel.js";
+import * as OrderModelModule from "../models/OrderModel.js";
+import * as OrderItemsModelModule from "../models/OrderItemsModel.js";
 
 const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
 const UserModel = resolveModuleDefault(UserModelModule);
+const ProductModel = resolveModuleDefault(ProductModelModule);
+const BrandModel = resolveModuleDefault(BrandModelModule);
+const CategoryModel = resolveModuleDefault(CategoryModelModule);
+const OrderModel = resolveModuleDefault(OrderModelModule);
+const OrderItemsModel = resolveModuleDefault(OrderItemsModelModule);
 
 // ===================================================================
 // Dashboard Aggregation

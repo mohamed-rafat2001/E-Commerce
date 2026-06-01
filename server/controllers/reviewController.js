@@ -1,10 +1,13 @@
-import ReviewsModel from "../models/ReviewsModel.js";
+import * as ReviewsModelModule from "../models/ReviewsModel.js";
 import {
 	createDoc,
 	updateByOwner,
 	getAll,
 	deleteOneByOwner,
 } from "./handlerFactory.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const ReviewsModel = resolveModuleDefault(ReviewsModelModule);
 
 //  @desc   add new review
 // @Route  POST /api/v1/reviews

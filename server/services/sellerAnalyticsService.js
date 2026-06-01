@@ -1,6 +1,11 @@
-import SellerModel from "../models/SellerModel.js";
-import ProductModel from "../models/ProductModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
+import * as OrderItemsModelModule from "../models/OrderItemsModel.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const SellerModel = resolveModuleDefault(SellerModelModule);
+const ProductModel = resolveModuleDefault(ProductModelModule);
+const OrderItemsModel = resolveModuleDefault(OrderItemsModelModule);
 
 // ===================================================================
 // Dashboard Aggregation

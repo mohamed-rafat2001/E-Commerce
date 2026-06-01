@@ -1,6 +1,9 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware.js";
-import ProductModel from "../../models/ProductModel.js";
+import * as ProductModelModule from "../../models/ProductModel.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const ProductModel = resolveModuleDefault(ProductModelModule);
 
 export const addProductToWishlistValidator = [
 	check("productId")

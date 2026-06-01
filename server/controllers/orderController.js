@@ -1,11 +1,16 @@
-import OrderModel from "../models/OrderModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
-import SellerModel from "../models/SellerModel.js";
+import * as OrderModelModule from "../models/OrderModel.js";
+import * as OrderItemsModelModule from "../models/OrderItemsModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import APIFeatures from "../utils/apiFeatures.js";
 import * as orderService from "../services/orderService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const OrderModel = resolveModuleDefault(OrderModelModule);
+const OrderItemsModel = resolveModuleDefault(OrderItemsModelModule);
+const SellerModel = resolveModuleDefault(SellerModelModule);
 
 // ========== CUSTOMER CONTROLLERS ==========
 

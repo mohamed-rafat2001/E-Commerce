@@ -1,6 +1,9 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware.js";
-import ReviewModel from "../../models/ReviewsModel.js";
+import * as ReviewModelModule from "../../models/ReviewsModel.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const ReviewModel = resolveModuleDefault(ReviewModelModule);
 
 export const createReviewValidator = [
 	check("title").optional(),

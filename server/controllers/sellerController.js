@@ -1,6 +1,6 @@
-import SellerModel from "../models/SellerModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
-import OrderModel from "../models/OrderModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
+import * as OrderItemsModelModule from "../models/OrderItemsModel.js";
+import * as OrderModelModule from "../models/OrderModel.js";
 import { updateByOwner } from "./handlerFactory.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -9,6 +9,11 @@ import { uploadSingleImage, setCloudinaryBody } from "../middlewares/uploadImage
 import cloudinary from "../utils/cloudinary.js";
 import { getCache, setCache, deleteCache } from "../utils/cache.js";
 import { fetchSellerDashboardStats, fetchSellerAnalyticsData } from "../services/sellerAnalyticsService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const SellerModel = resolveModuleDefault(SellerModelModule);
+const OrderItemsModel = resolveModuleDefault(OrderItemsModelModule);
+const OrderModel = resolveModuleDefault(OrderModelModule);
 
 //  @desc  Get seller's own profile
 // @Route  GET /api/v1/sellers/profile

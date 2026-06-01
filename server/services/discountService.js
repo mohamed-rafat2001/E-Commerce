@@ -1,6 +1,10 @@
-import DiscountModel from "../models/DiscountModel.js";
-import ProductModel from "../models/ProductModel.js";
+import * as DiscountModelModule from "../models/DiscountModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
 import appError from "../utils/appError.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const DiscountModel = resolveModuleDefault(DiscountModelModule);
+const ProductModel = resolveModuleDefault(ProductModelModule);
 
 /**
  * Build a query filter for discounts that are currently active.

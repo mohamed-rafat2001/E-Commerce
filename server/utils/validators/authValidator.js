@@ -1,6 +1,9 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware.js";
-import UserModel from "../../models/UserModel.js";
+import * as UserModelModule from "../../models/UserModel.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const UserModel = resolveModuleDefault(UserModelModule);
 
 export const signupValidator = [
 	check("firstName")

@@ -25,15 +25,40 @@ app.use(compression({
 	},
 }));
 
-app.use(
-	cors({
-		origin: ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174", process.env.CLIENT_URL].filter(Boolean),
-		credentials: true,
-		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-		allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Allow-Headers", "If-None-Match"],
-		exposedHeaders: ["ETag"],
-	}),
-);
+const normalizeOrigin = (value) => (value || "").trim().replace(/\/+$/, "");
+const splitEnvOrigins = (value) => normalizeOrigin(value)
+	.split(",")
+	.map((v) => normalizeOrigin(v))
+	.filter(Boolean);
+
+const allowedOrigins = new Set([
+	"http://localhost:5173",
+	"http://localhost:5174",
+	"http://127.0.0.1:5173",
+	"http://127.0.0.1:5174",
+	...splitEnvOrigins(process.env.CLIENT_URL),
+	...splitEnvOrigins(process.env.CLIENT_URLS),
+].map((v) => normalizeOrigin(v)));
+
+const corsOptions = {
+	origin: (origin, callback) => {
+		if (!origin) {
+			callback(null, true);
+			return;
+		}
+
+		const normalized = normalizeOrigin(origin);
+
+		callback(null, allowedOrigins.has(normalized));
+	},
+	credentials: true,
+	methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+	allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Allow-Headers", "If-None-Match"],
+	exposedHeaders: ["ETag"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.get("/api/v1/health", (_req, res) => {
 	res.status(200).json({ status: "ok" });

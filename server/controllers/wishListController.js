@@ -1,5 +1,5 @@
 import { catchAsync } from "../middlewares/catchAsync.js";
-import WishListModel from "../models/WishListModel.js";
+import * as WishListModelModule from "../models/WishListModel.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
 import {
@@ -8,6 +8,9 @@ import {
 	getOneByOwner,
 } from "./handlerFactory.js";
 import { invalidateCacheForModel } from "../utils/cache.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const WishListModel = resolveModuleDefault(WishListModelModule);
 
 //  @desc  create wishlist and push products to it
 //  POST /api/v1/wishlist

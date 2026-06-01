@@ -1,4 +1,4 @@
-import DiscountModel from "../models/DiscountModel.js";
+import * as DiscountModelModule from "../models/DiscountModel.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -7,6 +7,9 @@ import {
 	validateSellerScope,
 	resolveBestDiscount,
 } from "../services/discountService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const DiscountModel = resolveModuleDefault(DiscountModelModule);
 
 // ── Allowed fields for create/update ──────────────────────────────────
 const DISCOUNT_FIELDS = [

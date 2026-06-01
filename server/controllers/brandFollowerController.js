@@ -1,8 +1,12 @@
-import BrandFollowerModel from "../models/BrandFollowerModel.js";
-import BrandModel from "../models/BrandModel.js";
+import * as BrandFollowerModelModule from "../models/BrandFollowerModel.js";
+import * as BrandModelModule from "../models/BrandModel.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const BrandFollowerModel = resolveModuleDefault(BrandFollowerModelModule);
+const BrandModel = resolveModuleDefault(BrandModelModule);
 
 // @desc    Follow a brand (toggle follow/unfollow)
 // @route   POST /api/v1/brands/:brandId/follow

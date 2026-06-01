@@ -1,7 +1,11 @@
-import CartModel from "../models/CartModel.js";
-import ProductModel from "../models/ProductModel.js";
+import * as CartModelModule from "../models/CartModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
 import appError from "../utils/appError.js";
 import { enrichProductsWithDiscounts } from "./discountService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const CartModel = resolveModuleDefault(CartModelModule);
+const ProductModel = resolveModuleDefault(ProductModelModule);
 
 /**
  * Get the user's cart, enriched with live product availability data.

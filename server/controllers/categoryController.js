@@ -1,5 +1,8 @@
-import CategoryModel from "../models/CategoryModel.js";
+import * as CategoryModelModule from "../models/CategoryModel.js";
 import { getAll, getById, createDoc, updateDoc, deleteOne } from "./handlerFactory.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const CategoryModel = resolveModuleDefault(CategoryModelModule);
 
 //  @desc   get all categories
 // @Route  PATCH /api/v1/categories

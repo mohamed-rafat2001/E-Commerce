@@ -1,5 +1,5 @@
-import SubCategoryModel from "../models/SubCategoryModel.js";
-import CategoryModel from "../models/CategoryModel.js";
+import * as SubCategoryModelModule from "../models/SubCategoryModel.js";
+import * as CategoryModelModule from "../models/CategoryModel.js";
 import {
 	getAll as fetchAll,
 	getById as fetchById,
@@ -10,6 +10,10 @@ import {
 import { catchAsync } from "../middlewares/catchAsync.js";
 import appError from "../utils/appError.js";
 import sendResponse from "../utils/sendResponse.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const SubCategoryModel = resolveModuleDefault(SubCategoryModelModule);
+const CategoryModel = resolveModuleDefault(CategoryModelModule);
 
 //  @desc   Get all subcategories
 // @Route   GET /api/v1/subcategories

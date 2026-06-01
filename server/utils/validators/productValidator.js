@@ -1,8 +1,12 @@
 import { check, body } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware.js";
-import CategoryModel from "../../models/CategoryModel.js";
-import SubCategoryModel from "../../models/SubCategoryModel.js";
+import * as CategoryModelModule from "../../models/CategoryModel.js";
+import * as SubCategoryModelModule from "../../models/SubCategoryModel.js";
 import slugify from "slugify";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const CategoryModel = resolveModuleDefault(CategoryModelModule);
+const SubCategoryModel = resolveModuleDefault(SubCategoryModelModule);
 
 export const createProductValidator = [
 	check("title")

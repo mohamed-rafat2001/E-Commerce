@@ -1,4 +1,4 @@
-import ProductModel from "../models/ProductModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
 import {
 	createDoc,
 	deleteManyByOwner,
@@ -12,6 +12,9 @@ import { getCache, setCache } from "../utils/cache.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import { enrichProductsWithDiscounts } from "../services/discountService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const ProductModel = resolveModuleDefault(ProductModelModule);
 
 //  @desc   add new product
 // @Route  POST /api/v1/products

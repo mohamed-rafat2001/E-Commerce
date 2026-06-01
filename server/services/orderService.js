@@ -1,12 +1,19 @@
 import mongoose from "mongoose";
-import CartModel from "../models/CartModel.js";
-import ProductModel from "../models/ProductModel.js";
-import OrderModel from "../models/OrderModel.js";
-import OrderItemsModel from "../models/OrderItemsModel.js";
-import SellerModel from "../models/SellerModel.js";
+import * as CartModelModule from "../models/CartModel.js";
+import * as ProductModelModule from "../models/ProductModel.js";
+import * as OrderModelModule from "../models/OrderModel.js";
+import * as OrderItemsModelModule from "../models/OrderItemsModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
 import { validateCartForCheckout } from "./cartService.js";
 import { enrichProductsWithDiscounts, resolveShippingDiscount, incrementUsage, validateCouponForCart } from "./discountService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const CartModel = resolveModuleDefault(CartModelModule);
+const ProductModel = resolveModuleDefault(ProductModelModule);
+const OrderModel = resolveModuleDefault(OrderModelModule);
+const OrderItemsModel = resolveModuleDefault(OrderItemsModelModule);
+const SellerModel = resolveModuleDefault(SellerModelModule);
 
 // Shipping fee thresholds
 const SHIPPING_FREE_THRESHOLD = 500;

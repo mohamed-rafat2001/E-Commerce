@@ -1,7 +1,10 @@
-import CustomerModel from "../models/CustomerModel.js";
+import * as CustomerModelModule from "../models/CustomerModel.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const CustomerModel = resolveModuleDefault(CustomerModelModule);
 
 // @desc Get customer profile (including addresses)
 // @Route GET /api/v1/customers/profile

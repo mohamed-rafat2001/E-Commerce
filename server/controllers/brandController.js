@@ -1,12 +1,17 @@
-import BrandModel from "../models/BrandModel.js";
-import BrandFollowerModel from "../models/BrandFollowerModel.js";
-import SellerModel from "../models/SellerModel.js";
+import * as BrandModelModule from "../models/BrandModel.js";
+import * as BrandFollowerModelModule from "../models/BrandFollowerModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import cloudinary from "../utils/cloudinary.js";
 import sendResponse from "../utils/sendResponse.js";
 import appError from "../utils/appError.js";
 import APIFeatures from "../utils/apiFeatures.js";
 import { getCache, setCache, deleteCache, deleteCacheByPattern } from "../utils/cache.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const BrandModel = resolveModuleDefault(BrandModelModule);
+const BrandFollowerModel = resolveModuleDefault(BrandFollowerModelModule);
+const SellerModel = resolveModuleDefault(SellerModelModule);
 
 // Helper to build cache key for brands
 const buildBrandCacheKey = (identifier, req) => {
