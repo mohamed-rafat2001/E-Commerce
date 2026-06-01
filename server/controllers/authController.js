@@ -1,13 +1,18 @@
 import { catchAsync } from "../middlewares/catchAsync.js";
 import jwt from "jsonwebtoken";
-import UserModel from "../models/UserModel.js";
-import CustomerModel from "../models/CustomerModel.js";
-import SellerModel from "../models/SellerModel.js";
+import * as UserModelModule from "../models/UserModel.js";
+import * as CustomerModelModule from "../models/CustomerModel.js";
+import * as SellerModelModule from "../models/SellerModel.js";
 import appError from "../utils/appError.js";
 import { passwordResetCodeTemplate } from "../utils/emailTemplates.js";
 import sendCookies from "../utils/sendCookies.js";
 import sendEmail from "../utils/sendEmail.js";
 import sendResponse from "../utils/sendResponse.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const UserModel = resolveModuleDefault(UserModelModule);
+const CustomerModel = resolveModuleDefault(CustomerModelModule);
+const SellerModel = resolveModuleDefault(SellerModelModule);
 
 export const signUp = catchAsync(async (req, res, next) => {
 	const {

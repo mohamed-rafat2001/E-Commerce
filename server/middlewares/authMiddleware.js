@@ -1,7 +1,10 @@
 import jwt from "jsonwebtoken";
-import UserModel from "../models/UserModel.js";
+import * as UserModelModule from "../models/UserModel.js";
 import { catchAsync } from "./catchAsync.js";
 import appError from "../utils/appError.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const UserModel = resolveModuleDefault(UserModelModule);
 
 //authentication
 export const Protect = catchAsync(async (req, res, next) => {

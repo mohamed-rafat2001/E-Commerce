@@ -1,4 +1,4 @@
-import UserModel from "../models/UserModel.js";
+import * as UserModelModule from "../models/UserModel.js";
 import SellerModel from "../models/SellerModel.js";
 import CustomerModel from "../models/CustomerModel.js";
 import ProductModel from "../models/ProductModel.js";
@@ -13,6 +13,9 @@ import appError from "../utils/appError.js";
 import { catchAsync } from "../middlewares/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import { fetchDashboardStats, fetchAnalyticsData } from "../services/adminAnalyticsService.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const UserModel = resolveModuleDefault(UserModelModule);
 
 import {
 	getAll as fetchAll,

@@ -2,6 +2,9 @@
   command = "npm install"
   functions = "functions"
 
+[functions]
+  node_bundler = "zisi"
+
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/api/:splat"

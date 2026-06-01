@@ -1,9 +1,12 @@
-import UserModel from "../models/UserModel.js";
+import * as UserModelModule from "../models/UserModel.js";
 import ProductModel from "../models/ProductModel.js";
 import BrandModel from "../models/BrandModel.js";
 import CategoryModel from "../models/CategoryModel.js";
 import OrderModel from "../models/OrderModel.js";
 import OrderItemsModel from "../models/OrderItemsModel.js";
+
+const resolveModuleDefault = (moduleValue) => moduleValue?.default ?? moduleValue;
+const UserModel = resolveModuleDefault(UserModelModule);
 
 // ===================================================================
 // Dashboard Aggregation
