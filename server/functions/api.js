@@ -41,6 +41,14 @@ const getRequestMethod = (event) => event?.httpMethod
 	|| event?.requestContext?.http?.method
 	|| event?.headers?.[":method"]
 	|| "";
+const isProduction = () => {
+	const nodeMode = (process.env.NODE_MODE || process.env.NODE_ENV || "").toLowerCase();
+	const deploymentContext = (process.env.CONTEXT || "").toLowerCase();
+
+	return nodeMode === "prod"
+		|| nodeMode === "production"
+		|| deploymentContext === "production";
+};
 
 export const handler = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false;
@@ -57,13 +65,16 @@ export const handler = async (event, context) => {
 		await dbConnect();
 	} catch (error) {
 		console.error("Database bootstrap failed:", error.message);
+		const responseMessage = isProduction()
+			? "Something went very wrong!"
+			: error.message || "Database connection failed";
 
 		return {
 			statusCode: 500,
 			headers: buildCorsHeaders(event),
 			body: JSON.stringify({
 				status: "error",
-				message: error.message || "Database connection failed",
+				message: responseMessage,
 			}),
 		};
 	}

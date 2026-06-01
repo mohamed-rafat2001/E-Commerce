@@ -36,6 +36,16 @@ const sendErrorDev = (error, res) => {
 	});
 };
 const sendErrorProd = (error, res) => {
+	if (error.statusCode >= 500) {
+		console.error("ERROR 💥", error);
+		res.status(error.statusCode).json({
+			status: "error",
+			message: "Something went very wrong!",
+		});
+
+		return;
+	}
+
 	// Operational, trusted error: send message to client
 	if (error.isOperational) {
 		res.status(error.statusCode).json({
@@ -52,7 +62,7 @@ const sendErrorProd = (error, res) => {
 	}
 };
 
-export default function globalError(error, req, res, _next) {
+export default function globalError(error, _req, res, _next) {
 	error.statusCode = error.statusCode || 500;
 	error.status = error.status || "error";
 
